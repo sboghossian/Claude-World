@@ -15,6 +15,10 @@ import { buildCouncilContent, loadCouncilStyles } from '../zones/council.js';
 import { Archive } from '../zones/archive.js';
 import { RndLab } from '../zones/rnd-lab.js';
 import { buildIdentityPanelContent } from '../zones/identity-panel.js';
+import { SalesDistrict } from '../zones/sales-district.js';
+import { MarketingPlaza } from '../zones/marketing-plaza.js';
+import { Exchange } from '../zones/exchange.js';
+import { Market } from '../zones/market.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -108,6 +112,34 @@ function buildZoneContent(zoneId) {
 
   if (zoneId === 'identity') {
     return buildIdentityPanelContent({ worldId: window.__claudeWorldId || 1 });
+  }
+
+  if (zoneId === 'sales') {
+    const sales = new SalesDistrict();
+    const el = sales.render();
+    sales.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'marketing') {
+    const marketing = new MarketingPlaza();
+    const el = marketing.render();
+    marketing.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'exchange') {
+    const exchange = new Exchange();
+    const el = exchange.render();
+    exchange.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'market') {
+    const market = new Market();
+    const el = market.render();
+    market.init(window.__claudeWorldId || 1);
+    return el;
   }
 
   const info = ZONE_INFO[zoneId] || { icon: '\u{1F3D7}', desc: 'Unknown zone.' };

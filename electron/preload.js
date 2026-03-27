@@ -35,6 +35,23 @@ contextBridge.exposeInMainWorld('api', {
     createMinion: (worldId, config) => ipcRenderer.invoke('db:createMinion', worldId, config),
     updateMinion: (minionId, updates) => ipcRenderer.invoke('db:updateMinion', minionId, updates),
     recordMinionRun: (minionId, worldId, runData) => ipcRenderer.invoke('db:recordMinionRun', minionId, worldId, runData),
+    // Sales District
+    getLeads: (worldId) => ipcRenderer.invoke('db:getLeads', worldId),
+    createLead: (worldId, data) => ipcRenderer.invoke('db:createLead', worldId, data),
+    updateLead: (leadId, updates) => ipcRenderer.invoke('db:updateLead', leadId, updates),
+    deleteLead: (leadId) => ipcRenderer.invoke('db:deleteLead', leadId),
+    // Marketing Plaza
+    getContentPieces: (worldId, limit) => ipcRenderer.invoke('db:getContentPieces', worldId, limit),
+    createContentPiece: (worldId, data) => ipcRenderer.invoke('db:createContentPiece', worldId, data),
+    // The Exchange
+    getIntegrations: (worldId) => ipcRenderer.invoke('db:getIntegrations', worldId),
+    createIntegration: (worldId, data) => ipcRenderer.invoke('db:createIntegration', worldId, data),
+    updateIntegration: (integrationId, updates) => ipcRenderer.invoke('db:updateIntegration', integrationId, updates),
+    getWebhookEvents: (worldId, limit) => ipcRenderer.invoke('db:getWebhookEvents', worldId, limit),
+    createWebhookEvent: (worldId, data) => ipcRenderer.invoke('db:createWebhookEvent', worldId, data),
+    // The Market
+    getMarketInstalls: (worldId) => ipcRenderer.invoke('db:getMarketInstalls', worldId),
+    installMarketItem: (worldId, catalogItemId) => ipcRenderer.invoke('db:installMarketItem', worldId, catalogItemId),
     // Identity & Reputation
     getIdentity: (worldId) => ipcRenderer.invoke('db:getIdentity', worldId),
     updateIdentity: (worldId, updates) => ipcRenderer.invoke('db:updateIdentity', worldId, updates),

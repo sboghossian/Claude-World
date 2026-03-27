@@ -1,0 +1,511 @@
+/**
+ * market.css — Styles for The Market zone panel
+ *
+ * Marketplace for skills, prompt templates, and agent configs.
+ * Orange (#f97316) accent, dark panels, product card grid with star ratings.
+ * Uses CSS variables from variables.css.
+ */
+
+/* ── Panel root ───────────────────────────────────────────────── */
+
+.market-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 4px;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+}
+
+/* ── Description ──────────────────────────────────────────────── */
+
+.market-zone__description {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding: 8px 0 4px;
+}
+
+/* ── Stats bar ────────────────────────────────────────────────── */
+
+.market-zone__stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.market-zone__stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 8px;
+  border-right: 1px solid var(--border);
+}
+
+.market-zone__stat-item:last-child {
+  border-right: none;
+}
+
+.market-zone__stat-value {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: #f97316;
+  line-height: 1;
+}
+
+.market-zone__stat-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* ── Search bar ───────────────────────────────────────────────── */
+
+.market-zone__search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.market-zone__search-icon {
+  position: absolute;
+  left: 10px;
+  font-size: 13px;
+  color: var(--text-dim);
+  pointer-events: none;
+  user-select: none;
+}
+
+.market-zone__search-input {
+  width: 100%;
+  padding: 8px 10px 8px 32px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+  box-sizing: border-box;
+}
+
+.market-zone__search-input:focus {
+  border-color: #f97316;
+}
+
+.market-zone__search-input::placeholder {
+  color: var(--text-dim);
+}
+
+/* ── Category tabs ────────────────────────────────────────────── */
+
+.market-zone__tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.market-zone__tab {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast),
+              color var(--transition-fast),
+              border-color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.market-zone__tab:hover:not(.market-zone__tab--active) {
+  background: rgba(249, 115, 22, 0.08);
+  border-color: rgba(249, 115, 22, 0.3);
+  color: var(--text-primary);
+}
+
+.market-zone__tab--active {
+  background: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.5);
+  color: #f97316;
+}
+
+/* ── Section title ────────────────────────────────────────────── */
+
+.market-zone__section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  padding: 2px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.market-zone__section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Product grid ─────────────────────────────────────────────── */
+
+.market-zone__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.market-zone__grid--featured {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* ── Product card ─────────────────────────────────────────────── */
+
+.market-zone__card {
+  position: relative;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color var(--transition-fast),
+              box-shadow var(--transition-fast),
+              transform var(--transition-fast);
+  cursor: default;
+}
+
+.market-zone__card:hover {
+  border-color: rgba(249, 115, 22, 0.3);
+  box-shadow: 0 2px 12px rgba(249, 115, 22, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Featured card variant */
+.market-zone__card--featured {
+  border-color: rgba(249, 115, 22, 0.4);
+  box-shadow: 0 0 16px rgba(249, 115, 22, 0.12),
+              inset 0 0 24px rgba(249, 115, 22, 0.04);
+}
+
+.market-zone__card--featured::before {
+  content: '⭐ Featured';
+  position: absolute;
+  top: -1px;
+  right: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #f97316;
+  background: var(--bg-secondary);
+  padding: 2px 6px;
+  border: 1px solid rgba(249, 115, 22, 0.4);
+  border-top: none;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.market-zone__card--installed {
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+/* Card header */
+.market-zone__card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.market-zone__card-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: rgba(249, 115, 22, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.market-zone__card-title-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.market-zone__card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.market-zone__card-category {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(249, 115, 22, 0.12);
+  color: #f97316;
+  align-self: flex-start;
+}
+
+/* Description */
+.market-zone__card-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Meta row: stars + installs + price */
+.market-zone__card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.market-zone__stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.market-zone__star-count {
+  color: var(--text-dim);
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.market-zone__installs {
+  font-size: 10px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.market-zone__price {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+/* Install button */
+.market-zone__install-btn {
+  width: 100%;
+  padding: 6px 10px;
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.28);
+  border-radius: var(--radius-sm);
+  color: #f97316;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background var(--transition-fast),
+              border-color var(--transition-fast),
+              opacity var(--transition-fast);
+  text-align: center;
+}
+
+.market-zone__install-btn:hover:not(:disabled) {
+  background: rgba(249, 115, 22, 0.18);
+  border-color: rgba(249, 115, 22, 0.5);
+}
+
+.market-zone__install-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.market-zone__install-btn--installed {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.28);
+  color: #22c55e;
+  cursor: default;
+}
+
+.market-zone__install-btn--installing {
+  animation: market-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes market-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+
+/* ── My Installs tab ──────────────────────────────────────────── */
+
+.market-zone__installs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.market-zone__install-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast);
+}
+
+.market-zone__install-row:hover {
+  border-color: rgba(249, 115, 22, 0.25);
+}
+
+.market-zone__install-row-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.market-zone__install-row-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.market-zone__install-row-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.market-zone__install-row-cat {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.market-zone__install-row-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  color: #22c55e;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ── Empty states ─────────────────────────────────────────────── */
+
+.market-zone__empty {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 28px 16px;
+  color: var(--text-dim);
+}
+
+.market-zone__empty-icon {
+  font-size: 30px;
+  opacity: 0.5;
+}
+
+.market-zone__empty-text {
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── Loading skeletons ────────────────────────────────────────── */
+
+.market-zone__skeleton {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.market-zone__skeleton-row {
+  height: 90px;
+  background: linear-gradient(90deg,
+    var(--bg-secondary) 25%,
+    rgba(249, 115, 22, 0.05) 50%,
+    var(--bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--radius-md);
+  animation: market-shimmer 1.4s infinite;
+}
+
+@keyframes market-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Toast ────────────────────────────────────────────────────── */
+
+.market-zone__toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 10px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid #f97316;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: var(--font-sans);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: market-toast-in 0.2s ease-out;
+}
+
+@keyframes market-toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.market-zone__toast--success { border-color: #22c55e; }
+.market-zone__toast--error   { border-color: #ef4444; }

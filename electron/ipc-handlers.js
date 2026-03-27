@@ -638,6 +638,183 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
+  // ── Sales District — Leads ────────────────────────────────────────
+
+  ipcMain.handle('db:getLeads', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM leads WHERE world_id = ? ORDER BY updated_at DESC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createLead', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.name, 'string', 'name');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO leads (world_id, name, company, email, deal_value, stage, notes) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        ).run(worldId, data.name.trim(), data.company || '', data.email || '', data.dealValue || 0, data.stage || 'prospect', data.notes || '');
+        return database.prepare('SELECT * FROM leads WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:updateLead', async (_event, leadId, updates) => {
+    assertType(leadId, 'string', 'leadId');
+    const allowed = ['name', 'company', 'email', 'deal_value', 'stage', 'notes', 'last_contact_at'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k));
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE leads SET ${sets}, updated_at = datetime('now') WHERE id = @id`).run({ ...updates, id: leadId });
+        return database.prepare('SELECT * FROM leads WHERE id = ?').get(leadId);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:deleteLead', async (_event, leadId) => {
+    assertType(leadId, 'string', 'leadId');
+    return dbCall(
+      (database) => {
+        database.prepare('DELETE FROM leads WHERE id = ?').run(leadId);
+        return { success: true };
+      },
+      { success: true }
+    );
+  });
+
+  // ── Marketing Plaza — Content Pieces ──────────────────────────────
+
+  ipcMain.handle('db:getContentPieces', async (_event, worldId, limit) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM content_pieces WHERE world_id = ? ORDER BY created_at DESC LIMIT ?'
+      ).all(worldId, limit || 50),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createContentPiece', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.title, 'string', 'title');
+    assertType(data.content, 'string', 'content');
+    const wordCount = data.content.trim().split(/\s+/).filter(Boolean).length;
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO content_pieces (world_id, content_type, title, brief, content, tone, word_count, tokens_used, cost_usd) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        ).run(worldId, data.contentType || 'blog', data.title.trim(), data.brief || '', data.content, data.tone || 'professional', wordCount, data.tokensUsed || 0, data.costUsd || 0);
+        return database.prepare('SELECT * FROM content_pieces WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  // ── The Exchange — Integrations & Webhooks ────────────────────────
+
+  ipcMain.handle('db:getIntegrations', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM integrations WHERE world_id = ? ORDER BY name ASC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createIntegration', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.name, 'string', 'name');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO integrations (world_id, name, service, endpoint_url, status) VALUES (?, ?, ?, ?, ?)'
+        ).run(worldId, data.name.trim(), data.service || 'custom', data.endpointUrl || '', data.status || 'disconnected');
+        return database.prepare('SELECT * FROM integrations WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:updateIntegration', async (_event, integrationId, updates) => {
+    assertType(integrationId, 'string', 'integrationId');
+    const allowed = ['name', 'service', 'endpoint_url', 'status', 'last_pinged_at', 'latency_ms', 'webhook_count'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k));
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE integrations SET ${sets} WHERE id = @id`).run({ ...updates, id: integrationId });
+        return database.prepare('SELECT * FROM integrations WHERE id = ?').get(integrationId);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:getWebhookEvents', async (_event, worldId, limit) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM webhook_events WHERE world_id = ? ORDER BY created_at DESC LIMIT ?'
+      ).all(worldId, limit || 50),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createWebhookEvent', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.eventType, 'string', 'eventType');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO webhook_events (world_id, integration_id, direction, event_type, payload_json, status) VALUES (?, ?, ?, ?, ?, ?)'
+        ).run(worldId, data.integrationId || null, data.direction || 'inbound', data.eventType, JSON.stringify(data.payload || {}), data.status || 'received');
+        return database.prepare('SELECT * FROM webhook_events WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  // ── The Market — Installs ─────────────────────────────────────────
+
+  ipcMain.handle('db:getMarketInstalls', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM market_installs WHERE world_id = ? ORDER BY installed_at DESC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:installMarketItem', async (_event, worldId, catalogItemId) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(catalogItemId, 'string', 'catalogItemId');
+    return dbCall(
+      (database) => {
+        try {
+          const result = database.prepare(
+            'INSERT INTO market_installs (world_id, catalog_item_id) VALUES (?, ?)'
+          ).run(worldId, catalogItemId);
+          return database.prepare('SELECT * FROM market_installs WHERE rowid = ?').get(result.lastInsertRowid);
+        } catch (err) {
+          // Unique constraint violation = already installed
+          if (err.message.includes('UNIQUE')) return { world_id: worldId, catalog_item_id: catalogItemId, already_installed: true };
+          throw err;
+        }
+      },
+      null
+    );
+  });
+
   // ── Identity & Reputation ─────────────────────────────────────────
 
   ipcMain.handle('db:getIdentity', async (_event, worldId) => {
