@@ -33,6 +33,25 @@
     import { AgentRelationshipSystem } from '../systems/agent-relationships.js';
     import { IncidentPanel } from '../ui/incident-panel.js';
 
+    // IPC-based reputation listener — awards points via window.api for DOM events
+    function initReputationListener(worldId) {
+      const POINTS = {
+        'dispatch:task-complete':   { key: 'task_complete',   pts: 5,  desc: (d) => d.description || 'Task completed' },
+        'skills-academy:create':    { key: 'skill_create',    pts: 20, desc: (d) => d.name ? `Skill "${d.name}" created` : 'Skill created' },
+        'quest:complete':           { key: 'quest_complete',  pts: 50, desc: (d) => d.title ? `Quest "${d.title}" completed` : 'Quest completed' },
+        'zone:unlock':              { key: 'zone_unlock',     pts: 30, desc: (d) => d.zoneType ? `Zone "${d.zoneType}" unlocked` : 'Zone unlocked' },
+        'minion:run-complete':      { key: 'minion_run',      pts: 3,  desc: () => 'Minion run completed' },
+        'connector-docks:api-save': { key: 'api_connect',     pts: 25, desc: (d) => d.provider ? `${d.provider} API connected` : 'API connected' },
+      };
+      for (const [eventType, cfg] of Object.entries(POINTS)) {
+        document.addEventListener(eventType, (e) => {
+          const wid = (e.detail && e.detail.worldId) || worldId;
+          if (!wid) return;
+          window.api.db.awardReputation(wid, cfg.key, cfg.pts, cfg.desc(e.detail || {})).catch(() => {});
+        });
+      }
+    }
+
     async function boot() {
       try {
         // ── 1. Start the isometric world ──────────────────────────────
@@ -148,6 +167,18 @@
         if (briefing.tryShow()) {
           console.log('[boot] Morning briefing shown');
         }
+
+        // ── 11. Reputation listener ────────────────────────────────────
+        const worldIdForRep = window.__claudeWorldId || 1;
+        initReputationListener(worldIdForRep);
+        console.log('[boot] Reputation listener started');
+
+        // ── 12. Identity panel — open on avatar-click ──────────────────
+        document.addEventListener('hud:avatar-click', () => {
+          if (typeof ui !== 'undefined' && ui?.panels) {
+            ui.panels.openZone('identity', 'Identity');
+          }
+        });
 
       } catch (err) {
         console.error('[boot] Initialization failed:', err);

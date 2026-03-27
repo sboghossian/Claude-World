@@ -638,6 +638,230 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
+  // ── Identity & Reputation ─────────────────────────────────────────
+
+  ipcMain.handle('db:getIdentity', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => {
+        let row = database.prepare('SELECT * FROM identity WHERE world_id = ? LIMIT 1').get(worldId);
+        if (!row) {
+          const result = database.prepare(
+            'INSERT INTO identity (world_id) VALUES (?)'
+          ).run(worldId);
+          row = database.prepare('SELECT * FROM identity WHERE rowid = ?').get(result.lastInsertRowid);
+        }
+        return row;
+      },
+      { world_id: worldId, display_name: 'Commander', avatar_emoji: '🧠', avatar_color: '#7c3aed', title: 'World Builder', bio: '', reputation: 0, badges_json: '[]' }
+    );
+  });
+
+  ipcMain.handle('db:updateIdentity', async (_event, worldId, updates) => {
+    assertPositiveInt(worldId, 'worldId');
+    const allowed = ['display_name', 'avatar_emoji', 'avatar_color', 'title', 'bio'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k));
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE identity SET ${sets}, updated_at = datetime('now') WHERE world_id = @worldId`).run({ ...updates, worldId });
+        return database.prepare('SELECT * FROM identity WHERE world_id = ?').get(worldId);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:awardReputation', async (_event, worldId, eventType, points, description) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(eventType, 'string', 'eventType');
+    assertType(points, 'number', 'points');
+    assertType(description, 'string', 'description');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO reputation_events (world_id, event_type, points, description) VALUES (?, ?, ?, ?)'
+        ).run(worldId, eventType, points, description);
+        database.prepare(
+          'UPDATE identity SET reputation = reputation + ?, updated_at = datetime(\'now\') WHERE world_id = ?'
+        ).run(points, worldId);
+        return database.prepare('SELECT * FROM reputation_events WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:getReputationHistory', async (_event, worldId, limit) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM reputation_events WHERE world_id = ? ORDER BY created_at DESC LIMIT ?'
+      ).all(worldId, limit || 50),
+      []
+    );
+  });
+
+  // ── Legal Tower ───────────────────────────────────────────────────
+
+  ipcMain.handle('db:getLegalDocs', async (_event, worldId, limit) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM legal_docs WHERE world_id = ? ORDER BY updated_at DESC LIMIT ?'
+      ).all(worldId, limit || 50),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createLegalDoc', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.title, 'string', 'title');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO legal_docs (world_id, title, doc_type, content, tags_json) VALUES (?, ?, ?, ?, ?)'
+        ).run(worldId, data.title.trim(), data.docType || 'contract', data.content || '', JSON.stringify(data.tags || []));
+        return database.prepare('SELECT * FROM legal_docs WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:updateLegalDoc', async (_event, docId, updates) => {
+    assertType(docId, 'string', 'docId');
+    const allowed = ['title', 'content', 'analysis', 'risk_level', 'status', 'tags_json'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k));
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE legal_docs SET ${sets}, updated_at = datetime('now') WHERE id = @id`).run({ ...updates, id: docId });
+        return database.prepare('SELECT * FROM legal_docs WHERE id = ?').get(docId);
+      },
+      null
+    );
+  });
+
+  // ── Council ───────────────────────────────────────────────────────
+
+  ipcMain.handle('db:getCouncilSessions', async (_event, worldId, limit) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM council_sessions WHERE world_id = ? ORDER BY created_at DESC LIMIT ?'
+      ).all(worldId, limit || 20),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createCouncilSession', async (_event, worldId, prompt, models) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(prompt, 'string', 'prompt');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO council_sessions (world_id, prompt, models_json) VALUES (?, ?, ?)'
+        ).run(worldId, prompt.trim(), JSON.stringify(models || []));
+        return database.prepare('SELECT * FROM council_sessions WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:saveCouncilResponse', async (_event, sessionId, data) => {
+    assertType(sessionId, 'string', 'sessionId');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO council_responses (session_id, provider, model, response, cost_usd, tokens_used, latency_ms, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        ).run(sessionId, data.provider, data.model, data.response || null, data.costUsd || 0, data.tokensUsed || 0, data.latencyMs || 0, data.status || 'completed');
+        return database.prepare('SELECT * FROM council_responses WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:getCouncilResponses', async (_event, sessionId) => {
+    assertType(sessionId, 'string', 'sessionId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM council_responses WHERE session_id = ? ORDER BY created_at ASC'
+      ).all(sessionId),
+      []
+    );
+  });
+
+  // ── Archive & Snapshots ───────────────────────────────────────────
+
+  ipcMain.handle('db:getSnapshots', async (_event, worldId, limit) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM world_snapshots WHERE world_id = ? ORDER BY created_at DESC LIMIT ?'
+      ).all(worldId, limit || 20),
+      []
+    );
+  });
+
+  ipcMain.handle('db:saveWorldSnapshot', async (_event, worldId, label) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(label, 'string', 'label');
+    return dbCall(
+      (database) => {
+        const world = database.prepare('SELECT * FROM worlds WHERE id = ?').get(worldId);
+        const taskCount = database.prepare('SELECT COUNT(*) as n FROM tasks WHERE world_id = ?').get(worldId)?.n || 0;
+        const stateJson = JSON.stringify({ world, capturedAt: new Date().toISOString() });
+        const result = database.prepare(
+          'INSERT INTO world_snapshots (world_id, label, state_json, xp_at_snapshot, task_count_at_snapshot) VALUES (?, ?, ?, ?, ?)'
+        ).run(worldId, label.trim(), stateJson, world?.xp || 0, taskCount);
+        return database.prepare('SELECT * FROM world_snapshots WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  // ── R&D Lab — Experiments ─────────────────────────────────────────
+
+  ipcMain.handle('db:getExperiments', async (_event, worldId, limit) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM experiments WHERE world_id = ? ORDER BY created_at DESC LIMIT ?'
+      ).all(worldId, limit || 30),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createExperiment', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.name, 'string', 'name');
+    assertType(data.prompt, 'string', 'prompt');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO experiments (world_id, name, description, prompt) VALUES (?, ?, ?, ?)'
+        ).run(worldId, data.name.trim(), data.description || '', data.prompt.trim());
+        return database.prepare('SELECT * FROM experiments WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:updateExperiment', async (_event, experimentId, updates) => {
+    assertType(experimentId, 'string', 'experimentId');
+    const allowed = ['name', 'description', 'prompt', 'result', 'status', 'is_promoted'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k));
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE experiments SET ${sets} WHERE id = @id`).run({ ...updates, id: experimentId });
+        return database.prepare('SELECT * FROM experiments WHERE id = ?').get(experimentId);
+      },
+      null
+    );
+  });
+
   // ── app:* handlers ────────────────────────────────────────────────
 
   ipcMain.handle('app:getVersion', async () => {

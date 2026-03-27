@@ -1,0 +1,554 @@
+/* ============================================================
+   identity-panel.css — Identity & Reputation zone styles
+   Dark theme. Purple gradient avatar. Rep bar. Badge pills.
+   ============================================================ */
+
+/* ── Root ──────────────────────────────────────────────────── */
+
+.ip-container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.ip-root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0 0 2rem;
+  color: #e2e8f0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 0.875rem;
+  background: transparent;
+}
+
+/* ── Loading ─────────────────────────────────────────────── */
+
+.ip-loading {
+  padding: 3rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+
+.ip-header {
+  padding: 1.25rem 1.5rem 0.75rem;
+}
+
+.ip-header-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Divider ─────────────────────────────────────────────── */
+
+.ip-divider {
+  border: none;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  margin: 0.5rem 1.5rem;
+}
+
+/* ── Avatar section ──────────────────────────────────────── */
+
+.ip-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+}
+
+.ip-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.25rem;
+  line-height: 1;
+  box-shadow:
+    0 0 0 3px rgba(124, 58, 237, 0.35),
+    0 4px 24px rgba(124, 58, 237, 0.45),
+    0 1px 4px rgba(0, 0, 0, 0.5);
+  cursor: default;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+}
+
+.ip-avatar:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 0 4px rgba(124, 58, 237, 0.5),
+    0 6px 32px rgba(124, 58, 237, 0.55),
+    0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.ip-display-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #f8fafc;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.ip-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ip-title-badge {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: #e9d5ff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.625rem;
+  border-radius: 99px;
+  letter-spacing: 0.02em;
+}
+
+.ip-rep-score {
+  font-size: 0.8rem;
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.ip-bio {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  text-align: center;
+  max-width: 280px;
+  line-height: 1.5;
+  cursor: text;
+  border-radius: 4px;
+  padding: 2px 4px;
+  transition: background 0.15s;
+}
+
+.ip-bio:hover {
+  background: rgba(148, 163, 184, 0.08);
+}
+
+/* ── Name editing ─────────────────────────────────────────── */
+
+.ip-name-edit-wrap {
+  display: flex;
+  gap: 0.375rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ip-name-input {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(124, 58, 237, 0.5);
+  border-radius: 6px;
+  color: #f1f5f9;
+  font-size: 0.9rem;
+  font-family: inherit;
+  padding: 0.3rem 0.6rem;
+  outline: none;
+  width: 180px;
+  transition: border-color 0.15s;
+}
+
+.ip-name-input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.25);
+}
+
+/* ── Bio editing ──────────────────────────────────────────── */
+
+.ip-bio-edit-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  width: 100%;
+  max-width: 280px;
+}
+
+.ip-bio-input {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(124, 58, 237, 0.5);
+  border-radius: 6px;
+  color: #f1f5f9;
+  font-size: 0.825rem;
+  font-family: inherit;
+  padding: 0.4rem 0.6rem;
+  outline: none;
+  resize: vertical;
+  min-height: 56px;
+  transition: border-color 0.15s;
+}
+
+.ip-bio-input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.25);
+}
+
+.ip-bio-actions {
+  display: flex;
+  gap: 0.375rem;
+  justify-content: flex-end;
+}
+
+/* ── Emoji picker ─────────────────────────────────────────── */
+
+.ip-emoji-picker,
+.ip-color-picker {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 10px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 280px;
+  animation: ip-fade-in 0.15s ease;
+}
+
+.ip-picker-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ip-emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.25rem;
+}
+
+.ip-emoji-btn {
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  font-size: 1.375rem;
+  padding: 0.25rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.12s, border-color 0.12s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ip-emoji-btn:hover {
+  background: rgba(124, 58, 237, 0.2);
+  transform: scale(1.15);
+}
+
+.ip-emoji-btn--active {
+  border-color: #7c3aed;
+  background: rgba(124, 58, 237, 0.25);
+}
+
+/* ── Color picker ─────────────────────────────────────────── */
+
+.ip-color-swatches {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ip-color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.12s;
+}
+
+.ip-color-swatch:hover {
+  transform: scale(1.2);
+}
+
+.ip-color-swatch--active {
+  border-color: #f8fafc;
+  box-shadow: 0 0 0 2px rgba(248, 250, 252, 0.4);
+}
+
+/* ── Reputation bar ──────────────────────────────────────── */
+
+.ip-rep-bar-section {
+  padding: 0.75rem 1.5rem 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.ip-rep-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.ip-rep-bar-label strong {
+  color: #c4b5fd;
+}
+
+.ip-rep-bar-outer {
+  background: rgba(148, 163, 184, 0.12);
+  border-radius: 99px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.ip-rep-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, #7c3aed, #a855f7);
+  border-radius: 99px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 4px;
+}
+
+.ip-rep-bar-maxed {
+  font-size: 0.8rem;
+  color: #fbbf24;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* ── Edit controls ───────────────────────────────────────── */
+
+.ip-edit-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  justify-content: center;
+}
+
+/* ── Badges ──────────────────────────────────────────────── */
+
+.ip-badges-section {
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.ip-section-heading {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ip-badges-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #475569;
+  font-style: italic;
+}
+
+.ip-badges-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ip-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 99px;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  color: #c4b5fd;
+  font-weight: 500;
+  transition: background 0.15s, border-color 0.15s;
+  animation: ip-fade-in 0.2s ease;
+}
+
+.ip-badge-pill:hover {
+  background: rgba(124, 58, 237, 0.28);
+  border-color: rgba(124, 58, 237, 0.55);
+}
+
+.ip-badge-icon {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.ip-badge-label {
+  white-space: nowrap;
+}
+
+/* ── Activity feed ───────────────────────────────────────── */
+
+.ip-activity-section {
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.ip-activity-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #475569;
+  font-style: italic;
+}
+
+.ip-activity-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ip-activity-item {
+  display: grid;
+  grid-template-columns: 3rem 1fr auto;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.4);
+  transition: background 0.15s;
+  animation: ip-fade-in 0.25s ease both;
+}
+
+.ip-activity-item:hover {
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.ip-activity-points {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4ade80;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ip-activity-desc {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ip-activity-time {
+  font-size: 0.7rem;
+  color: #475569;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+
+.ip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: background 0.15s, opacity 0.15s, transform 0.1s;
+  padding: 0.4rem 0.875rem;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.ip-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.ip-btn:active {
+  transform: translateY(0);
+}
+
+.ip-btn--primary {
+  background: #7c3aed;
+  color: #fff;
+}
+
+.ip-btn--primary:hover {
+  background: #6d28d9;
+}
+
+.ip-btn--secondary {
+  background: rgba(124, 58, 237, 0.15);
+  color: #c4b5fd;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+}
+
+.ip-btn--secondary:hover {
+  background: rgba(124, 58, 237, 0.28);
+  border-color: rgba(124, 58, 237, 0.55);
+}
+
+.ip-btn--ghost {
+  background: transparent;
+  color: #64748b;
+  border: 1px solid rgba(100, 116, 139, 0.25);
+}
+
+.ip-btn--ghost:hover {
+  background: rgba(100, 116, 139, 0.1);
+  color: #94a3b8;
+}
+
+.ip-btn--sm {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+}
+
+/* ── Animations ──────────────────────────────────────────── */
+
+@keyframes ip-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+
+.ip-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ip-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ip-container::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.35);
+  border-radius: 99px;
+}
+
+.ip-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 58, 237, 0.55);
+}

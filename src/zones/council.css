@@ -1,0 +1,655 @@
+/* ================================================================
+   council.css — The Council zone styles
+   Dark war-room aesthetic: deep purple/indigo chamber,
+   provider signature colors, dramatic animations.
+   ================================================================ */
+
+/* ── Root container ─────────────────────────────────────────────── */
+
+.council {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background: #0f0820;
+  min-height: 100%;
+  color: #e2d9f3;
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+
+.council__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #2d1f5e;
+}
+
+.council__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.council__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #ede9fe;
+  line-height: 1.2;
+}
+
+.council__subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #a78bfa;
+  font-style: italic;
+}
+
+.council__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.council__member-count {
+  font-size: 12px;
+  color: #7c6bab;
+  background: #1e1040;
+  border: 1px solid #2d1f5e;
+  border-radius: 20px;
+  padding: 3px 10px;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+/* ── Prompt area ────────────────────────────────────────────────── */
+
+.council__prompt-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #1a1040;
+  border: 1px solid #2d1f5e;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.council__prompt-input {
+  width: 100%;
+  background: #0f0820;
+  color: #e2d9f3;
+  border: 1px solid #3b2a70;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 90px;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.council__prompt-input::placeholder {
+  color: #4b3d7a;
+}
+
+.council__prompt-input:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px #7c3aed22;
+}
+
+/* ── Model selector ─────────────────────────────────────────────── */
+
+.council__model-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.council__model-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #0f0820;
+  border: 1px solid #3b2a70;
+  border-radius: 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+  font-size: 13px;
+  color: #c4b5fd;
+}
+
+.council__model-chip:hover:not(.council__model-chip--disabled) {
+  border-color: #7c3aed;
+  background: #1e1040;
+}
+
+.council__model-chip input[type="checkbox"] {
+  accent-color: #7c3aed;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.council__model-chip--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.council__model-icon {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.council__model-name {
+  font-weight: 500;
+}
+
+.council__model-badge {
+  font-size: 10px;
+  color: #6b5e9e;
+  border: 1px solid #3b2a70;
+  border-radius: 6px;
+  padding: 1px 5px;
+}
+
+/* ── Convene button ─────────────────────────────────────────────── */
+
+.council__convene-btn {
+  align-self: flex-end;
+  padding: 10px 22px;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 2px 12px #7c3aed44;
+  letter-spacing: 0.3px;
+}
+
+.council__convene-btn:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px #7c3aed66;
+}
+
+.council__convene-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.council__convene-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ── Response grid ──────────────────────────────────────────────── */
+
+.council__response-area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.council__response-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr; /* default; overridden inline */
+}
+
+/* ── Seat cards ─────────────────────────────────────────────────── */
+
+.council__seat-card {
+  display: flex;
+  flex-direction: column;
+  background: #1a1040;
+  border: 1px solid #2d1f5e;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 160px;
+  animation: council-scale-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transition: border-color 0.3s;
+}
+
+@keyframes council-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.council__seat-card--thinking {
+  border-color: #3b2a70;
+  /* Rotating border gradient via outline trick using pseudo */
+  position: relative;
+}
+
+.council__seat-card--thinking::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 13px;
+  background: conic-gradient(
+    from 0deg,
+    #7c3aed,
+    #4f46e5,
+    #0f0820 40%,
+    #4f46e5,
+    #7c3aed
+  );
+  z-index: 0;
+  animation: council-border-spin 2.4s linear infinite;
+}
+
+.council__seat-card--thinking::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 12px;
+  background: #1a1040;
+  z-index: 1;
+}
+
+.council__seat-card--thinking > * {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes council-border-spin {
+  to { transform: rotate(360deg); }
+}
+
+.council__seat-card--complete {
+  border-color: #3b2a70;
+  animation: council-scale-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.council__seat-card--error {
+  border-color: #6b2020;
+  background: #1a0e0e;
+}
+
+/* ── Seat header ────────────────────────────────────────────────── */
+
+.council__seat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid #2d1f5e;
+  background: #120c30;
+}
+
+.council__seat-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.council__seat-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #ede9fe;
+  flex: 1;
+}
+
+.council__seat-model {
+  font-size: 10px;
+  color: #6b5e9e;
+  background: #0f0820;
+  border: 1px solid #2d1f5e;
+  border-radius: 5px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+/* ── Thinking state ─────────────────────────────────────────────── */
+
+.council__thinking {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 18px;
+  flex: 1;
+}
+
+.council__thinking-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #3b2a70;
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: council-spin 0.9s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes council-spin {
+  to { transform: rotate(360deg); }
+}
+
+.council__thinking-label {
+  font-size: 13px;
+  color: #7c6bab;
+  animation: council-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes council-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ── Response body ──────────────────────────────────────────────── */
+
+.council__seat-body {
+  padding: 14px 16px;
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #d4cae8;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-y: auto;
+  max-height: 320px;
+  animation: council-fade-in 0.45s ease both;
+}
+
+@keyframes council-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.council__seat-body--error {
+  color: #f87171;
+  font-style: italic;
+}
+
+/* ── Seat footer ────────────────────────────────────────────────── */
+
+.council__seat-footer {
+  font-size: 11px;
+  color: #6b5e9e;
+  padding: 6px 14px 4px;
+  border-top: 1px solid #1e1040;
+}
+
+/* ── Copy button ────────────────────────────────────────────────── */
+
+.council__copy-btn {
+  align-self: flex-end;
+  margin: 0 12px 10px;
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid #3b2a70;
+  border-radius: 6px;
+  color: #9d8bd4;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.council__copy-btn:hover {
+  background: #2d1f5e;
+  color: #e2d9f3;
+}
+
+/* ── Compare section ────────────────────────────────────────────── */
+
+.council__compare-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.council__compare-toggle {
+  align-self: flex-start;
+  padding: 8px 16px;
+  background: #1e1040;
+  border: 1px solid #3b2a70;
+  border-radius: 8px;
+  color: #c4b5fd;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.council__compare-toggle:hover {
+  background: #2d1f5e;
+  border-color: #7c3aed;
+}
+
+.council__compare-table {
+  background: #1a1040;
+  border: 1px solid #2d1f5e;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.council__compare-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 0;
+}
+
+.council__compare-row + .council__compare-row {
+  border-top: 1px solid #1e1040;
+}
+
+.council__compare-row--header {
+  background: #120c30;
+}
+
+.council__compare-cell {
+  padding: 9px 14px;
+  font-size: 12px;
+  color: #9d8bd4;
+  text-align: left;
+}
+
+.council__compare-row--header .council__compare-cell {
+  font-weight: 600;
+  font-size: 11px;
+  color: #6b5e9e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.council__compare-cell--label {
+  color: #e2d9f3;
+  font-weight: 500;
+}
+
+/* Provider color accents on compare rows */
+
+/* ── History panel ──────────────────────────────────────────────── */
+
+.council__history-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid #2d1f5e;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1a1040;
+}
+
+.council__history-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  background: #120c30;
+  border: none;
+  color: #9d8bd4;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s, background 0.15s;
+  width: 100%;
+}
+
+.council__history-toggle:hover {
+  color: #c4b5fd;
+  background: #1a1040;
+}
+
+.council__history-toggle-icon {
+  font-size: 10px;
+  color: #6b5e9e;
+  transition: transform 0.2s;
+}
+
+.council__history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.council__history-empty {
+  padding: 18px 16px;
+  font-size: 12px;
+  color: #6b5e9e;
+  font-style: italic;
+  text-align: center;
+}
+
+.council__history-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 11px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-top: 1px solid #1e1040;
+}
+
+.council__history-item:first-child {
+  border-top: none;
+}
+
+.council__history-item:hover {
+  background: #1e1040;
+}
+
+.council__history-item:focus {
+  outline: 2px solid #7c3aed;
+  outline-offset: -2px;
+}
+
+.council__history-prompt {
+  font-size: 13px;
+  color: #c4b5fd;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.council__history-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.council__history-badge {
+  font-size: 10px;
+  color: #7c6bab;
+  background: #0f0820;
+  border: 1px solid #2d1f5e;
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+
+.council__history-time {
+  font-size: 11px;
+  color: #4b3d7a;
+}
+
+/* ── Provider signature color accents ───────────────────────────── */
+
+/* Claude (amber/orange) */
+.council__seat-card [data-provider="anthropic"] .council__seat-header,
+.council__seat-header:has(.council__seat-icon[style*="#d97706"]) {
+  border-bottom-color: #d9770625;
+}
+
+/* GPT-4o (green) */
+.council__seat-header:has(.council__seat-icon[style*="#10a37f"]) {
+  border-bottom-color: #10a37f25;
+}
+
+/* Gemini (blue) */
+.council__seat-header:has(.council__seat-icon[style*="#4285f4"]) {
+  border-bottom-color: #4285f425;
+}
+
+/* Mistral (grey) */
+.council__seat-header:has(.council__seat-icon[style*="#9ca3af"]) {
+  border-bottom-color: #9ca3af20;
+}
+
+/* ── Responsive adjustments ─────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .council__response-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .council__compare-row {
+    grid-template-columns: 1.4fr 0.8fr 0.8fr 0.8fr;
+  }
+
+  .council__convene-btn {
+    align-self: stretch;
+    text-align: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .council {
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .council__title {
+    font-size: 18px;
+  }
+}
+
+/* ── Scrollbar styling (Webkit) ─────────────────────────────────── */
+
+.council__seat-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.council__seat-body::-webkit-scrollbar-track {
+  background: #0f0820;
+}
+
+.council__seat-body::-webkit-scrollbar-thumb {
+  background: #3b2a70;
+  border-radius: 3px;
+}
+
+.council__seat-body::-webkit-scrollbar-thumb:hover {
+  background: #5b3e9e;
+}

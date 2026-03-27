@@ -10,6 +10,11 @@ import { buildTreasuryContent, loadTreasuryStyles } from '../zones/treasury.js';
 import { buildConnectorDocksContent, loadConnectorDocksStyles } from '../zones/connector-docks.js';
 import { ChatRooms } from '../zones/chat-rooms.js';
 import { MinionTunnels } from '../zones/minion-tunnels.js';
+import { LegalTower } from '../zones/legal-tower.js';
+import { buildCouncilContent, loadCouncilStyles } from '../zones/council.js';
+import { Archive } from '../zones/archive.js';
+import { RndLab } from '../zones/rnd-lab.js';
+import { buildIdentityPanelContent } from '../zones/identity-panel.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -73,6 +78,36 @@ function buildZoneContent(zoneId) {
     const el = minionTunnels.render();
     minionTunnels.init(window.__claudeWorldId || 1);
     return el;
+  }
+
+  if (zoneId === 'legal') {
+    const legal = new LegalTower();
+    const el = legal.render();
+    legal.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'council') {
+    loadCouncilStyles('../zones/');
+    return buildCouncilContent(window.__claudeWorldId || 1);
+  }
+
+  if (zoneId === 'archive') {
+    const archive = new Archive();
+    const el = archive.render();
+    archive.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'rnd') {
+    const rnd = new RndLab();
+    const el = rnd.render();
+    rnd.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'identity') {
+    return buildIdentityPanelContent({ worldId: window.__claudeWorldId || 1 });
   }
 
   const info = ZONE_INFO[zoneId] || { icon: '\u{1F3D7}', desc: 'Unknown zone.' };

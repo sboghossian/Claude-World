@@ -35,6 +35,27 @@ contextBridge.exposeInMainWorld('api', {
     createMinion: (worldId, config) => ipcRenderer.invoke('db:createMinion', worldId, config),
     updateMinion: (minionId, updates) => ipcRenderer.invoke('db:updateMinion', minionId, updates),
     recordMinionRun: (minionId, worldId, runData) => ipcRenderer.invoke('db:recordMinionRun', minionId, worldId, runData),
+    // Identity & Reputation
+    getIdentity: (worldId) => ipcRenderer.invoke('db:getIdentity', worldId),
+    updateIdentity: (worldId, updates) => ipcRenderer.invoke('db:updateIdentity', worldId, updates),
+    awardReputation: (worldId, eventType, points, description) => ipcRenderer.invoke('db:awardReputation', worldId, eventType, points, description),
+    getReputationHistory: (worldId, limit) => ipcRenderer.invoke('db:getReputationHistory', worldId, limit),
+    // Legal Tower
+    getLegalDocs: (worldId, limit) => ipcRenderer.invoke('db:getLegalDocs', worldId, limit),
+    createLegalDoc: (worldId, data) => ipcRenderer.invoke('db:createLegalDoc', worldId, data),
+    updateLegalDoc: (docId, updates) => ipcRenderer.invoke('db:updateLegalDoc', docId, updates),
+    // Council
+    getCouncilSessions: (worldId, limit) => ipcRenderer.invoke('db:getCouncilSessions', worldId, limit),
+    createCouncilSession: (worldId, prompt, models) => ipcRenderer.invoke('db:createCouncilSession', worldId, prompt, models),
+    saveCouncilResponse: (sessionId, data) => ipcRenderer.invoke('db:saveCouncilResponse', sessionId, data),
+    getCouncilResponses: (sessionId) => ipcRenderer.invoke('db:getCouncilResponses', sessionId),
+    // Archive & Snapshots
+    getSnapshots: (worldId, limit) => ipcRenderer.invoke('db:getSnapshots', worldId, limit),
+    saveWorldSnapshot: (worldId, label) => ipcRenderer.invoke('db:saveWorldSnapshot', worldId, label),
+    // R&D Lab
+    getExperiments: (worldId, limit) => ipcRenderer.invoke('db:getExperiments', worldId, limit),
+    createExperiment: (worldId, data) => ipcRenderer.invoke('db:createExperiment', worldId, data),
+    updateExperiment: (experimentId, updates) => ipcRenderer.invoke('db:updateExperiment', experimentId, updates),
   },
 
   // ── AI dispatch ────────────────────────────────────────────────────
