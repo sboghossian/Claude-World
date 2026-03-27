@@ -479,6 +479,165 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
+  // ── Chat (projects + messages) ────────────────────────────────────
+
+  ipcMain.handle('db:getProjects', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM projects WHERE world_id = ? ORDER BY pinned DESC, updated_at DESC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createProject', async (_event, worldId, name, icon) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(name, 'string', 'name');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO projects (world_id, name, icon) VALUES (?, ?, ?)'
+        ).run(worldId, name.trim(), icon || '💬');
+        return database.prepare('SELECT * FROM projects WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:getMessages', async (_event, projectId, limit) => {
+    assertType(projectId, 'string', 'projectId');
+    const lim = limit || 50;
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM messages WHERE project_id = ? ORDER BY created_at ASC LIMIT ?'
+      ).all(projectId, lim),
+      []
+    );
+  });
+
+  ipcMain.handle('db:saveMessage', async (_event, projectId, worldId, role, content, meta) => {
+    assertType(projectId, 'string', 'projectId');
+    assertPositiveInt(worldId, 'worldId');
+    assertType(role, 'string', 'role');
+    assertType(content, 'string', 'content');
+    const m = meta || {};
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          `INSERT INTO messages (project_id, world_id, role, content, agent_name, model, cost_usd, tokens_used)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+        ).run(projectId, worldId, role, content, m.agentName || 'Commander', m.model || null, m.costUsd || 0, m.tokensUsed || 0);
+        database.prepare(
+          "UPDATE projects SET updated_at = datetime('now') WHERE id = ?"
+        ).run(projectId);
+        return database.prepare('SELECT * FROM messages WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  // ── Incidents ─────────────────────────────────────────────────────
+
+  ipcMain.handle('db:getIncidents', async (_event, worldId, limit) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        "SELECT i.*, a.name AS reporter_name FROM incidents i LEFT JOIN agents a ON i.reporter_agent_id = a.id WHERE i.world_id = ? AND i.status != 'resolved' ORDER BY i.created_at DESC LIMIT ?"
+      ).all(worldId, limit || 20),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createIncident', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.title, 'string', 'title');
+    assertType(data.description, 'string', 'description');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO incidents (world_id, reporter_agent_id, title, description, severity, zone_id) VALUES (?, ?, ?, ?, ?, ?)'
+        ).run(worldId, data.reporterAgentId || null, data.title, data.description, data.severity || 'info', data.zoneId || null);
+        return database.prepare('SELECT * FROM incidents WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:updateIncident', async (_event, incidentId, status) => {
+    assertType(incidentId, 'string', 'incidentId');
+    assertType(status, 'string', 'status');
+    return dbCall(
+      (database) => {
+        const resolvedAt = status === 'resolved' ? "datetime('now')" : 'NULL';
+        database.prepare(
+          `UPDATE incidents SET status = ?, resolved_at = ${resolvedAt} WHERE id = ?`
+        ).run(status, incidentId);
+        return database.prepare('SELECT * FROM incidents WHERE id = ?').get(incidentId);
+      },
+      null
+    );
+  });
+
+  // ── Minions ───────────────────────────────────────────────────────
+
+  ipcMain.handle('db:getMinions', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM minions WHERE world_id = ? ORDER BY created_at ASC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createMinion', async (_event, worldId, config) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(config.name, 'string', 'name');
+    assertType(config.prompt, 'string', 'prompt');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO minions (world_id, name, description, prompt, schedule, provider) VALUES (?, ?, ?, ?, ?, ?)'
+        ).run(worldId, config.name.trim(), config.description || '', config.prompt, config.schedule || 'manual', config.provider || 'auto');
+        return database.prepare('SELECT * FROM minions WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:updateMinion', async (_event, minionId, updates) => {
+    assertType(minionId, 'string', 'minionId');
+    const allowed = ['name', 'description', 'prompt', 'schedule', 'provider', 'enabled', 'status', 'last_output', 'last_run', 'run_count'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k));
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE minions SET ${sets} WHERE id = @id`).run({ ...updates, id: minionId });
+        return database.prepare('SELECT * FROM minions WHERE id = ?').get(minionId);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:recordMinionRun', async (_event, minionId, worldId, runData) => {
+    assertType(minionId, 'string', 'minionId');
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          "INSERT INTO minion_runs (minion_id, world_id, status, output, error, cost_usd, tokens_used, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))"
+        ).run(minionId, worldId, runData.status || 'completed', runData.output || null, runData.error || null, runData.costUsd || 0, runData.tokensUsed || 0);
+        database.prepare(
+          "UPDATE minions SET run_count = run_count + 1, last_run = datetime('now'), last_output = ?, status = 'idle' WHERE id = ?"
+        ).run(runData.output?.slice(0, 500) || null, minionId);
+        return database.prepare('SELECT * FROM minion_runs WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
   // ── app:* handlers ────────────────────────────────────────────────
 
   ipcMain.handle('app:getVersion', async () => {

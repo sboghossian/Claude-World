@@ -1,0 +1,262 @@
+/* ── Incident Panel — Claude World ───────────────────────────────────── */
+
+/* Container */
+.incident-panel {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  width: min(640px, 96vw);
+  z-index: 900;
+  background: #111418;
+  border: 1px solid #2a2f3a;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.6);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #d1d5db;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  max-height: 60vh;
+  overflow: hidden;
+}
+
+.incident-panel.incident-panel--visible {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Header */
+.incident-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #2a2f3a;
+  background: #161b22;
+  border-radius: 12px 12px 0 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.incident-panel__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f0f6fc;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.incident-panel__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: #e34234;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.incident-panel__badge--zero {
+  background: #374151;
+  color: #9ca3af;
+}
+
+.incident-panel__close {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.incident-panel__close:hover {
+  color: #f0f6fc;
+  background: #2a2f3a;
+}
+
+/* Body / scroll area */
+.incident-panel__body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 8px 0;
+  scrollbar-width: thin;
+  scrollbar-color: #374151 transparent;
+}
+
+.incident-panel__body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.incident-panel__body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.incident-panel__body::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 3px;
+}
+
+/* Empty state */
+.incident-panel__empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Individual incident row */
+.incident-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #1f2430;
+  transition: background 0.12s;
+}
+
+.incident-row:last-child {
+  border-bottom: none;
+}
+
+.incident-row:hover {
+  background: #1a1f29;
+}
+
+/* Severity pill */
+.incident-row__severity {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 1px;
+  white-space: nowrap;
+}
+
+/* Critical */
+.incident-row--critical .incident-row__severity {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+/* High */
+.incident-row--high .incident-row__severity {
+  background: rgba(249, 115, 22, 0.18);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.35);
+}
+
+/* Warning */
+.incident-row--warning .incident-row__severity {
+  background: rgba(234, 179, 8, 0.18);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.35);
+}
+
+/* Info */
+.incident-row--info .incident-row__severity {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+/* Main content */
+.incident-row__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.incident-row__title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #e5e7eb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.incident-row__meta {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+/* Action button */
+.incident-row__action {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid #374151;
+  color: #9ca3af;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+  margin-top: 1px;
+}
+
+.incident-row__action:hover {
+  border-color: #6b7280;
+  color: #f0f6fc;
+  background: #1f2430;
+}
+
+/* Resolved rows are dimmed */
+.incident-row--resolved {
+  opacity: 0.45;
+}
+
+/* ── Bottom-bar toggle button (rendered outside the panel) ────────────── */
+.incident-panel-toggle {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 890;
+  background: #161b22;
+  border: 1px solid #2a2f3a;
+  color: #d1d5db;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.incident-panel-toggle:hover {
+  background: #1f2430;
+  border-color: #4b5563;
+  color: #f0f6fc;
+}
+
+/* Hide the toggle while the panel is open */
+.incident-panel--visible ~ .incident-panel-toggle {
+  opacity: 0;
+  pointer-events: none;
+}

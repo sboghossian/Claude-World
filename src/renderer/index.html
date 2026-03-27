@@ -30,6 +30,8 @@
     import { MorningBriefing } from '../systems/morning-briefing.js';
     import { OnboardingSystem } from '../systems/onboarding.js';
     import { initOnboarding } from '../ui/onboarding.js';
+    import { AgentRelationshipSystem } from '../systems/agent-relationships.js';
+    import { IncidentPanel } from '../ui/incident-panel.js';
 
     async function boot() {
       try {
@@ -125,7 +127,23 @@
           }
         });
 
-        // ── 9. Morning briefing (once per day) ───────────────────────
+        // ── 9. Agent relationships + incident panel ───────────────
+        const incidentPanel = new IncidentPanel();
+        incidentPanel.mount();
+
+        const relationships = new AgentRelationshipSystem();
+        try {
+          const world = await window.api.db.getWorld(1);
+          if (world?.id) {
+            await relationships.init(world.id);
+            window.__claudeWorldId = world.id;
+            console.log('[boot] Agent relationships loaded');
+          }
+        } catch (err) {
+          console.warn('[boot] Could not init relationships:', err.message);
+        }
+
+        // ── 10. Morning briefing (once per day) ───────────────────────
         const briefing = new MorningBriefing();
         if (briefing.tryShow()) {
           console.log('[boot] Morning briefing shown');

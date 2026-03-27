@@ -21,6 +21,20 @@ contextBridge.exposeInMainWorld('api', {
       ipcRenderer.invoke('db:updateZoneProgress', worldId, zoneType, progress),
     getZoneProgress: (worldId) => ipcRenderer.invoke('db:getZoneProgress', worldId),
     unlockZone: (worldId, zoneType) => ipcRenderer.invoke('db:unlockZone', worldId, zoneType),
+    // Chat
+    getProjects: (worldId) => ipcRenderer.invoke('db:getProjects', worldId),
+    createProject: (worldId, name, icon) => ipcRenderer.invoke('db:createProject', worldId, name, icon),
+    getMessages: (projectId, limit) => ipcRenderer.invoke('db:getMessages', projectId, limit),
+    saveMessage: (projectId, worldId, role, content, meta) => ipcRenderer.invoke('db:saveMessage', projectId, worldId, role, content, meta),
+    // Incidents
+    getIncidents: (worldId, limit) => ipcRenderer.invoke('db:getIncidents', worldId, limit),
+    createIncident: (worldId, data) => ipcRenderer.invoke('db:createIncident', worldId, data),
+    updateIncident: (incidentId, status) => ipcRenderer.invoke('db:updateIncident', incidentId, status),
+    // Minions
+    getMinions: (worldId) => ipcRenderer.invoke('db:getMinions', worldId),
+    createMinion: (worldId, config) => ipcRenderer.invoke('db:createMinion', worldId, config),
+    updateMinion: (minionId, updates) => ipcRenderer.invoke('db:updateMinion', minionId, updates),
+    recordMinionRun: (minionId, worldId, runData) => ipcRenderer.invoke('db:recordMinionRun', minionId, worldId, runData),
   },
 
   // ── AI dispatch ────────────────────────────────────────────────────

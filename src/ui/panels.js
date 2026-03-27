@@ -8,6 +8,8 @@
 
 import { buildTreasuryContent, loadTreasuryStyles } from '../zones/treasury.js';
 import { buildConnectorDocksContent, loadConnectorDocksStyles } from '../zones/connector-docks.js';
+import { ChatRooms } from '../zones/chat-rooms.js';
+import { MinionTunnels } from '../zones/minion-tunnels.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -57,6 +59,20 @@ function buildZoneContent(zoneId) {
   if (zoneId === 'docks') {
     loadConnectorDocksStyles('../zones/');
     return buildConnectorDocksContent({ worldId: window.__claudeWorldId || null });
+  }
+
+  if (zoneId === 'chat') {
+    const chatRooms = new ChatRooms();
+    const el = chatRooms.render();
+    chatRooms.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'minions') {
+    const minionTunnels = new MinionTunnels();
+    const el = minionTunnels.render();
+    minionTunnels.init(window.__claudeWorldId || 1);
+    return el;
   }
 
   const info = ZONE_INFO[zoneId] || { icon: '\u{1F3D7}', desc: 'Unknown zone.' };
