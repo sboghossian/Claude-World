@@ -132,7 +132,7 @@ claude-world/
 ### Installation
 
 ```bash
-git clone https://github.com/stephaneboghossian/claude-world.git
+git clone https://github.com/sboghossian/Claude-World.git
 cd claude-world
 npm install
 ```
@@ -211,7 +211,7 @@ Then wire it into `src/ui/panels.js` (routing), `electron/ipc-handlers.js` (IPC)
 
 **AI features** — `src/systems/dispatch.js` orchestrates AI calls. Add new tools, streaming modes, or providers.
 
-**Bug fixes** — Check [Issues](https://github.com/stephaneboghossian/claude-world/issues) for open bugs.
+**Bug fixes** — Check [Issues](https://github.com/sboghossian/Claude-World/issues) for open bugs.
 
 ### Development Guidelines
 
@@ -224,7 +224,8 @@ Then wire it into `src/ui/panels.js` (routing), `electron/ipc-handlers.js` (IPC)
 ### Pull Request Process
 
 1. Fork the repo
-2. Create a branch: `git checkout -b feature/my-zone`
+2. Create a branch: `git checkout -b feature/my-zone
+# Fork first: https://github.com/sboghossian/Claude-World/fork`
 3. Make your changes
 4. Test with `npm start`
 5. Open a PR with a screenshot or demo GIF
