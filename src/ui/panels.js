@@ -23,6 +23,7 @@ import { Airport } from '../zones/airport.js';
 import { GlobeRoom } from '../zones/globe-room.js';
 import { BroadcastTower } from '../zones/broadcast-tower.js';
 import { WorldVersions } from '../zones/world-versions.js';
+import { MissionControl } from '../zones/mission-control.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -46,6 +47,8 @@ const ZONE_INFO = {
   airport: { icon: '\u{2708}', desc: 'Import/export data and deploy agents externally.' },
   globe: { icon: '\u{1F310}', desc: 'Web browsing and real-time information access.' },
   broadcast: { icon: '\u{1F4E1}', desc: 'Publish outputs, webhooks, and notifications.' },
+  'mission-control': { icon: '\u{1F6F0}', desc: 'Real-time war room. All agents, zones, and events in one view.' },
+  mission_control: { icon: '\u{1F6F0}', desc: 'Real-time war room. All agents, zones, and events in one view.' },
 };
 
 const AGENT_INFO = {
@@ -171,6 +174,13 @@ function buildZoneContent(zoneId) {
     const versions = new WorldVersions();
     const el = versions.render();
     versions.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'mission-control' || zoneId === 'mission_control') {
+    const mc = new MissionControl();
+    const el = mc.render();
+    mc.init(window.__claudeWorldId || 1);
     return el;
   }
 

@@ -1,182 +1,194 @@
 /**
  * command-palette.js — Cmd+K command palette for Claude World
  *
- * A VS Code / Linear / Notion style command palette.
- * Opens with Cmd+K (Mac) or Ctrl+K. Also opens with "/" when not in a text input.
- * Emits custom events on the document when commands are selected.
- */
-
-// ── Zone data (imported from renderer for zone names) ───────────
-// We define a lightweight copy here to avoid circular deps with renderer.
-const ZONES = [
-  { id: 'dispatch', name: 'Dispatch Tower', active: true },
-  { id: 'brain', name: 'Brain Library', active: true },
-  { id: 'chat', name: 'Chat Rooms', active: false },
-  { id: 'memory', name: 'Memory Vault', active: true },
-  { id: 'skills', name: 'Skills Academy', active: true },
-  { id: 'minions', name: 'Minion Tunnels', active: false },
-  { id: 'treasury', name: 'Treasury', active: false },
-  { id: 'sales', name: 'Sales District', active: false },
-  { id: 'marketing', name: 'Marketing Plaza', active: false },
-  { id: 'exchange', name: 'The Exchange', active: false },
-  { id: 'market', name: 'The Market', active: false },
-  { id: 'council', name: 'The Council', active: false },
-  { id: 'rnd', name: 'R&D Lab', active: false },
-  { id: 'legal', name: 'Legal Tower', active: false },
-  { id: 'archive', name: 'The Archive', active: false },
-  { id: 'docks', name: 'Connector Docks', active: true },
-  { id: 'airport', name: 'Airport', active: false },
-  { id: 'globe', name: 'Globe Room', active: false },
-  { id: 'broadcast', name: 'Broadcast Tower', active: false },
-];
-
-const AGENTS = [
-  { id: 'commander', name: 'Commander', zone: 'dispatch' },
-  { id: 'librarian', name: 'Librarian', zone: 'brain' },
-  { id: 'archivist', name: 'Archivist', zone: 'memory' },
-  { id: 'instructor', name: 'Instructor', zone: 'skills' },
-  { id: 'dockmaster', name: 'Dockmaster', zone: 'docks' },
-];
-
-/**
- * Build the full command list.
- * @returns {CommandDef[]}
+ * The defining feature of the product. A jaw-dropping mix of Linear's command
+ * menu, Spotlight, and a sci-fi terminal. Opens with Cmd+K, closes with Escape.
  *
- * @typedef {Object} CommandDef
- * @property {string} id
- * @property {string} label
- * @property {string} category   - "Navigate" | "Agents" | "Actions" | "Quick Tasks"
- * @property {string} icon
- * @property {string} [shortcut] - Display string for keyboard shortcut
- * @property {boolean} [locked]  - If the target zone is not yet active
- * @property {string} eventName  - Custom event name to dispatch
- * @property {Object} [eventDetail] - Payload for the custom event
+ * Five result categories:
+ *   1. Navigate   — All 20 zones
+ *   2. Quick Actions — Power actions
+ *   3. Ask Claude — Freeform AI routing
+ *   4. Recent Tasks — Last 5 from DB
+ *   5. Search Tasks — Live DB search
  */
-function buildCommands() {
-  const commands = [];
 
-  // ── Navigate ────────────────────────────────────────────────────
-  for (const z of ZONES) {
-    commands.push({
-      id: `nav-${z.id}`,
-      label: `Go to ${z.name}`,
-      category: 'Navigate',
-      icon: '\u{1F3D7}',  // building construction
-      locked: !z.active,
-      eventName: 'command-palette:navigate',
-      eventDetail: { zoneId: z.id, zoneName: z.name },
-    });
-  }
+// ── Zone registry ────────────────────────────────────────────────────────────
 
-  // ── Agents ──────────────────────────────────────────────────────
-  for (const a of AGENTS) {
-    commands.push({
-      id: `agent-talk-${a.id}`,
-      label: `Talk to ${a.name}`,
-      category: 'Agents',
-      icon: '\u{1F4AC}',  // speech bubble
-      eventName: 'command-palette:agent',
-      eventDetail: { agentId: a.id, action: 'talk' },
-    });
-    commands.push({
-      id: `agent-follow-${a.id}`,
-      label: `Follow ${a.name}`,
-      category: 'Agents',
-      icon: '\u{1F440}',  // eyes
-      eventName: 'command-palette:agent',
-      eventDetail: { agentId: a.id, action: 'follow' },
-    });
-  }
+const ZONES = [
+  { id: 'dispatch',   name: 'Dispatch Tower',   emoji: '🗼', active: true  },
+  { id: 'brain',      name: 'Brain Library',     emoji: '🧠', active: true  },
+  { id: 'chat',       name: 'Chat Rooms',         emoji: '💬', active: false },
+  { id: 'memory',     name: 'Memory Vault',       emoji: '🔒', active: true  },
+  { id: 'skills',     name: 'Skills Academy',     emoji: '🎓', active: true  },
+  { id: 'minions',    name: 'Minion Tunnels',     emoji: '🤖', active: false },
+  { id: 'treasury',   name: 'Treasury',           emoji: '💰', active: false },
+  { id: 'sales',      name: 'Sales District',     emoji: '📈', active: false },
+  { id: 'marketing',  name: 'Marketing Plaza',    emoji: '📣', active: false },
+  { id: 'exchange',   name: 'The Exchange',       emoji: '🔄', active: false },
+  { id: 'market',     name: 'The Market',         emoji: '🏪', active: false },
+  { id: 'council',    name: 'The Council',        emoji: '🏛️', active: false },
+  { id: 'rnd',        name: 'R&D Lab',            emoji: '🔬', active: false },
+  { id: 'legal',      name: 'Legal Tower',        emoji: '⚖️', active: false },
+  { id: 'archive',    name: 'The Archive',        emoji: '📚', active: false },
+  { id: 'docks',      name: 'Connector Docks',    emoji: '⚓', active: true  },
+  { id: 'airport',    name: 'Airport',            emoji: '✈️', active: false },
+  { id: 'globe',      name: 'Globe Room',         emoji: '🌐', active: false },
+  { id: 'broadcast',  name: 'Broadcast Tower',    emoji: '📡', active: false },
+  { id: 'missionctl', name: 'Mission Control',    emoji: '🎛️', active: false },
+];
 
-  // ── Actions ─────────────────────────────────────────────────────
-  commands.push(
-    {
-      id: 'action-new-task',
-      label: 'New Task',
-      category: 'Actions',
-      icon: '\u{2795}',
-      shortcut: '\u2318N',
-      eventName: 'command-palette:action',
-      eventDetail: { action: 'new-task' },
-    },
-    {
-      id: 'action-new-skill',
-      label: 'New Skill',
-      category: 'Actions',
-      icon: '\u{1F9E0}',
-      eventName: 'command-palette:action',
-      eventDetail: { action: 'new-skill' },
-    },
-    {
-      id: 'action-add-api-key',
-      label: 'Add API Key',
-      category: 'Actions',
-      icon: '\u{1F511}',
-      eventName: 'command-palette:action',
-      eventDetail: { action: 'add-api-key' },
-    },
-    {
-      id: 'action-snapshot',
-      label: 'Take Snapshot',
-      category: 'Actions',
-      icon: '\u{1F4F8}',
-      eventName: 'command-palette:action',
-      eventDetail: { action: 'snapshot' },
-    },
-    {
-      id: 'action-settings',
-      label: 'Open Settings',
-      category: 'Actions',
-      icon: '\u{2699}\uFE0F',
-      shortcut: '\u2318,',
-      eventName: 'command-palette:action',
-      eventDetail: { action: 'settings' },
-    },
-  );
+// ── Quick Actions registry ────────────────────────────────────────────────────
 
-  // ── Quick Tasks ─────────────────────────────────────────────────
-  commands.push(
-    {
-      id: 'quick-ask',
-      label: 'Ask Claude...',
-      category: 'Quick Tasks',
-      icon: '\u{1F4A1}',
-      eventName: 'command-palette:quick',
-      eventDetail: { task: 'ask-claude' },
+const QUICK_ACTIONS = [
+  {
+    id: 'qa-new-chat',
+    label: 'New chat',
+    subtitle: 'Open Chat Rooms and start a conversation',
+    icon: '💬',
+    shortcut: '↵ Open',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:navigate', {
+        detail: { zoneId: 'chat', zoneName: 'Chat Rooms' }, bubbles: true,
+      }));
     },
-    {
-      id: 'quick-compare',
-      label: 'Compare Models...',
-      category: 'Quick Tasks',
-      icon: '\u{1F504}',
-      eventName: 'command-palette:quick',
-      eventDetail: { task: 'compare-models' },
+  },
+  {
+    id: 'qa-cold-email',
+    label: 'Write cold email',
+    subtitle: 'Open Sales District in outreach mode',
+    icon: '✉️',
+    shortcut: '↵ Open',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:navigate', {
+        detail: { zoneId: 'sales', zoneName: 'Sales District', mode: 'outreach' }, bubbles: true,
+      }));
     },
-    {
-      id: 'quick-search',
-      label: 'Search Archive...',
-      category: 'Quick Tasks',
-      icon: '\u{1F50D}',
-      eventName: 'command-palette:quick',
-      eventDetail: { task: 'search-archive' },
+  },
+  {
+    id: 'qa-research',
+    label: 'Research topic',
+    subtitle: 'Open Globe Room for deep research',
+    icon: '🔍',
+    shortcut: '↵ Open',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:navigate', {
+        detail: { zoneId: 'globe', zoneName: 'Globe Room' }, bubbles: true,
+      }));
     },
-  );
+  },
+  {
+    id: 'qa-run-minions',
+    label: 'Run all minions',
+    subtitle: 'Trigger all currently enabled minions',
+    icon: '⚡',
+    shortcut: '↵ Run',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:action', {
+        detail: { action: 'run-all-minions' }, bubbles: true,
+      }));
+    },
+  },
+  {
+    id: 'qa-snapshot',
+    label: 'Save world snapshot',
+    subtitle: 'Snapshot with timestamp label',
+    icon: '📸',
+    shortcut: '↵ Save',
+    action: () => {
+      const label = `snapshot-${new Date().toISOString().slice(0, 19).replace('T', '_')}`;
+      document.dispatchEvent(new CustomEvent('command-palette:action', {
+        detail: { action: 'snapshot', label }, bubbles: true,
+      }));
+    },
+  },
+  {
+    id: 'qa-mission-ctrl',
+    label: 'Open command center',
+    subtitle: 'Open Mission Control',
+    icon: '🎛️',
+    shortcut: '↵ Open',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:navigate', {
+        detail: { zoneId: 'missionctl', zoneName: 'Mission Control' }, bubbles: true,
+      }));
+    },
+  },
+  {
+    id: 'qa-morning-brief',
+    label: 'Generate morning brief',
+    subtitle: 'Trigger the morning briefing agent',
+    icon: '☀️',
+    shortcut: '↵ Run',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:action', {
+        detail: { action: 'morning-brief' }, bubbles: true,
+      }));
+    },
+  },
+  {
+    id: 'qa-day-night',
+    label: 'Toggle day/night',
+    subtitle: 'Switch between day and night mode',
+    icon: '🌙',
+    shortcut: '↵ Toggle',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:toggle-day-night', {
+        bubbles: true,
+      }));
+    },
+  },
+];
 
-  return commands;
+// ── URL detector ──────────────────────────────────────────────────────────────
+
+function isURL(str) {
+  return /^(https?:\/\/|www\.)[^\s]{2,}/.test(str.trim());
 }
 
+// ── AI intent detector ────────────────────────────────────────────────────────
 
-// ── Fuzzy matcher ───────────────────────────────────────────────
+const QUESTION_WORDS = new Set([
+  'what', 'how', 'why', 'who', 'when', 'where', 'can', 'does', 'is',
+  'will', 'should', 'could', 'would', 'which', 'whose', 'whom',
+]);
+
+const ACTION_VERBS = new Set([
+  'write', 'draft', 'analyze', 'analyse', 'research', 'find', 'create',
+  'generate', 'summarize', 'summarise', 'explain', 'compare', 'list',
+  'help', 'make', 'build', 'suggest', 'improve', 'fix', 'edit', 'translate',
+  'describe', 'outline', 'plan', 'schedule', 'send', 'check', 'review',
+]);
+
+function shouldPrioritizeAI(query) {
+  if (!query || query.length < 3) return false;
+  const words = query.trim().toLowerCase().split(/\s+/);
+  if (QUESTION_WORDS.has(words[0])) return true;
+  for (const w of words) {
+    if (ACTION_VERBS.has(w)) return true;
+  }
+  return false;
+}
+
+// ── Special command detector ──────────────────────────────────────────────────
+
+function detectSpecialCommand(query) {
+  const q = query.trim().toLowerCase();
+  if (q === '/snapshot' || q === '/snap') return 'snapshot';
+  if (q === '/theme')                     return 'theme';
+  if (q === '/help')                      return 'help';
+  if (q === '/clear')                     return 'clear';
+  return null;
+}
+
+// ── Fuzzy matcher ─────────────────────────────────────────────────────────────
 
 /**
  * Score a candidate string against a query.
- * Returns -1 if no match, otherwise a score (higher = better).
- * Also returns the matched character indices for highlighting.
+ * Returns null if no match, otherwise { score, indices }.
+ * Scoring tiers: exact prefix (100+) > word start (80+) > word body (70+) > fuzzy (30+)
  *
- * Scoring: exact prefix > word start > fuzzy match
- *
- * @param {string} query - Lowercased query
- * @param {string} candidate - The string to match against
+ * @param {string} query     - Lowercased search query
+ * @param {string} candidate - String to match against
  * @returns {{ score: number, indices: number[] } | null}
  */
 function fuzzyMatch(query, candidate) {
@@ -184,53 +196,56 @@ function fuzzyMatch(query, candidate) {
 
   const lower = candidate.toLowerCase();
 
-  // Exact prefix match — highest score
+  // Exact prefix
   if (lower.startsWith(query)) {
-    const indices = [];
-    for (let i = 0; i < query.length; i++) indices.push(i);
-    return { score: 100 + query.length, indices };
+    return { score: 100 + query.length, indices: Array.from({ length: query.length }, (_, i) => i) };
   }
 
-  // Word start match — check if query chars match word starts
-  const words = lower.split(/[\s\-]/);
-  let wordAbbrev = '';
-  const wordStartIndices = [];
-  let pos = 0;
-  for (const w of words) {
-    const idx = lower.indexOf(w, pos);
-    if (w.length > 0) {
-      wordAbbrev += w[0];
-      wordStartIndices.push(idx);
+  // Substring match (anywhere)
+  const subIdx = lower.indexOf(query);
+  if (subIdx !== -1) {
+    return { score: 85 + query.length - subIdx * 0.1, indices: Array.from({ length: query.length }, (_, i) => subIdx + i) };
+  }
+
+  // Word start abbreviation match
+  const words = [];
+  const wordStarts = [];
+  let inWord = false;
+  for (let i = 0; i < lower.length; i++) {
+    const ch = lower[i];
+    const isBoundary = /[\s\-_/]/.test(ch);
+    if (!inWord && !isBoundary) {
+      words.push('');
+      wordStarts.push(i);
+      inWord = true;
     }
-    pos = idx + w.length + 1;
+    if (!isBoundary) words[words.length - 1] += ch;
+    else inWord = false;
   }
 
-  if (wordAbbrev.startsWith(query)) {
-    return { score: 80 + query.length, indices: wordStartIndices.slice(0, query.length) };
+  let abbrev = '';
+  for (const w of words) abbrev += w[0] || '';
+
+  if (abbrev.startsWith(query)) {
+    return { score: 80 + query.length, indices: wordStarts.slice(0, query.length) };
   }
 
-  // Check if each word starts with the query (for single-word queries)
+  // Word body match
   for (let wi = 0; wi < words.length; wi++) {
     if (words[wi].startsWith(query)) {
-      const startIdx = lower.indexOf(words[wi]);
-      const indices = [];
-      for (let i = 0; i < query.length; i++) indices.push(startIdx + i);
-      return { score: 70 + query.length, indices };
+      const start = wordStarts[wi];
+      return { score: 70 + query.length, indices: Array.from({ length: query.length }, (_, i) => start + i) };
     }
   }
 
-  // General fuzzy: all query chars appear in order
+  // General fuzzy: all chars in order
   const indices = [];
   let qi = 0;
   for (let i = 0; i < lower.length && qi < query.length; i++) {
-    if (lower[i] === query[qi]) {
-      indices.push(i);
-      qi++;
-    }
+    if (lower[i] === query[qi]) { indices.push(i); qi++; }
   }
 
   if (qi === query.length) {
-    // Bonus for consecutive matches and early matches
     let consecutiveBonus = 0;
     for (let i = 1; i < indices.length; i++) {
       if (indices[i] === indices[i - 1] + 1) consecutiveBonus += 5;
@@ -242,19 +257,27 @@ function fuzzyMatch(query, candidate) {
   return null;
 }
 
+// ── HTML helpers ──────────────────────────────────────────────────────────────
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 /**
- * Highlight matched characters in a label.
+ * Wrap matched characters in <mark> tags for highlighting.
  * @param {string} label
  * @param {number[]} indices
- * @returns {string} HTML with <mark> around matched chars
+ * @returns {string} HTML string
  */
 function highlightMatch(label, indices) {
   if (!indices || indices.length === 0) return escapeHtml(label);
-
   const set = new Set(indices);
   let html = '';
   let inMark = false;
-
   for (let i = 0; i < label.length; i++) {
     const ch = escapeHtml(label[i]);
     if (set.has(i)) {
@@ -269,286 +292,779 @@ function highlightMatch(label, indices) {
   return html;
 }
 
-function escapeHtml(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
+// ── Inline SVG icons ──────────────────────────────────────────────────────────
 
+const SVG = {
+  search: `<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="8.5" cy="8.5" r="5.5"/>
+    <line x1="12.5" y1="12.5" x2="17" y2="17"/>
+  </svg>`,
 
-// ── SVG icons (inline, no dependencies) ─────────────────────────
-const SEARCH_ICON_SVG = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-  <circle cx="8.5" cy="8.5" r="5.5"/>
-  <line x1="12.5" y1="12.5" x2="17" y2="17"/>
-</svg>`;
+  spinner: `<svg class="cp-spinner" width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="10" stroke-linecap="round"/>
+  </svg>`,
 
+  globe: `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+    <circle cx="8" cy="8" r="6"/>
+    <path d="M8 2c-2 2-2 8 0 12M8 2c2 2 2 8 0 12M2 8h12"/>
+  </svg>`,
 
-// ── CommandPalette class ────────────────────────────────────────
+  enter: `<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 2v4H2M2 6l3-3M2 6l3 3"/>
+  </svg>`,
+};
+
+// ── Result type definitions ───────────────────────────────────────────────────
+
+/**
+ * @typedef {Object} ResultItem
+ * @property {string} id
+ * @property {string} category      — "Navigate" | "Quick Actions" | "Ask Claude" | "Recent Tasks" | "Search Tasks"
+ * @property {string} icon
+ * @property {string} label
+ * @property {string} [subtitle]
+ * @property {string} [shortcutBadge]
+ * @property {boolean} [locked]
+ * @property {number} [matchScore]
+ * @property {number[]} [matchIndices]
+ * @property {Function} execute     — Called when user selects this result
+ */
+
+// ── CommandPalette ────────────────────────────────────────────────────────────
 
 export class CommandPalette {
   constructor() {
-    /** @type {CommandDef[]} */
-    this._commands = buildCommands();
-    /** @type {CommandDef[]} */
-    this._filtered = [];
+    /** @type {ResultItem[]} */
+    this._results = [];
     /** @type {number} */
     this._selectedIndex = 0;
     /** @type {boolean} */
     this._isOpen = false;
+    /** @type {number | null} */
+    this._searchDebounceTimer = null;
+    /** @type {boolean} */
+    this._isSearching = false;
+    /** @type {string} */
+    this._lastQuery = '';
+    /** @type {string | null} */
+    this._worldId = null;
 
     this._createDOM();
-    this._bindEvents();
+    this._bindGlobalKeys();
+    this._bindPaletteEvents();
   }
 
-  // ── DOM creation ────────────────────────────────────────────────
+  // ── DOM Creation ─────────────────────────────────────────────────────────────
 
   _createDOM() {
-    // Backdrop
+    // Full-screen backdrop
     this._backdrop = document.createElement('div');
-    this._backdrop.className = 'command-palette-backdrop';
+    this._backdrop.className = 'cp-backdrop';
     this._backdrop.setAttribute('role', 'dialog');
     this._backdrop.setAttribute('aria-modal', 'true');
     this._backdrop.setAttribute('aria-label', 'Command palette');
 
-    // Palette container
-    this._palette = document.createElement('div');
-    this._palette.className = 'command-palette';
+    // Centered modal
+    this._modal = document.createElement('div');
+    this._modal.className = 'cp-modal';
 
-    // Input area
-    const inputWrap = document.createElement('div');
-    inputWrap.className = 'command-palette__input-wrap';
+    // ── Input area
+    const inputArea = document.createElement('div');
+    inputArea.className = 'cp-input-area';
 
-    const iconEl = document.createElement('span');
-    iconEl.className = 'command-palette__icon';
-    iconEl.innerHTML = SEARCH_ICON_SVG;
-    inputWrap.appendChild(iconEl);
+    this._searchIcon = document.createElement('span');
+    this._searchIcon.className = 'cp-search-icon';
+    this._searchIcon.innerHTML = SVG.search;
+    inputArea.appendChild(this._searchIcon);
 
     this._input = document.createElement('input');
-    this._input.className = 'command-palette__input';
+    this._input.className = 'cp-input';
     this._input.type = 'text';
-    this._input.placeholder = 'Type a command...';
-    this._input.setAttribute('aria-label', 'Search commands');
+    this._input.placeholder = 'Search your world...';
+    this._input.setAttribute('aria-label', 'Search commands and tasks');
     this._input.setAttribute('autocomplete', 'off');
     this._input.setAttribute('spellcheck', 'false');
-    inputWrap.appendChild(this._input);
+    this._input.setAttribute('autocorrect', 'off');
+    this._input.setAttribute('autocapitalize', 'off');
+    inputArea.appendChild(this._input);
 
-    this._palette.appendChild(inputWrap);
+    this._spinnerEl = document.createElement('span');
+    this._spinnerEl.className = 'cp-spinner-wrap';
+    this._spinnerEl.innerHTML = SVG.spinner;
+    this._spinnerEl.style.display = 'none';
+    inputArea.appendChild(this._spinnerEl);
 
-    // Results
-    this._resultsList = document.createElement('div');
-    this._resultsList.className = 'command-palette__results';
-    this._resultsList.setAttribute('role', 'listbox');
-    this._palette.appendChild(this._resultsList);
+    // Special command badge (shown when "/" commands are typed)
+    this._commandBadge = document.createElement('span');
+    this._commandBadge.className = 'cp-command-badge';
+    this._commandBadge.style.display = 'none';
+    inputArea.appendChild(this._commandBadge);
 
-    // Footer
+    this._modal.appendChild(inputArea);
+
+    // ── Results container
+    this._resultsEl = document.createElement('div');
+    this._resultsEl.className = 'cp-results';
+    this._resultsEl.setAttribute('role', 'listbox');
+    this._modal.appendChild(this._resultsEl);
+
+    // ── Footer
     const footer = document.createElement('div');
-    footer.className = 'command-palette__footer';
+    footer.className = 'cp-footer';
     footer.innerHTML = `
-      <span class="command-palette__hint"><kbd>\u2191\u2193</kbd> navigate</span>
-      <span class="command-palette__hint"><kbd>\u21B5</kbd> select</span>
-      <span class="command-palette__hint"><kbd>esc</kbd> close</span>
+      <div class="cp-footer-hints">
+        <span class="cp-hint"><kbd>↑↓</kbd> navigate</span>
+        <span class="cp-hint"><kbd>↵</kbd> select</span>
+        <span class="cp-hint"><kbd>esc</kbd> close</span>
+      </div>
+      <div class="cp-footer-brand">
+        <span class="cp-footer-dot"></span>
+        Claude World
+      </div>
     `;
-    this._palette.appendChild(footer);
+    this._modal.appendChild(footer);
 
-    this._backdrop.appendChild(this._palette);
+    this._backdrop.appendChild(this._modal);
     document.body.appendChild(this._backdrop);
+
+    // ── Empty state (rendered once, shown/hidden)
+    this._emptyEl = document.createElement('div');
+    this._emptyEl.className = 'cp-empty';
+    this._emptyEl.innerHTML = `
+      <div class="cp-empty-cursor-wrap">
+        <span class="cp-empty-text">Start typing to search your world</span><span class="cp-empty-cursor">_</span>
+      </div>
+      <div class="cp-empty-hints">
+        <span class="cp-empty-hint"><kbd>/snapshot</kbd> save world</span>
+        <span class="cp-empty-hint"><kbd>/theme</kbd> change theme</span>
+        <span class="cp-empty-hint"><kbd>/help</kbd> keyboard shortcuts</span>
+      </div>
+    `;
   }
 
-  // ── Events ──────────────────────────────────────────────────────
+  // ── Global keyboard binding ──────────────────────────────────────────────────
 
-  _bindEvents() {
-    // Input typing
-    this._input.addEventListener('input', () => {
-      this._filter();
-      this._render();
-    });
+  _bindGlobalKeys() {
+    document.addEventListener('keydown', (e) => {
+      const isMac = navigator.platform.includes('Mac');
+      const modKey = isMac ? e.metaKey : e.ctrlKey;
 
-    // Keyboard navigation within palette
-    this._input.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowDown') {
+      if (modKey && e.key === 'k') {
         e.preventDefault();
-        this._moveSelection(1);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        this._moveSelection(-1);
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        this._executeSelected();
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        this.close();
+        this.toggle();
+        return;
       }
-    });
 
-    // Click outside to close
-    this._backdrop.addEventListener('mousedown', (e) => {
-      if (e.target === this._backdrop) {
-        this.close();
-      }
-    });
-  }
-
-  // ── Filtering ───────────────────────────────────────────────────
-
-  _filter() {
-    const query = this._input.value.trim().toLowerCase();
-
-    if (!query) {
-      // Show all commands, no scoring needed
-      this._filtered = this._commands.map(cmd => ({ ...cmd, matchIndices: [], matchScore: 1 }));
-    } else {
-      this._filtered = [];
-      for (const cmd of this._commands) {
-        const result = fuzzyMatch(query, cmd.label);
-        if (result) {
-          this._filtered.push({ ...cmd, matchIndices: result.indices, matchScore: result.score });
+      // Open with "/" when not focused in a text field
+      if (e.key === '/' && !this._isOpen) {
+        const active = document.activeElement;
+        const isTextField = active && (
+          active.tagName === 'INPUT' ||
+          active.tagName === 'TEXTAREA' ||
+          active.isContentEditable
+        );
+        if (!isTextField) {
+          e.preventDefault();
+          this.open();
         }
       }
-      // Sort by score descending
-      this._filtered.sort((a, b) => b.matchScore - a.matchScore);
-    }
-
-    this._selectedIndex = 0;
+    });
   }
 
-  // ── Rendering ───────────────────────────────────────────────────
+  // ── Palette event binding ─────────────────────────────────────────────────────
 
-  _render() {
-    this._resultsList.innerHTML = '';
+  _bindPaletteEvents() {
+    // Input typing
+    this._input.addEventListener('input', () => {
+      this._onInput();
+    });
 
-    if (this._filtered.length === 0) {
-      const empty = document.createElement('div');
-      empty.className = 'command-palette__empty';
-      empty.textContent = 'No matching commands';
-      this._resultsList.appendChild(empty);
+    // Keyboard navigation
+    this._input.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          this._moveSelection(1);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          this._moveSelection(-1);
+          break;
+        case 'Enter':
+          e.preventDefault();
+          this._executeSelected();
+          break;
+        case 'Escape':
+          e.preventDefault();
+          this.close();
+          break;
+        case 'Tab':
+          e.preventDefault();
+          this._moveSelection(e.shiftKey ? -1 : 1);
+          break;
+      }
+    });
+
+    // Backdrop click to dismiss
+    this._backdrop.addEventListener('mousedown', (e) => {
+      if (e.target === this._backdrop) this.close();
+    });
+  }
+
+  // ── Input handler ──────────────────────────────────────────────────────────────
+
+  _onInput() {
+    const raw = this._input.value;
+    const query = raw.trim();
+
+    // Detect special /commands
+    const special = detectSpecialCommand(query);
+    if (special) {
+      this._showSpecialCommand(special, query);
+      return;
+    }
+    this._commandBadge.style.display = 'none';
+
+    // URL detection
+    if (isURL(query)) {
+      this._showURLResult(query);
       return;
     }
 
-    let lastCategory = '';
+    // Clear debounce timer for DB search
+    if (this._searchDebounceTimer) {
+      clearTimeout(this._searchDebounceTimer);
+      this._searchDebounceTimer = null;
+    }
 
-    for (let i = 0; i < this._filtered.length; i++) {
-      const cmd = this._filtered[i];
+    this._buildSyncResults(query);
+    this._render();
 
-      // Category divider (only when showing all — when filtered, show inline)
-      if (!this._input.value.trim() && cmd.category !== lastCategory) {
-        const catEl = document.createElement('div');
-        catEl.className = 'command-palette__category';
-        catEl.textContent = cmd.category;
-        this._resultsList.appendChild(catEl);
-        lastCategory = cmd.category;
-      }
-
-      const row = document.createElement('div');
-      row.className = 'command-palette__row';
-      row.setAttribute('role', 'option');
-      row.setAttribute('aria-selected', i === this._selectedIndex ? 'true' : 'false');
-
-      if (i === this._selectedIndex) row.classList.add('selected');
-      if (cmd.locked) row.classList.add('locked');
-
-      // Category label (inline when searching)
-      if (this._input.value.trim()) {
-        const catSpan = document.createElement('span');
-        catSpan.className = 'command-palette__row-category';
-        catSpan.textContent = cmd.category;
-        row.appendChild(catSpan);
-      }
-
-      // Icon
-      const iconSpan = document.createElement('span');
-      iconSpan.className = 'command-palette__row-icon';
-      iconSpan.textContent = cmd.icon;
-      row.appendChild(iconSpan);
-
-      // Label (with highlight)
-      const labelSpan = document.createElement('span');
-      labelSpan.className = 'command-palette__row-label';
-      labelSpan.innerHTML = highlightMatch(cmd.label, cmd.matchIndices);
-      row.appendChild(labelSpan);
-
-      // Shortcut badge
-      if (cmd.shortcut) {
-        const shortcutSpan = document.createElement('span');
-        shortcutSpan.className = 'command-palette__row-shortcut';
-        shortcutSpan.textContent = cmd.shortcut;
-        row.appendChild(shortcutSpan);
-      }
-
-      // Locked indicator
-      if (cmd.locked) {
-        const lockSpan = document.createElement('span');
-        lockSpan.className = 'command-palette__row-shortcut';
-        lockSpan.textContent = 'locked';
-        row.appendChild(lockSpan);
-      }
-
-      // Click handler
-      row.addEventListener('click', () => {
-        this._selectedIndex = i;
-        this._executeSelected();
-      });
-
-      // Hover to select
-      row.addEventListener('mouseenter', () => {
-        this._selectedIndex = i;
-        this._updateSelection();
-      });
-
-      this._resultsList.appendChild(row);
+    // Kick off async DB search with debounce
+    if (query.length >= 2) {
+      this._setSearching(true);
+      this._searchDebounceTimer = setTimeout(() => {
+        this._runAsyncSearch(query);
+      }, 150);
+    } else {
+      this._setSearching(false);
     }
   }
 
-  // ── Selection navigation ────────────────────────────────────────
+  // ── Special command handler ────────────────────────────────────────────────────
 
-  _moveSelection(delta) {
-    // Skip locked items
-    let next = this._selectedIndex + delta;
-    const len = this._filtered.length;
-    if (len === 0) return;
+  _showSpecialCommand(type, query) {
+    this._commandBadge.style.display = 'flex';
 
-    // Wrap around
-    next = ((next % len) + len) % len;
+    const labels = {
+      snapshot: '📸 Save Snapshot',
+      theme:    '🎨 Open Theme Picker',
+      help:     '⌨️ Keyboard Shortcuts',
+      clear:    '🗑️ Clear Recent Tasks',
+    };
+    this._commandBadge.textContent = labels[type] || query;
 
-    // Try to skip locked items (up to full loop)
-    let attempts = 0;
-    while (this._filtered[next].locked && attempts < len) {
-      next = ((next + delta) % len + len) % len;
-      attempts++;
-    }
+    this._results = [{
+      id: `special-${type}`,
+      category: 'Quick Actions',
+      icon: labels[type]?.slice(0, 2) || '⚡',
+      label: labels[type]?.slice(3) || query,
+      subtitle: 'Special command',
+      shortcutBadge: '↵ Run',
+      execute: () => this._executeSpecialCommand(type),
+    }];
 
-    this._selectedIndex = next;
-    this._updateSelection();
+    this._selectedIndex = 0;
+    this._render();
   }
 
-  _updateSelection() {
-    const rows = this._resultsList.querySelectorAll('.command-palette__row');
+  _executeSpecialCommand(type) {
+    switch (type) {
+      case 'snapshot': {
+        const label = `snapshot-${new Date().toISOString().slice(0, 19).replace('T', '_')}`;
+        document.dispatchEvent(new CustomEvent('command-palette:action', {
+          detail: { action: 'snapshot', label }, bubbles: true,
+        }));
+        break;
+      }
+      case 'theme':
+        document.dispatchEvent(new CustomEvent('command-palette:open-theme-picker', { bubbles: true }));
+        break;
+      case 'help':
+        document.dispatchEvent(new CustomEvent('command-palette:show-help', { bubbles: true }));
+        break;
+      case 'clear':
+        document.dispatchEvent(new CustomEvent('command-palette:clear-tasks', { bubbles: true }));
+        break;
+    }
+  }
+
+  // ── URL result ────────────────────────────────────────────────────────────────
+
+  _showURLResult(url) {
+    this._commandBadge.style.display = 'none';
+    this._results = [{
+      id: 'open-url',
+      category: 'Quick Actions',
+      icon: '🌐',
+      label: `Open in Globe Room`,
+      subtitle: url,
+      shortcutBadge: '↵ Open',
+      execute: () => {
+        document.dispatchEvent(new CustomEvent('command-palette:navigate', {
+          detail: { zoneId: 'globe', zoneName: 'Globe Room', url }, bubbles: true,
+        }));
+      },
+    }];
+    this._selectedIndex = 0;
+    this._render();
+  }
+
+  // ── Sync result builder ────────────────────────────────────────────────────────
+
+  _buildSyncResults(query) {
+    const q = query.toLowerCase();
+    const results = [];
+
+    const prioritizeAI = shouldPrioritizeAI(query);
+
+    // ── Ask Claude result (appears at top when AI-intent detected, or always present when query exists)
+    if (query.length >= 2) {
+      const askResult = {
+        id: 'ask-claude',
+        category: 'Ask Claude',
+        icon: '✨',
+        label: `Ask Claude: ${query}`,
+        subtitle: 'Open Chat Rooms and pre-fill your query',
+        shortcutBadge: '↵ Ask',
+        _queryCapture: query,
+        execute: () => {
+          const capturedQuery = query;
+          document.dispatchEvent(new CustomEvent('command-palette:navigate', {
+            detail: { zoneId: 'chat', zoneName: 'Chat Rooms', prefill: capturedQuery }, bubbles: true,
+          }));
+        },
+      };
+
+      if (prioritizeAI) {
+        results.push({ ...askResult, matchScore: 9999, category: 'Ask Claude' });
+      } else {
+        // will be added after navigate/actions
+        results._askLater = askResult;
+      }
+    }
+
+    // ── Navigate results
+    const navResults = [];
+    for (const zone of ZONES) {
+      const match = fuzzyMatch(q, zone.name);
+      if (!q || match) {
+        navResults.push({
+          id: `nav-${zone.id}`,
+          category: 'Navigate',
+          icon: zone.emoji,
+          label: zone.name,
+          subtitle: zone.active ? 'Active zone' : 'Coming soon',
+          shortcutBadge: '↵ Open',
+          locked: !zone.active,
+          matchScore: match ? match.score : 1,
+          matchIndices: match ? match.indices : [],
+          execute: () => {
+            document.dispatchEvent(new CustomEvent('command-palette:navigate', {
+              detail: { zoneId: zone.id, zoneName: zone.name }, bubbles: true,
+            }));
+          },
+        });
+      }
+    }
+    navResults.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+    results.push(...navResults);
+
+    // ── Quick Actions results
+    const qaResults = [];
+    for (const qa of QUICK_ACTIONS) {
+      const matchLabel = fuzzyMatch(q, qa.label);
+      const matchSub   = q ? fuzzyMatch(q, qa.subtitle || '') : null;
+      const match = matchLabel || matchSub;
+      if (!q || match) {
+        qaResults.push({
+          id: qa.id,
+          category: 'Quick Actions',
+          icon: qa.icon,
+          label: qa.label,
+          subtitle: qa.subtitle,
+          shortcutBadge: qa.shortcut,
+          matchScore: matchLabel ? matchLabel.score : (matchSub ? matchSub.score - 5 : 1),
+          matchIndices: matchLabel ? matchLabel.indices : [],
+          execute: qa.action,
+        });
+      }
+    }
+    qaResults.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+    results.push(...qaResults);
+
+    // Add "Ask Claude" after navigate/actions if not prioritized
+    if (query.length >= 2 && !prioritizeAI && results._askLater) {
+      results.push(results._askLater);
+    }
+    delete results._askLater;
+
+    this._results = results;
+    this._selectedIndex = 0;
+  }
+
+  // ── Async DB search ────────────────────────────────────────────────────────────
+
+  async _runAsyncSearch(query) {
+    const api = window.api;
+    if (!api || !api.db) {
+      this._setSearching(false);
+      return;
+    }
+
+    try {
+      const worldId = this._worldId || (window.currentWorldId ?? null);
+
+      // Fetch recent tasks and search results in parallel
+      const [recentTasks, searchResults] = await Promise.all([
+        api.db.getRecentTasks ? api.db.getRecentTasks(worldId, 5).catch(() => []) : Promise.resolve([]),
+        query.length >= 3 && api.db.searchTasks
+          ? api.db.searchTasks(worldId, query).catch(() => [])
+          : Promise.resolve([]),
+      ]);
+
+      // Only apply results if query hasn't changed
+      if (this._input.value.trim() !== query) return;
+
+      // Remove any existing task results from previous search
+      this._results = this._results.filter(
+        r => r.category !== 'Recent Tasks' && r.category !== 'Search Tasks'
+      );
+
+      // ── Recent Tasks
+      if (recentTasks && recentTasks.length > 0) {
+        for (const task of recentTasks.slice(0, 5)) {
+          this._results.push({
+            id: `recent-${task.id || task.taskId}`,
+            category: 'Recent Tasks',
+            icon: '📋',
+            label: task.title || task.name || 'Untitled task',
+            subtitle: [task.zone, task.cost ? `$${Number(task.cost).toFixed(4)}` : null]
+              .filter(Boolean).join(' · '),
+            shortcutBadge: '↵ Open',
+            execute: () => {
+              document.dispatchEvent(new CustomEvent('command-palette:open-task', {
+                detail: { taskId: task.id || task.taskId }, bubbles: true,
+              }));
+            },
+          });
+        }
+      }
+
+      // ── Search Tasks (only shown when query >= 3 chars)
+      if (searchResults && searchResults.length > 0) {
+        for (const task of searchResults.slice(0, 8)) {
+          this._results.push({
+            id: `search-${task.id || task.taskId}`,
+            category: 'Search Tasks',
+            icon: '🔍',
+            label: task.title || task.name || 'Untitled task',
+            subtitle: [task.zone, task.cost ? `$${Number(task.cost).toFixed(4)}` : null]
+              .filter(Boolean).join(' · '),
+            shortcutBadge: '↵ Open',
+            execute: () => {
+              document.dispatchEvent(new CustomEvent('command-palette:open-task', {
+                detail: { taskId: task.id || task.taskId }, bubbles: true,
+              }));
+            },
+          });
+        }
+      }
+
+      this._setSearching(false);
+      this._render();
+    } catch (err) {
+      console.warn('[CommandPalette] Async search error:', err);
+      this._setSearching(false);
+    }
+  }
+
+  // ── Spinner helper ─────────────────────────────────────────────────────────────
+
+  _setSearching(val) {
+    this._isSearching = val;
+    this._spinnerEl.style.display = val ? 'flex' : 'none';
+  }
+
+  // ── Rendering ──────────────────────────────────────────────────────────────────
+
+  _render() {
+    const query = this._input.value.trim();
+
+    // Empty state
+    if (!query && this._results.length === 0) {
+      this._resultsEl.innerHTML = '';
+      this._resultsEl.appendChild(this._emptyEl);
+      return;
+    }
+
+    if (this._results.length === 0) {
+      this._resultsEl.innerHTML = `
+        <div class="cp-empty-search">
+          <span class="cp-no-results-icon">🌫️</span>
+          <span class="cp-no-results-text">No results for "<strong>${escapeHtml(query)}</strong>"</span>
+          <span class="cp-no-results-sub">Try rephrasing, or ask Claude directly</span>
+        </div>
+      `;
+      return;
+    }
+
+    // Group by category maintaining insertion order
+    const categoryOrder = ['Ask Claude', 'Navigate', 'Quick Actions', 'Recent Tasks', 'Search Tasks'];
+    const grouped = new Map();
+    for (const cat of categoryOrder) grouped.set(cat, []);
+
+    for (const result of this._results) {
+      if (!grouped.has(result.category)) grouped.set(result.category, []);
+      grouped.get(result.category).push(result);
+    }
+
+    // Build a flat list with section headers for item index tracking
+    const flatItems = []; // just result items, no headers
+    const sections = [];  // { category, items }
+
+    for (const [cat, items] of grouped) {
+      if (items.length > 0) {
+        sections.push({ category: cat, items });
+        for (const item of items) flatItems.push(item);
+      }
+    }
+
+    // Clamp selectedIndex
+    if (this._selectedIndex >= flatItems.length) this._selectedIndex = 0;
+
+    // Render
+    const fragment = document.createDocumentFragment();
+    let flatIndex = 0;
+
+    const CATEGORY_ICONS = {
+      'Navigate':      '🏙️',
+      'Quick Actions': '⚡',
+      'Ask Claude':    '✨',
+      'Recent Tasks':  '📋',
+      'Search Tasks':  '🔍',
+    };
+
+    for (const section of sections) {
+      // Category header
+      const header = document.createElement('div');
+      header.className = 'cp-section-header';
+      header.innerHTML = `
+        <span class="cp-section-icon">${CATEGORY_ICONS[section.category] || ''}</span>
+        <span class="cp-section-label">${escapeHtml(section.category)}</span>
+        <span class="cp-section-count">${section.items.length}</span>
+      `;
+      fragment.appendChild(header);
+
+      // Result rows
+      for (const result of section.items) {
+        const itemIndex = flatIndex++;
+        const isSelected = itemIndex === this._selectedIndex;
+
+        const row = document.createElement('div');
+        row.className = 'cp-row' + (isSelected ? ' cp-row--selected' : '') + (result.locked ? ' cp-row--locked' : '');
+        row.setAttribute('role', 'option');
+        row.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        row.dataset.index = itemIndex;
+
+        // Left: icon
+        const iconEl = document.createElement('span');
+        iconEl.className = 'cp-row-icon';
+        iconEl.textContent = result.icon || '';
+        row.appendChild(iconEl);
+
+        // Center: label + subtitle
+        const contentEl = document.createElement('span');
+        contentEl.className = 'cp-row-content';
+
+        const labelEl = document.createElement('span');
+        labelEl.className = 'cp-row-label';
+        labelEl.innerHTML = result.matchIndices && result.matchIndices.length > 0
+          ? highlightMatch(result.label, result.matchIndices)
+          : escapeHtml(result.label);
+        contentEl.appendChild(labelEl);
+
+        if (result.subtitle) {
+          const subEl = document.createElement('span');
+          subEl.className = 'cp-row-subtitle';
+          subEl.textContent = result.subtitle;
+          contentEl.appendChild(subEl);
+        }
+
+        row.appendChild(contentEl);
+
+        // Right: shortcut badge + locked badge
+        const rightEl = document.createElement('span');
+        rightEl.className = 'cp-row-right';
+
+        if (result.locked) {
+          const lockBadge = document.createElement('span');
+          lockBadge.className = 'cp-badge cp-badge--locked';
+          lockBadge.textContent = 'Soon';
+          rightEl.appendChild(lockBadge);
+        } else if (result.shortcutBadge) {
+          const badge = document.createElement('span');
+          badge.className = 'cp-badge';
+          badge.textContent = isSelected ? result.shortcutBadge : '';
+          rightEl.appendChild(badge);
+        }
+
+        row.appendChild(rightEl);
+
+        // Events
+        row.addEventListener('click', () => {
+          this._selectedIndex = itemIndex;
+          this._executeSelected();
+        });
+
+        row.addEventListener('mouseenter', () => {
+          this._selectedIndex = itemIndex;
+          this._updateSelectionHighlight();
+        });
+
+        fragment.appendChild(row);
+      }
+    }
+
+    // Animate old results out, new ones in
+    this._resultsEl.classList.add('cp-results--transitioning');
+    this._resultsEl.innerHTML = '';
+    this._resultsEl.appendChild(fragment);
+
+    // Staggered fade-in for each row
+    const rows = this._resultsEl.querySelectorAll('.cp-row');
     rows.forEach((row, i) => {
-      const isSelected = i === this._selectedIndex;
-      row.classList.toggle('selected', isSelected);
-      row.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+      row.style.animationDelay = `${i * 20}ms`;
+      row.classList.add('cp-row--animating');
     });
 
-    // Scroll selected into view
-    const selectedRow = rows[this._selectedIndex];
-    if (selectedRow) {
-      selectedRow.scrollIntoView({ block: 'nearest' });
+    requestAnimationFrame(() => {
+      this._resultsEl.classList.remove('cp-results--transitioning');
+    });
+
+    this._scrollSelectedIntoView();
+  }
+
+  // ── Selection ─────────────────────────────────────────────────────────────────
+
+  _moveSelection(delta) {
+    const rows = this._resultsEl.querySelectorAll('.cp-row:not(.cp-row--locked)');
+    if (rows.length === 0) return;
+
+    // Build an array of valid (non-locked) indices
+    const validIndices = [];
+    this._resultsEl.querySelectorAll('.cp-row').forEach((row, i) => {
+      if (!row.classList.contains('cp-row--locked')) validIndices.push(i);
+    });
+
+    const currentPos = validIndices.indexOf(this._selectedIndex);
+    let nextPos = currentPos + delta;
+    nextPos = ((nextPos % validIndices.length) + validIndices.length) % validIndices.length;
+    this._selectedIndex = validIndices[nextPos];
+
+    this._updateSelectionHighlight();
+    this._scrollSelectedIntoView();
+  }
+
+  _updateSelectionHighlight() {
+    const rows = this._resultsEl.querySelectorAll('.cp-row');
+    rows.forEach((row, i) => {
+      const isSelected = Number(row.dataset.index) === this._selectedIndex;
+      row.classList.toggle('cp-row--selected', isSelected);
+      row.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+
+      // Show/hide shortcut badge text
+      const badge = row.querySelector('.cp-badge:not(.cp-badge--locked)');
+      if (badge) {
+        // Re-look up badge label from results
+        const result = this._results.find(r => r.id && `${r.id}` === row.querySelector('[data-result-id]')?.dataset.resultId);
+        if (isSelected && result?.shortcutBadge) {
+          badge.textContent = result.shortcutBadge;
+        } else if (!isSelected) {
+          badge.textContent = '';
+        }
+      }
+    });
+  }
+
+  _scrollSelectedIntoView() {
+    const selected = this._resultsEl.querySelector('.cp-row--selected');
+    if (selected) {
+      selected.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
   }
 
-  // ── Command execution ───────────────────────────────────────────
+  // ── Execution ──────────────────────────────────────────────────────────────────
 
   _executeSelected() {
-    const cmd = this._filtered[this._selectedIndex];
-    if (!cmd || cmd.locked) return;
+    const rows = this._resultsEl.querySelectorAll('.cp-row');
+    let targetIndex = -1;
+    let rowIndex = 0;
 
-    this.close();
+    for (const row of rows) {
+      if (Number(row.dataset.index) === this._selectedIndex) {
+        targetIndex = rowIndex;
+        break;
+      }
+      rowIndex++;
+    }
 
-    // Dispatch custom event
-    document.dispatchEvent(new CustomEvent(cmd.eventName, {
-      detail: cmd.eventDetail,
-      bubbles: true,
-    }));
+    // Map flat DOM index back to result
+    // We need to map selectedIndex (flat item index) to a result
+    const flatResults = this._getFlatResults();
+    const result = flatResults[this._selectedIndex];
+
+    if (!result || result.locked) return;
+
+    // Flash the selected row
+    const selectedRow = this._resultsEl.querySelector('.cp-row--selected');
+    if (selectedRow) {
+      selectedRow.classList.add('cp-row--executing');
+      setTimeout(() => this.close(), 80);
+    } else {
+      this.close();
+    }
+
+    // Execute after close animation
+    setTimeout(() => {
+      try {
+        result.execute();
+      } catch (err) {
+        console.error('[CommandPalette] Execution error:', err);
+      }
+    }, 90);
   }
 
-  // ── Public API ──────────────────────────────────────────────────
+  /**
+   * Build flat ordered list of results matching the render order.
+   * @returns {ResultItem[]}
+   */
+  _getFlatResults() {
+    const categoryOrder = ['Ask Claude', 'Navigate', 'Quick Actions', 'Recent Tasks', 'Search Tasks'];
+    const grouped = new Map();
+    for (const cat of categoryOrder) grouped.set(cat, []);
+    for (const result of this._results) {
+      if (!grouped.has(result.category)) grouped.set(result.category, []);
+      grouped.get(result.category).push(result);
+    }
+    const flat = [];
+    for (const [, items] of grouped) {
+      for (const item of items) flat.push(item);
+    }
+    return flat;
+  }
+
+  // ── Public API ────────────────────────────────────────────────────────────────
 
   /** Open the command palette. */
   open() {
@@ -556,36 +1072,72 @@ export class CommandPalette {
     this._isOpen = true;
 
     this._input.value = '';
-    this._filter();
-    this._render();
+    this._commandBadge.style.display = 'none';
+    this._setSearching(false);
+    this._results = [];
+    this._selectedIndex = 0;
 
-    this._backdrop.classList.add('open');
+    // Show empty state immediately
+    this._resultsEl.innerHTML = '';
+    this._resultsEl.appendChild(this._emptyEl);
 
-    // Focus input after transition
+    this._backdrop.classList.add('cp-backdrop--open');
+    this._modal.classList.add('cp-modal--open');
+
+    // Focus input after entrance animation begins
     requestAnimationFrame(() => {
-      this._input.focus();
+      requestAnimationFrame(() => {
+        this._input.focus();
+      });
     });
+
+    // Announce to screen readers
+    document.dispatchEvent(new CustomEvent('command-palette:opened', { bubbles: true }));
   }
 
   /** Close the command palette. */
   close() {
     if (!this._isOpen) return;
     this._isOpen = false;
-    this._backdrop.classList.remove('open');
+
+    this._backdrop.classList.remove('cp-backdrop--open');
+    this._modal.classList.remove('cp-modal--open');
+    this._modal.classList.add('cp-modal--closing');
+
+    // Cancel any in-flight debounce
+    if (this._searchDebounceTimer) {
+      clearTimeout(this._searchDebounceTimer);
+      this._searchDebounceTimer = null;
+    }
+    this._setSearching(false);
+
+    setTimeout(() => {
+      this._modal.classList.remove('cp-modal--closing');
+    }, 140);
+
+    document.dispatchEvent(new CustomEvent('command-palette:closed', { bubbles: true }));
   }
 
-  /** Toggle open/close. */
+  /** Toggle open / close. */
   toggle() {
     if (this._isOpen) this.close();
     else this.open();
   }
 
-  /** @returns {boolean} Whether the palette is currently open. */
+  /** @returns {boolean} */
   get isOpen() {
     return this._isOpen;
   }
 
-  /** Tear down DOM. */
+  /**
+   * Set the current world ID for DB queries.
+   * @param {string|number} id
+   */
+  setWorldId(id) {
+    this._worldId = id;
+  }
+
+  /** Tear down DOM and event listeners. */
   destroy() {
     this._backdrop.remove();
   }

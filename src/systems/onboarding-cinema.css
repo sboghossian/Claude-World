@@ -1,0 +1,231 @@
+/* ================================================================
+   OnboardingCinema — Styles
+   Full-screen cinematic overlay for the Claude World first-run experience
+   ================================================================ */
+
+/* ── Overlay shell ──────────────────────────────────────────────── */
+.oc-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  pointer-events: none;
+  font-family: 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* ── Black curtain (used for fade-in and fade-to-play) ─────────── */
+.oc-curtain {
+  position: absolute;
+  inset: 0;
+  background: #0a0a14;
+  opacity: 1;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* ── Content wrapper ────────────────────────────────────────────── */
+.oc-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 48px;
+  text-align: center;
+}
+
+/* ── Commander emoji ────────────────────────────────────────────── */
+.oc-commander {
+  display: none;
+  font-size: 56px;
+  line-height: 1;
+  opacity: 0;
+  will-change: opacity, transform;
+  animation: oc-pulse 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 16px rgba(124, 58, 237, 0.7));
+}
+
+@keyframes oc-pulse {
+  0%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.08) translateY(-4px);
+  }
+}
+
+/* ── Main heading text ──────────────────────────────────────────── */
+.oc-main-text {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+  color: #ffffff;
+  opacity: 0;
+  will-change: opacity;
+  text-shadow:
+    0 0 24px rgba(124, 58, 237, 0.8),
+    0 0 60px rgba(124, 58, 237, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.6);
+  max-width: 720px;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+/* ── Sub / dialogue text ────────────────────────────────────────── */
+.oc-sub-text {
+  font-size: 20px;
+  font-weight: 400;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.65);
+  opacity: 0;
+  will-change: opacity;
+  line-height: 1.6;
+  max-width: 600px;
+  text-shadow: 0 0 12px rgba(124, 58, 237, 0.5);
+  transition: opacity 0.3s ease;
+  min-height: 1.6em; /* prevent layout jump during typewriter */
+}
+
+/* ── Typewriter cursor ──────────────────────────────────────────── */
+.oc-cursor {
+  display: none;
+  width: 2px;
+  height: 1.2em;
+  background: #a855f7;
+  border-radius: 1px;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: oc-blink 0.8s step-end infinite;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.9);
+}
+
+@keyframes oc-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ── Arrow — points down toward Dispatch Center ─────────────────── */
+.oc-arrow {
+  position: absolute;
+  bottom: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  will-change: opacity, transform;
+  transition: opacity 0.3s ease;
+  animation: oc-bounce 1.4s ease-in-out infinite;
+}
+
+@keyframes oc-bounce {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(8px);
+  }
+}
+
+.oc-arrow-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #a855f7;
+  text-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
+  white-space: nowrap;
+}
+
+.oc-arrow-icon {
+  font-size: 28px;
+  line-height: 1;
+  color: #a855f7;
+  text-shadow:
+    0 0 16px rgba(168, 85, 247, 0.9),
+    0 0 32px rgba(124, 58, 237, 0.5);
+}
+
+/* ── Skip button ────────────────────────────────────────────────── */
+.oc-skip-btn {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  pointer-events: auto;
+  background: transparent;
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: rgba(196, 181, 253, 0.7);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    opacity 0.2s ease;
+  font-family: inherit;
+  opacity: 0.75;
+}
+
+.oc-skip-btn:hover {
+  color: #e9d5ff;
+  border-color: rgba(168, 85, 247, 0.6);
+  background: rgba(124, 58, 237, 0.12);
+  opacity: 1;
+}
+
+.oc-skip-btn:active {
+  background: rgba(124, 58, 237, 0.22);
+  transform: scale(0.97);
+}
+
+/* ── Responsive — smaller screens ──────────────────────────────── */
+@media (max-width: 768px) {
+  .oc-main-text {
+    font-size: 32px;
+  }
+
+  .oc-sub-text {
+    font-size: 16px;
+  }
+
+  .oc-commander {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .oc-main-text {
+    font-size: 24px;
+    letter-spacing: 0;
+  }
+
+  .oc-sub-text {
+    font-size: 14px;
+  }
+
+  .oc-content {
+    padding: 0 24px;
+  }
+
+  .oc-skip-btn {
+    top: 16px;
+    right: 16px;
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}

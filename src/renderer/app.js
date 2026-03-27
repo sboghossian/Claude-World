@@ -151,6 +151,10 @@ function startRenderLoop() {
  * Get the camera instance for external control.
  * @returns {Camera | null}
  */
+export function getApp() {
+  return app;
+}
+
 export function getCamera() {
   return camera;
 }

@@ -1,0 +1,310 @@
+/* ============================================================================
+   thought-bubbles.css  — Charming DOM speech balloons for Claude World agents
+   ============================================================================ */
+
+/* ── Container overlay ─────────────────────────────────────────────────────── */
+
+.thought-bubbles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+  /* Isolate stacking context so bubbles never bleed outside the overlay */
+  isolation: isolate;
+}
+
+/* ── Base bubble ───────────────────────────────────────────────────────────── */
+
+.thought-bubble {
+  --agent-color: #7c3aed;  /* overridden per-instance via inline style */
+  --glass-bg: rgba(12, 12, 20, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.13);
+  --text-color: #e8e8f0;
+  --cursor-color: var(--agent-color);
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --tail-size: 10px;
+
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 140px;
+  max-width: 220px;
+
+  /* Glass morphism card */
+  background: var(--glass-bg);
+  border: 1.5px solid var(--glass-border);
+  border-radius: 14px;
+  box-shadow:
+    0 8px 32px var(--shadow-color),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+
+  /* Agent color accent: left border + subtle glow */
+  border-left-color: var(--agent-color);
+  border-left-width: 3px;
+  box-shadow:
+    0 8px 32px var(--shadow-color),
+    -4px 0 16px -4px var(--agent-color),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  /* Initial state — entrance animation controls opacity/transform */
+  opacity: 0;
+  transform: scale(0.8) translateY(8px);
+  transform-origin: bottom center;
+
+  /* Smooth repositioning */
+  transition: left 0.12s ease-out, top 0.12s ease-out;
+
+  will-change: opacity, transform;
+}
+
+/* ── Speech tail ───────────────────────────────────────────────────────────── */
+
+.tb-tail {
+  position: absolute;
+  bottom: -10px;
+  left: 24px;
+  width: 0;
+  height: 0;
+  border-left: var(--tail-size) solid transparent;
+  border-right: var(--tail-size) solid transparent;
+  border-top: var(--tail-size) solid var(--glass-bg);
+
+  /* Pseudo border for the tail */
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+
+/* Outer tail (border outline) */
+.tb-tail::before {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: calc(-1 * var(--tail-size));
+  width: 0;
+  height: 0;
+  border-left: var(--tail-size) solid transparent;
+  border-right: var(--tail-size) solid transparent;
+  border-top: var(--tail-size) solid var(--glass-border);
+  z-index: -1;
+}
+
+/* ── Inner content row ─────────────────────────────────────────────────────── */
+
+.tb-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px 10px 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Agent emoji avatar ─────────────────────────────────────────────────────── */
+
+.tb-avatar {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* Subtle color glow matching the agent */
+  box-shadow: 0 0 8px -2px var(--agent-color);
+  user-select: none;
+}
+
+/* ── Text area ─────────────────────────────────────────────────────────────── */
+
+.tb-text-wrap {
+  display: inline;
+  flex: 1;
+  min-width: 0;
+}
+
+.tb-text {
+  display: inline;
+  font-family: 'Berkeley Mono', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-color);
+  letter-spacing: 0.01em;
+  word-break: break-word;
+}
+
+/* ── Typing cursor ─────────────────────────────────────────────────────────── */
+
+.tb-cursor {
+  display: inline;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--agent-color);
+  opacity: 1;
+  animation: tb-blink 0.7s step-end infinite;
+  margin-left: 1px;
+}
+
+@keyframes tb-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Mood modifiers ─────────────────────────────────────────────────────────── */
+
+/* Happy: warm soft highlight */
+.thought-bubble--happy {
+  --glass-bg: rgba(18, 16, 8, 0.85);
+  border-top: 1.5px solid rgba(253, 230, 138, 0.18);
+}
+
+.thought-bubble--happy .tb-avatar {
+  animation: tb-wobble 0.6s ease-in-out;
+}
+
+@keyframes tb-wobble {
+  0%   { transform: rotate(0deg);    }
+  20%  { transform: rotate(-8deg);   }
+  40%  { transform: rotate(8deg);    }
+  60%  { transform: rotate(-4deg);   }
+  80%  { transform: rotate(4deg);    }
+  100% { transform: rotate(0deg);    }
+}
+
+/* Excited: pulsing glow on the border */
+.thought-bubble--excited {
+  --glass-bg: rgba(15, 10, 25, 0.88);
+  animation: tb-excited-glow 1.4s ease-in-out infinite;
+}
+
+@keyframes tb-excited-glow {
+  0%, 100% {
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      -4px 0 16px -4px var(--agent-color),
+      0 0 20px -6px var(--agent-color),
+      0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+  50% {
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      -4px 0 24px -2px var(--agent-color),
+      0 0 32px -2px var(--agent-color),
+      0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+}
+
+.thought-bubble--excited .tb-avatar {
+  animation: tb-bounce 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes tb-bounce {
+  from { transform: translateY(0);    }
+  to   { transform: translateY(-3px); }
+}
+
+/* Tired: desaturated, droopy style */
+.thought-bubble--tired {
+  --glass-bg: rgba(8, 10, 14, 0.88);
+  --text-color: rgba(180, 180, 195, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  filter: saturate(0.5);
+}
+
+.thought-bubble--tired .tb-cursor {
+  animation: tb-blink 1.4s step-end infinite; /* slower blink = sleepy */
+}
+
+/* Worried: slight red tint, jitter */
+.thought-bubble--worried {
+  --glass-bg: rgba(20, 8, 8, 0.88);
+  --text-color: #f5c0c0;
+  border-left-color: #ef4444;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    -4px 0 16px -4px #ef4444,
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.thought-bubble--worried .tb-avatar {
+  animation: tb-jitter 0.35s ease-in-out 3;
+}
+
+@keyframes tb-jitter {
+  0%, 100% { transform: translateX(0);    }
+  20%       { transform: translateX(-2px); }
+  40%       { transform: translateX(2px);  }
+  60%       { transform: translateX(-2px); }
+  80%       { transform: translateX(2px);  }
+}
+
+/* ── Entrance / exit keyframes ─────────────────────────────────────────────── */
+/* Note: opacity + transform are driven by JS directly (BubbleInstance.tick),  */
+/* so these keyframes are available as CSS-only fallback / extra polish.        */
+
+@keyframes tb-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes tb-exit {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-12px);
+  }
+}
+
+/* ── Responsive: smaller bubbles on narrow viewports ───────────────────────── */
+
+@media (max-width: 600px) {
+  .thought-bubble {
+    min-width: 100px;
+    max-width: 160px;
+  }
+
+  .tb-text {
+    font-size: 11px;
+  }
+
+  .tb-avatar {
+    width: 22px;
+    height: 22px;
+    font-size: 14px;
+  }
+}
+
+/* ── High-contrast / reduced-motion accessibility ─────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .thought-bubble,
+  .tb-avatar,
+  .tb-cursor {
+    animation: none !important;
+    transition: opacity 0.1s linear !important;
+  }
+}
+
+/* ── Scrollbar hide (if bubbles ever overflow) ─────────────────────────────── */
+
+.thought-bubbles * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
