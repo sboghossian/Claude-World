@@ -211,11 +211,4 @@ export function getTileAt(screenX, screenY) {
   return screenToTile(world.x, world.y);
 }
 
-// ── Auto-initialize when DOM is ready ─────────────────────────────
-if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => initWorld());
-  } else {
-    initWorld();
-  }
-}
+// initWorld() is called explicitly by src/renderer/index.html boot sequence

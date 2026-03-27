@@ -5,7 +5,11 @@ package-lock.json
 # Build output
 dist/
 out/
-build/
+
+# Generated build assets (keep source SVGs in build/)
+build/*.icns
+build/*.png
+build/*.ico
 
 # Electron Builder
 *.blockmap
