@@ -1,0 +1,58 @@
+/**
+ * variables.css — Claude World design tokens
+ * All UI elements reference these custom properties.
+ */
+
+:root {
+  /* Backgrounds */
+  --bg-primary: rgba(10, 10, 20, 0.95);
+  --bg-secondary: rgba(20, 25, 40, 0.9);
+  --bg-hover: rgba(40, 50, 80, 0.8);
+  --bg-selected: rgba(50, 70, 120, 0.7);
+  --bg-toast: rgba(15, 15, 25, 0.95);
+
+  /* Text */
+  --text-primary: #e8e8f0;
+  --text-secondary: #8888a0;
+  --text-dim: #555570;
+  --text-inverse: #0a0a14;
+
+  /* Accents */
+  --accent-blue: #4a9eff;
+  --accent-green: #4aff8a;
+  --accent-amber: #ffb84a;
+  --accent-red: #ff4a6a;
+  --accent-gold: #ffd700;
+  --accent-purple: #a855f7;
+
+  /* Borders & shadows */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.12);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.6);
+  --blur: blur(20px);
+  --blur-light: blur(12px);
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Fonts */
+  --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Sizes */
+  --hud-top-height: 48px;
+  --hud-bottom-height: 40px;
+  --panel-width: 400px;
+  --palette-width: 560px;
+  --palette-max-height: 420px;
+  --minimap-size: 180px;
+  --toast-width: 340px;
+}

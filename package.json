@@ -1,0 +1,23 @@
+{
+  "name": "claude-world",
+  "version": "0.1.0",
+  "description": "Claude World — AI-native OS as an isometric 2.5D city",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "rebuild": "npx @electron/rebuild"
+  },
+  "keywords": ["electron", "ai", "isometric", "orchestration"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@electron/rebuild": "^4.0.3",
+    "better-sqlite3": "^12.8.0",
+    "electron": "^41.1.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^26.8.1",
+    "esbuild": "^0.27.4"
+  }
+}

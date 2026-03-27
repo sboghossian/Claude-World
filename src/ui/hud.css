@@ -1,0 +1,307 @@
+/**
+ * hud.css — Persistent heads-up display overlay
+ */
+
+/* ── Top bar ─────────────────────────────────────────────────────── */
+.hud-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--hud-top-height);
+  background: rgba(10, 10, 20, 0.7);
+  backdrop-filter: var(--blur-light);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1000;
+  pointer-events: none;
+  user-select: none;
+  transition: left var(--transition-normal);
+}
+
+.hud-top > * {
+  pointer-events: auto;
+}
+
+/* Logo */
+.hud-logo {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-logo__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  box-shadow: 0 0 8px var(--accent-blue);
+  animation: hud-pulse 2s ease-in-out infinite;
+}
+
+@keyframes hud-pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* XP bar section */
+.hud-xp {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hud-xp__bar-wrap {
+  width: 160px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hud-xp__bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+  border-radius: 3px;
+  width: 0%;
+  transition: width var(--transition-slow);
+}
+
+.hud-xp__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.hud-xp__level {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+/* ── Bottom bar ──────────────────────────────────────────────────── */
+.hud-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--hud-bottom-height);
+  background: rgba(10, 10, 20, 0.7);
+  backdrop-filter: var(--blur-light);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 0 20px;
+  z-index: 1000;
+  pointer-events: none;
+  user-select: none;
+  transition: left var(--transition-normal);
+}
+
+.hud-bottom > * {
+  pointer-events: auto;
+}
+
+.hud-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.hud-stat__icon {
+  font-size: 14px;
+}
+
+.hud-stat--green { color: var(--accent-green); }
+.hud-stat--amber { color: var(--accent-amber); }
+.hud-stat--red { color: var(--accent-red); }
+.hud-stat--blue { color: var(--accent-blue); }
+
+.hud-stat__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.hud-stat__dot--idle { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+.hud-stat__dot--active { background: var(--accent-blue); box-shadow: 0 0 6px var(--accent-blue); }
+.hud-stat__dot--busy { background: var(--accent-amber); box-shadow: 0 0 6px var(--accent-amber); }
+.hud-stat__dot--overload { background: var(--accent-red); box-shadow: 0 0 6px var(--accent-red); animation: hud-blink 0.6s ease-in-out infinite; }
+
+@keyframes hud-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ── Bottom-left: Quest card ─────────────────────────────────────── */
+.hud-quest {
+  position: fixed;
+  bottom: calc(var(--hud-bottom-height) + 16px);
+  left: 16px;
+  z-index: 1000;
+  width: 260px;
+  background: var(--bg-secondary);
+  backdrop-filter: var(--blur-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  transition: left var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.hud-quest:hover {
+  border-color: var(--border-light);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.hud-quest.completable {
+  animation: quest-pulse 2s ease-in-out infinite;
+}
+
+@keyframes quest-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 255, 138, 0); }
+  50% { box-shadow: 0 0 12px 2px rgba(74, 255, 138, 0.25); }
+}
+
+.hud-quest__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hud-quest__header-icon {
+  font-size: 14px;
+}
+
+.hud-quest__header-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hud-quest__progress {
+  padding: 0 14px 10px;
+}
+
+.hud-quest__progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.hud-quest__progress-fill {
+  height: 100%;
+  background: var(--accent-green);
+  border-radius: 2px;
+  width: 0%;
+  transition: width var(--transition-slow);
+}
+
+.hud-quest__progress-text {
+  margin-top: 6px;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+/* Expanded state */
+.hud-quest__body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--transition-normal);
+  border-top: 1px solid transparent;
+}
+
+.hud-quest.expanded .hud-quest__body {
+  max-height: 200px;
+  border-top-color: var(--border);
+}
+
+.hud-quest__chain {
+  padding: 10px 14px;
+  list-style: none;
+  margin: 0;
+}
+
+.hud-quest__chain-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.hud-quest__chain-item.completed {
+  color: var(--accent-green);
+  text-decoration: line-through;
+  text-decoration-color: rgba(74, 255, 138, 0.3);
+}
+
+.hud-quest__chain-item.current {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ── Bottom-right: Minimap ───────────────────────────────────────── */
+.hud-minimap {
+  position: fixed;
+  bottom: calc(var(--hud-bottom-height) + 16px);
+  right: 16px;
+  z-index: 1000;
+  width: var(--minimap-size);
+  height: var(--minimap-size);
+  background: rgba(10, 10, 20, 0.85);
+  backdrop-filter: var(--blur-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: right var(--transition-normal);
+}
+
+.hud-minimap__canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Panel-open shift ────────────────────────────────────────────── */
+body.panel-open .hud-top,
+body.panel-open .hud-bottom {
+  right: var(--panel-width);
+}
+
+body.panel-open .hud-minimap {
+  right: calc(var(--panel-width) + 16px);
+}
+
+body.panel-open .hud-quest {
+  /* Quest stays on the left, no shift needed */
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude World</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "pixi.js": "https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.mjs"
+    }
+  }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a14; }
+    #world-canvas { display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+    #ui-root { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+    #ui-root * { pointer-events: auto; }
+    #ui-root .hud-bar { pointer-events: none; }
+    #ui-root .hud-bar > * { pointer-events: auto; }
+  </style>
+</head>
+<body>
+  <canvas id="world-canvas"></canvas>
+  <div id="ui-root"></div>
+  <script type="module">
+    // Initialize PixiJS renderer
+    import { initWorld } from './app.js';
+
+    // Initialize UI layer
+    import { initUI } from '../ui/index.js';
+
+    async function boot() {
+      try {
+        // Start the isometric world
+        const world = await initWorld();
+        console.log('[boot] World renderer initialized');
+
+        // Start the UI overlay
+        const ui = initUI('../ui/');
+        console.log('[boot] UI layer initialized');
+
+        // Wire zone clicks from renderer to UI panels
+        document.addEventListener('zone-click', (e) => {
+          const { zoneId, zoneName } = e.detail;
+          ui.panels.openZone(zoneId, zoneName);
+          ui.toasts.show({ type: 'info', title: zoneName, description: 'Zone selected' });
+        });
+
+        // Wire command palette navigation to camera
+        document.addEventListener('command-palette:navigate', (e) => {
+          const { zoneId } = e.detail;
+          if (world && world.getCamera()) {
+            // Camera will be wired to zone positions
+            console.log('[boot] Navigate to zone:', zoneId);
+          }
+        });
+
+      } catch (err) {
+        console.error('[boot] Initialization failed:', err);
+        document.body.innerHTML = `
+          <div style="color: #ff4a6a; padding: 40px; font-family: monospace;">
+            <h1>Claude World — Boot Error</h1>
+            <pre>${err.message}\n${err.stack}</pre>
+          </div>
+        `;
+      }
+    }
+
+    boot();
+  </script>
+</body>
+</html>
