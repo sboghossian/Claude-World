@@ -1,5 +1,8 @@
 const { app } = require('electron');
 const KeyStore = require('./key-store');
+const DispatchManager = require('../src/systems/dispatch');
+const AnthropicAdapter = require('../src/systems/providers/anthropic');
+const OpenAIAdapter = require('../src/systems/providers/openai');
 
 // ── Validation helpers ─────────────────────────────────────────────────
 function assertType(value, type, name) {
@@ -232,41 +235,165 @@ function registerHandlers(ipcMain, db) {
 
   // ── ai:* handlers ─────────────────────────────────────────────────
 
+  // Lazy-init the dispatch manager on first AI call
+  let dispatchManager = null;
+
+  function getDispatchManager() {
+    if (dispatchManager) return dispatchManager;
+
+    dispatchManager = new DispatchManager(keyStore, db);
+
+    // Register built-in providers
+    dispatchManager.registerProvider('anthropic', new AnthropicAdapter(keyStore));
+    dispatchManager.registerProvider('openai', new OpenAIAdapter(keyStore));
+
+    return dispatchManager;
+  }
+
   ipcMain.handle('ai:dispatch', async (_event, task) => {
     assertType(task, 'object', 'task');
-    if (!task.prompt) throw new Error('Task must include a "prompt" field');
-    // AI dispatch will be implemented by the AI module
-    // For now, return a placeholder response
-    console.log('[ipc] ai:dispatch called with:', task.prompt?.substring(0, 80));
-    return {
-      id: `task_${Date.now()}`,
-      status: 'queued',
-      prompt: task.prompt,
-      provider: task.provider || 'anthropic',
-      created_at: new Date().toISOString(),
+    if (!task.messages || !Array.isArray(task.messages) || task.messages.length === 0) {
+      throw new Error('Task must include a non-empty "messages" array');
+    }
+
+    const dm = getDispatchManager();
+    const start = Date.now();
+
+    console.log(
+      '[ipc] ai:dispatch provider=%s model=%s messages=%d',
+      task.provider || 'auto',
+      task.model || 'default',
+      task.messages.length
+    );
+
+    const response = await dm.dispatch({
+      worldId: task.worldId || null,
+      zoneId: task.zoneId || null,
+      agentId: task.agentId || null,
+      provider: task.provider || null,
+      model: task.model || null,
+      messages: task.messages,
+      systemPrompt: task.systemPrompt || null,
+      maxTokens: task.maxTokens || 4096,
+    });
+
+    // Persist completed task in database if available
+    if (db) {
+      try {
+        const rawDb = db.db || db;
+        rawDb
+          .prepare(
+            `INSERT INTO tasks (world_id, title, description, status, provider, model,
+              input_tokens, output_tokens, cost_usd, latency_ms, created_at, completed_at)
+            VALUES (?, ?, ?, 'completed', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+          )
+          .run(
+            task.worldId || 1,
+            (task.messages[task.messages.length - 1]?.content || '').substring(0, 120),
+            response.text.substring(0, 500),
+            response.provider,
+            response.model,
+            response.inputTokens,
+            response.outputTokens,
+            response.costUsd,
+            response.latencyMs
+          );
+      } catch (dbErr) {
+        // Don't fail the AI response because of a logging error
+        console.warn('[ipc] Failed to persist task:', dbErr.message);
+      }
+    }
+
+    return response;
+  });
+
+  ipcMain.handle('ai:stream', async (_event, task) => {
+    assertType(task, 'object', 'task');
+    if (!task.messages || !Array.isArray(task.messages) || task.messages.length === 0) {
+      throw new Error('Task must include a non-empty "messages" array');
+    }
+
+    const dm = getDispatchManager();
+
+    console.log(
+      '[ipc] ai:stream provider=%s model=%s messages=%d',
+      task.provider || 'auto',
+      task.model || 'default',
+      task.messages.length
+    );
+
+    // Collect full streamed response (IPC invoke cannot stream natively,
+    // so this handler buffers everything and returns the final result).
+    // For true streaming, use ai:dispatchStream with MessagePort (below).
+    let fullText = '';
+    let finalMeta = null;
+
+    for await (const chunk of dm.stream({
+      worldId: task.worldId || null,
+      zoneId: task.zoneId || null,
+      agentId: task.agentId || null,
+      provider: task.provider || null,
+      model: task.model || null,
+      messages: task.messages,
+      systemPrompt: task.systemPrompt || null,
+      maxTokens: task.maxTokens || 4096,
+    })) {
+      if (chunk.type === 'text') {
+        fullText += chunk.text;
+      } else if (chunk.type === 'done') {
+        finalMeta = chunk;
+      }
+    }
+
+    const response = {
+      text: fullText,
+      provider: finalMeta?.provider || 'unknown',
+      model: finalMeta?.model || 'unknown',
+      inputTokens: finalMeta?.inputTokens || 0,
+      outputTokens: finalMeta?.outputTokens || 0,
+      costUsd: finalMeta?.costUsd || 0,
+      latencyMs: finalMeta?.latencyMs || 0,
     };
+
+    // Persist
+    if (db) {
+      try {
+        const rawDb = db.db || db;
+        rawDb
+          .prepare(
+            `INSERT INTO tasks (world_id, title, description, status, provider, model,
+              input_tokens, output_tokens, cost_usd, latency_ms, created_at, completed_at)
+            VALUES (?, ?, ?, 'completed', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+          )
+          .run(
+            task.worldId || 1,
+            (task.messages[task.messages.length - 1]?.content || '').substring(0, 120),
+            response.text.substring(0, 500),
+            response.provider,
+            response.model,
+            response.inputTokens,
+            response.outputTokens,
+            response.costUsd,
+            response.latencyMs
+          );
+      } catch (dbErr) {
+        console.warn('[ipc] Failed to persist streamed task:', dbErr.message);
+      }
+    }
+
+    return response;
   });
 
   ipcMain.handle('ai:listProviders', async () => {
-    const providers = [
-      { id: 'anthropic', name: 'Anthropic (Claude)', models: ['claude-sonnet-4-20250514', 'claude-opus-4-20250514'] },
-      { id: 'openai', name: 'OpenAI', models: ['gpt-4o', 'gpt-4o-mini'] },
-      { id: 'google', name: 'Google (Gemini)', models: ['gemini-2.0-flash', 'gemini-2.5-pro'] },
-    ];
-    // Mark providers that have keys configured
-    if (keyStore) {
-      const keys = keyStore.list();
-      for (const provider of providers) {
-        provider.configured = keys.some((k) => k.provider === provider.id && k.is_active);
-      }
-    }
-    return providers;
+    const dm = getDispatchManager();
+    return dm.listProviders();
   });
 
   ipcMain.handle('ai:ping', async (_event, provider) => {
     assertType(provider, 'string', 'provider');
-    // Placeholder — real implementation will test the API key
-    return { provider, status: 'ok', latency_ms: 0 };
+    const dm = getDispatchManager();
+    const result = await dm.ping(provider);
+    return { provider, status: result.ok ? 'ok' : 'error', latency_ms: result.latencyMs, error: result.error || null };
   });
 
   // ── keys:* handlers ───────────────────────────────────────────────

@@ -13,6 +13,8 @@ import { Camera } from './camera.js';
 import { BuildingManager } from './buildings.js';
 import { FogOfWar } from './fog.js';
 import { DayNightCycle } from './daynight.js';
+import { WeatherSystem } from './weather.js';
+import worldState from '../systems/world-state.js';
 
 /** @type {Application | null} */
 let app = null;
@@ -24,6 +26,8 @@ let buildingManager = null;
 let fog = null;
 /** @type {DayNightCycle | null} */
 let dayNight = null;
+/** @type {WeatherSystem | null} */
+let weatherSystem = null;
 
 /**
  * Initialize the Claude World renderer.
@@ -73,6 +77,18 @@ export async function initWorld() {
   // ── Day/night cycle ───────────────────────────────────────────
   dayNight = new DayNightCycle(worldContainer);
 
+  // ── Weather system ──────────────────────────────────────────────
+  weatherSystem = new WeatherSystem(worldContainer);
+
+  // Wire world state changes to the weather system
+  worldState.onChange((snapshot) => {
+    weatherSystem.setState(snapshot);
+    weatherSystem.setActiveZones(worldState.getActiveZones());
+  });
+
+  // Initialize weather with current state
+  weatherSystem.setState(worldState.getState());
+
   // ── Click handler ─────────────────────────────────────────────
   canvas.addEventListener('click', (e) => {
     if (!camera || !buildingManager) return;
@@ -121,6 +137,9 @@ function startRenderLoop() {
         buildingManager.setNightGlow(dayNight.nightIntensity);
       }
     }
+    if (weatherSystem) {
+      weatherSystem.update(dt);
+    }
   };
 
   requestAnimationFrame(loop);
@@ -158,6 +177,22 @@ export function getFog() {
  */
 export function getDayNight() {
   return dayNight;
+}
+
+/**
+ * Get the weather system instance.
+ * @returns {WeatherSystem | null}
+ */
+export function getWeatherSystem() {
+  return weatherSystem;
+}
+
+/**
+ * Get the world state manager singleton.
+ * @returns {import('../systems/world-state.js').WorldStateManager}
+ */
+export function getWorldState() {
+  return worldState;
 }
 
 /**

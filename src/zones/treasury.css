@@ -1,0 +1,658 @@
+/**
+ * treasury.css — Styles for the Treasury zone panel
+ *
+ * Budget tracking, spending visualization, and cost controls.
+ * Uses only CSS variables from variables.css. No external chart libraries.
+ */
+
+/* ── Panel root ───────────────────────────────────────────────── */
+
+.treasury {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 4px;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+}
+
+.treasury--exceeded {
+  animation: treasury-pulse 2s ease-in-out infinite;
+}
+
+@keyframes treasury-pulse {
+  0%, 100% { box-shadow: inset 0 0 0 1px transparent; }
+  50% { box-shadow: inset 0 0 12px rgba(255, 74, 106, 0.25); }
+}
+
+/* ── Stats bar ────────────────────────────────────────────────── */
+
+.treasury__stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.treasury__stats-bar span {
+  white-space: nowrap;
+}
+
+.treasury__stats-sep {
+  color: var(--text-dim);
+  user-select: none;
+}
+
+.treasury__status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.treasury__status-dot--green {
+  background: var(--accent-green);
+  box-shadow: 0 0 6px var(--accent-green);
+}
+
+.treasury__status-dot--amber {
+  background: var(--accent-amber);
+  box-shadow: 0 0 6px var(--accent-amber);
+}
+
+.treasury__status-dot--red {
+  background: var(--accent-red);
+  box-shadow: 0 0 6px var(--accent-red);
+  animation: dot-blink 1.5s ease-in-out infinite;
+}
+
+@keyframes dot-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── Section scaffolding ──────────────────────────────────────── */
+
+.treasury__section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.treasury__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition-fast);
+}
+
+.treasury__section-header:hover {
+  background: var(--bg-hover);
+}
+
+.treasury__section-header::after {
+  content: '\25BC';
+  font-size: 8px;
+  transition: transform var(--transition-fast);
+}
+
+.treasury__section.collapsed .treasury__section-header::after {
+  transform: rotate(-90deg);
+}
+
+.treasury__section-body {
+  padding: 12px;
+  transition: max-height var(--transition-normal), opacity var(--transition-normal);
+  max-height: 2000px;
+  opacity: 1;
+}
+
+.treasury__section.collapsed .treasury__section-body {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 12px;
+  overflow: hidden;
+}
+
+/* ── Budget config form ───────────────────────────────────────── */
+
+.treasury__form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.treasury__form-group:last-child {
+  margin-bottom: 0;
+}
+
+.treasury__form-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.treasury__form-input {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.treasury__form-input:focus {
+  border-color: var(--accent-blue);
+}
+
+.treasury__form-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.treasury__toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.treasury__toggle {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.treasury__toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.treasury__toggle.active {
+  background: rgba(74, 158, 255, 0.2);
+  border-color: var(--accent-blue);
+}
+
+.treasury__toggle.active::after {
+  transform: translateX(16px);
+  background: var(--accent-blue);
+}
+
+.treasury__toggle-label {
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+/* Slider */
+
+.treasury__slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.treasury__slider-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.treasury__slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: var(--bg-primary);
+  border-radius: 2px;
+  outline: none;
+}
+
+.treasury__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  cursor: pointer;
+  border: 2px solid var(--bg-secondary);
+  box-shadow: 0 0 4px rgba(74, 158, 255, 0.4);
+}
+
+.treasury__slider-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent-blue);
+  min-width: 32px;
+  text-align: right;
+}
+
+.treasury__save-btn {
+  width: 100%;
+  padding: 8px 16px;
+  background: var(--accent-blue);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  margin-top: 4px;
+}
+
+.treasury__save-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.treasury__save-btn:active {
+  transform: translateY(0);
+}
+
+/* ── Overview card ────────────────────────────────────────────── */
+
+.treasury__overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.treasury__overview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.treasury__overview-card--wide {
+  grid-column: 1 / -1;
+}
+
+.treasury__overview-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+}
+
+.treasury__overview-value {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.treasury__overview-value--small {
+  font-size: 14px;
+}
+
+.treasury__overview-sub {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+/* ── Horizontal bar charts ────────────────────────────────────── */
+
+.treasury__bar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.treasury__bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.treasury__bar-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.treasury__bar-name {
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.treasury__bar-amount {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.treasury__bar-track {
+  height: 6px;
+  background: var(--bg-primary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.treasury__bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  min-width: 2px;
+}
+
+/* Provider colors */
+.treasury__bar-fill--anthropic { background: var(--accent-purple); }
+.treasury__bar-fill--openai { background: var(--accent-green); }
+.treasury__bar-fill--google { background: var(--accent-blue); }
+.treasury__bar-fill--default { background: var(--accent-amber); }
+
+/* Zone colors */
+.treasury__bar-fill--core { background: var(--accent-blue); }
+.treasury__bar-fill--business { background: var(--accent-green); }
+.treasury__bar-fill--advanced { background: var(--accent-purple); }
+.treasury__bar-fill--edge { background: var(--accent-amber); }
+
+/* ── Daily spend chart ────────────────────────────────────────── */
+
+.treasury__daily-chart {
+  position: relative;
+  height: 120px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  padding-bottom: 20px;
+}
+
+.treasury__daily-bar-wrap {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+}
+
+.treasury__daily-bar {
+  width: 100%;
+  background: var(--accent-blue);
+  border-radius: 2px 2px 0 0;
+  transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity var(--transition-fast);
+  opacity: 0.7;
+  min-height: 1px;
+  cursor: crosshair;
+  position: relative;
+}
+
+.treasury__daily-bar:hover {
+  opacity: 1;
+}
+
+.treasury__daily-bar[data-amount]::after {
+  content: attr(data-amount);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  padding: 2px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  z-index: 10;
+}
+
+.treasury__daily-bar:hover::after {
+  opacity: 1;
+}
+
+.treasury__budget-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed var(--accent-red);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.treasury__budget-line-label {
+  position: absolute;
+  right: 0;
+  top: -14px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--accent-red);
+  opacity: 0.7;
+}
+
+.treasury__daily-axis {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-dim);
+}
+
+/* ── Recent transactions ──────────────────────────────────────── */
+
+.treasury__tx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-light) transparent;
+}
+
+.treasury__tx-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.treasury__tx-list::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 2px;
+}
+
+.treasury__tx-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 2px 12px;
+  padding: 8px 10px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.treasury__tx-item:hover {
+  background: var(--bg-hover);
+}
+
+.treasury__tx-agent {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  grid-row: 1;
+  grid-column: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.treasury__tx-cost {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-amber);
+  grid-row: 1;
+  grid-column: 2;
+  text-align: right;
+}
+
+.treasury__tx-detail {
+  font-size: 10px;
+  color: var(--text-dim);
+  grid-row: 2;
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.treasury__tx-detail span {
+  white-space: nowrap;
+}
+
+.treasury__export-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px dashed var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  margin-top: 8px;
+}
+
+.treasury__export-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-blue);
+}
+
+/* ── Cost calculator ──────────────────────────────────────────── */
+
+.treasury__calc {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.treasury__calc-row {
+  display: flex;
+  gap: 8px;
+}
+
+.treasury__calc-row .treasury__form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.treasury__calc-select {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 8px 10px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.treasury__calc-select:focus {
+  border-color: var(--accent-blue);
+}
+
+.treasury__calc-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.treasury__calc-result-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.treasury__calc-result-value {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+/* ── Empty state ──────────────────────────────────────────────── */
+
+.treasury__empty {
+  text-align: center;
+  padding: 20px 12px;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+/* ── Animations ───────────────────────────────────────────────── */
+
+@keyframes treasury-bar-grow {
+  from { width: 0; }
+}
+
+.treasury__bar-fill {
+  animation: treasury-bar-grow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}

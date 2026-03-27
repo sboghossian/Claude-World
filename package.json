@@ -8,13 +8,20 @@
     "build": "electron-builder",
     "rebuild": "npx @electron/rebuild"
   },
-  "keywords": ["electron", "ai", "isometric", "orchestration"],
+  "keywords": [
+    "electron",
+    "ai",
+    "isometric",
+    "orchestration"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "@electron/rebuild": "^4.0.3",
     "better-sqlite3": "^12.8.0",
-    "electron": "^41.1.0"
+    "electron": "^41.1.0",
+    "openai": "^6.33.0"
   },
   "devDependencies": {
     "electron-builder": "^26.8.1",

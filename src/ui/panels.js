@@ -1,10 +1,13 @@
 /**
  * panels.js — Slide-in side panel system for Claude World
  *
- * Supports ZonePanel, AgentPanel, and SettingsPanel.
+ * Supports ZonePanel, AgentPanel, SettingsPanel, and zone-specific panels.
  * Only one panel open at a time. Slides from the right, 400px wide.
  * Body gets class "panel-open" so HUD elements can shift.
  */
+
+import { buildTreasuryContent, loadTreasuryStyles } from '../zones/treasury.js';
+import { buildConnectorDocksContent, loadConnectorDocksStyles } from '../zones/connector-docks.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -45,6 +48,17 @@ const AGENT_INFO = {
  * @returns {HTMLElement}
  */
 function buildZoneContent(zoneId) {
+  // Zone-specific panel builders
+  if (zoneId === 'treasury') {
+    loadTreasuryStyles('../zones/');
+    return buildTreasuryContent({ worldId: window.__claudeWorldId || null });
+  }
+
+  if (zoneId === 'docks') {
+    loadConnectorDocksStyles('../zones/');
+    return buildConnectorDocksContent({ worldId: window.__claudeWorldId || null });
+  }
+
   const info = ZONE_INFO[zoneId] || { icon: '\u{1F3D7}', desc: 'Unknown zone.' };
   const frag = document.createElement('div');
 

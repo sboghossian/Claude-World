@@ -185,10 +185,9 @@ export class HUD {
     this._questBody.appendChild(this._questChain);
     this._questCard.appendChild(this._questBody);
 
-    // Click to expand
+    // Click to open the full quest panel
     this._questCard.addEventListener('click', () => {
-      this._questExpanded = !this._questExpanded;
-      this._questCard.classList.toggle('expanded', this._questExpanded);
+      document.dispatchEvent(new CustomEvent('quest-panel:open', { bubbles: true }));
     });
 
     document.body.appendChild(this._questCard);

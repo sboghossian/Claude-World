@@ -1,0 +1,349 @@
+/**
+ * agent-dialogue.css — Rich agent dialogue panel styles
+ *
+ * Uses the same CSS variable system from variables.css.
+ * Agent role colors are defined here as additional tokens.
+ */
+
+/* ── Agent color tokens ─────────────────────────────────────────── */
+:root {
+  --agent-dispatcher: #4a9eff;
+  --agent-researcher: #4aff8a;
+  --agent-trainer: #ffb84a;
+  --agent-memory: #b84aff;
+  --agent-integrator: #4af0ff;
+}
+
+/* ── Dialogue panel (fills the panel__body slot) ────────────────── */
+.agent-dialogue {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* ── Header section ─────────────────────────────────────────────── */
+.agent-dialogue__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.agent-dialogue__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-inverse);
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.agent-dialogue__avatar--small {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+  font-weight: 600;
+  border-width: 1px;
+  flex-shrink: 0;
+}
+
+.agent-dialogue__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.agent-dialogue__name {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agent-dialogue__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.agent-dialogue__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.agent-dialogue__badge--role {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+}
+
+.agent-dialogue__badge--personality {
+  background: rgba(255, 184, 74, 0.12);
+  color: var(--accent-amber);
+  border: 1px solid rgba(255, 184, 74, 0.2);
+}
+
+/* ── Level / XP ─────────────────────────────────────────────────── */
+.agent-dialogue__level {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.agent-dialogue__level-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.agent-dialogue__xp-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+  max-width: 80px;
+}
+
+.agent-dialogue__xp-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width var(--transition-normal);
+}
+
+/* ── Messages area ──────────────────────────────────────────────── */
+.agent-dialogue__messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 120px;
+  max-height: 320px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+.agent-dialogue__messages::-webkit-scrollbar {
+  width: 4px;
+}
+
+.agent-dialogue__messages::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+
+/* ── Single message ─────────────────────────────────────────────── */
+.agent-dialogue__msg {
+  display: flex;
+  gap: 8px;
+  max-width: 92%;
+  animation: agentDialogueFadeIn 200ms ease;
+}
+
+.agent-dialogue__msg--agent {
+  align-self: flex-start;
+}
+
+.agent-dialogue__msg--user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.agent-dialogue__bubble {
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.agent-dialogue__msg--agent .agent-dialogue__bubble {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-top-left-radius: 2px;
+}
+
+.agent-dialogue__msg--user .agent-dialogue__bubble {
+  background: rgba(74, 158, 255, 0.15);
+  border: 1px solid rgba(74, 158, 255, 0.25);
+  border-top-right-radius: 2px;
+}
+
+.agent-dialogue__timestamp {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  padding: 0 4px;
+}
+
+.agent-dialogue__msg--user .agent-dialogue__timestamp {
+  text-align: right;
+}
+
+@keyframes agentDialogueFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Typing indicator ───────────────────────────────────────────── */
+.agent-dialogue__typing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 4px 0;
+}
+
+.agent-dialogue__typing-dots {
+  display: flex;
+  gap: 4px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  border-top-left-radius: 2px;
+}
+
+.agent-dialogue__typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  animation: agentDialogueBounce 1.2s ease-in-out infinite;
+}
+
+.agent-dialogue__typing-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.agent-dialogue__typing-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes agentDialogueBounce {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30%           { opacity: 1;   transform: translateY(-4px); }
+}
+
+/* ── Quick actions bar ──────────────────────────────────────────── */
+.agent-dialogue__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.agent-dialogue__action-btn {
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.agent-dialogue__action-btn:hover,
+.agent-dialogue__action-btn:focus-visible {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.agent-dialogue__action-btn:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* ── Task input bar ─────────────────────────────────────────────── */
+.agent-dialogue__input-bar {
+  display: flex;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.agent-dialogue__input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  min-width: 0;
+}
+
+.agent-dialogue__input:focus {
+  border-color: var(--accent-blue);
+}
+
+.agent-dialogue__input::placeholder {
+  color: var(--text-dim);
+}
+
+.agent-dialogue__send-btn {
+  padding: 10px 18px;
+  background: var(--accent-blue);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.agent-dialogue__send-btn:hover {
+  opacity: 0.85;
+}
+
+.agent-dialogue__send-btn:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+.agent-dialogue__send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

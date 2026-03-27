@@ -1,0 +1,675 @@
+/**
+ * memory-vault.css — Memory Vault zone styles
+ *
+ * Dark theme, glassmorphism cards, accessible.
+ * Uses design tokens from variables.css.
+ */
+
+/* ── Root container ────────────────────────────────────────────── */
+.mv-root {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mv-container {
+  width: 100%;
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+.mv-header {
+  margin-bottom: 4px;
+}
+
+.mv-title {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.mv-greeting {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 8px;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.mv-header-stats {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.3px;
+}
+
+/* ── Search ────────────────────────────────────────────────────── */
+.mv-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mv-search-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  box-sizing: border-box;
+}
+
+.mv-search-input:focus {
+  border-color: var(--accent-blue);
+}
+
+.mv-search-input::placeholder {
+  color: var(--text-dim);
+}
+
+.mv-search-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Highlight matches ─────────────────────────────────────────── */
+.mv-highlight {
+  background: rgba(74, 158, 255, 0.25);
+  color: var(--text-primary);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* ── Tab bar ───────────────────────────────────────────────────── */
+.mv-tab-bar {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.mv-tab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.mv-tab {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.mv-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.mv-tab--active {
+  background: var(--bg-selected);
+  color: var(--text-primary);
+  border-color: var(--accent-blue);
+}
+
+.mv-tab-count {
+  display: inline-block;
+  min-width: 16px;
+  padding: 1px 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  margin-left: 4px;
+}
+
+.mv-tab--active .mv-tab-count {
+  background: rgba(74, 158, 255, 0.3);
+}
+
+/* ── Memory list ───────────────────────────────────────────────── */
+.mv-memory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Memory card ───────────────────────────────────────────────── */
+.mv-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: var(--blur-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.mv-card:hover {
+  border-color: var(--border-light);
+}
+
+.mv-card--pinned {
+  border-left: 3px solid var(--accent-gold);
+}
+
+/* ── Card meta ─────────────────────────────────────────────────── */
+.mv-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.mv-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mv-badge--auto {
+  background: rgba(74, 158, 255, 0.15);
+  color: var(--accent-blue);
+}
+
+.mv-badge--manual {
+  background: rgba(74, 255, 138, 0.15);
+  color: var(--accent-green);
+}
+
+.mv-badge--agent {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--accent-purple);
+}
+
+.mv-badge--category {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: none;
+}
+
+.mv-card-source {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+.mv-card-time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+/* ── Card content ──────────────────────────────────────────────── */
+.mv-card-content {
+  max-height: 3.2em;
+  overflow: hidden;
+  transition: max-height var(--transition-normal) ease;
+}
+
+.mv-card-content--expanded {
+  max-height: 1000px;
+}
+
+.mv-card-text {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.mv-card-toggle {
+  display: inline-block;
+  margin-top: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--accent-blue);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.mv-card-toggle:hover {
+  color: var(--text-primary);
+}
+
+/* ── Card actions ──────────────────────────────────────────────── */
+.mv-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.mv-action-btn {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.mv-action-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.mv-action-btn--active {
+  color: var(--accent-gold);
+}
+
+.mv-action-btn--active:hover {
+  color: var(--accent-gold);
+}
+
+.mv-action-btn--danger {
+  color: var(--text-dim);
+}
+
+.mv-action-btn--danger:hover {
+  color: var(--accent-red);
+  background: rgba(255, 74, 106, 0.1);
+}
+
+/* ── Delete confirmation ───────────────────────────────────────── */
+.mv-delete-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.mv-delete-confirm-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--accent-red);
+  font-weight: 600;
+}
+
+/* ── Edit inline ───────────────────────────────────────────────── */
+.mv-edit-wrap {
+  margin-top: 4px;
+}
+
+.mv-edit-textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+  line-height: 1.6;
+  transition: border-color var(--transition-fast);
+}
+
+.mv-edit-textarea:focus {
+  border-color: var(--accent-blue);
+}
+
+.mv-edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* ── Empty state ───────────────────────────────────────────────── */
+.mv-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  gap: 12px;
+}
+
+.mv-empty-icon {
+  font-size: 36px;
+  opacity: 0.35;
+}
+
+.mv-empty-text {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  max-width: 280px;
+  margin: 0;
+}
+
+/* ── Add memory button / form ──────────────────────────────────── */
+.mv-add-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.mv-add-btn {
+  width: 100%;
+}
+
+.mv-add-form {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: var(--blur-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mv-add-form-title {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mv-form-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: block;
+}
+
+.mv-add-textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+  line-height: 1.6;
+  transition: border-color var(--transition-fast);
+}
+
+.mv-add-textarea:focus {
+  border-color: var(--accent-blue);
+}
+
+.mv-add-textarea::placeholder {
+  color: var(--text-dim);
+}
+
+.mv-add-select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238888a0' d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+
+.mv-add-select:focus {
+  border-color: var(--accent-blue);
+}
+
+.mv-add-select option {
+  background: #1a1a2e;
+  color: var(--text-primary);
+}
+
+/* ── Checkbox ──────────────────────────────────────────────────── */
+.mv-checkbox-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.mv-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-blue);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.mv-checkbox-label {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ── Buttons ───────────────────────────────────────────────────── */
+.mv-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition-fast), background var(--transition-fast);
+}
+
+.mv-btn--primary {
+  background: var(--accent-blue);
+  color: var(--text-inverse);
+}
+
+.mv-btn--primary:hover {
+  opacity: 0.85;
+}
+
+.mv-btn--ghost {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.mv-btn--ghost:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.mv-add-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ── Stats panel ───────────────────────────────────────────────── */
+.mv-stats {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-top: 4px;
+}
+
+.mv-stats-title {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+
+.mv-stats-empty {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ── Stat bars ─────────────────────────────────────────────────── */
+.mv-stat-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.mv-stat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mv-stat-bar-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-secondary);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.mv-stat-bar-outer {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.mv-stat-bar-inner {
+  height: 100%;
+  border-radius: 3px;
+  transition: width var(--transition-normal) ease;
+}
+
+.mv-stat-bar--auto {
+  background: var(--accent-blue);
+}
+
+.mv-stat-bar--manual {
+  background: var(--accent-green);
+}
+
+.mv-stat-bar--agent {
+  background: var(--accent-purple);
+}
+
+.mv-stat-bar-value {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  min-width: 56px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Stat rows ─────────────────────────────────────────────────── */
+.mv-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.mv-stat-row:last-child {
+  border-bottom: none;
+}
+
+.mv-stat-label {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.mv-stat-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ── Age distribution ──────────────────────────────────────────── */
+.mv-stat-age {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.mv-stat-age-title {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+/* ── Focus styles for accessibility ────────────────────────────── */
+.mv-tab:focus-visible,
+.mv-action-btn:focus-visible,
+.mv-btn:focus-visible,
+.mv-card-toggle:focus-visible,
+.mv-search-input:focus-visible,
+.mv-add-textarea:focus-visible,
+.mv-edit-textarea:focus-visible,
+.mv-add-select:focus-visible,
+.mv-checkbox:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .mv-card-content,
+  .mv-stat-bar-inner {
+    transition: none;
+  }
+}

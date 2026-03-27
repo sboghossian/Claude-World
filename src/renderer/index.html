@@ -26,10 +26,13 @@
   <div id="ui-root"></div>
   <script type="module">
     // Initialize PixiJS renderer
-    import { initWorld } from './app.js';
+    import { initWorld, getWorldState } from './app.js';
 
     // Initialize UI layer
     import { initUI } from '../ui/index.js';
+
+    // Morning briefing system
+    import { MorningBriefing } from '../systems/morning-briefing.js';
 
     async function boot() {
       try {
@@ -40,6 +43,12 @@
         // Start the UI overlay
         const ui = initUI('../ui/');
         console.log('[boot] UI layer initialized');
+
+        // Wire world state changes to HUD
+        const worldState = getWorldState();
+        worldState.onChange((snapshot) => {
+          ui.hud.setWorldState(snapshot.state);
+        });
 
         // Wire zone clicks from renderer to UI panels
         document.addEventListener('zone-click', (e) => {
@@ -56,6 +65,12 @@
             console.log('[boot] Navigate to zone:', zoneId);
           }
         });
+
+        // Show morning briefing (once per day, on first app open)
+        const briefing = new MorningBriefing();
+        if (briefing.tryShow()) {
+          console.log('[boot] Morning briefing shown');
+        }
 
       } catch (err) {
         console.error('[boot] Initialization failed:', err);

@@ -1,0 +1,609 @@
+/**
+ * connector-docks.css — Styles for the Connector Docks zone panel
+ *
+ * API key management, provider configuration, and connection health.
+ * Uses only CSS variables from variables.css.
+ */
+
+/* ── Panel root ───────────────────────────────────────────────── */
+
+.connector-docks {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 4px;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+}
+
+/* ── Header ───────────────────────────────────────────────────── */
+
+.connector-docks__greeting {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding: 8px 0 4px;
+}
+
+.connector-docks__stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.connector-docks__stats-bar span {
+  white-space: nowrap;
+}
+
+.connector-docks__stats-sep {
+  color: var(--text-dim);
+  user-select: none;
+}
+
+/* ── Provider grid ────────────────────────────────────────────── */
+
+.connector-docks__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ── Provider card ────────────────────────────────────────────── */
+
+.connector-docks__card {
+  position: relative;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: opacity var(--transition-fast),
+              border-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+
+.connector-docks__card--connected {
+  border-left-color: var(--accent-green);
+  box-shadow: inset 0 0 12px rgba(74, 255, 138, 0.06);
+}
+
+.connector-docks__card--unconfigured {
+  opacity: 0.75;
+}
+
+.connector-docks__card--coming-soon {
+  opacity: 0.4;
+  pointer-events: none;
+  user-select: none;
+}
+
+.connector-docks__card--coming-soon .connector-docks__card-lock {
+  display: flex;
+}
+
+.connector-docks__card-lock {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 20, 0.5);
+  border-radius: var(--radius-md);
+  font-size: 20px;
+  z-index: 1;
+}
+
+/* Card header row */
+.connector-docks__card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.connector-docks__card-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.connector-docks__card-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.connector-docks__card-status {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.connector-docks__card-status--connected {
+  color: var(--accent-green);
+}
+
+.connector-docks__card-status--not-configured {
+  color: var(--text-dim);
+}
+
+.connector-docks__card-status--coming-soon {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* Card info rows */
+.connector-docks__card-info {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.connector-docks__card-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.connector-docks__card-info-label {
+  color: var(--text-dim);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.connector-docks__card-info-value {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* Health indicators */
+.connector-docks__health {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.connector-docks__health-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.connector-docks__health-dot--green {
+  background: var(--accent-green);
+  box-shadow: 0 0 4px var(--accent-green);
+}
+
+.connector-docks__health-dot--amber {
+  background: var(--accent-amber);
+  box-shadow: 0 0 4px var(--accent-amber);
+}
+
+.connector-docks__health-dot--red {
+  background: var(--accent-red);
+  box-shadow: 0 0 4px var(--accent-red);
+}
+
+.connector-docks__health-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  flex: 1;
+}
+
+.connector-docks__health-value {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+/* Mini spend bar */
+.connector-docks__spend-bar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.connector-docks__spend-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width var(--transition-normal);
+  min-width: 0;
+}
+
+/* Card action button */
+.connector-docks__card-btn {
+  margin-top: 4px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast),
+              color var(--transition-fast),
+              border-color var(--transition-fast);
+  text-align: center;
+}
+
+.connector-docks__card-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.connector-docks__card-btn:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* ── Modal overlay ────────────────────────────────────────────── */
+
+.connector-docks__modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 6000;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+
+.connector-docks__modal-overlay--open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.connector-docks__modal {
+  width: 380px;
+  max-height: 90vh;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+/* Modal header */
+.connector-docks__modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.connector-docks__modal-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.connector-docks__modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.connector-docks__modal-close {
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background var(--transition-fast);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.connector-docks__modal-close:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.connector-docks__modal-close:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* Modal form fields */
+.connector-docks__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.connector-docks__field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.connector-docks__field-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.connector-docks__field-icon {
+  position: absolute;
+  left: 10px;
+  font-size: 13px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+
+.connector-docks__field-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 36px 9px 32px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color var(--transition-fast);
+}
+
+.connector-docks__field-input--no-icon {
+  padding-left: 12px;
+}
+
+.connector-docks__field-input:focus {
+  border-color: var(--accent-blue);
+}
+
+.connector-docks__field-input::placeholder {
+  color: var(--text-dim);
+}
+
+.connector-docks__field-toggle {
+  position: absolute;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast);
+  padding: 0;
+}
+
+.connector-docks__field-toggle:hover {
+  color: var(--text-secondary);
+}
+
+.connector-docks__field-toggle:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* Test connection result */
+.connector-docks__test-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  min-height: 20px;
+  transition: opacity var(--transition-fast);
+}
+
+.connector-docks__test-result--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.connector-docks__test-result--success {
+  background: rgba(74, 255, 138, 0.08);
+  border: 1px solid rgba(74, 255, 138, 0.2);
+  color: var(--accent-green);
+}
+
+.connector-docks__test-result--error {
+  background: rgba(255, 74, 106, 0.08);
+  border: 1px solid rgba(255, 74, 106, 0.2);
+  color: var(--accent-red);
+}
+
+.connector-docks__test-result--loading {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+/* Spinner */
+.connector-docks__spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: connector-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes connector-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Modal buttons */
+.connector-docks__modal-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.connector-docks__btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition-fast),
+              background var(--transition-fast),
+              border-color var(--transition-fast);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.connector-docks__btn:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+.connector-docks__btn--primary {
+  background: var(--accent-blue);
+  color: var(--text-inverse);
+  border-color: var(--accent-blue);
+}
+
+.connector-docks__btn--primary:hover {
+  opacity: 0.85;
+}
+
+.connector-docks__btn--primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.connector-docks__btn--secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.connector-docks__btn--secondary:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.connector-docks__btn--danger {
+  background: rgba(255, 74, 106, 0.1);
+  color: var(--accent-red);
+  border-color: rgba(255, 74, 106, 0.3);
+}
+
+.connector-docks__btn--danger:hover {
+  background: rgba(255, 74, 106, 0.2);
+}
+
+/* Delete confirmation */
+.connector-docks__confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 74, 106, 0.06);
+  border: 1px solid rgba(255, 74, 106, 0.15);
+  border-radius: var(--radius-sm);
+}
+
+.connector-docks__confirm-text {
+  font-size: 12px;
+  color: var(--accent-red);
+  line-height: 1.4;
+}
+
+.connector-docks__confirm-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Security notice ──────────────────────────────────────────── */
+
+.connector-docks__security {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-top: 4px;
+}
+
+.connector-docks__security-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.connector-docks__security-text {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* ── Section title (reuse panel convention) ───────────────────── */
+
+.connector-docks__section-title {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}

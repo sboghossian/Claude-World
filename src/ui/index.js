@@ -18,7 +18,10 @@ import { CommandPalette } from './command-palette.js';
 import { HUD } from './hud.js';
 import { ToastManager } from './toasts.js';
 import { PanelManager } from './panels.js';
+import { AgentDialogue } from './agent-dialogue.js';
 import { ShortcutManager } from './shortcuts.js';
+import { QuestPanel } from './quest-panel.js';
+import { initTreasuryEvents } from '../zones/treasury.js';
 
 /**
  * Load all UI CSS files by injecting <link> elements.
@@ -31,7 +34,9 @@ function loadStyles(basePath = '') {
     'hud.css',
     'toasts.css',
     'panels.css',
+    'agent-dialogue.css',
     'shortcuts.css',
+    'quest-panel.css',
   ];
 
   for (const file of cssFiles) {
@@ -57,9 +62,22 @@ export function initUI({ cssBasePath = '' } = {}) {
   const hud = new HUD();
   const toasts = new ToastManager();
   const panels = new PanelManager();
+  const agentDialogue = new AgentDialogue(panels);
   const shortcuts = new ShortcutManager({ palette, panels });
+  const questPanel = new QuestPanel();
 
   // ── Wire up cross-component events ────────────────────────────
+
+  // Toast forwarding — quest engine emits toast:show, we route to the manager
+  document.addEventListener('toast:show', (e) => {
+    toasts.show(e.detail);
+  });
+
+  // Quest chain updates → refresh HUD quest card
+  document.addEventListener('quest:chain-updated', () => {
+    // The quest engine exposes toHUDData() via its singleton
+    // This is picked up by whatever initializes the quest engine
+  });
 
   // Command palette navigation → camera pan + panel open
   document.addEventListener('command-palette:navigate', (e) => {
@@ -68,10 +86,20 @@ export function initUI({ cssBasePath = '' } = {}) {
     hud.setCurrentZone(zoneId);
   });
 
-  // Command palette agent → open agent panel
+  // Command palette agent → open rich agent dialogue panel
+  // Maps agent ids to dialogue-compatible data using known agent metadata.
+  const AGENT_DIALOGUE_DATA = {
+    commander:  { id: 'commander',  name: 'Commander',  role: 'Dispatcher',  personality: 'Strategic',  level: 3, xp: 75, colorKey: 'dispatcher' },
+    librarian:  { id: 'librarian',  name: 'Librarian',  role: 'Researcher',  personality: 'Curious',    level: 2, xp: 40, colorKey: 'researcher' },
+    archivist:  { id: 'archivist',  name: 'Archivist',  role: 'Memory',      personality: 'Meticulous', level: 2, xp: 55, colorKey: 'memory' },
+    instructor: { id: 'instructor', name: 'Instructor', role: 'Trainer',     personality: 'Patient',    level: 1, xp: 20, colorKey: 'trainer' },
+    dockmaster: { id: 'dockmaster', name: 'Dockmaster', role: 'Integrator',  personality: 'Practical',  level: 1, xp: 10, colorKey: 'integrator' },
+  };
+
   document.addEventListener('command-palette:agent', (e) => {
     const { agentId } = e.detail;
-    panels.openAgent(agentId);
+    const data = AGENT_DIALOGUE_DATA[agentId] || { id: agentId, name: agentId, role: 'Agent', personality: 'Adaptive', level: 1, xp: 0, colorKey: 'dispatcher' };
+    agentDialogue.open(data);
   });
 
   // Command palette action → route actions
@@ -89,17 +117,23 @@ export function initUI({ cssBasePath = '' } = {}) {
     hud.setCurrentZone(zoneId);
   });
 
+  // Treasury zone events → HUD budget indicator + toasts
+  initTreasuryEvents({ hud, toasts });
+
   return {
     palette,
     hud,
     toasts,
     panels,
+    agentDialogue,
+    questPanel,
     shortcuts,
     destroy() {
       palette.destroy();
       hud.destroy();
       toasts.destroy();
       panels.destroy();
+      questPanel.destroy();
       shortcuts.destroy();
     },
   };
