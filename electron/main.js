@@ -1,5 +1,6 @@
 const { app, BrowserWindow, session, ipcMain, dialog } = require('electron');
 const path = require('path');
+const { initAutoUpdater } = require('./auto-updater');
 
 let mainWindow = null;
 let db = null;
@@ -42,6 +43,7 @@ function createWindow() {
   // Show window once content is ready (prevents white flash)
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
+    initAutoUpdater(mainWindow);
   });
 
   // CSP headers — applied to all responses

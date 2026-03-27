@@ -35,6 +35,25 @@ contextBridge.exposeInMainWorld('api', {
     createMinion: (worldId, config) => ipcRenderer.invoke('db:createMinion', worldId, config),
     updateMinion: (minionId, updates) => ipcRenderer.invoke('db:updateMinion', minionId, updates),
     recordMinionRun: (minionId, worldId, runData) => ipcRenderer.invoke('db:recordMinionRun', minionId, worldId, runData),
+    // Airport
+    getAirportLog: (worldId) => ipcRenderer.invoke('db:getAirportLog', worldId),
+    createAirportLog: (worldId, data) => ipcRenderer.invoke('db:createAirportLog', worldId, data),
+    getDeployToken: (worldId) => ipcRenderer.invoke('db:getDeployToken', worldId),
+    upsertDeployToken: (worldId, token) => ipcRenderer.invoke('db:upsertDeployToken', worldId, token),
+    // Globe Room
+    getResearchQueries: (worldId) => ipcRenderer.invoke('db:getResearchQueries', worldId),
+    createResearchQuery: (worldId, data) => ipcRenderer.invoke('db:createResearchQuery', worldId, data),
+    updateResearchQuery: (queryId, updates) => ipcRenderer.invoke('db:updateResearchQuery', queryId, updates),
+    // Broadcast Tower
+    getBroadcastChannels: (worldId) => ipcRenderer.invoke('db:getBroadcastChannels', worldId),
+    createBroadcastChannel: (worldId, data) => ipcRenderer.invoke('db:createBroadcastChannel', worldId, data),
+    updateBroadcastChannel: (channelId, updates) => ipcRenderer.invoke('db:updateBroadcastChannel', channelId, updates),
+    deleteBroadcastChannel: (channelId) => ipcRenderer.invoke('db:deleteBroadcastChannel', channelId),
+    getBroadcastLog: (worldId, limit) => ipcRenderer.invoke('db:getBroadcastLog', worldId, limit),
+    createBroadcastLog: (worldId, data) => ipcRenderer.invoke('db:createBroadcastLog', worldId, data),
+    // World Versions
+    deleteSnapshot: (snapshotId) => ipcRenderer.invoke('db:deleteSnapshot', snapshotId),
+    restoreSnapshot: (worldId, snapshotId) => ipcRenderer.invoke('db:restoreSnapshot', worldId, snapshotId),
     // Sales District
     getLeads: (worldId) => ipcRenderer.invoke('db:getLeads', worldId),
     createLead: (worldId, data) => ipcRenderer.invoke('db:createLead', worldId, data),

@@ -19,6 +19,10 @@ import { SalesDistrict } from '../zones/sales-district.js';
 import { MarketingPlaza } from '../zones/marketing-plaza.js';
 import { Exchange } from '../zones/exchange.js';
 import { Market } from '../zones/market.js';
+import { Airport } from '../zones/airport.js';
+import { GlobeRoom } from '../zones/globe-room.js';
+import { BroadcastTower } from '../zones/broadcast-tower.js';
+import { WorldVersions } from '../zones/world-versions.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -139,6 +143,34 @@ function buildZoneContent(zoneId) {
     const market = new Market();
     const el = market.render();
     market.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'airport') {
+    const airport = new Airport();
+    const el = airport.render();
+    airport.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'globe') {
+    const globe = new GlobeRoom();
+    const el = globe.render();
+    globe.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'broadcast') {
+    const broadcast = new BroadcastTower();
+    const el = broadcast.render();
+    broadcast.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'versions') {
+    const versions = new WorldVersions();
+    const el = versions.render();
+    versions.init(window.__claudeWorldId || 1);
     return el;
   }
 

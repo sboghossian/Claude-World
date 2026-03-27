@@ -638,6 +638,193 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
+  // ── Airport ───────────────────────────────────────────────────────
+
+  ipcMain.handle('db:getAirportLog', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM airport_log WHERE world_id = ? ORDER BY created_at DESC LIMIT 50'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createAirportLog', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO airport_log (world_id, operation, file_type, file_name, file_size_kb, status) VALUES (?, ?, ?, ?, ?, ?)'
+        ).run(worldId, data.operation || 'export', data.fileType || 'json', data.fileName || 'export.json', data.fileSizeKb || 0, data.status || 'completed');
+        return database.prepare('SELECT * FROM airport_log WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:getDeployToken', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare('SELECT * FROM deploy_tokens WHERE world_id = ?').get(worldId) || null,
+      null
+    );
+  });
+
+  ipcMain.handle('db:upsertDeployToken', async (_event, worldId, token) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(token, 'string', 'token');
+    return dbCall(
+      (database) => {
+        database.prepare(
+          'INSERT INTO deploy_tokens (world_id, token) VALUES (?, ?) ON CONFLICT(world_id) DO UPDATE SET token = excluded.token, created_at = datetime(\'now\')'
+        ).run(worldId, token);
+        return database.prepare('SELECT * FROM deploy_tokens WHERE world_id = ?').get(worldId);
+      },
+      null
+    );
+  });
+
+  // ── Globe Room — Research ─────────────────────────────────────────
+
+  ipcMain.handle('db:getResearchQueries', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM research_queries WHERE world_id = ? ORDER BY created_at DESC LIMIT 50'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createResearchQuery', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.query, 'string', 'query');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO research_queries (world_id, query, result, sources_json, is_monitored) VALUES (?, ?, ?, ?, ?)'
+        ).run(worldId, data.query.trim(), data.result || null, JSON.stringify(data.sources || []), data.isMonitored ? 1 : 0);
+        return database.prepare('SELECT * FROM research_queries WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:updateResearchQuery', async (_event, queryId, updates) => {
+    assertType(queryId, 'string', 'queryId');
+    const allowed = ['result', 'sources_json', 'is_monitored', 'last_queried_at'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k));
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE research_queries SET ${sets} WHERE id = @id`).run({ ...updates, id: queryId });
+        return database.prepare('SELECT * FROM research_queries WHERE id = ?').get(queryId);
+      },
+      null
+    );
+  });
+
+  // ── Broadcast Tower ───────────────────────────────────────────────
+
+  ipcMain.handle('db:getBroadcastChannels', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM broadcast_channels WHERE world_id = ? ORDER BY name ASC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createBroadcastChannel', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.name, 'string', 'name');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO broadcast_channels (world_id, name, channel_type, endpoint, triggers_json, enabled) VALUES (?, ?, ?, ?, ?, ?)'
+        ).run(worldId, data.name.trim(), data.channelType || 'webhook', data.endpoint || '', JSON.stringify(data.triggers || []), data.enabled !== false ? 1 : 0);
+        return database.prepare('SELECT * FROM broadcast_channels WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:updateBroadcastChannel', async (_event, channelId, updates) => {
+    assertType(channelId, 'string', 'channelId');
+    const allowed = ['name', 'channel_type', 'endpoint', 'triggers_json', 'enabled', 'last_broadcast_at'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k));
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE broadcast_channels SET ${sets} WHERE id = @id`).run({ ...updates, id: channelId });
+        return database.prepare('SELECT * FROM broadcast_channels WHERE id = ?').get(channelId);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:deleteBroadcastChannel', async (_event, channelId) => {
+    assertType(channelId, 'string', 'channelId');
+    return dbCall(
+      (database) => {
+        database.prepare('DELETE FROM broadcast_channels WHERE id = ?').run(channelId);
+        return { success: true };
+      },
+      { success: true }
+    );
+  });
+
+  ipcMain.handle('db:getBroadcastLog', async (_event, worldId, limit) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT l.*, c.name AS channel_name FROM broadcast_log l LEFT JOIN broadcast_channels c ON l.channel_id = c.id WHERE l.world_id = ? ORDER BY l.created_at DESC LIMIT ?'
+      ).all(worldId, limit || 50),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createBroadcastLog', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.eventType, 'string', 'eventType');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO broadcast_log (world_id, channel_id, event_type, payload_json, status) VALUES (?, ?, ?, ?, ?)'
+        ).run(worldId, data.channelId || null, data.eventType, JSON.stringify(data.payload || {}), data.status || 'sent');
+        return database.prepare('SELECT * FROM broadcast_log WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  // ── World Versions (snapshot restore/delete) ──────────────────────
+
+  ipcMain.handle('db:deleteSnapshot', async (_event, snapshotId) => {
+    assertType(snapshotId, 'string', 'snapshotId');
+    return dbCall(
+      (database) => {
+        database.prepare('DELETE FROM world_snapshots WHERE id = ?').run(snapshotId);
+        return { success: true };
+      },
+      { success: true }
+    );
+  });
+
+  ipcMain.handle('db:restoreSnapshot', async (_event, worldId, snapshotId) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(snapshotId, 'string', 'snapshotId');
+    // Restoration in MVP: return the snapshot for the renderer to apply
+    return dbCall(
+      (database) => database.prepare('SELECT * FROM world_snapshots WHERE id = ?').get(snapshotId) || null,
+      null
+    );
+  });
+
   // ── Sales District — Leads ────────────────────────────────────────
 
   ipcMain.handle('db:getLeads', async (_event, worldId) => {

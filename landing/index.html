@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude World — Your company runs on agents. Now you can see them.</title>
+  <meta name="description" content="Claude World is an Electron Mac app that reimagines AI orchestration as a navigable isometric 2.5D city. SimCity meets an AI IDE." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Claude World — AI orchestration as a city" />
+  <meta property="og:description" content="Your company runs on agents. Now you can see them. Every AI component is a physical building you enter, staff, and operate." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://claudeworld.app" />
+  <meta property="og:image" content="https://claudeworld.app/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Claude World — AI orchestration as a city" />
+  <meta name="twitter:description" content="Your company runs on agents. Now you can see them." />
+
+  <!-- Favicon: purple hexagon via data URI -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">⬡ CLAUDE WORLD</a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#city">The City</a>
+        <a href="#zones">Zones</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#download" class="btn btn-primary btn-sm">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-bg-grid"></div>
+    <div class="container hero-content">
+      <div class="hero-badge">Now in Early Access · Mac App</div>
+      <h1 class="hero-title">
+        Your company runs on agents.<br />
+        <span class="gradient-text">Now you can see them.</span>
+      </h1>
+      <p class="hero-sub">
+        Claude World is a Mac desktop app that turns AI orchestration into a navigable
+        isometric city. Every tool is a building. Every agent is staff. SimCity meets your AI IDE.
+      </p>
+      <div class="hero-ctas">
+        <a href="#download" class="btn btn-primary btn-shimmer">
+          <span>⬇ Download for Mac</span>
+        </a>
+        <a href="https://github.com" class="btn btn-outline">
+          <span>★ View on GitHub</span>
+        </a>
+      </div>
+      <p class="hero-proof">Built for developers who ship with AI.</p>
+    </div>
+
+    <!-- Floating city preview -->
+    <div class="hero-city-wrap float-anim">
+      <div class="hero-city-card">
+        <div class="city-mini-preview" aria-hidden="true">
+          <div class="city-row">
+            <span class="bldg b1">🏰</span>
+            <span class="bldg b2">💬</span>
+            <span class="bldg b3">🔭</span>
+          </div>
+          <div class="city-row offset">
+            <span class="bldg b4">⚖️</span>
+            <span class="bldg b5">📡</span>
+            <span class="bldg b6">🛒</span>
+          </div>
+          <div class="city-row">
+            <span class="bldg b7">🏦</span>
+            <span class="bldg b8">🎨</span>
+            <span class="bldg b9">📊</span>
+          </div>
+          <div class="city-label">Claude World v1.0</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════ FEATURES ═════════════════════════ -->
+  <section id="features" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Every zone is a fully functional AI tool</h2>
+        <p>Not a dashboard. Not a wrapper. Each building is a real workspace — enter it, use it, leave.</p>
+      </div>
+
+      <div class="zone-cards-grid">
+
+        <div class="zone-card">
+          <div class="zone-icon">🏰</div>
+          <h3>Dispatch Center</h3>
+          <p>Command hub. Every AI task starts here. Route work, assign agents, monitor progress.</p>
+          <div class="zone-tag">Core</div>
+        </div>
+
+        <div class="zone-card">
+          <div class="zone-icon">💬</div>
+          <h3>Chat Rooms</h3>
+          <p>Persistent conversations with full history. Pick up exactly where you left off.</p>
+          <div class="zone-tag">Communication</div>
+        </div>
+
+        <div class="zone-card">
+          <div class="zone-icon">🔭</div>
+          <h3>The Council</h3>
+          <p>Ask 3 models simultaneously. Compare answers side-by-side. Let the best answer win.</p>
+          <div class="zone-tag">Intelligence</div>
+        </div>
+
+        <div class="zone-card">
+          <div class="zone-icon">⚖️</div>
+          <h3>Legal Tower</h3>
+          <p>Contract analysis. Risk detection. Lex never sleeps. Review agreements at machine speed.</p>
+          <div class="zone-tag">Legal</div>
+        </div>
+
+        <div class="zone-card">
+          <div class="zone-icon">📡</div>
+          <h3>Broadcast Tower</h3>
+          <p>Webhooks, notifications, automation triggers. Connect your city to the outside world.</p>
+          <div class="zone-tag">Automation</div>
+        </div>
+
+        <div class="zone-card">
+          <div class="zone-icon">🛒</div>
+          <h3>The Market</h3>
+          <p>Install skills and agent configs in one click. Extend your city with community-built zones.</p>
+          <div class="zone-tag">Marketplace</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════ HOW IT WORKS ══════════════════════ -->
+  <section class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <h2>Up and running in minutes</h2>
+        <p>No server setup. No Docker. Just your API key and a city to build.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-num">01</div>
+          <h3>Enter your API key</h3>
+          <p>Connect Anthropic or OpenAI. Your keys stay local — we never touch your data.</p>
+        </div>
+        <div class="step-arrow" aria-hidden="true">→</div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <h3>Build your city</h3>
+          <p>Unlock zones as you complete tasks. Your city grows with your usage.</p>
+        </div>
+        <div class="step-arrow" aria-hidden="true">→</div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <h3>Let your agents run</h3>
+          <p>Automate, delegate, repeat. The city works even when you don't.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════ THE CITY ══════════════════════════ -->
+  <section id="city" class="section section-city">
+    <div class="container">
+      <div class="section-header">
+        <h2>Every building is a tool.</h2>
+        <p>The world IS the interface. Navigate it. Inhabit it. Own it.</p>
+      </div>
+
+      <div class="ascii-city" role="img" aria-label="Isometric city preview">
+        <pre class="city-art">
+         ╔══════════════════════════════════════════════════════╗
+         ║     · · · · · CLAUDE  WORLD  v1 · · · · ·           ║
+         ╠══════════════════════════════════════════════════════╣
+         ║                                                      ║
+         ║       ▲           ▲▲▲         ▲                      ║
+         ║      ╱█╲         ╱███╲       ╱█╲     ▲              ║
+         ║     ╱███╲       ╱█████╲     ╱███╲   ╱█╲             ║
+         ║    ╱█████╲     ╱███████╲   ╱█████╲ ╱███╲            ║
+         ║   ╱DISPATCH╲  ╱ COUNCIL ╲ ╱ LEGAL ╲████╲            ║
+         ║  ╱___________╲___________╲__________████╲           ║
+         ║                                                      ║
+         ║      ░░░░░░░░░    ┌────────┐    ░░░░░░░░            ║
+         ║      ░  CHAT ░    │MEMORY  │    ░MARKET ░           ║
+         ║      ░  ROOMS░    │ VAULT  │    ░░░░░░░░░           ║
+         ║      ░░░░░░░░░    └────────┘                        ║
+         ║                                                      ║
+         ║   ╔══════╗   ╔══════╗   ╔══════╗   ╔══════╗        ║
+         ║   ║SALES ║   ║ LEGAL║   ║  HR  ║   ║  DEV ║        ║
+         ║   ║DIST. ║   ║TOWER ║   ║PLAZA ║   ║ LABS ║        ║
+         ║   ╚══════╝   ╚══════╝   ╚══════╝   ╚══════╝        ║
+         ║                                                      ║
+         ║   ─────────── · ISOMETRIC 2.5D CITY · ─────────── ║
+         ╚══════════════════════════════════════════════════════╝</pre>
+      </div>
+
+      <div class="city-features">
+        <div class="city-feat">
+          <span class="city-feat-icon">⌘</span>
+          <span>Cmd+K for everything</span>
+        </div>
+        <div class="city-feat">
+          <span class="city-feat-icon">🗄</span>
+          <span>SQLite-powered Memory Vault</span>
+        </div>
+        <div class="city-feat">
+          <span class="city-feat-icon">🔒</span>
+          <span>100% local — your keys, your data</span>
+        </div>
+        <div class="city-feat">
+          <span class="city-feat-icon">✈️</span>
+          <span>Works fully offline</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════ ZONES GRID ════════════════════════ -->
+  <section id="zones" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>20+ zones. All functional.</h2>
+        <p>Every zone on the map is a fully built tool. Not a placeholder — a place.</p>
+      </div>
+
+      <div class="zones-legend">
+
+        <div class="zone-item">
+          <span class="zone-emoji">🏰</span>
+          <div>
+            <strong>Dispatch Center</strong>
+            <span>Command hub for all AI tasks</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">💬</span>
+          <div>
+            <strong>Chat Rooms</strong>
+            <span>Persistent multi-model conversations</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">🔭</span>
+          <div>
+            <strong>The Council</strong>
+            <span>3-model simultaneous comparison</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">⚖️</span>
+          <div>
+            <strong>Legal Tower</strong>
+            <span>Contract analysis & risk detection</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">📡</span>
+          <div>
+            <strong>Broadcast Tower</strong>
+            <span>Webhooks & automation triggers</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">🛒</span>
+          <div>
+            <strong>The Market</strong>
+            <span>Install skills & agent configs</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">🏦</span>
+          <div>
+            <strong>Sales District</strong>
+            <span>Outreach, cold email, CRM sync</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">🎨</span>
+          <div>
+            <strong>Marketing Plaza</strong>
+            <span>Copy, campaigns, brand voice</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">📊</span>
+          <div>
+            <strong>Data Foundry</strong>
+            <span>CSV analysis & chart generation</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">🔬</span>
+          <div>
+            <strong>Research Lab</strong>
+            <span>Deep-dive reports & summaries</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">🗄</span>
+          <div>
+            <strong>Memory Vault</strong>
+            <span>Persistent context across sessions</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">💻</span>
+          <div>
+            <strong>Dev Labs</strong>
+            <span>Code generation & review</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">🧠</span>
+          <div>
+            <strong>Brain Trust</strong>
+            <span>Brainstorming & ideation engine</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">📝</span>
+          <div>
+            <strong>Writer's Block</strong>
+            <span>Long-form content & ghost-writing</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">🤝</span>
+          <div>
+            <strong>HR Plaza</strong>
+            <span>Job descriptions, interviews, offers</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">📬</span>
+          <div>
+            <strong>Inbox Zero</strong>
+            <span>Email drafting & triage</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">🗺</span>
+          <div>
+            <strong>Strategy Room</strong>
+            <span>Planning, OKRs, decision trees</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">🎙</span>
+          <div>
+            <strong>Studio</strong>
+            <span>Podcast scripts & video briefs</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">🔐</span>
+          <div>
+            <strong>Security HQ</strong>
+            <span>Threat analysis & code auditing</span>
+          </div>
+        </div>
+
+        <div class="zone-item">
+          <span class="zone-emoji">🚀</span>
+          <div>
+            <strong>Launch Pad</strong>
+            <span>Product Hunt prep & go-to-market</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════ PRICING ═══════════════════════════ -->
+  <section id="pricing" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <h2>Simple pricing. No surprises.</h2>
+        <p>Your API costs are separate. We just build the city.</p>
+      </div>
+
+      <div class="pricing-card-wrap">
+        <div class="pricing-card">
+          <div class="pricing-badge">Early Bird</div>
+          <div class="pricing-amount">
+            <span class="pricing-dollar">$</span>
+            <span class="pricing-number">10</span>
+            <span class="pricing-period">/month</span>
+          </div>
+          <p class="pricing-earlybird">
+            🐦 First 100 users get <strong>lifetime access at $49</strong>
+          </p>
+          <ul class="pricing-features">
+            <li>✓ All 20+ zones unlocked</li>
+            <li>✓ Anthropic + OpenAI support</li>
+            <li>✓ SQLite Memory Vault (persistent context)</li>
+            <li>✓ Cmd+K command palette</li>
+            <li>✓ Works fully offline</li>
+            <li>✓ The Market (community skills)</li>
+            <li>✓ All future zones included</li>
+            <li>✓ Priority email support</li>
+          </ul>
+          <a href="#download" class="btn btn-primary btn-full btn-shimmer">
+            <span>Get Early Access</span>
+          </a>
+          <p class="pricing-note">Mac only · Requires your own API key</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════ FAQ ═══════════════════════════════ -->
+  <section id="faq" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Frequently asked</h2>
+      </div>
+
+      <div class="faq-list">
+
+        <details class="faq-item">
+          <summary class="faq-question">Do I need an Anthropic API key?</summary>
+          <div class="faq-answer">
+            <p>You need at least one API key — either Anthropic or OpenAI. Claude World works with both. Your keys are stored locally in your system keychain and are never sent to our servers. Bring your own keys, keep your own costs.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">Does Claude World store my data?</summary>
+          <div class="faq-answer">
+            <p>No. All your data — conversations, memory, configs — lives in a local SQLite database on your Mac. We have no backend, no cloud sync, no telemetry. The Memory Vault is yours and only yours.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">Is it really a city?</summary>
+          <div class="faq-answer">
+            <p>Yes. The isometric 2.5D city is the actual interface — not a skin or theme. You navigate it like a game. Each building you click opens a full-featured AI workspace. The city grows as you unlock more zones. It is genuinely unlike anything else in the AI tooling space.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">What models does it support?</summary>
+          <div class="faq-answer">
+            <p>Claude World supports Claude 3.5 Sonnet, Claude 3 Opus, Claude 3 Haiku (via Anthropic), and GPT-4o, GPT-4 Turbo, GPT-3.5 Turbo (via OpenAI). More models are added regularly. The Council zone lets you query multiple models simultaneously to compare responses.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">Can I use it offline?</summary>
+          <div class="faq-answer">
+            <p>Fully. The app runs locally via Electron. You only need internet when making API calls to Anthropic or OpenAI. All navigation, memory retrieval, and local tooling works without a connection. Perfect for planes, trains, and focus sessions.</p>
+          </div>
+        </details>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════ DOWNLOAD ══════════════════════════ -->
+  <section id="download" class="section section-download">
+    <div class="container">
+      <div class="download-inner">
+        <div class="download-logo">⬡</div>
+        <h2>Ready to build your city?</h2>
+        <p>The AI operating system disguised as a city.<br />Download free. Bring your API key. Start building.</p>
+        <div class="hero-ctas">
+          <a href="#" class="btn btn-primary btn-lg btn-shimmer">
+            <span>⬇ Download for Mac</span>
+          </a>
+          <a href="https://github.com" class="btn btn-outline btn-lg">
+            <span>★ Star on GitHub</span>
+          </a>
+        </div>
+        <p class="hero-proof">macOS 13 Ventura or later · Apple Silicon + Intel</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════ FOOTER ════════════════════════════ -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-logo">⬡ CLAUDE WORLD</div>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#city">The City</a>
+        <a href="#zones">Zones</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com">GitHub</a>
+      </div>
+      <p class="footer-copy">© 2026 Claude World · Made with ❤️ and Claude</p>
+    </div>
+  </footer>
+
+</body>
+</html>
