@@ -17,6 +17,10 @@ contextBridge.exposeInMainWorld('api', {
       ipcRenderer.invoke('db:searchTasks', worldId, query),
     getTaskStats: (worldId) => ipcRenderer.invoke('db:getTaskStats', worldId),
     completeQuest: (questId) => ipcRenderer.invoke('db:completeQuest', questId),
+    updateZoneProgress: (worldId, zoneType, progress) =>
+      ipcRenderer.invoke('db:updateZoneProgress', worldId, zoneType, progress),
+    getZoneProgress: (worldId) => ipcRenderer.invoke('db:getZoneProgress', worldId),
+    unlockZone: (worldId, zoneType) => ipcRenderer.invoke('db:unlockZone', worldId, zoneType),
   },
 
   // ── AI dispatch ────────────────────────────────────────────────────

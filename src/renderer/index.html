@@ -25,48 +25,107 @@
   <canvas id="world-canvas"></canvas>
   <div id="ui-root"></div>
   <script type="module">
-    // Initialize PixiJS renderer
-    import { initWorld, getWorldState } from './app.js';
-
-    // Initialize UI layer
+    import { initWorld, getWorldState, getBuildingManager } from './app.js';
     import { initUI } from '../ui/index.js';
-
-    // Morning briefing system
     import { MorningBriefing } from '../systems/morning-briefing.js';
+    import { OnboardingSystem } from '../systems/onboarding.js';
+    import { initOnboarding } from '../ui/onboarding.js';
 
     async function boot() {
       try {
-        // Start the isometric world
-        const world = await initWorld();
+        // ── 1. Start the isometric world ──────────────────────────────
+        await initWorld();
         console.log('[boot] World renderer initialized');
 
-        // Start the UI overlay
+        // ── 2. Start the UI overlay ───────────────────────────────────
         const ui = initUI('../ui/');
         console.log('[boot] UI layer initialized');
 
-        // Wire world state changes to HUD
+        // ── 3. Wire world state → HUD ────────────────────────────────
         const worldState = getWorldState();
         worldState.onChange((snapshot) => {
           ui.hud.setWorldState(snapshot.state);
         });
 
-        // Wire zone clicks from renderer to UI panels
+        // ── 4. Wire zone clicks → UI panels ──────────────────────────
         document.addEventListener('zone-click', (e) => {
           const { zoneId, zoneName } = e.detail;
           ui.panels.openZone(zoneId, zoneName);
           ui.toasts.show({ type: 'info', title: zoneName, description: 'Zone selected' });
         });
 
-        // Wire command palette navigation to camera
-        document.addEventListener('command-palette:navigate', (e) => {
-          const { zoneId } = e.detail;
-          if (world && world.getCamera()) {
-            // Camera will be wired to zone positions
-            console.log('[boot] Navigate to zone:', zoneId);
+        // ── 5. Load zone build progress from DB → buildings ──────────
+        async function syncBuildProgress(worldId) {
+          try {
+            const zones = await window.api.db.getZoneProgress(worldId);
+            const bm = getBuildingManager();
+            if (bm && zones && zones.length) {
+              bm.updateAllFromDB(zones);
+              console.log('[boot] Build progress synced for', zones.length, 'zones');
+            }
+          } catch (err) {
+            console.warn('[boot] Could not sync build progress:', err.message);
+          }
+        }
+
+        // ── 6. Onboarding ─────────────────────────────────────────────
+        const onboarding = new OnboardingSystem();
+        initOnboarding(onboarding);
+
+        // After onboarding creates a world, unlock starting zones + sync
+        document.addEventListener('onboarding:world-created', async (e) => {
+          const { worldId, template } = e.detail;
+          // Unlock the 3 template starting zones
+          const startingZones = {
+            'startup':   ['dispatch', 'brain', 'legal'],
+            'developer': ['dispatch', 'brain', 'docks'],
+            'freelancer':['dispatch', 'brain', 'skills'],
+          };
+          const zones = startingZones[template] || ['dispatch', 'brain'];
+          for (const zoneType of zones) {
+            await window.api.db.unlockZone(worldId, zoneType).catch(() => {});
+          }
+          await syncBuildProgress(worldId);
+        });
+
+        // When onboarding completes, sync progress + show morning briefing
+        document.addEventListener('onboarding:complete', async (e) => {
+          const worldId = e.detail?.worldId || 1;
+          await syncBuildProgress(worldId);
+        });
+
+        // ── 7. Check if onboarding is needed ─────────────────────────
+        if (!onboarding.isComplete()) {
+          await onboarding.check();
+        } else {
+          // Returning user — sync existing world's build progress
+          try {
+            const world = await window.api.db.getWorld(1);
+            if (world?.id) await syncBuildProgress(world.id);
+          } catch (_) {}
+        }
+
+        // ── 8. Wire zone progress on dispatch task complete ───────────
+        document.addEventListener('dispatch:task-complete', async (e) => {
+          const { worldId, zoneType, success } = e.detail || {};
+          if (!worldId || !zoneType) return;
+          try {
+            // Get current progress and advance it
+            const zones = await window.api.db.getZoneProgress(worldId);
+            const zone = zones?.find(z => z.zone_type === zoneType);
+            const current = zone?.build_progress ?? 0;
+            // Each successful task adds 0.08–0.15 progress
+            const delta = success ? (0.08 + Math.random() * 0.07) : 0.02;
+            const next = Math.min(1.0, current + delta);
+            await window.api.db.updateZoneProgress(worldId, zoneType, next);
+            const bm = getBuildingManager();
+            if (bm) bm.setZoneProgress(zoneType, next);
+          } catch (err) {
+            console.warn('[boot] Could not update zone progress:', err.message);
           }
         });
 
-        // Show morning briefing (once per day, on first app open)
+        // ── 9. Morning briefing (once per day) ───────────────────────
         const briefing = new MorningBriefing();
         if (briefing.tryShow()) {
           console.log('[boot] Morning briefing shown');

@@ -233,6 +233,50 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
+  ipcMain.handle('db:updateZoneProgress', async (_event, worldId, zoneType, progress) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(zoneType, 'string', 'zoneType');
+    assertType(progress, 'number', 'progress');
+    if (progress < 0 || progress > 1) throw new Error('progress must be 0.0-1.0');
+    return dbCall(
+      (database) => {
+        database.prepare(
+          'UPDATE zones SET build_progress = ? WHERE world_id = ? AND zone_type = ?'
+        ).run(progress, worldId, zoneType);
+        return database.prepare(
+          'SELECT * FROM zones WHERE world_id = ? AND zone_type = ?'
+        ).get(worldId, zoneType);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:getZoneProgress', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT zone_type, build_progress, unlocked FROM zones WHERE world_id = ?'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:unlockZone', async (_event, worldId, zoneType) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(zoneType, 'string', 'zoneType');
+    return dbCall(
+      (database) => {
+        database.prepare(
+          "UPDATE zones SET unlocked = 1, build_progress = MAX(build_progress, 0.1), unlocked_at = datetime('now') WHERE world_id = ? AND zone_type = ?"
+        ).run(worldId, zoneType);
+        return database.prepare(
+          'SELECT * FROM zones WHERE world_id = ? AND zone_type = ?'
+        ).get(worldId, zoneType);
+      },
+      null
+    );
+  });
+
   // ── ai:* handlers ─────────────────────────────────────────────────
 
   // Lazy-init the dispatch manager on first AI call
