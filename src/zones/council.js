@@ -107,39 +107,28 @@ function countWords(text) {
   return text.trim().split(/\s+/).filter(Boolean).length;
 }
 
-// ── DB helpers ────────────────────────────────────────────────────
+// ── DB helpers (use dedicated safe IPC handlers, no raw SQL) ─────
 
-async function _dbRun(sql, params = []) {
+async function _councilExec(action, params = {}) {
   try {
-    if (window.api && window.api.db && window.api.db.run) {
-      return await window.api.db.run(sql, params);
+    if (window.api && window.api.db && window.api.db.executeCouncilQuery) {
+      return await window.api.db.executeCouncilQuery(action, params);
     }
   } catch (err) {
-    console.warn('[council] DB run failed:', err);
+    console.warn('[council] DB exec failed:', err);
   }
   return null;
 }
 
-async function _dbAll(sql, params = []) {
+async function _councilQuery(action, params = {}) {
   try {
-    if (window.api && window.api.db && window.api.db.all) {
-      return await window.api.db.all(sql, params);
+    if (window.api && window.api.db && window.api.db.getCouncilData) {
+      return await window.api.db.getCouncilData(action, params);
     }
   } catch (err) {
-    console.warn('[council] DB all failed:', err);
+    console.warn('[council] DB query failed:', err);
   }
   return [];
-}
-
-async function _dbGet(sql, params = []) {
-  try {
-    if (window.api && window.api.db && window.api.db.get) {
-      return await window.api.db.get(sql, params);
-    }
-  } catch (err) {
-    console.warn('[council] DB get failed:', err);
-  }
-  return null;
 }
 
 function _generateId() {
@@ -406,10 +395,9 @@ export class Council {
     const sessionId = _generateId();
     const modelsJson = JSON.stringify(selectedModels.map(p => ({ provider: p.id, model: p.model })));
 
-    await _dbRun(
-      `INSERT INTO council_sessions (id, world_id, prompt, models_json) VALUES (?, ?, ?, ?)`,
-      [sessionId, worldId, prompt, modelsJson]
-    );
+    await _councilExec('insertSession', {
+      id: sessionId, worldId, prompt, modelsJson,
+    });
 
     // 2. Build seat cards
     this._responseGrid.innerHTML = '';
@@ -427,10 +415,9 @@ export class Council {
       responseIds[provider.id] = responseId;
 
       // Insert pending response row
-      await _dbRun(
-        `INSERT INTO council_responses (id, session_id, provider, model, status) VALUES (?, ?, ?, ?, 'pending')`,
-        [responseId, sessionId, provider.id, provider.model]
-      );
+      await _councilExec('insertPendingResponse', {
+        id: responseId, sessionId, provider: provider.id, model: provider.model,
+      });
 
       const card = this._buildSeatCard(provider);
       this._responseGrid.appendChild(card.el);
@@ -472,10 +459,9 @@ export class Council {
         results[provider.id] = { text, costUsd, tokensUsed, latencyMs, error: null };
 
         // Update DB
-        await _dbRun(
-          `UPDATE council_responses SET response=?, cost_usd=?, tokens_used=?, latency_ms=?, status='complete' WHERE id=?`,
-          [text, costUsd, tokensUsed, latencyMs, responseId]
-        );
+        await _councilExec('completeResponse', {
+          responseId, response: text, costUsd, tokensUsed, latencyMs,
+        });
 
         // Update card
         card.setResponse(text, costUsd, latencyMs);
@@ -494,10 +480,7 @@ export class Council {
 
         results[provider.id] = { text: null, costUsd: 0, tokensUsed: 0, latencyMs, error: errMsg };
 
-        await _dbRun(
-          `UPDATE council_responses SET status='error', latency_ms=? WHERE id=?`,
-          [latencyMs, responseId]
-        );
+        await _councilExec('errorResponse', { responseId, latencyMs });
 
         card.setError(errMsg);
 
@@ -672,17 +655,7 @@ export class Council {
   async loadHistory(worldId) {
     if (!this._historyList) return;
 
-    const sessions = await _dbAll(
-      `SELECT cs.id, cs.prompt, cs.models_json, cs.created_at,
-              COUNT(cr.id) AS response_count
-       FROM council_sessions cs
-       LEFT JOIN council_responses cr ON cr.session_id = cs.id
-       WHERE cs.world_id = ?
-       GROUP BY cs.id
-       ORDER BY cs.created_at DESC
-       LIMIT 10`,
-      [worldId]
-    );
+    const sessions = await _councilQuery('getSessionsWithCounts', { worldId });
 
     this._historyList.innerHTML = '';
 
@@ -750,10 +723,7 @@ export class Council {
     }
 
     // Load responses
-    const responses = await _dbAll(
-      `SELECT * FROM council_responses WHERE session_id = ? ORDER BY created_at ASC`,
-      [session.id]
-    );
+    const responses = await _councilQuery('getResponsesBySession', { sessionId: session.id });
 
     if (!responses || responses.length === 0) return;
 

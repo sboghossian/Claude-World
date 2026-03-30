@@ -101,6 +101,7 @@ contextBridge.exposeInMainWorld('api', {
     importSkills: (worldId, skills) => ipcRenderer.invoke('db:importSkills', worldId, skills),
     // Tasks
     getTasks: (worldId, opts) => ipcRenderer.invoke('db:getTasks', worldId, opts),
+    createTask: (worldId, data) => ipcRenderer.invoke('db:createTask', worldId, data),
     // Kanban Board
     getKanbanCards: (worldId) => ipcRenderer.invoke('db:getKanbanCards', worldId),
     createKanbanCard: (worldId, data) => ipcRenderer.invoke('db:createKanbanCard', worldId, data),
@@ -140,9 +141,9 @@ contextBridge.exposeInMainWorld('api', {
     unlockAgentSkill: (worldId, agentId, skillId) => ipcRenderer.invoke('db:unlockAgentSkill', worldId, agentId, skillId),
     // Global search
     globalSearch: (worldId, query, limit) => ipcRenderer.invoke('db:globalSearch', worldId, query, limit),
-    // Raw query helpers (used by council.js)
-    run: (sql, params) => ipcRenderer.invoke('db:run', sql, params),
-    all: (sql, params) => ipcRenderer.invoke('db:all', sql, params),
+    // Council-specific safe query helpers
+    executeCouncilQuery: (action, params) => ipcRenderer.invoke('db:executeCouncilQuery', action, params),
+    getCouncilData: (action, params) => ipcRenderer.invoke('db:getCouncilData', action, params),
   },
 
   // ── AI dispatch ────────────────────────────────────────────────────

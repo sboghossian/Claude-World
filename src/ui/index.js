@@ -45,6 +45,8 @@ function loadStyles(basePath = '') {
     'minimap.css',
     'search-results.css',
     'quick-actions.css',
+    'status-bar.css',
+    'perf-monitor.css',
   ];
 
   for (const file of cssFiles) {

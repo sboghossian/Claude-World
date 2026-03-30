@@ -4,50 +4,126 @@
  */
 
 :root {
-  /* Backgrounds */
+  /* ── Background palette ────────────────────────────────────────── */
   --bg-primary: rgba(10, 10, 20, 0.95);
   --bg-secondary: rgba(20, 25, 40, 0.9);
+  --bg-tertiary: #1a1a2e;
   --bg-hover: rgba(40, 50, 80, 0.8);
+  --bg-active: #2a2a40;
   --bg-selected: rgba(50, 70, 120, 0.7);
   --bg-toast: rgba(15, 15, 25, 0.95);
 
-  /* Text */
+  /* Solid background variants (non-transparent contexts) */
+  --bg-solid-primary: #0a0a14;
+  --bg-solid-secondary: #12121e;
+  --bg-solid-tertiary: #1a1a2e;
+
+  /* ── Text palette ──────────────────────────────────────────────── */
   --text-primary: #e8e8f0;
   --text-secondary: #8888a0;
   --text-dim: #555570;
+  --text-muted: #44445a;
   --text-inverse: #0a0a14;
 
-  /* Accents */
+  /* ── Accent colors ─────────────────────────────────────────────── */
   --accent-blue: #4a9eff;
-  --accent-green: #4aff8a;
-  --accent-amber: #ffb84a;
-  --accent-red: #ff4a6a;
-  --accent-gold: #ffd700;
   --accent-purple: #a855f7;
+  --accent-green: #4aff8a;
+  --accent-red: #ff4a6a;
+  --accent-amber: #ffb84a;
+  --accent-cyan: #06b6d4;
+  --accent-pink: #ec4899;
+  --accent-orange: #f97316;
+  --accent-indigo: #6366f1;
+  --accent-teal: #14b8a6;
+  --accent-gold: #ffd700;
 
-  /* Borders & shadows */
+  /* ── Borders ───────────────────────────────────────────────────── */
   --border: rgba(255, 255, 255, 0.08);
   --border-light: rgba(255, 255, 255, 0.12);
+  --border-hover: #3a3a52;
+  --border-focus: var(--accent-blue);
+
+  /* ── Shadows & effects ─────────────────────────────────────────── */
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 4px 24px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.6);
   --blur: blur(20px);
   --blur-light: blur(12px);
+  --glow-blue: 0 0 20px rgba(74, 158, 255, 0.3);
+  --glow-purple: 0 0 20px rgba(168, 85, 247, 0.3);
+  --glow-green: 0 0 20px rgba(74, 255, 138, 0.3);
+  --glow-red: 0 0 20px rgba(255, 74, 106, 0.3);
 
-  /* Radii */
+  /* ── Radii ─────────────────────────────────────────────────────── */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
 
-  /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
-  --transition-slow: 400ms ease;
+  /* ── Transitions ───────────────────────────────────────────────── */
+  --transition-instant: 100ms;
+  --transition-fast: 150ms;
+  --transition-normal: 250ms;
+  --transition-slow: 500ms;
+  --transition-glacial: 1000ms;
 
-  /* Fonts */
+  /* ── Z-Index Layers ────────────────────────────────────────────── */
+  --z-canvas: 0;
+  --z-buildings: 1;
+  --z-fog: 2;
+  --z-agents: 5;
+  --z-data-flows: 8;
+  --z-particles: 10;
+  --z-ui-root: 100;
+  --z-hud: 200;
+  --z-activity-feed: 300;
+  --z-minimap: 400;
+  --z-status-bar: 500;
+  --z-tooltips: 600;
+  --z-notifications: 700;
+  --z-panels: 800;
+  --z-context-menu: 900;
+  --z-command-palette: 1000;
+  --z-modal: 1100;
+  --z-task-stream: 1200;
+  --z-tutorial: 1300;
+  --z-splash: 9999;
+
+  /* ── Typography ────────────────────────────────────────────────── */
   --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* Sizes */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* ── Spacing scale ─────────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ── Component sizes ───────────────────────────────────────────── */
   --hud-top-height: 48px;
   --hud-bottom-height: 40px;
   --panel-width: 400px;

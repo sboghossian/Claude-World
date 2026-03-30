@@ -1481,19 +1481,97 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
-  // Raw SQL helpers (used by council.js for dynamic queries)
-  ipcMain.handle('db:run', async (_event, sql, params) => {
-    return dbCall(
-      (database) => database.prepare(sql).run(...(params || [])),
-      null
-    );
+  // ── Council: dedicated safe handlers (replaces raw db:run / db:all) ──
+
+  ipcMain.handle('db:executeCouncilQuery', async (_event, action, params) => {
+    assertType(action, 'string', 'action');
+
+    switch (action) {
+      case 'insertSession': {
+        const { id, worldId, prompt, modelsJson } = params;
+        assertType(id, 'string', 'id');
+        assertPositiveInt(worldId, 'worldId');
+        assertType(prompt, 'string', 'prompt');
+        assertType(modelsJson, 'string', 'modelsJson');
+        return dbCall(
+          (database) => database.prepare(
+            'INSERT INTO council_sessions (id, world_id, prompt, models_json) VALUES (?, ?, ?, ?)'
+          ).run(id, worldId, prompt, modelsJson),
+          null
+        );
+      }
+      case 'insertPendingResponse': {
+        const { id, sessionId, provider, model } = params;
+        assertType(id, 'string', 'id');
+        assertType(sessionId, 'string', 'sessionId');
+        assertType(provider, 'string', 'provider');
+        assertType(model, 'string', 'model');
+        return dbCall(
+          (database) => database.prepare(
+            "INSERT INTO council_responses (id, session_id, provider, model, status) VALUES (?, ?, ?, ?, 'pending')"
+          ).run(id, sessionId, provider, model),
+          null
+        );
+      }
+      case 'completeResponse': {
+        const { responseId, response, costUsd, tokensUsed, latencyMs } = params;
+        assertType(responseId, 'string', 'responseId');
+        return dbCall(
+          (database) => database.prepare(
+            "UPDATE council_responses SET response=?, cost_usd=?, tokens_used=?, latency_ms=?, status='complete' WHERE id=?"
+          ).run(response, costUsd || 0, tokensUsed || 0, latencyMs || 0, responseId),
+          null
+        );
+      }
+      case 'errorResponse': {
+        const { responseId, latencyMs } = params;
+        assertType(responseId, 'string', 'responseId');
+        return dbCall(
+          (database) => database.prepare(
+            "UPDATE council_responses SET status='error', latency_ms=? WHERE id=?"
+          ).run(latencyMs || 0, responseId),
+          null
+        );
+      }
+      default:
+        throw new Error(`Unknown council action: ${action}`);
+    }
   });
 
-  ipcMain.handle('db:all', async (_event, sql, params) => {
-    return dbCall(
-      (database) => database.prepare(sql).all(...(params || [])),
-      []
-    );
+  ipcMain.handle('db:getCouncilData', async (_event, action, params) => {
+    assertType(action, 'string', 'action');
+
+    switch (action) {
+      case 'getSessionsWithCounts': {
+        const { worldId } = params;
+        assertPositiveInt(worldId, 'worldId');
+        return dbCall(
+          (database) => database.prepare(
+            `SELECT cs.id, cs.prompt, cs.models_json, cs.created_at,
+                    COUNT(cr.id) AS response_count
+             FROM council_sessions cs
+             LEFT JOIN council_responses cr ON cr.session_id = cs.id
+             WHERE cs.world_id = ?
+             GROUP BY cs.id
+             ORDER BY cs.created_at DESC
+             LIMIT 10`
+          ).all(worldId),
+          []
+        );
+      }
+      case 'getResponsesBySession': {
+        const { sessionId } = params;
+        assertType(sessionId, 'string', 'sessionId');
+        return dbCall(
+          (database) => database.prepare(
+            'SELECT * FROM council_responses WHERE session_id = ? ORDER BY created_at ASC'
+          ).all(sessionId),
+          []
+        );
+      }
+      default:
+        throw new Error(`Unknown council data query: ${action}`);
+    }
   });
 
   // ── Analytics ──────────────────────────────────────────────────────
@@ -2214,6 +2292,25 @@ function registerHandlers(ipcMain, db) {
         return { success: true };
       },
       { success: true }
+    );
+  });
+
+  // ── Task creation (for Dispatch zone) ──────────────────────────
+  ipcMain.handle('db:createTask', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          `INSERT INTO tasks (world_id, prompt, model, provider, status, response, tokens_in, tokens_out, cost, created_at, completed_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?)`
+        ).run(
+          worldId, data.prompt || '', data.model || '', data.provider || '',
+          data.status || 'completed', data.response || '', data.tokens_in || 0,
+          data.tokens_out || 0, data.cost || 0, data.completed_at || null
+        );
+        return database.prepare('SELECT * FROM tasks WHERE id = ?').get(result.lastInsertRowid);
+      },
+      null
     );
   });
 

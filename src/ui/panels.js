@@ -36,6 +36,10 @@ import { AutomationBuilder } from '../zones/automation-builder.js';
 import { SkillTree } from '../zones/skill-tree.js';
 import { Calendar } from '../zones/calendar.js';
 import { Sharing } from '../zones/sharing.js';
+import { BrainLibrary } from '../zones/brain-library.js';
+import { MemoryVault } from '../zones/memory-vault.js';
+import { SkillsAcademy } from '../zones/skills-academy.js';
+import { Dispatch } from '../zones/dispatch.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -91,6 +95,14 @@ const AGENT_INFO = {
  */
 function buildZoneContent(zoneId) {
   // Zone-specific panel builders
+
+  if (zoneId === 'dispatch') {
+    const dispatch = new Dispatch();
+    const el = dispatch.render();
+    dispatch.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
   if (zoneId === 'treasury') {
     loadTreasuryStyles('../zones/');
     return buildTreasuryContent({ worldId: window.__claudeWorldId || null });
@@ -286,6 +298,27 @@ function buildZoneContent(zoneId) {
     const sharing = new Sharing();
     const el = sharing.render();
     sharing.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'brain') {
+    const brain = new BrainLibrary();
+    const el = brain.render();
+    brain.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'memory') {
+    const memory = new MemoryVault();
+    const el = memory.render();
+    memory.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'skills') {
+    const skills = new SkillsAcademy();
+    const el = skills.render();
+    skills.init(window.__claudeWorldId || 1);
     return el;
   }
 
