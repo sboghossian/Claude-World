@@ -1,0 +1,194 @@
+/**
+ * zone-tooltips.css — Floating tooltip for zone buildings
+ *
+ * Glass morphism tooltip that appears on hover over isometric buildings.
+ * Uses design tokens from variables.css.
+ */
+
+/* ── Container ───────────────────────────────────────────────────────── */
+
+.zone-tooltip {
+  position: fixed;
+  z-index: 500; /* above canvas (0), below panels (1000) */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  font-family: var(--font-sans);
+  max-width: 260px;
+  min-width: 180px;
+}
+
+.zone-tooltip.visible {
+  opacity: 1;
+}
+
+/* ── Card body ───────────────────────────────────────────────────────── */
+
+.zone-tooltip__card {
+  background: rgba(12, 14, 28, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  padding: 10px 12px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Caret / arrow ───────────────────────────────────────────────────── */
+
+.zone-tooltip__caret {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: rgba(12, 14, 28, 0.82);
+  border-left: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  transform: rotate(-45deg);
+  pointer-events: none;
+}
+
+/* Default caret position: top-left corner pointing down-left */
+.zone-tooltip--below .zone-tooltip__caret {
+  top: -5px;
+  left: 16px;
+  transform: rotate(135deg);
+}
+
+.zone-tooltip--above .zone-tooltip__caret {
+  bottom: -5px;
+  left: 16px;
+  transform: rotate(-45deg);
+}
+
+.zone-tooltip--flip-x.zone-tooltip--below .zone-tooltip__caret {
+  left: auto;
+  right: 16px;
+}
+
+.zone-tooltip--flip-x.zone-tooltip--above .zone-tooltip__caret {
+  left: auto;
+  right: 16px;
+}
+
+/* ── Header row: icon + name ─────────────────────────────────────────── */
+
+.zone-tooltip__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.zone-tooltip__icon {
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.zone-tooltip__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zone-tooltip__locked-tag {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* ── Description ─────────────────────────────────────────────────────── */
+
+.zone-tooltip__desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Progress bar ────────────────────────────────────────────────────── */
+
+.zone-tooltip__progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.zone-tooltip__progress-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.zone-tooltip__progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent-blue);
+  transition: width 200ms ease;
+}
+
+.zone-tooltip__progress-fill--complete {
+  background: var(--accent-green);
+}
+
+.zone-tooltip__progress-label {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  min-width: 28px;
+  text-align: right;
+}
+
+/* ── Footer row: agents + status ─────────────────────────────────────── */
+
+.zone-tooltip__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.zone-tooltip__agents {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.zone-tooltip__status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.zone-tooltip__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.zone-tooltip__status-dot--active {
+  background: var(--accent-green);
+  box-shadow: 0 0 4px var(--accent-green);
+}
+
+.zone-tooltip__status-dot--idle {
+  background: var(--accent-amber);
+}
+
+.zone-tooltip__status-dot--locked {
+  background: var(--text-dim);
+}

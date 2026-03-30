@@ -21,6 +21,8 @@ import { PanelManager } from './panels.js';
 import { AgentDialogue } from './agent-dialogue.js';
 import { ShortcutManager } from './shortcuts.js';
 import { QuestPanel } from './quest-panel.js';
+import { ZoneTooltips } from './zone-tooltips.js';
+import { SearchResults } from './search-results.js';
 import { initTreasuryEvents } from '../zones/treasury.js';
 
 /**
@@ -38,6 +40,9 @@ function loadStyles(basePath = '') {
     'shortcuts.css',
     'shortcuts-overlay.css',
     'quest-panel.css',
+    'zone-tooltips.css',
+    'minimap.css',
+    'search-results.css',
   ];
 
   for (const file of cssFiles) {
@@ -66,6 +71,7 @@ export function initUI({ cssBasePath = '' } = {}) {
   const agentDialogue = new AgentDialogue(panels);
   const shortcuts = new ShortcutManager({ palette, panels });
   const questPanel = new QuestPanel();
+  const searchResults = new SearchResults(palette._modal);
 
   // ── Wire up cross-component events ────────────────────────────
 
@@ -121,6 +127,9 @@ export function initUI({ cssBasePath = '' } = {}) {
   // Treasury zone events → HUD budget indicator + toasts
   initTreasuryEvents({ hud, toasts });
 
+  /** @type {ZoneTooltips | null} */
+  let zoneTooltips = null;
+
   return {
     palette,
     hud,
@@ -128,13 +137,32 @@ export function initUI({ cssBasePath = '' } = {}) {
     panels,
     agentDialogue,
     questPanel,
+    searchResults,
     shortcuts,
+
+    /**
+     * Mount the zone tooltip system.  Call after camera and buildingManager
+     * are initialised (e.g., after initWorld()).
+     * @param {HTMLCanvasElement} canvas
+     * @param {import('../renderer/camera.js').Camera} camera
+     * @param {import('../renderer/buildings.js').BuildingManager} buildingManager
+     * @returns {ZoneTooltips}
+     */
+    mountTooltips(canvas, camera, buildingManager) {
+      if (zoneTooltips) zoneTooltips.destroy();
+      zoneTooltips = new ZoneTooltips(canvas, camera, buildingManager);
+      zoneTooltips.enable();
+      return zoneTooltips;
+    },
+
     destroy() {
+      if (zoneTooltips) zoneTooltips.destroy();
       palette.destroy();
       hud.destroy();
       toasts.destroy();
       panels.destroy();
       questPanel.destroy();
+      searchResults.destroy();
       shortcuts.destroy();
     },
   };

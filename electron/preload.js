@@ -116,6 +116,8 @@ contextBridge.exposeInMainWorld('api', {
     getAppInfo: () => ipcRenderer.invoke('db:getAppInfo'),
     // Analytics
     getAnalytics: (worldId, range) => ipcRenderer.invoke('db:getAnalytics', worldId, range),
+    // Global search
+    globalSearch: (worldId, query, limit) => ipcRenderer.invoke('db:globalSearch', worldId, query, limit),
     // Raw query helpers (used by council.js)
     run: (sql, params) => ipcRenderer.invoke('db:run', sql, params),
     all: (sql, params) => ipcRenderer.invoke('db:all', sql, params),

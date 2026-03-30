@@ -546,8 +546,18 @@ export class CommandPalette {
       this._searchDebounceTimer = setTimeout(() => {
         this._runAsyncSearch(query);
       }, 150);
+
+      // Dispatch global search event for SearchResults integration
+      document.dispatchEvent(new CustomEvent('command-palette:global-search', {
+        detail: { query, worldId: this._worldId || (window.currentWorldId ?? null) },
+        bubbles: true,
+      }));
     } else {
       this._setSearching(false);
+      // Hide global search results when query is too short
+      document.dispatchEvent(new CustomEvent('command-palette:global-search-clear', {
+        bubbles: true,
+      }));
     }
   }
 

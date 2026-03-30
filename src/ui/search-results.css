@@ -1,0 +1,227 @@
+/**
+ * search-results.css — Global search results dropdown
+ * Renders below the command palette input when global search is active.
+ */
+
+/* ── Container ──────────────────────────────────────────────────────────────── */
+
+.sr-container {
+  border-top: 1px solid var(--border);
+  max-height: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.sr-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sr-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sr-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+
+.sr-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── List ────────────────────────────────────────────────────────────────────── */
+
+.sr-list {
+  padding: 4px 0;
+}
+
+/* ── Category headers ────────────────────────────────────────────────────────── */
+
+.sr-category-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  user-select: none;
+}
+
+.sr-category-icon {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.sr-category-label {
+  flex: 1;
+}
+
+.sr-category-count {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 1px 6px;
+  min-width: 16px;
+  text-align: center;
+}
+
+/* ── Result rows ─────────────────────────────────────────────────────────────── */
+
+.sr-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  border-radius: var(--radius-sm);
+  margin: 0 6px;
+}
+
+.sr-row:hover,
+.sr-row--selected {
+  background: var(--bg-hover);
+}
+
+.sr-row--selected {
+  background: var(--bg-selected);
+}
+
+/* ── Type badge ──────────────────────────────────────────────────────────────── */
+
+.sr-type-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--accent-blue);
+  background: rgba(74, 158, 255, 0.1);
+  border: 1px solid rgba(74, 158, 255, 0.15);
+  border-radius: 4px;
+  padding: 2px 6px;
+  line-height: 1.2;
+  min-width: 56px;
+  text-align: center;
+}
+
+/* ── Row content ─────────────────────────────────────────────────────────────── */
+
+.sr-row-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sr-row-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sr-row-snippet {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ── Match highlighting ──────────────────────────────────────────────────────── */
+
+.sr-row-snippet mark {
+  background: none;
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+/* ── Right column ────────────────────────────────────────────────────────────── */
+
+.sr-row-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.sr-row:hover .sr-row-right,
+.sr-row--selected .sr-row-right {
+  opacity: 1;
+}
+
+.sr-row-right kbd {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* ── Loading state ───────────────────────────────────────────────────────────── */
+
+.sr-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 16px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.sr-spinner {
+  animation: sr-spin 0.8s linear infinite;
+  color: var(--accent-blue);
+}
+
+@keyframes sr-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────────── */
+
+.sr-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 28px 16px;
+  text-align: center;
+}
+
+.sr-empty-icon {
+  font-size: 24px;
+  opacity: 0.6;
+  margin-bottom: 4px;
+}
+
+.sr-empty-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.sr-empty-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+}

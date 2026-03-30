@@ -1592,6 +1592,172 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
+  // ── db:globalSearch — cross-zone search ──────────────────────────
+
+  ipcMain.handle('db:globalSearch', async (_event, worldId, query, limit) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(query, 'string', 'query');
+    const maxResults = (limit && Number.isInteger(limit) && limit > 0) ? limit : 50;
+    const likePattern = `%${query}%`;
+
+    // Each search source: { sql, params, type, titleCol, snippetCol, idCol }
+    const sources = [
+      // FTS tables (higher score)
+      {
+        type: 'tasks',
+        fts: true,
+        sql: `SELECT t.id, t.prompt AS title, t.response AS snippet, rank
+              FROM tasks_fts fts
+              JOIN tasks t ON t.rowid = fts.rowid
+              WHERE tasks_fts MATCH ? AND t.world_id = ?
+              ORDER BY rank LIMIT 10`,
+        params: [query, worldId],
+      },
+      {
+        type: 'legal_docs',
+        fts: true,
+        sql: `SELECT ld.id, ld.title, ld.content AS snippet, rank
+              FROM legal_docs_fts fts
+              JOIN legal_docs ld ON ld.rowid = fts.rowid
+              WHERE legal_docs_fts MATCH ? AND ld.world_id = ?
+              ORDER BY rank LIMIT 10`,
+        params: [query, worldId],
+      },
+      {
+        type: 'messages',
+        fts: true,
+        sql: `SELECT m.id, m.content AS title, m.content AS snippet, rank
+              FROM messages_fts fts
+              JOIN messages m ON m.rowid = fts.rowid
+              WHERE messages_fts MATCH ? AND m.world_id = ?
+              ORDER BY rank LIMIT 10`,
+        params: [query, worldId],
+      },
+      // LIKE fallback tables
+      {
+        type: 'council_sessions',
+        fts: false,
+        sql: `SELECT id, prompt AS title, prompt AS snippet
+              FROM council_sessions
+              WHERE world_id = ? AND prompt LIKE ?
+              ORDER BY created_at DESC LIMIT 10`,
+        params: [worldId, likePattern],
+      },
+      {
+        type: 'leads',
+        fts: false,
+        sql: `SELECT id, name AS title, (name || ' - ' || COALESCE(company, '') || ' - ' || COALESCE(notes, '')) AS snippet
+              FROM leads
+              WHERE world_id = ? AND (name LIKE ? OR company LIKE ? OR notes LIKE ?)
+              ORDER BY updated_at DESC LIMIT 10`,
+        params: [worldId, likePattern, likePattern, likePattern],
+      },
+      {
+        type: 'content_pieces',
+        fts: false,
+        sql: `SELECT id, title, (COALESCE(brief, '') || ' ' || COALESCE(content, '')) AS snippet
+              FROM content_pieces
+              WHERE world_id = ? AND (title LIKE ? OR brief LIKE ? OR content LIKE ?)
+              ORDER BY created_at DESC LIMIT 10`,
+        params: [worldId, likePattern, likePattern, likePattern],
+      },
+      {
+        type: 'research_queries',
+        fts: false,
+        sql: `SELECT id, query AS title, COALESCE(result, query) AS snippet
+              FROM research_queries
+              WHERE world_id = ? AND (query LIKE ? OR result LIKE ?)
+              ORDER BY created_at DESC LIMIT 10`,
+        params: [worldId, likePattern, likePattern],
+      },
+      {
+        type: 'broadcast_log',
+        fts: false,
+        sql: `SELECT id, event_type AS title, payload_json AS snippet
+              FROM broadcast_log
+              WHERE world_id = ? AND (event_type LIKE ? OR payload_json LIKE ?)
+              ORDER BY created_at DESC LIMIT 10`,
+        params: [worldId, likePattern, likePattern],
+      },
+      {
+        type: 'experiments',
+        fts: false,
+        sql: `SELECT id, name AS title, (COALESCE(description, '') || ' ' || COALESCE(prompt, '')) AS snippet
+              FROM experiments
+              WHERE world_id = ? AND (name LIKE ? OR description LIKE ? OR prompt LIKE ?)
+              ORDER BY created_at DESC LIMIT 10`,
+        params: [worldId, likePattern, likePattern, likePattern],
+      },
+      {
+        type: 'skills',
+        fts: false,
+        sql: `SELECT id, name AS title, COALESCE(description, '') AS snippet
+              FROM skills
+              WHERE world_id = ? AND (name LIKE ? OR description LIKE ?)
+              ORDER BY created_at DESC LIMIT 10`,
+        params: [worldId, likePattern, likePattern],
+      },
+    ];
+
+    // Zone ID mapping
+    const ZONE_IDS = {
+      tasks:            'dispatch',
+      legal_docs:       'legal',
+      council_sessions: 'council',
+      leads:            'sales',
+      content_pieces:   'marketing',
+      research_queries: 'globe',
+      broadcast_log:    'broadcast',
+      experiments:      'rnd',
+      skills:           'skills',
+      messages:         'chat',
+    };
+
+    return dbCall(
+      (database) => {
+        const allResults = [];
+
+        for (const source of sources) {
+          try {
+            const rows = database.prepare(source.sql).all(...source.params);
+            for (const row of rows) {
+              const score = source.fts
+                ? 100 + (row.rank ? Math.abs(row.rank) : 0)
+                : 80 - (allResults.length * 0.1);
+
+              // Truncate snippet for transport
+              let snippet = row.snippet || '';
+              if (snippet.length > 200) {
+                snippet = snippet.slice(0, 200) + '...';
+              }
+
+              allResults.push({
+                type: source.type,
+                title: (row.title || '').slice(0, 200),
+                snippet,
+                score,
+                id: row.id,
+                zoneId: ZONE_IDS[source.type] || source.type,
+              });
+            }
+          } catch (err) {
+            // Table may not exist — skip silently
+            if (!err.message.includes('no such table')) {
+              console.warn(`[globalSearch] Error querying ${source.type}:`, err.message);
+            }
+          }
+        }
+
+        // Sort by score descending, then truncate
+        allResults.sort((a, b) => b.score - a.score);
+        const results = allResults.slice(0, maxResults);
+
+        return { results, total: allResults.length };
+      },
+      { results: [], total: 0 }
+    );
+  });
+
   // ── app:* handlers ────────────────────────────────────────────────
 
   ipcMain.handle('app:getVersion', async () => {
