@@ -647,6 +647,15 @@
           console.warn('[boot] Agent chat init failed (non-critical):', err.message);
         }
 
+        // Wire agent-click to open Agent Profile zone
+        document.addEventListener('agent-click', (e) => {
+          try {
+            const agentKey = e.detail?.agentKey || e.detail?.agentId || 'commander';
+            window.__agentProfileTarget = agentKey;
+            ui.panels.openZone('agent-profile', 'Agent Profile');
+          } catch (err) { console.warn('[boot] AgentProfile open:', err.message); }
+        });
+
         // ── 31. Status bar ────────────────────────────────────────────
         splash.setProgress(31, TOTAL_STEPS, 'Mounting status bar...');
         try {

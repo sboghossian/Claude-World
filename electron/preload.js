@@ -124,6 +124,11 @@ contextBridge.exposeInMainWorld('api', {
     getWorldSnapshots: (worldId) => ipcRenderer.invoke('db:getSnapshots', worldId),
     restoreWorldSnapshot: (worldId, snapshotId) => ipcRenderer.invoke('db:restoreSnapshot', worldId, snapshotId),
     importWorldSnapshot: (worldId, data) => ipcRenderer.invoke('db:importWorldSnapshot', worldId, data),
+    // Prompt Library
+    getPrompts: (worldId) => ipcRenderer.invoke('db:getPrompts', worldId),
+    createPrompt: (worldId, data) => ipcRenderer.invoke('db:createPrompt', worldId, data),
+    updatePrompt: (promptId, updates) => ipcRenderer.invoke('db:updatePrompt', promptId, updates),
+    deletePrompt: (promptId) => ipcRenderer.invoke('db:deletePrompt', promptId),
     // Settings
     getSettings: (worldId) => ipcRenderer.invoke('db:getSettings', worldId),
     updateSettings: (worldId, key, value) => ipcRenderer.invoke('db:updateSettings', worldId, key, value),

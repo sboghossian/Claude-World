@@ -1,0 +1,350 @@
+/**
+ * world-map.css — World Map overview zone
+ *
+ * Full-bleed Canvas 2D top-down city map with glass-morphism overlays,
+ * category filter pills, search bar, legend, and tooltips.
+ */
+
+/* ── Container ───────────────────────────────────────────────────────── */
+
+.wm-zone {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-primary);
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+}
+
+.wm-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.wm-canvas.grabbing {
+  cursor: grabbing;
+}
+
+.wm-canvas.pointer {
+  cursor: pointer;
+}
+
+/* ── Top bar (search + filters) ──────────────────────────────────────── */
+
+.wm-top-bar {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(15, 15, 30, 0.80);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  z-index: 10;
+  max-width: 90%;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Search bar ──────────────────────────────────────────────────────── */
+
+.wm-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  min-width: 160px;
+}
+
+.wm-search-icon {
+  color: var(--text-dim);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.wm-search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 11px;
+  font-family: var(--font-sans);
+  width: 100%;
+  padding: 0;
+}
+
+.wm-search-input::placeholder {
+  color: var(--text-dim);
+}
+
+/* ── Filter pills ────────────────────────────────────────────────────── */
+
+.wm-filters {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.wm-filter-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.wm-filter-pill:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.wm-filter-pill.active {
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.wm-filter-pill.active[data-cat="core"] {
+  background: rgba(74, 158, 255, 0.18);
+  border-color: rgba(74, 158, 255, 0.35);
+}
+
+.wm-filter-pill.active[data-cat="operations"] {
+  background: rgba(74, 255, 138, 0.18);
+  border-color: rgba(74, 255, 138, 0.35);
+}
+
+.wm-filter-pill.active[data-cat="infrastructure"] {
+  background: rgba(249, 115, 22, 0.18);
+  border-color: rgba(249, 115, 22, 0.35);
+}
+
+.wm-filter-pill.active[data-cat="intelligence"] {
+  background: rgba(168, 85, 247, 0.18);
+  border-color: rgba(168, 85, 247, 0.35);
+}
+
+.wm-filter-pill.active[data-cat="management"] {
+  background: rgba(255, 184, 74, 0.18);
+  border-color: rgba(255, 184, 74, 0.35);
+}
+
+.wm-filter-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Legend panel (bottom-left) ───────────────────────────────────────── */
+
+.wm-legend {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  padding: 12px 16px;
+  background: rgba(15, 15, 30, 0.80);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  z-index: 10;
+  min-width: 170px;
+}
+
+.wm-legend-title {
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.wm-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.wm-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ── Tooltip ─────────────────────────────────────────────────────────── */
+
+.wm-tooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 20;
+  padding: 10px 14px;
+  background: rgba(10, 10, 24, 0.92);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  font-size: 12px;
+  line-height: 1.5;
+  max-width: 240px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.wm-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wm-tooltip-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wm-tooltip-category {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.wm-tooltip-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.wm-tooltip-stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.wm-tooltip-stat-label {
+  color: var(--text-dim);
+}
+
+.wm-tooltip-stat-value {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* ── Controls (bottom-right) ─────────────────────────────────────────── */
+
+.wm-controls {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 10;
+}
+
+.wm-ctrl-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 15, 30, 0.80);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-sans);
+}
+
+.wm-ctrl-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.wm-ctrl-btn.danger {
+  color: var(--accent-red);
+}
+
+.wm-ctrl-btn.danger:hover {
+  background: rgba(255, 74, 106, 0.15);
+  border-color: rgba(255, 74, 106, 0.35);
+}
+
+/* ── Unlock-all badge ────────────────────────────────────────────────── */
+
+.wm-unlock-btn {
+  padding: 4px 12px;
+  height: auto;
+  width: auto;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ── Zone count badge (top-right) ────────────────────────────────────── */
+
+.wm-stats-bar {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.wm-stat-chip {
+  padding: 4px 10px;
+  background: rgba(15, 15, 30, 0.80);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.wm-stat-chip strong {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}

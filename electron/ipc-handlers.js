@@ -2336,6 +2336,67 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
+  // ── Prompt Library ─────────────────────────────────────────────
+
+  ipcMain.handle('db:getPrompts', async (_event, worldId) => {
+    assertId(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM prompts WHERE world_id = ? ORDER BY updated_at DESC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createPrompt', async (_event, worldId, data) => {
+    assertId(worldId, 'worldId');
+    assertType(data.title, 'string', 'title');
+    const id = data.id || require('crypto').randomBytes(8).toString('hex');
+    return dbCall(
+      (database) => {
+        database.prepare(
+          `INSERT INTO prompts (id, world_id, title, category, template, description, tags, starred)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+        ).run(
+          id, worldId, data.title.trim(),
+          data.category || 'General',
+          data.template || '',
+          data.description || '',
+          data.tags || '[]',
+          data.starred || 0
+        );
+        return database.prepare('SELECT * FROM prompts WHERE id = ?').get(id);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:updatePrompt', async (_event, promptId, updates) => {
+    assertType(promptId, 'string', 'promptId');
+    const allowed = ['title', 'category', 'template', 'description', 'tags', 'usage_count', 'starred'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k) && updates[k] !== undefined);
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE prompts SET ${sets}, updated_at = datetime('now') WHERE id = @id`).run({ ...updates, id: promptId });
+        return database.prepare('SELECT * FROM prompts WHERE id = ?').get(promptId);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:deletePrompt', async (_event, promptId) => {
+    assertType(promptId, 'string', 'promptId');
+    return dbCall(
+      (database) => {
+        database.prepare('DELETE FROM prompts WHERE id = ?').run(promptId);
+        return { success: true };
+      },
+      { success: true }
+    );
+  });
+
   ipcMain.handle('app:getVersion', async () => {
     return app.getVersion();
   });

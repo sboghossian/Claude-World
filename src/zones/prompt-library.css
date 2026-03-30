@@ -1,0 +1,468 @@
+/**
+ * prompt-library.css — Prompt Library zone styles
+ */
+
+/* ── Container ──────────────────────────────────────────────────── */
+
+.prompt-library {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  height: 100%;
+  overflow-y: auto;
+  font-family: var(--font-sans);
+}
+
+/* ── Header bar ─────────────────────────────────────────────────── */
+
+.pl-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.pl-header__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.pl-header__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.pl-btn {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.pl-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
+.pl-btn--primary {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  color: #fff;
+}
+
+.pl-btn--primary:hover {
+  background: #9945e0;
+  box-shadow: var(--glow-purple);
+}
+
+.pl-btn--small {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+.pl-btn--danger {
+  color: var(--accent-red);
+  border-color: rgba(255, 74, 106, 0.3);
+}
+
+.pl-btn--danger:hover {
+  background: rgba(255, 74, 106, 0.15);
+}
+
+/* ── Search + Filter bar ────────────────────────────────────────── */
+
+.pl-filters {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.pl-search {
+  flex: 1;
+  min-width: 160px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.pl-search:focus {
+  border-color: var(--border-focus);
+}
+
+.pl-search::placeholder {
+  color: var(--text-dim);
+}
+
+.pl-select {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  outline: none;
+}
+
+.pl-select:focus {
+  border-color: var(--border-focus);
+}
+
+/* ── Prompt grid ────────────────────────────────────────────────── */
+
+.pl-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding-bottom: var(--space-4);
+}
+
+@media (max-width: 900px) {
+  .pl-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .pl-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Prompt card (glass morphism) ───────────────────────────────── */
+
+.pl-card {
+  background: var(--bg-secondary);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.pl-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.pl-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.pl-card__title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  line-height: var(--line-height-tight);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.pl-card__star {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.4;
+  transition: opacity var(--transition-fast);
+}
+
+.pl-card__star:hover,
+.pl-card__star--active {
+  opacity: 1;
+}
+
+/* ── Category badge ─────────────────────────────────────────────── */
+
+.pl-badge {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.pl-badge--General   { background: rgba(99,102,241,0.2); color: var(--accent-indigo); }
+.pl-badge--Code      { background: rgba(74,255,138,0.15); color: var(--accent-green); }
+.pl-badge--Writing   { background: rgba(236,72,153,0.15); color: var(--accent-pink); }
+.pl-badge--Analysis  { background: rgba(6,182,212,0.15); color: var(--accent-cyan); }
+.pl-badge--Creative  { background: rgba(249,115,22,0.15); color: var(--accent-orange); }
+.pl-badge--Custom    { background: rgba(168,85,247,0.15); color: var(--accent-purple); }
+
+/* ── Card body ──────────────────────────────────────────────────── */
+
+.pl-card__preview {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.pl-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
+}
+
+.pl-card__usage {
+  font-size: var(--font-size-xs);
+  color: var(--text-dim);
+}
+
+.pl-card__actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+/* ── Star rating display ────────────────────────────────────────── */
+
+.pl-stars {
+  display: inline-flex;
+  gap: 1px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.pl-stars__filled {
+  color: var(--accent-gold);
+}
+
+.pl-stars__empty {
+  color: var(--text-muted);
+}
+
+/* ── Modal overlay ──────────────────────────────────────────────── */
+
+.pl-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  animation: plFadeIn 150ms ease-out;
+}
+
+@keyframes plFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pl-modal {
+  background: var(--bg-solid-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  width: 90%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: plSlideUp 200ms ease-out;
+}
+
+@keyframes plSlideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.pl-modal__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+/* ── Form fields ────────────────────────────────────────────────── */
+
+.pl-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.pl-field__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+}
+
+.pl-field__input,
+.pl-field__textarea,
+.pl-field__select {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.pl-field__input:focus,
+.pl-field__textarea:focus,
+.pl-field__select:focus {
+  border-color: var(--border-focus);
+}
+
+.pl-field__textarea {
+  font-family: var(--font-mono);
+  resize: vertical;
+  min-height: 120px;
+  line-height: var(--line-height-relaxed);
+}
+
+.pl-field__hint {
+  font-size: var(--font-size-xs);
+  color: var(--text-dim);
+}
+
+.pl-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+/* ── Variable fill dialog ───────────────────────────────────────── */
+
+.pl-vars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pl-var-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.pl-var-field__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--accent-purple);
+}
+
+.pl-var-field__input {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.pl-var-field__input:focus {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
+}
+
+.pl-template-preview {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+  max-height: 160px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Empty state ────────────────────────────────────────────────── */
+
+.pl-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-12) var(--space-4);
+  color: var(--text-dim);
+}
+
+.pl-empty__icon {
+  font-size: 48px;
+  margin-bottom: var(--space-3);
+}
+
+.pl-empty__text {
+  font-size: var(--font-size-base);
+  margin-bottom: var(--space-4);
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────────── */
+
+.prompt-library::-webkit-scrollbar,
+.pl-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.prompt-library::-webkit-scrollbar-track,
+.pl-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.prompt-library::-webkit-scrollbar-thumb,
+.pl-grid::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--radius-full);
+}
+
+.prompt-library::-webkit-scrollbar-thumb:hover,
+.pl-grid::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}

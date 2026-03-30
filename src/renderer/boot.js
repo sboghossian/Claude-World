@@ -336,6 +336,15 @@ async function boot() {
 
     try { const ac = new AgentChat(); window.__agentChat = ac; document.addEventListener('agent-click', (ev) => ac.open(ev.detail)); } catch (e) { console.warn('[boot] AgentChat:', e.message); }
 
+    // Wire agent-click to open Agent Profile zone
+    document.addEventListener('agent-click', (ev) => {
+      try {
+        const agentKey = ev.detail?.agentKey || ev.detail?.agentId || 'commander';
+        window.__agentProfileTarget = agentKey;
+        ui.panels.openZone('agent-profile', 'Agent Profile');
+      } catch (e) { console.warn('[boot] AgentProfile open:', e.message); }
+    });
+
     splash.setProgress(31, TOTAL_STEPS, 'Mounting status bar...');
     try {
       const sb = new StatusBar(); sb.mount(); window.__statusBar = sb;

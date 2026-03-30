@@ -40,6 +40,13 @@ import { BrainLibrary } from '../zones/brain-library.js';
 import { MemoryVault } from '../zones/memory-vault.js';
 import { SkillsAcademy } from '../zones/skills-academy.js';
 import { Dispatch } from '../zones/dispatch.js';
+import { Leaderboard } from '../zones/leaderboard.js';
+import { PromptLibrary } from '../zones/prompt-library.js';
+import { ConversationHistory } from '../zones/conversation-history.js';
+import { WorldMap } from '../zones/world-map.js';
+import { PluginStore } from '../zones/plugin-store.js';
+import { getPluginManager } from '../systems/plugin-api.js';
+import { AgentProfile } from '../zones/agent-profile.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -77,6 +84,14 @@ const ZONE_INFO = {
   'skill-tree': { icon: '\u{1F333}', desc: 'Agent skill trees with XP-based unlock progression.' },
   calendar: { icon: '\u{1F4C5}', desc: 'Calendar with scheduled tasks, events, and milestones.' },
   sharing: { icon: '\u{1F4E4}', desc: 'Export, import, and share your world.' },
+  leaderboard: { icon: '\u{1F3C6}', desc: 'World stats, agent rankings, records & activity heatmap.' },
+  'prompt-library': { icon: '\u{1F4DD}', desc: 'Save, organize, and reuse AI prompts with variable substitution.' },
+  prompt_library: { icon: '\u{1F4DD}', desc: 'Save, organize, and reuse AI prompts with variable substitution.' },
+  conversations: { icon: '\u{1F4AC}', desc: 'Browse and search all past AI interactions with full detail.' },
+  'world-map': { icon: '\u{1F5FA}', desc: 'Top-down overview of the entire city with zone status and connections.' },
+  world_map: { icon: '\u{1F5FA}', desc: 'Top-down overview of the entire city with zone status and connections.' },
+  plugins: { icon: '\u{1F9E9}', desc: 'Browse, install, and manage community plugins and extensions.' },
+  'agent-profile': { icon: '\u{1F464}', desc: 'Detailed agent profile with stats, personality, and relationships.' },
 };
 
 const AGENT_INFO = {
@@ -301,6 +316,13 @@ function buildZoneContent(zoneId) {
     return el;
   }
 
+  if (zoneId === 'leaderboard') {
+    const lb = new Leaderboard();
+    const el = lb.render();
+    lb.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
   if (zoneId === 'brain') {
     const brain = new BrainLibrary();
     const el = brain.render();
@@ -320,6 +342,53 @@ function buildZoneContent(zoneId) {
     const el = skills.render();
     skills.init(window.__claudeWorldId || 1);
     return el;
+  }
+
+  if (zoneId === 'prompt-library' || zoneId === 'prompt_library') {
+    const pl = new PromptLibrary();
+    const el = pl.render();
+    pl.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'conversations') {
+    const ch = new ConversationHistory();
+    const el = ch.render();
+    ch.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'world-map' || zoneId === 'world_map') {
+    const wm = new WorldMap();
+    const el = wm.render();
+    wm.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'plugins') {
+    const ps = new PluginStore();
+    const el = ps.render();
+    ps.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'agent-profile') {
+    const ap = new AgentProfile();
+    const el = ap.render();
+    ap.init(window.__claudeWorldId || 1, window.__agentProfileTarget || 'commander');
+    window.__agentProfileTarget = null;
+    return el;
+  }
+
+  // Check if this is a plugin-provided zone
+  {
+    const pm = getPluginManager();
+    const pluginZone = pm.getZone(zoneId);
+    if (pluginZone) {
+      const el = pluginZone.render();
+      pluginZone.init(window.__claudeWorldId || 1);
+      return el;
+    }
   }
 
   const info = ZONE_INFO[zoneId] || { icon: '\u{1F3D7}', desc: 'Unknown zone.' };

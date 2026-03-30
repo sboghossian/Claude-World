@@ -1,0 +1,483 @@
+/* ─────────────────────────────────────────────────────────────────────── */
+/* leaderboard.css — World Stats & Leaderboard zone                      */
+/* Glass morphism cards, animated counters, medal styling, heatmap grid, */
+/* Canvas 2D charts. Dark theme with purple/gold accents.                */
+/* ─────────────────────────────────────────────────────────────────────── */
+
+/* ── CSS custom properties ─────────────────────────────────────────────── */
+.lb-dashboard {
+  --lb-bg:            #06080e;
+  --lb-surface:       rgba(15, 20, 35, 0.85);
+  --lb-surface-2:     rgba(25, 32, 55, 0.75);
+  --lb-border:        rgba(168, 85, 247, 0.12);
+  --lb-border-hover:  rgba(168, 85, 247, 0.3);
+
+  --lb-purple:        #a855f7;
+  --lb-purple-dim:    rgba(168, 85, 247, 0.15);
+  --lb-purple-glow:   rgba(168, 85, 247, 0.35);
+  --lb-purple-faint:  rgba(168, 85, 247, 0.07);
+
+  --lb-blue:          #3b82f6;
+  --lb-blue-dim:      rgba(59, 130, 246, 0.15);
+  --lb-green:         #22c55e;
+  --lb-green-dim:     rgba(34, 197, 94, 0.15);
+  --lb-amber:         #f59e0b;
+  --lb-amber-dim:     rgba(245, 158, 11, 0.15);
+  --lb-red:           #ef4444;
+  --lb-cyan:          #22d3ee;
+  --lb-pink:          #f472b6;
+
+  --lb-gold:          #eab308;
+  --lb-silver:        #94a3b8;
+  --lb-bronze:        #d97706;
+
+  --lb-text:          #c8d0e0;
+  --lb-text-muted:    #6b7a99;
+  --lb-text-dim:      #3a4560;
+
+  --lb-font:          'SF Mono', 'Fira Code', 'Consolas', monospace;
+  --lb-font-sans:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --lb-radius:        12px;
+  --lb-radius-sm:     8px;
+  --lb-transition:    200ms ease;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--lb-bg);
+  color: var(--lb-text);
+  font-family: var(--lb-font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────────────── */
+@keyframes lb-gradient-border {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes lb-count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lb-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lb-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes lb-pulse-gold {
+  0%, 100% { box-shadow: 0 0 8px rgba(234, 179, 8, 0.2); }
+  50%      { box-shadow: 0 0 20px rgba(234, 179, 8, 0.5); }
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+.lb-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--lb-border);
+  flex-shrink: 0;
+}
+
+.lb-header__icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.lb-header__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #e8e8f0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.lb-header__subtitle {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--lb-text-muted);
+}
+
+/* ── Body scroll container ─────────────────────────────────────────────── */
+.lb-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--lb-purple-dim) transparent;
+}
+
+.lb-body::-webkit-scrollbar { width: 5px; }
+.lb-body::-webkit-scrollbar-track { background: transparent; }
+.lb-body::-webkit-scrollbar-thumb {
+  background: var(--lb-purple-dim);
+  border-radius: 4px;
+}
+
+/* ── Section titles ────────────────────────────────────────────────────── */
+.lb-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--lb-text-muted);
+  margin: 16px 0 8px;
+  padding-left: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lb-section-title:first-child { margin-top: 4px; }
+
+.lb-section-title__icon {
+  font-size: 13px;
+}
+
+/* ── Glass card base ───────────────────────────────────────────────────── */
+.lb-card {
+  background: var(--lb-surface);
+  border: 1px solid var(--lb-border);
+  border-radius: var(--lb-radius);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: border-color var(--lb-transition), box-shadow var(--lb-transition);
+  animation: lb-fade-in 0.4s ease both;
+}
+
+.lb-card:hover {
+  border-color: var(--lb-border-hover);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Stat cards grid ───────────────────────────────────────────────────── */
+.lb-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.lb-stat-card {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.lb-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: var(--lb-radius) var(--lb-radius) 0 0;
+}
+
+.lb-stat-card--tasks::before    { background: linear-gradient(90deg, var(--lb-blue), var(--lb-cyan)); }
+.lb-stat-card--tokens::before   { background: linear-gradient(90deg, var(--lb-amber), #f97316); }
+.lb-stat-card--xp::before       { background: linear-gradient(90deg, var(--lb-purple), var(--lb-pink)); }
+.lb-stat-card--age::before      { background: linear-gradient(90deg, var(--lb-green), #14b8a6); }
+.lb-stat-card--zones::before    { background: linear-gradient(90deg, var(--lb-cyan), var(--lb-blue)); }
+.lb-stat-card--achieve::before  { background: linear-gradient(90deg, var(--lb-gold), var(--lb-amber)); }
+.lb-stat-card--streak::before   { background: linear-gradient(90deg, var(--lb-red), var(--lb-pink)); }
+
+.lb-stat-card__label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--lb-text-muted);
+}
+
+.lb-stat-card__value {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--lb-font);
+  color: #e8e8f0;
+  animation: lb-count-up 0.6s ease both;
+  line-height: 1.1;
+}
+
+.lb-stat-card__sub {
+  font-size: 10px;
+  color: var(--lb-text-dim);
+}
+
+/* ── Agent leaderboard table ───────────────────────────────────────────── */
+.lb-agent-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 4px;
+}
+
+.lb-agent-table th {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--lb-text-dim);
+  padding: 6px 6px;
+  text-align: left;
+  border-bottom: 1px solid var(--lb-border);
+}
+
+.lb-agent-table th:first-child { width: 28px; text-align: center; }
+
+.lb-agent-table td {
+  font-size: 11px;
+  padding: 7px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--lb-text);
+}
+
+.lb-agent-table tr:last-child td { border-bottom: none; }
+
+.lb-agent-table tr:hover td {
+  background: var(--lb-purple-faint);
+}
+
+/* Position / medal */
+.lb-pos {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--lb-font);
+}
+
+.lb-pos--1 {
+  background: rgba(234, 179, 8, 0.2);
+  color: var(--lb-gold);
+  animation: lb-pulse-gold 2s ease infinite;
+}
+
+.lb-pos--2 {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--lb-silver);
+}
+
+.lb-pos--3 {
+  background: rgba(217, 119, 6, 0.15);
+  color: var(--lb-bronze);
+}
+
+.lb-pos--other {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--lb-text-dim);
+}
+
+.lb-agent-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.lb-agent-name__icon { font-size: 14px; }
+
+.lb-agent-stat {
+  font-family: var(--lb-font);
+  font-size: 10px;
+  color: var(--lb-text-muted);
+}
+
+/* ── Agent bar chart canvas ────────────────────────────────────────────── */
+.lb-chart-wrap {
+  position: relative;
+  padding: 8px 4px 4px;
+}
+
+.lb-chart-wrap canvas {
+  display: block;
+  width: 100%;
+}
+
+/* ── Zone leaderboard ──────────────────────────────────────────────────── */
+.lb-zone-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 10px;
+}
+
+.lb-zone-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+}
+
+.lb-zone-item__rank {
+  font-family: var(--lb-font);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--lb-text-dim);
+  width: 16px;
+  text-align: right;
+}
+
+.lb-zone-item__name {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--lb-text);
+  width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-zone-item__bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.lb-zone-item__bar {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--lb-purple), var(--lb-blue));
+  transition: width 0.8s ease;
+}
+
+.lb-zone-item__count {
+  font-family: var(--lb-font);
+  font-size: 10px;
+  color: var(--lb-text-muted);
+  width: 40px;
+  text-align: right;
+}
+
+.lb-zone-item__time {
+  font-size: 9px;
+  color: var(--lb-text-dim);
+  width: 40px;
+  text-align: right;
+}
+
+/* ── Personal records cards ────────────────────────────────────────────── */
+.lb-records-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.lb-record-card {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.lb-record-card__icon {
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+.lb-record-card__label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--lb-text-muted);
+}
+
+.lb-record-card__value {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--lb-font);
+  color: #e8e8f0;
+  animation: lb-count-up 0.6s ease both;
+}
+
+.lb-record-card__detail {
+  font-size: 9px;
+  color: var(--lb-text-dim);
+}
+
+/* ── Activity heatmap ──────────────────────────────────────────────────── */
+.lb-heatmap-wrap {
+  padding: 10px;
+}
+
+.lb-heatmap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.lb-heatmap-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lb-text);
+}
+
+.lb-heatmap-total {
+  font-size: 10px;
+  font-family: var(--lb-font);
+  color: var(--lb-text-muted);
+}
+
+.lb-heatmap-canvas {
+  display: block;
+  width: 100%;
+}
+
+.lb-heatmap-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  margin-top: 6px;
+  font-size: 9px;
+  color: var(--lb-text-dim);
+}
+
+.lb-heatmap-legend__box {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+/* ── Loading state ─────────────────────────────────────────────────────── */
+.lb-loading {
+  background: linear-gradient(90deg,
+    var(--lb-surface) 25%,
+    var(--lb-surface-2) 50%,
+    var(--lb-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: lb-shimmer 1.5s ease infinite;
+}
+
+/* ── Animation delays for staggered entrance ───────────────────────────── */
+.lb-stat-card:nth-child(1) { animation-delay: 0.05s; }
+.lb-stat-card:nth-child(2) { animation-delay: 0.1s; }
+.lb-stat-card:nth-child(3) { animation-delay: 0.15s; }
+.lb-stat-card:nth-child(4) { animation-delay: 0.2s; }
+.lb-stat-card:nth-child(5) { animation-delay: 0.25s; }
+.lb-stat-card:nth-child(6) { animation-delay: 0.3s; }
+.lb-stat-card:nth-child(7) { animation-delay: 0.35s; }

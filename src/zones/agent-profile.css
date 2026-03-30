@@ -1,0 +1,567 @@
+/**
+ * agent-profile.css — Agent Profile zone styles
+ *
+ * Dark theme matching variables.css tokens.
+ * Glass morphism panels, agent-colored accents,
+ * animated trait bars, relationship mini-graph.
+ */
+
+/* ── Container ──────────────────────────────────────────────────── */
+.agent-profile {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-hover) transparent;
+}
+
+.agent-profile::-webkit-scrollbar {
+  width: 6px;
+}
+
+.agent-profile::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.agent-profile::-webkit-scrollbar-thumb {
+  background: var(--border-hover);
+  border-radius: var(--radius-full);
+}
+
+/* ── Agent Tab Bar ──────────────────────────────────────────────── */
+.ap-tabs {
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+
+.ap-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.ap-tab {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 8px 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  border-bottom: 3px solid transparent;
+  position: relative;
+}
+
+.ap-tab:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+}
+
+.ap-tab--active {
+  color: var(--text-primary);
+  border-bottom-color: var(--agent-color, var(--accent-blue));
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ap-tab__emoji {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.ap-tab__name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70px;
+}
+
+/* ── Profile Header ─────────────────────────────────────────────── */
+.ap-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 20px;
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--agent-color-rgb, 74, 158, 255), 0.08) 0%,
+    transparent 100%
+  );
+}
+
+.ap-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  position: relative;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(var(--agent-color-rgb, 74, 158, 255), 0.3),
+    rgba(var(--agent-color-rgb, 74, 158, 255), 0.1)
+  );
+  border: 2px solid var(--agent-color, var(--accent-blue));
+  box-shadow:
+    0 0 20px rgba(var(--agent-color-rgb, 74, 158, 255), 0.3),
+    0 0 40px rgba(var(--agent-color-rgb, 74, 158, 255), 0.1),
+    inset 0 0 12px rgba(var(--agent-color-rgb, 74, 158, 255), 0.15);
+  animation: ap-glow-pulse 3s ease-in-out infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes ap-glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(var(--agent-color-rgb, 74, 158, 255), 0.3), 0 0 40px rgba(var(--agent-color-rgb, 74, 158, 255), 0.1); }
+  50% { box-shadow: 0 0 28px rgba(var(--agent-color-rgb, 74, 158, 255), 0.45), 0 0 56px rgba(var(--agent-color-rgb, 74, 158, 255), 0.15); }
+}
+
+.ap-name {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 2px;
+  text-align: center;
+}
+
+.ap-role {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.ap-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  background: rgba(var(--agent-color-rgb, 74, 158, 255), 0.15);
+  color: var(--agent-color, var(--accent-blue));
+  border: 1px solid rgba(var(--agent-color-rgb, 74, 158, 255), 0.25);
+}
+
+.ap-badge--mood {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.ap-description {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: var(--line-height-normal);
+  margin-top: 10px;
+  padding: 0 8px;
+  max-width: 320px;
+}
+
+/* ── Section titles ─────────────────────────────────────────────── */
+.ap-section {
+  padding: 16px;
+}
+
+.ap-section + .ap-section {
+  border-top: 1px solid var(--border);
+}
+
+.ap-section__title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Stats Grid ─────────────────────────────────────────────────── */
+.ap-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ap-stat-card {
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--agent-color-rgb, 74, 158, 255), 0.08),
+    rgba(var(--agent-color-rgb, 74, 158, 255), 0.02)
+  );
+  border: 1px solid rgba(var(--agent-color-rgb, 74, 158, 255), 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.ap-stat-card__label {
+  font-size: var(--font-size-xs);
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ap-stat-card__value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-stat-card__sub {
+  font-size: var(--font-size-xs);
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* ── Activity Graph ─────────────────────────────────────────────── */
+.ap-activity-canvas {
+  width: 100%;
+  height: 120px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+}
+
+/* ── Personality / Trait Bars ────────────────────────────────────── */
+.ap-traits {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ap-trait {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ap-trait__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ap-trait__name {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.ap-trait__value {
+  font-size: var(--font-size-xs);
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-trait__bar-outer {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.ap-trait__bar-inner {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--agent-color, var(--accent-blue)), var(--agent-color-light, var(--accent-cyan)));
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 0;
+  box-shadow: 0 0 8px rgba(var(--agent-color-rgb, 74, 158, 255), 0.3);
+}
+
+.ap-trait__bar-inner[data-animated] {
+  width: var(--trait-width);
+}
+
+.ap-comm-style {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+}
+
+.ap-comm-style__label {
+  font-size: var(--font-size-xs);
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ap-comm-style__text {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+.ap-preferred-zones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.ap-zone-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+/* ── Relationship Map ───────────────────────────────────────────── */
+.ap-relationships {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ap-rel-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+}
+
+.ap-rel-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.ap-rel-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ap-rel-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.ap-rel-type {
+  font-size: var(--font-size-xs);
+  color: var(--text-dim);
+}
+
+.ap-rel-line {
+  width: 40px;
+  height: 3px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.ap-rel-line--like {
+  background: var(--accent-green);
+  box-shadow: 0 0 6px rgba(74, 255, 138, 0.3);
+}
+
+.ap-rel-line--dislike {
+  background: var(--accent-red);
+  box-shadow: 0 0 6px rgba(255, 74, 106, 0.3);
+}
+
+.ap-rel-line--neutral {
+  background: var(--text-dim);
+}
+
+/* ── Recent Tasks ───────────────────────────────────────────────── */
+.ap-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ap-task-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  transition: background var(--transition-fast);
+}
+
+.ap-task-row:hover {
+  background: var(--bg-hover);
+}
+
+.ap-task-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.ap-task-status--done {
+  background: var(--accent-green);
+  box-shadow: 0 0 4px rgba(74, 255, 138, 0.4);
+}
+
+.ap-task-status--error {
+  background: var(--accent-red);
+  box-shadow: 0 0 4px rgba(255, 74, 106, 0.4);
+}
+
+.ap-task-status--pending {
+  background: var(--accent-amber);
+  box-shadow: 0 0 4px rgba(255, 184, 74, 0.4);
+}
+
+.ap-task-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ap-task-prompt {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: var(--line-height-tight);
+}
+
+.ap-task-meta {
+  font-size: var(--font-size-xs);
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* ── Action Buttons ─────────────────────────────────────────────── */
+.ap-actions {
+  display: flex;
+  gap: 8px;
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.ap-action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  border: 1px solid var(--border);
+  transition: all var(--transition-fast);
+}
+
+.ap-action-btn--primary {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--agent-color-rgb, 74, 158, 255), 0.2),
+    rgba(var(--agent-color-rgb, 74, 158, 255), 0.1)
+  );
+  color: var(--agent-color, var(--accent-blue));
+  border-color: rgba(var(--agent-color-rgb, 74, 158, 255), 0.3);
+}
+
+.ap-action-btn--primary:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--agent-color-rgb, 74, 158, 255), 0.3),
+    rgba(var(--agent-color-rgb, 74, 158, 255), 0.15)
+  );
+  border-color: rgba(var(--agent-color-rgb, 74, 158, 255), 0.5);
+}
+
+.ap-action-btn--secondary {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+}
+
+.ap-action-btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+/* ── Empty / Loading states ─────────────────────────────────────── */
+.ap-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-dim);
+  font-size: var(--font-size-sm);
+}
+
+.ap-empty {
+  font-size: var(--font-size-sm);
+  color: var(--text-dim);
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* ── Glass morphism shared ──────────────────────────────────────── */
+.ap-glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+/* ── Agent color overrides (set as CSS custom properties) ────────  */
+.ap-agent--commander   { --agent-color: #7c3aed; --agent-color-rgb: 124, 58, 237; --agent-color-light: #a78bfa; }
+.ap-agent--librarian   { --agent-color: #2563eb; --agent-color-rgb: 37, 99, 235;  --agent-color-light: #60a5fa; }
+.ap-agent--archivist   { --agent-color: #0891b2; --agent-color-rgb: 8, 145, 178;  --agent-color-light: #22d3ee; }
+.ap-agent--instructor  { --agent-color: #16a34a; --agent-color-rgb: 22, 163, 74;  --agent-color-light: #4ade80; }
+.ap-agent--dockmaster  { --agent-color: #d97706; --agent-color-rgb: 217, 119, 6;  --agent-color-light: #fbbf24; }
