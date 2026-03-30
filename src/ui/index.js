@@ -20,10 +20,13 @@ import { ToastManager } from './toasts.js';
 import { PanelManager } from './panels.js';
 import { AgentDialogue } from './agent-dialogue.js';
 import { ShortcutManager } from './shortcuts.js';
+import { Workspace } from './workspace.js';
 import { QuestPanel } from './quest-panel.js';
 import { ZoneTooltips } from './zone-tooltips.js';
 import { SearchResults } from './search-results.js';
 import { QuickActions } from './quick-actions.js';
+import { CommandHistoryPanel } from './command-history-panel.js';
+import { getCommandHistory } from '../systems/command-history.js';
 import { initTreasuryEvents } from '../zones/treasury.js';
 
 /**
@@ -53,6 +56,8 @@ function loadStyles(basePath = '') {
     'agent-chat.css',
     'achievements-panel.css',
     'tutorial-overlay.css',
+    'workspace.css',
+    'command-history-panel.css',
   ];
 
   for (const file of cssFiles) {
@@ -78,12 +83,18 @@ export function initUI({ cssBasePath = '' } = {}) {
   const hud = new HUD();
   const toasts = new ToastManager();
   const panels = new PanelManager();
+  const workspace = new Workspace(panels);
+  workspace.mount();
   const agentDialogue = new AgentDialogue(panels);
   const shortcuts = new ShortcutManager({ palette, panels });
   const questPanel = new QuestPanel();
   const searchResults = new SearchResults(palette._modal);
   const quickActions = new QuickActions();
   quickActions.mount();
+
+  // Command history system (undo/redo + action recording)
+  const commandHistory = getCommandHistory();
+  const commandHistoryPanel = new CommandHistoryPanel();
 
   // ── Wire up cross-component events ────────────────────────────
 
@@ -147,11 +158,14 @@ export function initUI({ cssBasePath = '' } = {}) {
     hud,
     toasts,
     panels,
+    workspace,
     agentDialogue,
     questPanel,
     searchResults,
     shortcuts,
     quickActions,
+    commandHistory,
+    commandHistoryPanel,
 
     /**
      * Mount the zone tooltip system.  Call after camera and buildingManager
@@ -174,9 +188,12 @@ export function initUI({ cssBasePath = '' } = {}) {
       hud.destroy();
       toasts.destroy();
       panels.destroy();
+      workspace.destroy();
       questPanel.destroy();
       searchResults.destroy();
       quickActions.destroy();
+      commandHistoryPanel.destroy();
+      commandHistory.destroy();
       shortcuts.destroy();
     },
   };

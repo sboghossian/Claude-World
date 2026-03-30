@@ -1,0 +1,270 @@
+/**
+ * command-history-panel.css — History viewer slide-in panel
+ * Glass morphism, action icons, filter tabs, undo buttons.
+ */
+
+/* ── Panel overlay (slide from right) ─────────────────────────── */
+.cmd-history-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--panel-width);
+  z-index: var(--z-panels);
+  transform: translateX(100%);
+  transition: transform var(--transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.cmd-history-overlay.open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* ── Glass panel ──────────────────────────────────────────────── */
+.cmd-history-panel {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-primary);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Header ───────────────────────────────────────────────────── */
+.cmd-history__header {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-4);
+  height: 52px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.cmd-history__header-icon {
+  font-size: 18px;
+  margin-right: var(--space-3);
+}
+
+.cmd-history__title {
+  flex: 1;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cmd-history__close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.cmd-history__close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* ── Filter bar ───────────────────────────────────────────────── */
+.cmd-history__filters {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.cmd-history__filter-btn {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.cmd-history__filter-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+.cmd-history__filter-btn.active {
+  background: var(--accent-blue);
+  color: #fff;
+  border-color: var(--accent-blue);
+}
+
+/* ── Scrollable list ──────────────────────────────────────────── */
+.cmd-history__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2) 0;
+}
+
+.cmd-history__list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cmd-history__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cmd-history__list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+/* ── Command item ─────────────────────────────────────────────── */
+.cmd-history__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  transition: background var(--transition-fast);
+}
+
+.cmd-history__item:hover {
+  background: var(--bg-hover);
+}
+
+.cmd-history__item-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.cmd-history__item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cmd-history__item-desc {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cmd-history__item-time {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.cmd-history__item-undo {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--accent-blue);
+  background: transparent;
+  color: var(--accent-blue);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  opacity: 0;
+}
+
+.cmd-history__item:hover .cmd-history__item-undo {
+  opacity: 1;
+}
+
+.cmd-history__item-undo:hover {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+/* ── Empty state ──────────────────────────────────────────────── */
+.cmd-history__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-4);
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.cmd-history__empty-icon {
+  font-size: 40px;
+  margin-bottom: var(--space-4);
+  opacity: 0.4;
+}
+
+.cmd-history__empty-text {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+}
+
+/* ── Footer ───────────────────────────────────────────────────── */
+.cmd-history__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.cmd-history__count {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-dim);
+}
+
+.cmd-history__clear-btn {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--accent-red);
+  background: transparent;
+  color: var(--accent-red);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cmd-history__clear-btn:hover {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+/* ── Undo/redo badge (non-reversible indicator) ───────────────── */
+.cmd-history__item-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}

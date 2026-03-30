@@ -112,7 +112,7 @@
     let SplashScreen, initWorld, getWorldState, getBuildingManager, getApp, getCamera, getDayNight;
     let initUI, MorningBriefing, OnboardingSystem, initOnboarding;
     let AgentRelationshipSystem, IncidentPanel;
-    let initThemes, initThemePicker, initCelebrations, initAudio, ZoneAmbience;
+    let initThemes, initThemePicker, initCelebrations, initAudio, ZoneAmbience, initSoundEffects;
     let initPersonalityEngine, ThoughtBubbles, getQualityManager;
     let initVFX, initParticles, initCityLife, initDataFlows;
     let OnboardingCinema, NotificationCenter, Minimap, ActivityFeed;
@@ -137,6 +137,7 @@
       ({ initCelebrations } = await import('../systems/celebrations.js'));
       ({ initAudio } = await import('../systems/audio.js'));
       ({ ZoneAmbience } = await import('../systems/zone-ambience.js'));
+      ({ initSoundEffects } = await import('../systems/sound-effects.js'));
       ({ initPersonalityEngine } = await import('../systems/agent-personalities.js'));
       ({ ThoughtBubbles } = await import('../ui/thought-bubbles.js'));
       ({ getQualityManager } = await import('../systems/quality.js'));
@@ -369,6 +370,8 @@
           const celebrations = initCelebrations();
           audio = initAudio();
           window.__audio = audio;
+          const sfx = initSoundEffects(audio?._ctx);
+          window.__soundEffects = sfx;
 
           // Zone-specific ambient soundscapes (shares AudioContext with main audio)
           // Lazy-init: ZoneAmbience needs a running AudioContext, which is created

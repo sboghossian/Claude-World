@@ -129,6 +129,18 @@ contextBridge.exposeInMainWorld('api', {
     createPrompt: (worldId, data) => ipcRenderer.invoke('db:createPrompt', worldId, data),
     updatePrompt: (promptId, updates) => ipcRenderer.invoke('db:updatePrompt', promptId, updates),
     deletePrompt: (promptId) => ipcRenderer.invoke('db:deletePrompt', promptId),
+    // Daily Digest
+    getDigests: (worldId) => ipcRenderer.invoke('db:getDigests', worldId),
+    saveDigest: (worldId, data) => ipcRenderer.invoke('db:saveDigest', worldId, data),
+    updateDigest: (digestId, updates) => ipcRenderer.invoke('db:updateDigest', digestId, updates),
+    getGoals: (worldId, goalDate) => ipcRenderer.invoke('db:getGoals', worldId, goalDate),
+    createGoal: (worldId, data) => ipcRenderer.invoke('db:createGoal', worldId, data),
+    updateGoal: (goalId, updates) => ipcRenderer.invoke('db:updateGoal', goalId, updates),
+    // MCP Hub
+    getMcpServers: (worldId) => ipcRenderer.invoke('db:getMcpServers', worldId),
+    createMcpServer: (worldId, data) => ipcRenderer.invoke('db:createMcpServer', worldId, data),
+    updateMcpServer: (serverId, updates) => ipcRenderer.invoke('db:updateMcpServer', serverId, updates),
+    deleteMcpServer: (serverId) => ipcRenderer.invoke('db:deleteMcpServer', serverId),
     // Settings
     getSettings: (worldId) => ipcRenderer.invoke('db:getSettings', worldId),
     updateSettings: (worldId, key, value) => ipcRenderer.invoke('db:updateSettings', worldId, key, value),
@@ -181,5 +193,19 @@ contextBridge.exposeInMainWorld('api', {
   app: {
     getVersion: () => ipcRenderer.invoke('app:getVersion'),
     getPlatform: () => ipcRenderer.invoke('app:getPlatform'),
+  },
+
+  // ── Backup operations ─────────────────────────────────────────────
+  backup: {
+    list: () => ipcRenderer.invoke('backup:list'),
+    create: (trigger) => ipcRenderer.invoke('backup:create', trigger),
+    delete: (filename) => ipcRenderer.invoke('backup:delete', filename),
+    restore: (backupPath) => ipcRenderer.invoke('backup:restore', backupPath),
+    getStorageUsage: () => ipcRenderer.invoke('backup:getStorageUsage'),
+    cleanup: () => ipcRenderer.invoke('backup:cleanup'),
+    setAutoBackup: (enabled, intervalMinutes) => ipcRenderer.invoke('backup:setAutoBackup', enabled, intervalMinutes),
+    export: (filename) => ipcRenderer.invoke('backup:export', filename),
+    import: () => ipcRenderer.invoke('backup:import'),
+    restartApp: () => ipcRenderer.invoke('backup:restartApp'),
   },
 });

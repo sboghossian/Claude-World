@@ -1,0 +1,320 @@
+/**
+ * workspace.css — Multi-panel workspace styles
+ *
+ * Tab bar, split panes, divider, and tab animations.
+ */
+
+/* ── Workspace root ─────────────────────────────────────────────── */
+.workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Tab bar ────────────────────────────────────────────────────── */
+.workspace__tab-bar {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 4px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 2px;
+  transition: opacity var(--transition-fast), height var(--transition-fast);
+}
+
+.workspace__tab-bar--hidden {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0;
+  border-bottom: none;
+  pointer-events: none;
+}
+
+/* ── Tab scroller (overflow handling) ───────────────────────────── */
+.workspace__tab-scroller {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 2px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.workspace__tab-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Individual tab ─────────────────────────────────────────────── */
+.workspace__tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px 0 10px;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  max-width: 160px;
+  min-width: 0;
+  transition:
+    background var(--transition-fast),
+    opacity var(--transition-fast);
+  user-select: none;
+  position: relative;
+}
+
+.workspace__tab:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Active tab */
+.workspace__tab--active {
+  background: var(--bg-primary);
+}
+
+.workspace__tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background: var(--accent-blue);
+  border-radius: 1px 1px 0 0;
+}
+
+/* Split pane tab indicator */
+.workspace__tab--split::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background: var(--accent-purple);
+  border-radius: 1px 1px 0 0;
+}
+
+/* Dragging state */
+.workspace__tab--dragging {
+  opacity: 0.4;
+}
+
+/* ── Tab icon ───────────────────────────────────────────────────── */
+.workspace__tab-icon {
+  font-size: 12px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* ── Tab label ──────────────────────────────────────────────────── */
+.workspace__tab-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
+  min-width: 0;
+}
+
+.workspace__tab--active .workspace__tab-label {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ── Tab close button ───────────────────────────────────────────── */
+.workspace__tab-close {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 0;
+  flex-shrink: 0;
+  opacity: 0;
+  transition:
+    opacity var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.workspace__tab:hover .workspace__tab-close,
+.workspace__tab--active .workspace__tab-close {
+  opacity: 1;
+}
+
+.workspace__tab-close:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Split toggle button ────────────────────────────────────────── */
+.workspace__split-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  padding: 0;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.workspace__split-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Pane container ─────────────────────────────────────────────── */
+.workspace__panes {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.workspace__panes--single {
+  flex-direction: column;
+}
+
+.workspace__panes--horizontal {
+  flex-direction: row;
+}
+
+.workspace__panes--vertical {
+  flex-direction: column;
+}
+
+/* ── Pane ───────────────────────────────────────────────────────── */
+.workspace__pane {
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace__pane--primary {
+  flex: 1;
+}
+
+.workspace__pane--secondary {
+  display: none;
+  flex: 0;
+}
+
+.workspace__pane--visible {
+  display: flex;
+  flex: none;
+}
+
+/* ── Divider ────────────────────────────────────────────────────── */
+.workspace__divider {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  z-index: 2;
+  position: relative;
+}
+
+.workspace__divider--visible {
+  display: flex;
+}
+
+/* Horizontal split: vertical divider */
+.workspace__panes--horizontal > .workspace__divider {
+  width: 8px;
+  cursor: col-resize;
+}
+
+/* Vertical split: horizontal divider */
+.workspace__panes--vertical > .workspace__divider {
+  height: 8px;
+  cursor: row-resize;
+}
+
+/* Divider handle (visual grip) */
+.workspace__divider-handle {
+  border-radius: var(--radius-full);
+  background: var(--border-light);
+  transition: background var(--transition-fast);
+}
+
+.workspace__panes--horizontal .workspace__divider-handle {
+  width: 3px;
+  height: 32px;
+}
+
+.workspace__panes--vertical .workspace__divider-handle {
+  width: 32px;
+  height: 3px;
+}
+
+.workspace__divider:hover .workspace__divider-handle {
+  background: var(--accent-blue);
+}
+
+/* Resizing state: disable pointer events on panes to prevent iframe capture */
+.workspace--resizing .workspace__pane {
+  pointer-events: none;
+}
+
+.workspace--resizing .workspace__divider-handle {
+  background: var(--accent-blue);
+}
+
+/* ── Tab switch animation ───────────────────────────────────────── */
+.workspace__pane > .panel__body {
+  animation: workspace-fade-in var(--transition-fast) ease-out;
+}
+
+@keyframes workspace-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Adjustments to existing panel when workspace is active ──── */
+.panel-overlay.open .workspace {
+  flex: 1;
+  min-height: 0;
+}
+
+/* The panel body lives inside the primary pane now */
+.workspace .panel__body {
+  flex: 1;
+  min-height: 0;
+}

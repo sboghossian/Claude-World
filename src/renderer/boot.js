@@ -16,7 +16,7 @@ _log('Loading core modules...');
 let SplashScreen, initWorld, getWorldState, getBuildingManager, getApp, getCamera, getDayNight;
 let initUI, MorningBriefing, OnboardingSystem, initOnboarding;
 let AgentRelationshipSystem, IncidentPanel;
-let initThemes, initThemePicker, initCelebrations, initAudio, ZoneAmbience;
+let initThemes, initThemePicker, initCelebrations, initAudio, ZoneAmbience, initSoundEffects;
 let initPersonalityEngine, ThoughtBubbles, getQualityManager;
 let initVFX, initParticles, initCityLife, initDataFlows;
 let OnboardingCinema, NotificationCenter, Minimap, ActivityFeed;
@@ -45,6 +45,7 @@ try {
   ({ initCelebrations } = await import('../systems/celebrations.js'));
   ({ initAudio } = await import('../systems/audio.js'));
   ({ ZoneAmbience } = await import('../systems/zone-ambience.js'));
+  ({ initSoundEffects } = await import('../systems/sound-effects.js'));
   ({ initPersonalityEngine } = await import('../systems/agent-personalities.js'));
   ({ ThoughtBubbles } = await import('../ui/thought-bubbles.js'));
   ({ getQualityManager } = await import('../systems/quality.js'));
@@ -243,6 +244,8 @@ async function boot() {
       initCelebrations();
       audio = initAudio();
       window.__audio = audio;
+      const sfx = initSoundEffects(audio?._ctx);
+      window.__soundEffects = sfx;
       let zoneAmbience = null;
       document.addEventListener('zone-click', () => {
         if (zoneAmbience) return;

@@ -47,6 +47,9 @@ import { WorldMap } from '../zones/world-map.js';
 import { PluginStore } from '../zones/plugin-store.js';
 import { getPluginManager } from '../systems/plugin-api.js';
 import { AgentProfile } from '../zones/agent-profile.js';
+import { Backups } from '../zones/backups.js';
+import { McpHub } from '../zones/mcp-hub.js';
+import { DailyDigest } from '../zones/daily-digest.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -92,6 +95,11 @@ const ZONE_INFO = {
   world_map: { icon: '\u{1F5FA}', desc: 'Top-down overview of the entire city with zone status and connections.' },
   plugins: { icon: '\u{1F9E9}', desc: 'Browse, install, and manage community plugins and extensions.' },
   'agent-profile': { icon: '\u{1F464}', desc: 'Detailed agent profile with stats, personality, and relationships.' },
+  backups: { icon: '\u{1F4BE}', desc: 'Backup and restore your world database. Auto-backup settings.' },
+  'mcp-hub': { icon: '\u{1F50C}', desc: 'Model Context Protocol hub. Connect AI agents to external tools and data sources.' },
+  mcp_hub: { icon: '\u{1F50C}', desc: 'Model Context Protocol hub. Connect AI agents to external tools and data sources.' },
+  'daily-digest': { icon: '\u{1F4F0}', desc: 'AI-powered daily summaries with stats, insights, goals, and weekly trends.' },
+  daily_digest: { icon: '\u{1F4F0}', desc: 'AI-powered daily summaries with stats, insights, goals, and weekly trends.' },
 };
 
 const AGENT_INFO = {
@@ -377,6 +385,27 @@ function buildZoneContent(zoneId) {
     const el = ap.render();
     ap.init(window.__claudeWorldId || 1, window.__agentProfileTarget || 'commander');
     window.__agentProfileTarget = null;
+    return el;
+  }
+
+  if (zoneId === 'backups') {
+    const backups = new Backups();
+    const el = backups.render();
+    backups.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'mcp-hub' || zoneId === 'mcp_hub') {
+    const mcp = new McpHub();
+    const el = mcp.render();
+    mcp.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'daily-digest' || zoneId === 'daily_digest') {
+    const dd = new DailyDigest();
+    const el = dd.render();
+    dd.init(window.__claudeWorldId || 1);
     return el;
   }
 

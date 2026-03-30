@@ -1,6 +1,7 @@
 const { app, BrowserWindow, session, ipcMain, dialog } = require('electron');
 const path = require('path');
 const { initAutoUpdater } = require('./auto-updater');
+const backup = require('./backup');
 
 let mainWindow = null;
 let db = null;
@@ -82,6 +83,10 @@ app.whenReady().then(() => {
   // Initialize database before creating window
   db = initDatabase();
 
+  // Initialize backup system (creates startup backup before any writes)
+  const dbPath = path.join(app.getPath('userData'), 'claude-world.db');
+  backup.initBackup(dbPath);
+
   createWindow();
 
   // Register IPC handlers (pass db so handlers can use it)
@@ -102,6 +107,9 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', () => {
+  // Graceful backup on quit (before DB close)
+  backup.cleanup();
+
   // Graceful database shutdown
   if (db) {
     try {

@@ -1,8 +1,11 @@
-const { app } = require('electron');
+const { app, dialog } = require('electron');
 const KeyStore = require('./key-store');
 const DispatchManager = require('../src/systems/dispatch');
 const AnthropicAdapter = require('../src/systems/providers/anthropic');
 const OpenAIAdapter = require('../src/systems/providers/openai');
+const backup = require('./backup');
+const fs = require('fs');
+const path = require('path');
 
 // ── Validation helpers ─────────────────────────────────────────────────
 function assertType(value, type, name) {
@@ -2397,12 +2400,274 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
+  // ── MCP Hub ──────────────────────────────────────────────────────
+
+  ipcMain.handle('db:getMcpServers', async (_event, worldId) => {
+    assertId(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM mcp_servers WHERE world_id = ? ORDER BY created_at DESC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createMcpServer', async (_event, worldId, data) => {
+    assertId(worldId, 'worldId');
+    assertType(data.name, 'string', 'name');
+    assertType(data.command, 'string', 'command');
+    const id = data.id || require('crypto').randomBytes(8).toString('hex');
+    return dbCall(
+      (database) => {
+        database.prepare(
+          `INSERT INTO mcp_servers (id, world_id, name, command, args_json, env_json, status, auto_connect)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+        ).run(
+          id,
+          worldId,
+          data.name,
+          data.command,
+          data.args_json || '[]',
+          data.env_json || '{}',
+          data.status || 'disconnected',
+          data.auto_connect || 0
+        );
+        return database.prepare('SELECT * FROM mcp_servers WHERE id = ?').get(id);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:updateMcpServer', async (_event, serverId, updates) => {
+    assertType(serverId, 'string', 'serverId');
+    const allowed = ['name', 'command', 'args_json', 'env_json', 'status', 'auto_connect'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k) && updates[k] !== undefined);
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE mcp_servers SET ${sets}, updated_at = datetime('now') WHERE id = @id`).run({ ...updates, id: serverId });
+        return database.prepare('SELECT * FROM mcp_servers WHERE id = ?').get(serverId);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:deleteMcpServer', async (_event, serverId) => {
+    assertType(serverId, 'string', 'serverId');
+    return dbCall(
+      (database) => {
+        database.prepare('DELETE FROM mcp_servers WHERE id = ?').run(serverId);
+        return { success: true };
+      },
+      { success: true }
+    );
+  });
+
   ipcMain.handle('app:getVersion', async () => {
     return app.getVersion();
   });
 
   ipcMain.handle('app:getPlatform', async () => {
     return process.platform;
+  });
+
+  // ── Backup handlers ──────────────────────────────────────────────
+
+  ipcMain.handle('backup:list', async () => {
+    return backup.listBackups();
+  });
+
+  ipcMain.handle('backup:create', async (_event, trigger) => {
+    return backup.createBackup(trigger || 'manual');
+  });
+
+  ipcMain.handle('backup:delete', async (_event, filename) => {
+    assertType(filename, 'string', 'filename');
+    return backup.deleteBackup(filename);
+  });
+
+  ipcMain.handle('backup:restore', async (_event, backupPath) => {
+    assertType(backupPath, 'string', 'backupPath');
+    return backup.restoreFromBackup(backupPath);
+  });
+
+  ipcMain.handle('backup:getStorageUsage', async () => {
+    return backup.getStorageUsage();
+  });
+
+  ipcMain.handle('backup:cleanup', async () => {
+    const deleted = backup.pruneBackups();
+    return { deleted };
+  });
+
+  ipcMain.handle('backup:setAutoBackup', async (_event, enabled, intervalMinutes) => {
+    if (enabled) {
+      backup.scheduleBackups(intervalMinutes * 60 * 1000);
+    } else {
+      backup.scheduleBackups(0); // stops the scheduler internally
+    }
+    return { success: true };
+  });
+
+  ipcMain.handle('backup:export', async (_event, filename) => {
+    assertType(filename, 'string', 'filename');
+    const backupDir = backup.getBackupDir();
+    const srcPath = path.join(backupDir, filename);
+    if (!fs.existsSync(srcPath)) {
+      return { success: false, error: 'Backup file not found' };
+    }
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      title: 'Export Backup',
+      defaultPath: filename,
+      filters: [{ name: 'Database Backup', extensions: ['db.bak'] }],
+    });
+    if (canceled || !filePath) return { success: false, cancelled: true };
+    try {
+      fs.copyFileSync(srcPath, filePath);
+      return { success: true, path: filePath };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('backup:import', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: 'Import Backup',
+      filters: [
+        { name: 'Database Backup', extensions: ['bak'] },
+        { name: 'All Files', extensions: ['*'] },
+      ],
+      properties: ['openFile'],
+    });
+    if (canceled || !filePaths.length) return { success: false, cancelled: true };
+    const srcPath = filePaths[0];
+    try {
+      const backupDir = backup.getBackupDir();
+      const destName = path.basename(srcPath);
+      // Ensure it doesn't clash: add timestamp if needed
+      let finalName = destName;
+      if (fs.existsSync(path.join(backupDir, finalName))) {
+        const ts = Date.now();
+        finalName = `imported-${ts}-${destName}`;
+      }
+      fs.mkdirSync(backupDir, { recursive: true });
+      fs.copyFileSync(srcPath, path.join(backupDir, finalName));
+      return { success: true, filename: finalName };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('backup:restartApp', async () => {
+    app.relaunch();
+    app.quit();
+  });
+
+  // ── Daily Digest ────────────────────────────────────────────────────
+
+  ipcMain.handle('db:getDigests', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare('SELECT * FROM daily_digests WHERE world_id = ? ORDER BY digest_date DESC LIMIT 90').all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:saveDigest', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => {
+        database.prepare(`
+          INSERT OR REPLACE INTO daily_digests
+            (id, world_id, digest_date, tasks_completed, tasks_failed, total_tokens, total_cost,
+             top_achievement, most_active_zone, agent_of_day, health_change, ai_summary,
+             weekly_summary, insights, raw_data)
+          VALUES (@id, @world_id, @digest_date, @tasks_completed, @tasks_failed, @total_tokens, @total_cost,
+                  @top_achievement, @most_active_zone, @agent_of_day, @health_change, @ai_summary,
+                  @weekly_summary, @insights, @raw_data)
+        `).run({
+          id: data.id,
+          world_id: worldId,
+          digest_date: data.digest_date,
+          tasks_completed: data.tasks_completed || 0,
+          tasks_failed: data.tasks_failed || 0,
+          total_tokens: data.total_tokens || 0,
+          total_cost: data.total_cost || 0,
+          top_achievement: data.top_achievement || '',
+          most_active_zone: data.most_active_zone || '',
+          agent_of_day: data.agent_of_day || '',
+          health_change: data.health_change || 'stable',
+          ai_summary: data.ai_summary || '',
+          weekly_summary: data.weekly_summary || '',
+          insights: data.insights || '[]',
+          raw_data: data.raw_data || '{}',
+        });
+        return database.prepare('SELECT * FROM daily_digests WHERE id = ?').get(data.id);
+      },
+      data
+    );
+  });
+
+  ipcMain.handle('db:updateDigest', async (_event, digestId, updates) => {
+    assertType(digestId, 'string', 'digestId');
+    const allowed = ['ai_summary', 'weekly_summary', 'insights', 'raw_data', 'health_change'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k) && updates[k] !== undefined);
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE daily_digests SET ${sets} WHERE id = @id`).run({ ...updates, id: digestId });
+        return database.prepare('SELECT * FROM daily_digests WHERE id = ?').get(digestId);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:getGoals', async (_event, worldId, goalDate) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare('SELECT * FROM daily_goals WHERE world_id = ? AND goal_date = ? ORDER BY created_at').all(worldId, goalDate),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createGoal', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => {
+        database.prepare(`
+          INSERT INTO daily_goals (id, world_id, goal_date, label, target_value, current_value, goal_type, completed)
+          VALUES (@id, @world_id, @goal_date, @label, @target_value, @current_value, @goal_type, @completed)
+        `).run({
+          id: data.id,
+          world_id: worldId,
+          goal_date: data.goal_date,
+          label: data.label || '',
+          target_value: data.target_value || 1,
+          current_value: data.current_value || 0,
+          goal_type: data.goal_type || 'tasks',
+          completed: data.completed || 0,
+        });
+        return database.prepare('SELECT * FROM daily_goals WHERE id = ?').get(data.id);
+      },
+      data
+    );
+  });
+
+  ipcMain.handle('db:updateGoal', async (_event, goalId, updates) => {
+    assertType(goalId, 'string', 'goalId');
+    const allowed = ['label', 'target_value', 'current_value', 'completed'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k) && updates[k] !== undefined);
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE daily_goals SET ${sets} WHERE id = @id`).run({ ...updates, id: goalId });
+        return database.prepare('SELECT * FROM daily_goals WHERE id = ?').get(goalId);
+      },
+      null
+    );
   });
 }
 
