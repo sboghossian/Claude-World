@@ -1,0 +1,505 @@
+/**
+ * task-stream.css — Real-time task streaming overlay
+ *
+ * Bottom drawer with terminal-style display for AI response streaming.
+ * Glass morphism sidebar, syntax highlighting, animated token counter.
+ */
+
+/* ── Drawer container ──────────────────────────────────────────────── */
+
+.task-stream {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40vh;
+  min-height: 260px;
+  max-height: 600px;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  background: #0d0d1a;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6);
+  transform: translateY(100%);
+  transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+  font-family: var(--font-mono, 'SF Mono', 'Fira Code', 'Consolas', monospace);
+}
+
+.task-stream--open {
+  transform: translateY(0);
+}
+
+.task-stream--collapsing {
+  transform: translateY(100%);
+  transition: transform 350ms cubic-bezier(0.55, 0, 1, 0.45);
+}
+
+/* ── Tab bar ───────────────────────────────────────────────────────── */
+
+.task-stream__tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 12px;
+  background: rgba(8, 8, 16, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.task-stream__tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.task-stream__tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-family: var(--font-mono, monospace);
+  color: var(--text-secondary, #8888a0);
+  background: transparent;
+  border: none;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms ease, color 150ms ease;
+  position: relative;
+}
+
+.task-stream__tab:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary, #e8e8f0);
+}
+
+.task-stream__tab--active {
+  background: rgba(74, 158, 255, 0.1);
+  color: var(--accent-blue, #4a9eff);
+}
+
+.task-stream__tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: var(--accent-blue, #4a9eff);
+  border-radius: 2px 2px 0 0;
+}
+
+.task-stream__tab-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-green, #4aff8a);
+  flex-shrink: 0;
+}
+
+.task-stream__tab-indicator--streaming {
+  animation: ts-pulse 1.2s ease-in-out infinite;
+}
+
+.task-stream__tab-indicator--done {
+  background: var(--accent-green, #4aff8a);
+  animation: none;
+}
+
+.task-stream__tab-indicator--error {
+  background: var(--accent-red, #ff4a6a);
+  animation: none;
+}
+
+.task-stream__tab-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  color: var(--text-dim, #555570);
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 150ms ease, background 150ms ease;
+}
+
+.task-stream__tab:hover .task-stream__tab-close {
+  opacity: 1;
+}
+
+.task-stream__tab-close:hover {
+  background: rgba(255, 74, 106, 0.2);
+  color: var(--accent-red, #ff4a6a);
+}
+
+/* ── Main body ─────────────────────────────────────────────────────── */
+
+.task-stream__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Sidebar (glass morphism stats panel) ──────────────────────────── */
+
+.task-stream__sidebar {
+  width: 200px;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 14px 16px;
+  background: rgba(15, 15, 30, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+.task-stream__sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.task-stream__sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.task-stream__sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+
+.task-stream__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.task-stream__stat:last-child {
+  border-bottom: none;
+}
+
+.task-stream__stat-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim, #555570);
+}
+
+.task-stream__stat-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #e8e8f0);
+  font-variant-numeric: tabular-nums;
+  transition: color 200ms ease;
+}
+
+.task-stream__stat-value--model {
+  font-size: 12px;
+  color: var(--accent-blue, #4a9eff);
+  word-break: break-all;
+}
+
+.task-stream__stat-value--tokens {
+  color: var(--accent-amber, #ffb84a);
+  display: inline-block;
+}
+
+.task-stream__stat-value--tokens.ts-animating {
+  animation: ts-counter-bump 200ms ease-out;
+}
+
+.task-stream__stat-value--cost {
+  color: var(--accent-green, #4aff8a);
+}
+
+.task-stream__stat-value--time {
+  color: var(--text-secondary, #8888a0);
+}
+
+.task-stream__provider-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.task-stream__provider-icon--anthropic { background: #d97706; }
+.task-stream__provider-icon--openai    { background: #10a37f; }
+.task-stream__provider-icon--google    { background: #4285f4; }
+.task-stream__provider-icon--default   { background: #6366f1; }
+
+/* ── Output area (terminal) ────────────────────────────────────────── */
+
+.task-stream__output-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.task-stream__output {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-primary, #e8e8f0);
+  white-space: pre-wrap;
+  word-break: break-word;
+  scroll-behavior: smooth;
+}
+
+/* Matrix-style green tint option */
+.task-stream--matrix .task-stream__output {
+  color: #33ff88;
+  text-shadow: 0 0 4px rgba(51, 255, 136, 0.15);
+}
+
+/* Scrollbar styling for output */
+.task-stream__output::-webkit-scrollbar {
+  width: 6px;
+}
+
+.task-stream__output::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 3px;
+}
+
+.task-stream__output::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.task-stream__output::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* Typewriter cursor */
+.task-stream__cursor {
+  display: inline-block;
+  width: 7px;
+  height: 16px;
+  background: var(--accent-green, #4aff8a);
+  vertical-align: text-bottom;
+  margin-left: 1px;
+  animation: ts-blink 800ms step-end infinite;
+}
+
+.task-stream--matrix .task-stream__cursor {
+  background: #33ff88;
+  box-shadow: 0 0 6px rgba(51, 255, 136, 0.4);
+}
+
+/* ── Syntax highlighting ───────────────────────────────────────────── */
+
+.task-stream__output .ts-keyword {
+  color: #4a9eff;
+  font-weight: 500;
+}
+
+.task-stream__output .ts-string {
+  color: #4aff8a;
+}
+
+.task-stream__output .ts-comment {
+  color: #555570;
+  font-style: italic;
+}
+
+.task-stream__output .ts-number {
+  color: #ffb84a;
+}
+
+.task-stream__output .ts-punct {
+  color: #8888a0;
+}
+
+.task-stream__output .ts-fn {
+  color: #a78bfa;
+}
+
+.task-stream__output .ts-code-block {
+  display: block;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin: 8px 0;
+  overflow-x: auto;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.task-stream__output .ts-code-lang {
+  display: block;
+  font-size: 10px;
+  color: var(--text-dim, #555570);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* ── Toolbar ───────────────────────────────────────────────────────── */
+
+.task-stream__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(8, 8, 16, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  min-height: 40px;
+}
+
+.task-stream__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 500;
+  color: var(--text-secondary, #8888a0);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  white-space: nowrap;
+}
+
+.task-stream__btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary, #e8e8f0);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.task-stream__btn--stop {
+  color: var(--accent-red, #ff4a6a);
+  border-color: rgba(255, 74, 106, 0.25);
+}
+
+.task-stream__btn--stop:hover {
+  background: rgba(255, 74, 106, 0.12);
+  color: #ff6b84;
+}
+
+.task-stream__btn--pin {
+  color: var(--text-dim, #555570);
+}
+
+.task-stream__btn--pin.active {
+  color: var(--accent-amber, #ffb84a);
+  background: rgba(255, 184, 74, 0.1);
+  border-color: rgba(255, 184, 74, 0.25);
+}
+
+.task-stream__btn--copy.copied {
+  color: var(--accent-green, #4aff8a);
+}
+
+.task-stream__spacer {
+  flex: 1;
+}
+
+/* Stream status indicator */
+.task-stream__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-dim, #555570);
+}
+
+.task-stream__status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-green, #4aff8a);
+  flex-shrink: 0;
+}
+
+.task-stream__status-dot--streaming {
+  animation: ts-pulse 1.2s ease-in-out infinite;
+}
+
+.task-stream__status-dot--done {
+  background: var(--accent-green, #4aff8a);
+  animation: none;
+}
+
+.task-stream__status-dot--error {
+  background: var(--accent-red, #ff4a6a);
+  animation: none;
+}
+
+.task-stream__status-check {
+  color: var(--accent-green, #4aff8a);
+  font-size: 13px;
+}
+
+/* ── Animations ────────────────────────────────────────────────────── */
+
+@keyframes ts-pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(74, 255, 138, 0.4);
+  }
+  50% {
+    opacity: 0.5;
+    box-shadow: 0 0 0 4px rgba(74, 255, 138, 0);
+  }
+}
+
+@keyframes ts-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+@keyframes ts-counter-bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+
+@media (max-width: 720px) {
+  .task-stream__sidebar {
+    display: none;
+  }
+
+  .task-stream__tabs {
+    padding: 0 8px;
+  }
+
+  .task-stream__output {
+    padding: 12px 14px;
+    font-size: 12px;
+  }
+}

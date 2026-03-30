@@ -116,6 +116,8 @@ contextBridge.exposeInMainWorld('api', {
     getAppInfo: () => ipcRenderer.invoke('db:getAppInfo'),
     // Analytics
     getAnalytics: (worldId, range) => ipcRenderer.invoke('db:getAnalytics', worldId, range),
+    // Timeline
+    getTimelineEvents: (worldId, limit) => ipcRenderer.invoke('db:getTimelineEvents', worldId, limit),
     // Achievements
     getAchievements: (worldId) => ipcRenderer.invoke('db:getAchievements', worldId),
     unlockAchievement: (worldId, achievementId) => ipcRenderer.invoke('db:unlockAchievement', worldId, achievementId),

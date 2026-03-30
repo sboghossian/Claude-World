@@ -1,0 +1,499 @@
+/**
+ * timeline.css — World Timeline zone styles
+ *
+ * Vertical timeline with event cards, heatmap, filters, and zoom controls.
+ * Uses design tokens from variables.css.
+ */
+
+/* ── Root container ─────────────────────────────────────────────────── */
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  max-width: 860px;
+  margin: 0 auto;
+  font-family: var(--font-sans, 'Inter', -apple-system, sans-serif);
+  color: var(--text-primary, #e8e8f0);
+}
+
+/* ── Header ──────────────────────────────────────────────────────────── */
+
+.timeline__header {
+  margin-bottom: 4px;
+}
+
+.timeline__title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.timeline__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary, #e8e8f0);
+}
+
+.timeline__subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #8888a0);
+}
+
+/* ── Heatmap section ─────────────────────────────────────────────────── */
+
+.timeline__heatmap-section {
+  position: relative;
+  background: var(--bg-secondary, rgba(20, 25, 40, 0.9));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--radius-md, 10px);
+  padding: 16px;
+  overflow-x: auto;
+}
+
+.timeline__heatmap-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #8888a0);
+  margin-bottom: 8px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.timeline__heatmap-canvas {
+  display: block;
+  cursor: crosshair;
+}
+
+.timeline__heatmap-tooltip {
+  position: absolute;
+  background: var(--bg-primary, rgba(10, 10, 20, 0.95));
+  color: var(--text-primary, #e8e8f0);
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.12));
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  white-space: nowrap;
+  z-index: 10;
+  box-shadow: var(--shadow, 0 8px 32px rgba(0, 0, 0, 0.4));
+}
+
+/* ── Controls bar ────────────────────────────────────────────────────── */
+
+.timeline__controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.timeline__search-wrap {
+  flex: 1;
+  min-width: 180px;
+}
+
+.timeline__search {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: var(--bg-secondary, rgba(20, 25, 40, 0.9));
+  color: var(--text-primary, #e8e8f0);
+  font-size: 0.85rem;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  outline: none;
+  transition: border-color var(--transition-fast, 150ms ease);
+}
+
+.timeline__search:focus {
+  border-color: var(--accent-blue, #4a9eff);
+}
+
+.timeline__search::placeholder {
+  color: var(--text-dim, #555570);
+}
+
+/* ── Zoom controls ───────────────────────────────────────────────────── */
+
+.timeline__zoom-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timeline__zoom-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #8888a0);
+  margin-right: 4px;
+}
+
+.timeline__zoom-btn {
+  padding: 5px 10px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: transparent;
+  color: var(--text-secondary, #8888a0);
+  font-size: 0.75rem;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.timeline__zoom-btn:hover {
+  background: var(--bg-hover, rgba(40, 50, 80, 0.8));
+  color: var(--text-primary, #e8e8f0);
+}
+
+.timeline__zoom-btn--active {
+  background: var(--accent-blue, #4a9eff);
+  color: var(--text-inverse, #0a0a14);
+  border-color: var(--accent-blue, #4a9eff);
+  font-weight: 600;
+}
+
+/* ── Category filters ────────────────────────────────────────────────── */
+
+.timeline__filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.timeline__filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: transparent;
+  color: var(--text-secondary, #8888a0);
+  font-size: 0.78rem;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.timeline__filter-btn:hover {
+  background: var(--bg-hover, rgba(40, 50, 80, 0.8));
+}
+
+.timeline__filter-btn--active {
+  background: color-mix(in srgb, var(--cat-color) 15%, transparent);
+  border-color: color-mix(in srgb, var(--cat-color) 40%, transparent);
+  color: var(--cat-color);
+}
+
+.timeline__filter-icon {
+  font-size: 0.9rem;
+}
+
+/* ── Stats bar ───────────────────────────────────────────────────────── */
+
+.timeline__stats {
+  font-size: 0.78rem;
+  color: var(--text-dim, #555570);
+  padding: 0 2px;
+}
+
+/* ── Timeline container (vertical line) ──────────────────────────────── */
+
+.timeline__container {
+  position: relative;
+  padding-left: 28px;
+  scroll-behavior: smooth;
+}
+
+.timeline__container::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-light, rgba(255, 255, 255, 0.12));
+  border-radius: 1px;
+}
+
+/* ── Time markers ────────────────────────────────────────────────────── */
+
+.timeline__time-marker {
+  position: relative;
+  margin: 20px 0 12px -28px;
+  padding-left: 28px;
+}
+
+.timeline__time-marker::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg-primary, rgba(10, 10, 20, 0.95));
+  border: 2px solid var(--accent-blue, #4a9eff);
+  z-index: 1;
+}
+
+.timeline__time-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--bg-secondary, rgba(20, 25, 40, 0.9));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  color: var(--text-secondary, #8888a0);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ── Event cards ─────────────────────────────────────────────────────── */
+
+.timeline__event-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 8px 0;
+  padding: 12px 14px;
+  background: var(--bg-secondary, rgba(20, 25, 40, 0.9));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-left: 3px solid var(--card-accent, #8888a0);
+  border-radius: var(--radius-md, 10px);
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.timeline__event-card::before {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: 16px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--card-accent, #8888a0);
+  box-shadow: 0 0 0 3px var(--bg-primary, rgba(10, 10, 20, 0.95));
+  z-index: 1;
+}
+
+.timeline__event-card:hover {
+  background: var(--bg-hover, rgba(40, 50, 80, 0.8));
+  border-color: var(--border-light, rgba(255, 255, 255, 0.12));
+  transform: translateX(2px);
+}
+
+.timeline__event-card:focus-visible {
+  outline: 2px solid var(--accent-blue, #4a9eff);
+  outline-offset: 2px;
+}
+
+/* ── Event icon ──────────────────────────────────────────────────────── */
+
+.timeline__event-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* ── Event content ───────────────────────────────────────────────────── */
+
+.timeline__event-content {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.timeline__event-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.timeline__event-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary, #e8e8f0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timeline__event-time {
+  font-size: 0.72rem;
+  color: var(--text-dim, #555570);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.timeline__event-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #8888a0);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.timeline__event-zone-link {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: rgba(74, 158, 255, 0.1);
+  color: var(--accent-blue, #4a9eff);
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.timeline__event-zone-link:hover {
+  background: rgba(74, 158, 255, 0.2);
+}
+
+/* ── Event badge ─────────────────────────────────────────────────────── */
+
+.timeline__event-badge {
+  padding: 2px 8px;
+  border-radius: 100px;
+  border: 1px solid;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 2px;
+}
+
+/* ── Event detail (expand) ───────────────────────────────────────────── */
+
+.timeline__event-detail {
+  display: none;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+
+.timeline__event-card--expanded .timeline__event-detail {
+  display: block;
+}
+
+.timeline__event-card--expanded .timeline__event-desc {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.timeline__detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 0.78rem;
+}
+
+.timeline__detail-label {
+  color: var(--text-dim, #555570);
+  text-transform: capitalize;
+}
+
+.timeline__detail-value {
+  color: var(--text-secondary, #8888a0);
+  font-family: var(--font-mono, 'SF Mono', monospace);
+  font-size: 0.75rem;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────── */
+
+.timeline__empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-dim, #555570);
+  font-size: 0.9rem;
+}
+
+/* ── Sentinel (infinite scroll trigger) ──────────────────────────────── */
+
+.timeline__sentinel {
+  height: 1px;
+  width: 100%;
+}
+
+/* ── Scrollbar styling ───────────────────────────────────────────────── */
+
+.timeline__container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.timeline__container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.timeline__container::-webkit-scrollbar-thumb {
+  background: var(--border-light, rgba(255, 255, 255, 0.12));
+  border-radius: 3px;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────── */
+
+@keyframes timeline-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.timeline__event-card {
+  animation: timeline-card-enter 0.25s ease both;
+}
+
+.timeline__time-marker {
+  animation: timeline-card-enter 0.2s ease both;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .timeline {
+    padding: 16px;
+  }
+
+  .timeline__controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .timeline__zoom-group {
+    justify-content: center;
+  }
+
+  .timeline__filters {
+    justify-content: center;
+  }
+
+  .timeline__event-badge {
+    display: none;
+  }
+
+  .timeline__event-card {
+    padding: 10px;
+    gap: 8px;
+  }
+}

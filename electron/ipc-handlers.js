@@ -1783,6 +1783,189 @@ function registerHandlers(ipcMain, db) {
 
   // ── app:* handlers ────────────────────────────────────────────────
 
+  // ── Timeline ──────────────────────────────────────────────────────────
+  ipcMain.handle('db:getTimelineEvents', async (_event, worldId, limit) => {
+    assertPositiveInt(worldId, 'worldId');
+    const max = (typeof limit === 'number' && limit > 0) ? limit : 2000;
+
+    return dbCall(
+      (database) => {
+        const rawDb = database.db || database;
+        const events = [];
+
+        // 1. Tasks — dispatched / completed / failed
+        try {
+          const tasks = rawDb.prepare(`
+            SELECT id, prompt, status, model, cost_usd, zone_id, created_at, completed_at
+            FROM tasks
+            WHERE world_id = ?
+            ORDER BY created_at DESC
+            LIMIT ?
+          `).all(worldId, max);
+
+          for (const t of tasks) {
+            events.push({
+              category: 'tasks',
+              title: t.status === 'completed' ? 'Task Completed'
+                   : t.status === 'failed' ? 'Task Failed'
+                   : 'Task Dispatched',
+              description: t.prompt
+                ? (t.prompt.length > 120 ? t.prompt.slice(0, 120) + '...' : t.prompt)
+                : `Task ${t.status || 'dispatched'}`,
+              created_at: t.completed_at || t.created_at,
+              zone_link: t.zone_id || null,
+              meta: { status: t.status, model: t.model, cost: t.cost_usd },
+            });
+          }
+        } catch (_) { /* table may not exist */ }
+
+        // 2. Zones — unlocked, progress milestones
+        try {
+          const zones = rawDb.prepare(`
+            SELECT slug, name, color, unlocked, unlocked_at, progress, created_at
+            FROM zones
+            WHERE world_id = ?
+          `).all(worldId);
+
+          for (const z of zones) {
+            if (z.unlocked) {
+              events.push({
+                category: 'zones',
+                title: `Zone Unlocked: ${z.name || z.slug}`,
+                description: `The ${z.name || z.slug} zone is now accessible.`,
+                created_at: z.unlocked_at || z.created_at,
+                zone_link: z.slug,
+                meta: { color: z.color },
+              });
+            }
+            // Progress milestones
+            const progress = z.progress || 0;
+            const milestones = [25, 50, 75, 100];
+            for (const m of milestones) {
+              if (progress >= m) {
+                events.push({
+                  category: 'zones',
+                  title: `${z.name || z.slug}: ${m}% Complete`,
+                  description: `Zone progress reached ${m}%.`,
+                  created_at: z.created_at, // approximate
+                  zone_link: z.slug,
+                  meta: { progress: m },
+                });
+              }
+            }
+          }
+        } catch (_) { /* table may not exist */ }
+
+        // 3. Agents — joined / relationships
+        try {
+          const agents = rawDb.prepare(`
+            SELECT name, role, state, created_at
+            FROM agents
+            WHERE world_id = ?
+          `).all(worldId);
+
+          for (const a of agents) {
+            events.push({
+              category: 'agents',
+              title: `Agent Joined: ${a.name}`,
+              description: `${a.name} (${a.role || 'agent'}) entered the world.`,
+              created_at: a.created_at,
+              zone_link: null,
+              meta: { role: a.role, state: a.state },
+            });
+          }
+        } catch (_) { /* table may not exist */ }
+
+        // 4. Achievements — badges unlocked
+        try {
+          const achievements = rawDb.prepare(`
+            SELECT achievement_id, description, unlocked_at, created_at
+            FROM achievements
+            WHERE world_id = ?
+          `).all(worldId);
+
+          for (const a of achievements) {
+            events.push({
+              category: 'achievements',
+              title: `Achievement Unlocked: ${a.achievement_id || 'Badge'}`,
+              description: a.description || 'A new achievement was unlocked.',
+              created_at: a.unlocked_at || a.created_at,
+              zone_link: null,
+              meta: {},
+            });
+          }
+        } catch (_) { /* table may not exist */ }
+
+        // 5. Quests — started / completed
+        try {
+          const quests = rawDb.prepare(`
+            SELECT title, description, xp_reward, status, created_at, completed_at
+            FROM quests
+            WHERE world_id = ?
+          `).all(worldId);
+
+          for (const q of quests) {
+            events.push({
+              category: 'quests',
+              title: q.status === 'completed'
+                ? `Quest Completed: ${q.title}`
+                : `Quest Started: ${q.title}`,
+              description: q.description || '',
+              created_at: q.status === 'completed'
+                ? (q.completed_at || q.created_at)
+                : q.created_at,
+              zone_link: null,
+              meta: { xp_reward: q.xp_reward, status: q.status },
+            });
+          }
+        } catch (_) { /* table may not exist */ }
+
+        // 6. System — world creation, snapshots
+        try {
+          const world = rawDb.prepare(`
+            SELECT name, created_at FROM worlds WHERE id = ?
+          `).get(worldId);
+
+          if (world) {
+            events.push({
+              category: 'system',
+              title: `World Created: ${world.name}`,
+              description: 'The world was created.',
+              created_at: world.created_at,
+              zone_link: null,
+              meta: {},
+            });
+          }
+        } catch (_) { /* table may not exist */ }
+
+        try {
+          const snapshots = rawDb.prepare(`
+            SELECT label, created_at
+            FROM world_snapshots
+            WHERE world_id = ?
+            ORDER BY created_at DESC
+          `).all(worldId);
+
+          for (const s of snapshots) {
+            events.push({
+              category: 'system',
+              title: `Snapshot: ${s.label || 'Untitled'}`,
+              description: 'A world snapshot was saved.',
+              created_at: s.created_at,
+              zone_link: null,
+              meta: {},
+            });
+          }
+        } catch (_) { /* table may not exist */ }
+
+        // Sort descending by date and limit
+        events.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        return events.slice(0, max);
+      },
+      []
+    );
+  });
+
   ipcMain.handle('app:getVersion', async () => {
     return app.getVersion();
   });

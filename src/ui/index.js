@@ -23,6 +23,7 @@ import { ShortcutManager } from './shortcuts.js';
 import { QuestPanel } from './quest-panel.js';
 import { ZoneTooltips } from './zone-tooltips.js';
 import { SearchResults } from './search-results.js';
+import { QuickActions } from './quick-actions.js';
 import { initTreasuryEvents } from '../zones/treasury.js';
 
 /**
@@ -43,6 +44,7 @@ function loadStyles(basePath = '') {
     'zone-tooltips.css',
     'minimap.css',
     'search-results.css',
+    'quick-actions.css',
   ];
 
   for (const file of cssFiles) {
@@ -72,6 +74,8 @@ export function initUI({ cssBasePath = '' } = {}) {
   const shortcuts = new ShortcutManager({ palette, panels });
   const questPanel = new QuestPanel();
   const searchResults = new SearchResults(palette._modal);
+  const quickActions = new QuickActions();
+  quickActions.mount();
 
   // ── Wire up cross-component events ────────────────────────────
 
@@ -139,6 +143,7 @@ export function initUI({ cssBasePath = '' } = {}) {
     questPanel,
     searchResults,
     shortcuts,
+    quickActions,
 
     /**
      * Mount the zone tooltip system.  Call after camera and buildingManager
@@ -163,6 +168,7 @@ export function initUI({ cssBasePath = '' } = {}) {
       panels.destroy();
       questPanel.destroy();
       searchResults.destroy();
+      quickActions.destroy();
       shortcuts.destroy();
     },
   };

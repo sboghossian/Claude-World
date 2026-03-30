@@ -28,6 +28,7 @@ import { Analytics } from '../zones/analytics.js';
 import { Settings, buildSettingsContent } from '../zones/settings.js';
 import { Reports } from '../zones/reports.js';
 import { AchievementsPanel } from './achievements-panel.js';
+import { Timeline } from '../zones/timeline.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -57,6 +58,7 @@ const ZONE_INFO = {
   settings: { icon: '\u{2699}', desc: 'World settings, AI providers, appearance, audio, and privacy.' },
   reports: { icon: '\u{1F4CB}', desc: 'Generate and export weekly, cost, and performance reports.' },
   achievements: { icon: '\u{1F3C6}', desc: 'Badges, milestones, and progression tracking.' },
+  timeline: { icon: '\u{1F4C5}', desc: 'Chronological history of everything that happened in your world.' },
 };
 
 const AGENT_INFO = {
@@ -214,6 +216,13 @@ function buildZoneContent(zoneId) {
     const achievements = new AchievementsPanel();
     const el = achievements.render();
     achievements.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'timeline') {
+    const timeline = new Timeline();
+    const el = timeline.render();
+    timeline.init(window.__claudeWorldId || 1);
     return el;
   }
 

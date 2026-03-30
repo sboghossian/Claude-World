@@ -140,6 +140,10 @@ function startRenderLoop() {
     if (weatherSystem) {
       weatherSystem.update(dt);
     }
+    // Data flow visualization (attached at runtime via window.__dataFlows)
+    if (window.__dataFlows) {
+      window.__dataFlows.update(dt);
+    }
   };
 
   requestAnimationFrame(loop);

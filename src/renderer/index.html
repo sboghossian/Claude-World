@@ -108,6 +108,7 @@
     import { ThoughtBubbles } from '../ui/thought-bubbles.js';
     import { initVFX } from './vfx.js';
     import { initCityLife } from './city-life.js';
+    import { initDataFlows } from './data-flows.js';
     import { OnboardingCinema } from '../systems/onboarding-cinema.js';
     import { NotificationCenter } from '../ui/notification-center.js';
     import { Minimap } from '../ui/minimap.js';
@@ -117,6 +118,9 @@
     import { ContextMenu } from '../ui/context-menu.js';
     import { getAchievementEngine } from '../systems/achievements.js';
     import { TutorialEngine } from '../systems/tutorial.js';
+    import { FocusMode } from '../systems/focus-mode.js';
+    import { TaskStream } from '../ui/task-stream.js';
+    import { AgentChat } from '../ui/agent-chat.js';
 
     // IPC-based reputation listener — awards points via window.api for DOM events
     function initReputationListener(worldId) {
@@ -139,7 +143,7 @@
 
     async function boot() {
       const splash = new SplashScreen();
-      const TOTAL_STEPS = 27;
+      const TOTAL_STEPS = 30;
       try {
         // ── 1. Start the isometric world ──────────────────────────────
         splash.setProgress(1, TOTAL_STEPS, 'Initializing world renderer...');
@@ -332,6 +336,15 @@
             const cityLife = initCityLife(pixiApp, pixiApp.stage);
             window.__cityLife = cityLife;
             console.log('[boot] VFX + CityLife started');
+
+            // Data flow visualization (after buildings are initialized)
+            const bm = getBuildingManager();
+            if (bm) {
+              const dataFlows = initDataFlows(pixiApp, bm);
+              pixiApp.stage.addChild(dataFlows.container);
+              window.__dataFlows = dataFlows;
+              console.log('[boot] DataFlowSystem started');
+            }
           }
         } catch (err) {
           console.warn('[boot] VFX init failed (non-critical):', err.message);
@@ -478,6 +491,44 @@
           console.log('[boot] Tutorial system ready');
         } catch (err) {
           console.warn('[boot] Tutorial init failed (non-critical):', err.message);
+        }
+
+        // ── 28. Focus / Zen mode ────────────────────────────────────
+        splash.setProgress(28, TOTAL_STEPS, 'Enabling focus mode...');
+        try {
+          const focusMode = new FocusMode({
+            getCamera,
+            getDayNight: () => window.__dayNight,
+          });
+          window.__focusMode = focusMode;
+          console.log('[boot] Focus mode ready (Cmd+Shift+F or F11)');
+        } catch (err) {
+          console.warn('[boot] Focus mode init failed (non-critical):', err.message);
+        }
+
+        // ── 29. Task streaming visualizer ────────────────────────────
+        splash.setProgress(29, TOTAL_STEPS, 'Mounting task stream...');
+        try {
+          const taskStream = new TaskStream();
+          taskStream.mount();
+          window.__taskStream = taskStream;
+          console.log('[boot] Task stream mounted');
+        } catch (err) {
+          console.warn('[boot] Task stream init failed (non-critical):', err.message);
+        }
+
+        // ── 30. Agent chat ──────────────────────────────────────────
+        splash.setProgress(30, TOTAL_STEPS, 'Enabling agent chat...');
+        try {
+          const agentChat = new AgentChat();
+          window.__agentChat = agentChat;
+          // Wire agent-click events to open chat
+          document.addEventListener('agent-click', (e) => {
+            agentChat.open(e.detail);
+          });
+          console.log('[boot] Agent chat ready');
+        } catch (err) {
+          console.warn('[boot] Agent chat init failed (non-critical):', err.message);
         }
 
         // ── Done — fade out the splash screen ────────────────────────

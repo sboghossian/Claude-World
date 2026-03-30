@@ -1,0 +1,195 @@
+/**
+ * focus-mode.css — Styles for Focus/Zen mode
+ *
+ * Vignette overlay, fade animations, floating clock,
+ * and exit bar. Uses design tokens from variables.css.
+ */
+
+/* ── Vignette overlay ──────────────────────────────────────────── */
+
+.focus-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 500ms ease;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(0, 0, 0, 0.25) 75%,
+    rgba(0, 0, 0, 0.55) 90%,
+    rgba(0, 0, 0, 0.75) 100%
+  );
+}
+
+.focus-vignette--active {
+  opacity: 1;
+}
+
+/* ── Exit bar (top edge) ───────────────────────────────────────── */
+
+.focus-exit-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 100;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent-purple, #a855f7) 30%,
+    var(--accent-blue, #4a9eff) 70%,
+    transparent 100%
+  );
+  opacity: 0;
+  transform: scaleY(1);
+  transition:
+    opacity 300ms ease,
+    height 300ms ease,
+    transform 300ms ease;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.focus-exit-bar--visible {
+  opacity: 0.6;
+}
+
+.focus-exit-bar:hover {
+  opacity: 1;
+  height: 32px;
+  transform: scaleY(1);
+}
+
+.focus-exit-bar__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono, 'SF Mono', monospace);
+  font-size: 11px;
+  color: var(--text-primary, #e8e8f0);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 200ms ease 100ms;
+  pointer-events: none;
+}
+
+.focus-exit-bar:hover .focus-exit-bar__label {
+  opacity: 1;
+}
+
+/* ── Floating clock ────────────────────────────────────────────── */
+
+.focus-clock {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  z-index: 60;
+  font-family: var(--font-mono, 'SF Mono', monospace);
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(232, 232, 240, 0.4);
+  letter-spacing: 2px;
+  user-select: none;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 500ms ease 200ms,
+    transform 500ms ease 200ms;
+}
+
+.focus-clock--active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.focus-clock__time {
+  display: block;
+}
+
+.focus-clock__meditation {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: rgba(168, 85, 247, 0.5);
+  letter-spacing: 1px;
+}
+
+/* ── UI fade-out when focus mode is active ─────────────────────── */
+
+body.focus-mode-active .hud-tl,
+body.focus-mode-active .hud-tc,
+body.focus-mode-active .hud-tr,
+body.focus-mode-active .hud-bl,
+body.focus-mode-active .hud-br,
+body.focus-mode-active .hud-minimap,
+body.focus-mode-active .activity-feed,
+body.focus-mode-active .notification-center,
+body.focus-mode-active .minimap-container,
+body.focus-mode-active [data-focus-hide] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 500ms ease !important;
+}
+
+/* Restore UI elements when exiting focus mode */
+body:not(.focus-mode-active) .hud-tl,
+body:not(.focus-mode-active) .hud-tc,
+body:not(.focus-mode-active) .hud-tr,
+body:not(.focus-mode-active) .hud-bl,
+body:not(.focus-mode-active) .hud-br,
+body:not(.focus-mode-active) .hud-minimap,
+body:not(.focus-mode-active) .activity-feed,
+body:not(.focus-mode-active) .notification-center,
+body:not(.focus-mode-active) .minimap-container,
+body:not(.focus-mode-active) [data-focus-hide] {
+  transition: opacity 500ms ease !important;
+}
+
+/* ── Ambient auto-pan indicator ────────────────────────────────── */
+
+.focus-ambient-badge {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono, 'SF Mono', monospace);
+  font-size: 10px;
+  color: rgba(232, 232, 240, 0.3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  user-select: none;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 500ms ease 300ms,
+    transform 500ms ease 300ms;
+}
+
+.focus-ambient-badge--active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.focus-ambient-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-purple, #a855f7);
+  animation: focus-dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes focus-dot-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.3); }
+}
