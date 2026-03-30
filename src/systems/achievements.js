@@ -538,17 +538,36 @@ export class AchievementEngine {
   // ── Event binding ───────────────────────────────────────────
 
   _bindEvents() {
+    this._boundHandlers = [];
+
     const eventTypes = Object.keys(EVENT_MAP);
     for (const eventType of eventTypes) {
-      window.addEventListener(eventType, (e) => {
+      const handler = (e) => {
         this._debouncedCheck(eventType, e.detail);
-      });
+      };
+      window.addEventListener(eventType, handler);
+      this._boundHandlers.push([eventType, handler]);
     }
 
     // Also listen on generic dispatches
-    window.addEventListener('dispatch:task-complete', () => {
+    const taskHandler = () => {
       this._debouncedCheck('dispatch:task-complete', {});
-    });
+    };
+    window.addEventListener('dispatch:task-complete', taskHandler);
+    this._boundHandlers.push(['dispatch:task-complete', taskHandler]);
+  }
+
+  /**
+   * Remove all event listeners to prevent leaks.
+   */
+  destroy() {
+    if (this._boundHandlers) {
+      for (const [event, handler] of this._boundHandlers) {
+        window.removeEventListener(event, handler);
+      }
+      this._boundHandlers = [];
+    }
+    this._ready = false;
   }
 
   // ── Context builder ─────────────────────────────────────────

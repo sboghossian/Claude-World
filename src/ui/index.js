@@ -41,12 +41,18 @@ function loadStyles(basePath = '') {
     'shortcuts.css',
     'shortcuts-overlay.css',
     'quest-panel.css',
+    'incident-panel.css',
     'zone-tooltips.css',
     'minimap.css',
     'search-results.css',
     'quick-actions.css',
     'status-bar.css',
     'perf-monitor.css',
+    'thought-bubbles.css',
+    'task-stream.css',
+    'agent-chat.css',
+    'achievements-panel.css',
+    'tutorial-overlay.css',
   ];
 
   for (const file of cssFiles) {

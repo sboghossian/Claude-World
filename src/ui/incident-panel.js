@@ -10,8 +10,6 @@
  * It can also be toggled programmatically via panel.show() / panel.hide().
  */
 
-import './incident-panel.css';
-
 /** Map severity value -> display label + dot character */
 const SEVERITY_META = {
   critical: { label: 'CRIT', dot: '🔴' },
@@ -95,7 +93,7 @@ export class IncidentPanel {
    */
   async loadIncidents(worldId, limit = 20) {
     this._worldId = worldId;
-    this._incidents = await window.api.db.getIncidents({ worldId, limit });
+    this._incidents = await window.api.db.getIncidents({ worldId, limit }) || [];
     this._render();
   }
 

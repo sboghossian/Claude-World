@@ -14,7 +14,7 @@ Claude World is a **Mac desktop app** where your AI agents live inside an isomet
 
 It's not a chat interface. It's not a dashboard. It's a **place** your AI agents actually inhabit.
 
-### The City Zones
+### The City Zones (35+)
 
 | Zone | Color | Purpose |
 |------|-------|---------|
@@ -40,84 +40,155 @@ It's not a chat interface. It's not a dashboard. It's a **place** your AI agents
 | **Connector Docks** | Teal | External API connections |
 | **Minion Tunnels** | Gray | Background automation pipelines |
 | **Memory Vault** | Purple | Persistent agent memory store |
+| **Analytics Dashboard** | Blue | Real-time metrics, charts, and world statistics |
+| **Settings** | Slate | App configuration, preferences, API keys |
+| **Reports** | Indigo | Generate and export structured reports |
+| **Timeline** | Amber | Chronological view of all world activity |
+| **Home Dashboard** | White | At-a-glance overview — recent activity, quick actions |
+| **Kanban Board** | Green | Drag-and-drop task management with columns |
+| **Knowledge Graph** | Violet | Visual map of connected concepts and entities |
+| **Automation Builder** | Orange | No-code workflow builder with triggers and actions |
+| **Skill Trees** | Emerald | Visual progression trees for agent capabilities |
+| **Calendar** | Blue | Schedule tasks, deadlines, and agent activities |
+| **Sharing / Export** | Teal | Share snapshots, export data, publish reports |
+| **Achievements Gallery** | Gold | Track milestones, badges, and world accomplishments |
 
 ### Visual Systems
 
 - **Isometric city** rendered in WebGL via PixiJS v8 — 40×40 tile grid
 - **Day/night cycle** — the city transforms at dusk and dawn
-- **Dynamic weather** — rain, fog, clear skies reflecting world state
+- **Weather effects** — rain, snow, fog, aurora, lightning — 5 dynamic weather types
+- **Particle system** — 10 presets (sparks, embers, fireflies, snow, rain, smoke, confetti, bubbles, stars, dust)
+- **Data flow visualization** — animated connections between zones showing real-time data movement
+- **Agent sprites** — named agents walk the city streets, enter buildings, carry out tasks
 - **Fog of war** — zones reveal as you unlock them
-- **City life** — agents wander streets, windows light up at night, smoke rises
+- **City life** — windows light up at night, smoke rises, ambient animation
 - **VFX system** — XP fountains, zone glows, lightning, aurora effects
 - **5 themes** — Cyber Noir, Solar Flare, Arctic Void, Forest Deep, Blood Moon
 - **Thought bubbles** — agents surface context-aware thoughts
 - **Celebration system** — confetti, level-ups, quest completions
+- **Focus / Zen mode** — dim the city, hide UI, spotlight the active zone
 
 ---
 
 ## Tech Stack
 
 ```
-claude-world/
-├── electron/           # Main process (Node.js)
-│   ├── main.js         # App entry, window, menu
-│   ├── ipc-handlers.js # All IPC handlers (60+ endpoints)
-│   ├── preload.js      # contextBridge API exposure
-│   ├── key-store.js    # safeStorage encrypted keys
-│   └── auto-updater.js # update.electronjs.org auto-updates
+claude-world/                    # 99K+ lines · 191 files
+├── electron/                    # Main process (Node.js)
+│   ├── main.js                  # App entry, window, menu
+│   ├── ipc-handlers.js          # All IPC handlers (100+ endpoints)
+│   ├── preload.js               # contextBridge API exposure
+│   ├── key-store.js             # safeStorage encrypted keys
+│   └── auto-updater.js          # update.electronjs.org auto-updates
 │
 ├── src/
-│   ├── renderer/       # PixiJS isometric engine
-│   │   ├── app.js      # Renderer entry, PixiJS init
-│   │   ├── tiles.js    # Isometric tile grid
-│   │   ├── buildings.js # Zone buildings + progress
-│   │   ├── camera.js   # Pan/zoom camera
-│   │   ├── fog.js      # Fog of war
-│   │   ├── daynight.js # Day/night cycle
-│   │   ├── weather.js  # Weather system
-│   │   ├── vfx.js      # Visual effects (8 types)
-│   │   ├── city-life.js # Ambient city animation
-│   │   └── index.html  # Boot sequence (18 steps)
+│   ├── db/                      # Database layer
+│   │   ├── database.js          # SQLite connection + migrations
+│   │   └── seed.js              # Initial world data
 │   │
-│   ├── zones/          # Each zone = a JS + CSS file
-│   │   └── *.js + *.css
+│   ├── renderer/                # PixiJS isometric engine (19 modules)
+│   │   ├── app.js               # Renderer entry, PixiJS init
+│   │   ├── tiles.js             # Isometric tile grid
+│   │   ├── buildings.js         # Zone buildings + progress
+│   │   ├── camera.js            # Pan/zoom camera
+│   │   ├── fog.js               # Fog of war
+│   │   ├── daynight.js          # Day/night cycle
+│   │   ├── weather.js           # Weather state machine
+│   │   ├── weather-effects.js   # Rain, snow, fog, aurora, lightning
+│   │   ├── particles.js         # Particle system (10 presets)
+│   │   ├── data-flows.js        # Animated data flow between zones
+│   │   ├── agent-sprites.js     # Agent walking sprites
+│   │   ├── agents.js            # Agent placement + behavior
+│   │   ├── vfx.js               # Visual effects (8 types)
+│   │   ├── city-life.js         # Ambient city animation
+│   │   ├── zones.js             # Zone rendering layer
+│   │   ├── constants.js         # Shared constants
+│   │   └── drag-drop.js         # Drag-and-drop support
 │   │
-│   ├── systems/        # Cross-cutting systems
-│   │   ├── dispatch.js      # AI task runner (Claude + OpenAI)
-│   │   ├── world-state.js   # Reactive world state
-│   │   ├── themes.js        # 5 color themes
-│   │   ├── audio.js         # Web Audio API synthesis
-│   │   ├── celebrations.js  # Confetti + XP floaters
+│   ├── zones/                   # 33 zones — each a JS + CSS pair
+│   │   ├── dispatch.js/css      # Dispatch HQ
+│   │   ├── kanban.js/css        # Kanban Board
+│   │   ├── calendar.js/css      # Calendar
+│   │   ├── knowledge-graph.js/css # Knowledge Graph
+│   │   ├── automation-builder.js/css # Automation Builder
+│   │   ├── analytics.js/css     # Analytics Dashboard
+│   │   ├── home-dashboard.js/css # Home Dashboard
+│   │   ├── skill-tree.js/css    # Skill Trees
+│   │   ├── timeline.js/css      # Timeline
+│   │   ├── reports.js/css       # Reports
+│   │   ├── settings.js/css      # Settings
+│   │   ├── sharing.js/css       # Sharing / Export
+│   │   └── ... (21 more)        # All original zones
+│   │
+│   ├── systems/                 # Cross-cutting systems (24 modules)
+│   │   ├── dispatch.js          # AI task runner (Claude + OpenAI)
+│   │   ├── world-state.js       # Reactive world state
+│   │   ├── themes.js            # 5 color themes
+│   │   ├── audio.js             # Web Audio API synthesis
+│   │   ├── celebrations.js      # Confetti + XP floaters
+│   │   ├── focus-mode.js/css    # Focus / Zen mode
+│   │   ├── achievements.js      # Achievement tracking
 │   │   ├── agent-personalities.js # Named agents + moods
-│   │   ├── onboarding-cinema.js   # Cinematic intro
 │   │   ├── agent-relationships.js # Agent social graph
-│   │   ├── morning-briefing.js    # Daily digest
-│   │   ├── quests.js        # Quest system
-│   │   └── reputation.js    # XP + reputation engine
+│   │   ├── onboarding-cinema.js # Cinematic intro
+│   │   ├── morning-briefing.js  # Daily digest
+│   │   ├── quests.js            # Quest system
+│   │   ├── reputation.js        # XP + reputation engine
+│   │   ├── global-search.js     # Cross-zone search
+│   │   ├── zone-ambience.js     # Per-zone audio ambience
+│   │   ├── quality.js           # Quality metrics
+│   │   ├── tutorial.js          # Interactive tutorial
+│   │   ├── sanitize.js          # Input sanitization
+│   │   ├── notify.js            # Notification system
+│   │   └── providers/           # AI provider adapters
+│   │       ├── base.js
+│   │       ├── anthropic.js
+│   │       └── openai.js
 │   │
-│   └── ui/             # Overlay UI (zero frameworks)
-│       ├── hud.js       # HUD (avatar, resources, clock)
-│       ├── panels.js    # Zone panel router
-│       ├── command-palette.js # Cmd+K AI command palette
-│       ├── thought-bubbles.js # Agent thought display
-│       ├── theme-picker.js    # Live theme switcher
-│       └── ...
+│   └── ui/                      # Overlay UI (zero frameworks, 30+ modules)
+│       ├── hud.js/css           # HUD (avatar, resources, clock)
+│       ├── panels.js/css        # Zone panel router
+│       ├── command-palette.js/css # Cmd+K AI command palette
+│       ├── shortcuts-overlay.js/css # Keyboard shortcuts overlay
+│       ├── perf-monitor.js/css  # Performance monitor
+│       ├── minimap.js/css       # City minimap
+│       ├── status-bar.js/css    # Bottom status bar
+│       ├── notification-center.js/css # Notification center
+│       ├── context-menu.js/css  # Right-click context menu
+│       ├── achievements-panel.js/css # Achievements display
+│       ├── thought-bubbles.js/css # Agent thought display
+│       ├── theme-picker.js      # Live theme switcher
+│       └── ... (18 more)
 │
-├── landing/            # Product landing page (zero deps)
+├── landing/                     # Product landing page (zero deps)
 │   ├── index.html
 │   └── style.css
 │
-└── build/              # Packaging assets
+└── build/                       # Packaging assets
     ├── icon.svg
     ├── dmg-background.svg
     └── entitlements.mac.plist
 ```
 
-**Database:** SQLite via `better-sqlite3` — WAL mode, FTS5 full-text search, 13 migrations covering all zones.
+**Database:** SQLite via `better-sqlite3` — WAL mode, FTS5 full-text search, migrations covering all zones.
 
-**AI:** `@anthropic-ai/sdk` (Claude) + `openai` (GPT-4/Gemini) — dual provider, streaming responses.
+**AI:** `@anthropic-ai/sdk` (Claude) + `openai` (GPT-4/Gemini) — dual provider, streaming responses, provider abstraction layer.
 
 **UI:** Zero frontend frameworks — vanilla ES modules, CSS custom properties, glass morphism.
+
+---
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Cmd+K` | Command Palette — search zones, run tasks, jump anywhere |
+| `Cmd+Shift+F` | Focus Mode — dim the city, hide UI, spotlight active zone |
+| `Cmd+Shift+P` | Performance Monitor — FPS, memory, render stats |
+| `?` | Shortcuts Overlay — show all available shortcuts |
+| `V` | Toggle Data Flows — show/hide animated data connections |
+| `1`–`9` | Zone Quick Jump — jump directly to your pinned zones |
 
 ---
 
@@ -242,14 +313,29 @@ Please include:
 
 ## Roadmap
 
+### Built
+
+- [x] 35+ fully functional zones (Kanban, Calendar, Knowledge Graph, Automation Builder, Skill Trees, Analytics, and more)
+- [x] Weather effects system (rain, snow, fog, aurora, lightning)
+- [x] Particle system with 10 presets
+- [x] Data flow visualization between zones
+- [x] Agent sprites walking the city
+- [x] Focus / Zen mode
+- [x] Agent memory persistence across sessions (Memory Vault)
+- [x] Streaming task visualization in real-time (Task Stream)
+- [x] Achievements and milestone tracking
+- [x] Sharing and export system
+- [x] Performance monitor and keyboard shortcuts overlay
+- [x] Global search across all zones
+
+### Up Next
+
 - [ ] Windows + Linux support (remove macOS-only APIs)
-- [ ] Agent memory persistence across sessions
 - [ ] Zone marketplace (community zones as npm packages)
 - [ ] Multiplayer worlds (shared city, multiple users)
 - [ ] Mobile companion app
 - [ ] Plugin API for third-party zones
 - [ ] Voice commands ("Hey Claude, dispatch a task")
-- [ ] Streaming task visualization in real-time
 
 ---
 

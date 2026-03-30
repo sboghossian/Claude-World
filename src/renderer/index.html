@@ -106,6 +106,7 @@
     import { ZoneAmbience } from '../systems/zone-ambience.js';
     import { initPersonalityEngine } from '../systems/agent-personalities.js';
     import { ThoughtBubbles } from '../ui/thought-bubbles.js';
+    import { getQualityManager } from '../systems/quality.js';
     import { initVFX } from './vfx.js';
     import { initParticles } from './particles.js';
     import { initCityLife } from './city-life.js';
@@ -198,9 +199,10 @@
           const { worldId, template } = e.detail;
           // Unlock the 3 template starting zones
           const startingZones = {
-            'startup':   ['dispatch', 'brain', 'legal'],
-            'developer': ['dispatch', 'brain', 'docks'],
-            'freelancer':['dispatch', 'brain', 'skills'],
+            'startup_founder': ['dispatch', 'brain', 'legal'],
+            'startup':         ['dispatch', 'brain', 'legal'],
+            'developer':       ['dispatch', 'brain', 'docks'],
+            'freelancer':      ['dispatch', 'brain', 'skills'],
           };
           const zones = startingZones[template] || ['dispatch', 'brain'];
           for (const zoneType of zones) {
@@ -267,67 +269,103 @@
 
         // ── 10. Morning briefing (once per day) ───────────────────────
         splash.setProgress(10, TOTAL_STEPS, 'Checking morning briefing...');
-        const briefing = new MorningBriefing();
-        if (briefing.tryShow()) {
-          console.log('[boot] Morning briefing shown');
+        try {
+          const briefing = new MorningBriefing();
+          if (briefing.tryShow()) {
+            console.log('[boot] Morning briefing shown');
+          }
+        } catch (err) {
+          console.warn('[boot] Morning briefing failed (non-critical):', err.message);
         }
 
         // ── 11. Reputation listener ────────────────────────────────────
         splash.setProgress(11, TOTAL_STEPS, 'Starting reputation system...');
-        const worldIdForRep = window.__claudeWorldId || 1;
-        initReputationListener(worldIdForRep);
-        console.log('[boot] Reputation listener started');
+        try {
+          const worldIdForRep = window.__claudeWorldId || 1;
+          initReputationListener(worldIdForRep);
+          console.log('[boot] Reputation listener started');
+        } catch (err) {
+          console.warn('[boot] Reputation listener failed (non-critical):', err.message);
+        }
 
         // ── 12. Identity panel — open on avatar-click ──────────────────
         splash.setProgress(12, TOTAL_STEPS, 'Wiring identity panel...');
-        document.addEventListener('hud:avatar-click', () => {
-          if (typeof ui !== 'undefined' && ui?.panels) {
-            ui.panels.openZone('identity', 'Identity');
-          }
-        });
+        try {
+          document.addEventListener('hud:avatar-click', () => {
+            if (typeof ui !== 'undefined' && ui?.panels) {
+              ui.panels.openZone('identity', 'Identity');
+            }
+          });
+        } catch (err) {
+          console.warn('[boot] Identity panel wiring failed (non-critical):', err.message);
+        }
 
         // ── 13. Theme engine (apply saved theme immediately) ───────────
         splash.setProgress(13, TOTAL_STEPS, 'Applying theme...');
-        const themeEngine = initThemes();
-        const themePicker = initThemePicker(themeEngine);
-        window.__themeEngine = themeEngine;
-        // Update PixiJS renderer colors when theme changes
-        document.addEventListener('theme:changed', (e) => {
-          const bm = getBuildingManager();
-          if (bm) bm.setThemeTint?.(e.detail.theme.buildingTint);
-        });
-        console.log('[boot] Theme engine started:', themeEngine.getCurrent());
+        let themeEngine = null;
+        try {
+          themeEngine = initThemes();
+          const themePicker = initThemePicker(themeEngine);
+          window.__themeEngine = themeEngine;
+          // Update PixiJS renderer colors when theme changes
+          document.addEventListener('theme:changed', (e) => {
+            const bm = getBuildingManager();
+            if (bm) bm.setThemeTint?.(e.detail.theme.buildingTint);
+          });
+          console.log('[boot] Theme engine started:', themeEngine.getCurrent());
+        } catch (err) {
+          console.warn('[boot] Theme engine failed (non-critical):', err.message);
+        }
 
         // ── 14. Celebrations & Audio ───────────────────────────────────
         splash.setProgress(14, TOTAL_STEPS, 'Initializing audio...');
-        const celebrations = initCelebrations();
-        const audio = initAudio();
-        window.__audio = audio;
+        let audio = null;
+        try {
+          const celebrations = initCelebrations();
+          audio = initAudio();
+          window.__audio = audio;
 
-        // Zone-specific ambient soundscapes (shares AudioContext with main audio)
-        // Lazy-init: ZoneAmbience needs a running AudioContext, which is created
-        // on first user gesture inside AudioSystem. We listen for the first
-        // zone-click to bootstrap it if the context exists by then.
-        let zoneAmbience = null;
-        function ensureZoneAmbience() {
-          if (zoneAmbience) return;
-          const ctx = audio._ctx;
-          if (!ctx) return;
-          zoneAmbience = new ZoneAmbience(ctx);
-          window.__zoneAmbience = zoneAmbience;
-          console.log('[boot] ZoneAmbience initialized');
+          // Zone-specific ambient soundscapes (shares AudioContext with main audio)
+          // Lazy-init: ZoneAmbience needs a running AudioContext, which is created
+          // on first user gesture inside AudioSystem. We listen for the first
+          // zone-click to bootstrap it if the context exists by then.
+          let zoneAmbience = null;
+          function ensureZoneAmbience() {
+            if (zoneAmbience) return;
+            const ctx = audio?._ctx;
+            if (!ctx) return;
+            zoneAmbience = new ZoneAmbience(ctx);
+            window.__zoneAmbience = zoneAmbience;
+            console.log('[boot] ZoneAmbience initialized');
+          }
+          document.addEventListener('zone-click', () => ensureZoneAmbience());
+
+          console.log('[boot] Celebrations + Audio initialized');
+        } catch (err) {
+          console.warn('[boot] Audio/Celebrations init failed (non-critical):', err.message);
         }
-        document.addEventListener('zone-click', () => ensureZoneAmbience());
-
-        console.log('[boot] Celebrations + Audio initialized');
 
         // ── 15. Agent personalities + thought bubbles ─────────────────
         splash.setProgress(15, TOTAL_STEPS, 'Loading agent personalities...');
-        const personalities = initPersonalityEngine();
-        const canvas = document.getElementById('world-canvas');
-        const thoughtBubbles = new ThoughtBubbles(canvas, personalities);
-        window.__personalities = personalities;
-        console.log('[boot] Agent personalities loaded');
+        try {
+          const personalities = initPersonalityEngine();
+          const canvas = document.getElementById('world-canvas');
+          const thoughtBubbles = new ThoughtBubbles(canvas, personalities);
+          window.__personalities = personalities;
+          console.log('[boot] Agent personalities loaded');
+        } catch (err) {
+          console.warn('[boot] Agent personalities failed (non-critical):', err.message);
+        }
+
+        // ── 15b. Quality manager (before VFX so systems read settings) ─
+        splash.setProgress(16, TOTAL_STEPS, 'Detecting quality settings...');
+        try {
+          const quality = getQualityManager({ firstRun: true });
+          window.__quality = quality;
+          console.log('[boot] Quality manager initialized — preset:', quality.getPreset());
+        } catch (err) {
+          console.warn('[boot] Quality manager failed (non-critical):', err.message);
+        }
 
         // ── 16. VFX system + City Life ────────────────────────────────
         splash.setProgress(16, TOTAL_STEPS, 'Starting VFX engine...');
@@ -371,6 +409,33 @@
             }
           } catch (err) {
             console.warn('[boot] Cinema failed (non-critical):', err.message);
+          }
+
+          // After cinema, check if any API key is configured.
+          // If not, show a gentle nudge to connect a provider.
+          try {
+            const keys = (window.api?.keys?.list) ? await window.api.keys.list() : [];
+            const hasActiveKey = keys.some(k => k.is_active);
+            if (!hasActiveKey) {
+              setTimeout(() => {
+                if (window.__notifications) {
+                  window.__notifications.show({
+                    title: 'Connect an AI provider',
+                    body: 'Add an API key in Connector Docks to unlock your agents.',
+                    type: 'info',
+                    duration: 8000,
+                    action: () => {
+                      document.dispatchEvent(new CustomEvent('zone:open', {
+                        detail: { zone: 'docks' }, bubbles: true,
+                      }));
+                    },
+                  });
+                }
+              }, 2500);
+            }
+          } catch (err) {
+            // Non-critical — don't block boot
+            console.warn('[boot] API key check failed (non-critical):', err.message);
           }
         });
 
@@ -543,6 +608,14 @@
           const statusBar = new StatusBar();
           statusBar.mount();
           window.__statusBar = statusBar;
+          // Set initial values from world state
+          try {
+            const world = await window.api.db.getWorld(window.__claudeWorldId || 1);
+            statusBar.setWorldName(world?.name || 'Claude World');
+          } catch (_) {
+            statusBar.setWorldName('Claude World');
+          }
+          statusBar.setZone('home');
           console.log('[boot] Status bar mounted');
         } catch (err) {
           console.warn('[boot] Status bar init failed (non-critical):', err.message);
@@ -561,6 +634,12 @@
         // ── Done — fade out the splash screen ────────────────────────
         await splash.fadeOut();
         console.log('[boot] Splash screen dismissed');
+
+        // Open home dashboard as the default zone
+        if (onboarding.isComplete()) {
+          ui.panels.openZone('home', 'Home');
+          console.log('[boot] Home dashboard opened');
+        }
 
       } catch (err) {
         console.error('[boot] Initialization failed:', err);

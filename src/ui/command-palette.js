@@ -4,45 +4,71 @@
  * The defining feature of the product. A jaw-dropping mix of Linear's command
  * menu, Spotlight, and a sci-fi terminal. Opens with Cmd+K, closes with Escape.
  *
- * Five result categories:
- *   1. Navigate   — All 20 zones
- *   2. Quick Actions — Power actions
- *   3. Ask Claude — Freeform AI routing
- *   4. Recent Tasks — Last 5 from DB
- *   5. Search Tasks — Live DB search
+ * Seven result categories:
+ *   1. Recent     — Last 5 commands (localStorage)
+ *   2. Ask Claude — Freeform AI routing
+ *   3. Zones      — All 33 routed zones
+ *   4. Actions    — Power actions (new task, snapshot, theme, audio, focus, etc.)
+ *   5. Agents     — Named AI agents (Commander, Librarian, etc.)
+ *   6. Recent Tasks — Last 5 from DB
+ *   7. Search Tasks — Live DB search
  */
 
 // ── Zone registry ────────────────────────────────────────────────────────────
 
 const ZONES = [
-  { id: 'dispatch',   name: 'Dispatch Tower',   emoji: '🗼', active: true  },
-  { id: 'brain',      name: 'Brain Library',     emoji: '🧠', active: true  },
-  { id: 'chat',       name: 'Chat Rooms',         emoji: '💬', active: false },
-  { id: 'memory',     name: 'Memory Vault',       emoji: '🔒', active: true  },
-  { id: 'skills',     name: 'Skills Academy',     emoji: '🎓', active: true  },
-  { id: 'minions',    name: 'Minion Tunnels',     emoji: '🤖', active: false },
-  { id: 'treasury',   name: 'Treasury',           emoji: '💰', active: false },
-  { id: 'sales',      name: 'Sales District',     emoji: '📈', active: false },
-  { id: 'marketing',  name: 'Marketing Plaza',    emoji: '📣', active: false },
-  { id: 'exchange',   name: 'The Exchange',       emoji: '🔄', active: false },
-  { id: 'market',     name: 'The Market',         emoji: '🏪', active: false },
-  { id: 'council',    name: 'The Council',        emoji: '🏛️', active: false },
-  { id: 'rnd',        name: 'R&D Lab',            emoji: '🔬', active: false },
-  { id: 'legal',      name: 'Legal Tower',        emoji: '⚖️', active: false },
-  { id: 'archive',    name: 'The Archive',        emoji: '📚', active: false },
-  { id: 'docks',      name: 'Connector Docks',    emoji: '⚓', active: true  },
-  { id: 'airport',    name: 'Airport',            emoji: '✈️', active: false },
-  { id: 'globe',      name: 'Globe Room',         emoji: '🌐', active: false },
-  { id: 'broadcast',  name: 'Broadcast Tower',    emoji: '📡', active: false },
-  { id: 'missionctl', name: 'Mission Control',    emoji: '🎛️', active: false },
+  { id: 'home',             name: 'Home Dashboard',     emoji: '🏠', active: true  },
+  { id: 'dispatch',         name: 'Dispatch Tower',     emoji: '🗼', active: true  },
+  { id: 'brain',            name: 'Brain Library',      emoji: '🧠', active: true  },
+  { id: 'chat',             name: 'Chat Rooms',         emoji: '💬', active: true  },
+  { id: 'memory',           name: 'Memory Vault',       emoji: '🔒', active: true  },
+  { id: 'skills',           name: 'Skills Academy',     emoji: '🎓', active: true  },
+  { id: 'minions',          name: 'Minion Tunnels',     emoji: '🤖', active: true  },
+  { id: 'treasury',         name: 'Treasury',           emoji: '💰', active: true  },
+  { id: 'sales',            name: 'Sales District',     emoji: '📈', active: true  },
+  { id: 'marketing',        name: 'Marketing Plaza',    emoji: '📣', active: true  },
+  { id: 'exchange',         name: 'The Exchange',       emoji: '🔄', active: true  },
+  { id: 'market',           name: 'The Market',         emoji: '🏪', active: true  },
+  { id: 'council',          name: 'The Council',        emoji: '🏛️', active: true  },
+  { id: 'rnd',              name: 'R&D Lab',            emoji: '🔬', active: true  },
+  { id: 'legal',            name: 'Legal Tower',        emoji: '⚖️', active: true  },
+  { id: 'archive',          name: 'The Archive',        emoji: '📚', active: true  },
+  { id: 'docks',            name: 'Connector Docks',    emoji: '⚓', active: true  },
+  { id: 'airport',          name: 'Airport',            emoji: '✈️', active: true  },
+  { id: 'globe',            name: 'Globe Room',         emoji: '🌐', active: true  },
+  { id: 'broadcast',        name: 'Broadcast Tower',    emoji: '📡', active: true  },
+  { id: 'mission-control',  name: 'Mission Control',    emoji: '🎛️', active: true  },
+  { id: 'analytics',        name: 'Analytics',          emoji: '📊', active: true  },
+  { id: 'settings',         name: 'Settings',           emoji: '⚙️', active: true  },
+  { id: 'reports',          name: 'Reports',            emoji: '📋', active: true  },
+  { id: 'timeline',         name: 'Timeline',           emoji: '📅', active: true  },
+  { id: 'kanban',           name: 'Kanban Board',       emoji: '📋', active: true  },
+  { id: 'knowledge-graph',  name: 'Knowledge Graph',    emoji: '🕸️', active: true  },
+  { id: 'automations',      name: 'Automations',        emoji: '⚙️', active: true  },
+  { id: 'skill-tree',       name: 'Skill Tree',         emoji: '🌳', active: true  },
+  { id: 'calendar',         name: 'Calendar',           emoji: '📅', active: true  },
+  { id: 'sharing',          name: 'Sharing',            emoji: '📤', active: true  },
+  { id: 'achievements',     name: 'Achievements',       emoji: '🏆', active: true  },
 ];
 
 // ── Quick Actions registry ────────────────────────────────────────────────────
 
 const QUICK_ACTIONS = [
   {
+    id: 'qa-new-task',
+    label: 'New Task',
+    subtitle: 'Open Dispatch Tower with input focused',
+    icon: '➕',
+    shortcut: '↵ Create',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:navigate', {
+        detail: { zoneId: 'dispatch', zoneName: 'Dispatch Tower', focusInput: true }, bubbles: true,
+      }));
+    },
+  },
+  {
     id: 'qa-new-chat',
-    label: 'New chat',
+    label: 'New Chat',
     subtitle: 'Open Chat Rooms and start a conversation',
     icon: '💬',
     shortcut: '↵ Open',
@@ -53,8 +79,89 @@ const QUICK_ACTIONS = [
     },
   },
   {
+    id: 'qa-snapshot',
+    label: 'Take Snapshot',
+    subtitle: 'Save a timestamped snapshot of the current world',
+    icon: '📸',
+    shortcut: '↵ Save',
+    action: () => {
+      const label = `snapshot-${new Date().toISOString().slice(0, 19).replace('T', '_')}`;
+      document.dispatchEvent(new CustomEvent('command-palette:action', {
+        detail: { action: 'snapshot', label }, bubbles: true,
+      }));
+    },
+  },
+  {
+    id: 'qa-toggle-theme',
+    label: 'Toggle Theme',
+    subtitle: 'Cycle through available themes',
+    icon: '🎨',
+    shortcut: '↵ Toggle',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:open-theme-picker', { bubbles: true }));
+    },
+  },
+  {
+    id: 'qa-toggle-audio',
+    label: 'Toggle Audio',
+    subtitle: 'Mute or unmute all sounds',
+    icon: '🔊',
+    shortcut: '↵ Toggle',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:action', {
+        detail: { action: 'toggle-audio' }, bubbles: true,
+      }));
+    },
+  },
+  {
+    id: 'qa-focus-mode',
+    label: 'Focus Mode',
+    subtitle: 'Enter distraction-free focus mode',
+    icon: '🎯',
+    shortcut: '↵ Enter',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:action', {
+        detail: { action: 'focus-mode' }, bubbles: true,
+      }));
+    },
+  },
+  {
+    id: 'qa-open-settings',
+    label: 'Open Settings',
+    subtitle: 'World settings, providers, appearance',
+    icon: '⚙️',
+    shortcut: '↵ Open',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:navigate', {
+        detail: { zoneId: 'settings', zoneName: 'Settings' }, bubbles: true,
+      }));
+    },
+  },
+  {
+    id: 'qa-show-shortcuts',
+    label: 'Show Shortcuts',
+    subtitle: 'View all keyboard shortcuts',
+    icon: '⌨️',
+    shortcut: '↵ Show',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:show-help', { bubbles: true }));
+    },
+  },
+  {
+    id: 'qa-perf-monitor',
+    label: 'Performance Monitor',
+    subtitle: 'Toggle the performance overlay',
+    icon: '📈',
+    shortcut: '↵ Toggle',
+    action: () => {
+      document.dispatchEvent(new CustomEvent('command-palette:action', {
+        detail: { action: 'toggle-perf-monitor' }, bubbles: true,
+      }));
+    },
+  },
+  {
     id: 'qa-cold-email',
-    label: 'Write cold email',
+    label: 'Write Cold Email',
     subtitle: 'Open Sales District in outreach mode',
     icon: '✉️',
     shortcut: '↵ Open',
@@ -66,7 +173,7 @@ const QUICK_ACTIONS = [
   },
   {
     id: 'qa-research',
-    label: 'Research topic',
+    label: 'Research Topic',
     subtitle: 'Open Globe Room for deep research',
     icon: '🔍',
     shortcut: '↵ Open',
@@ -78,7 +185,7 @@ const QUICK_ACTIONS = [
   },
   {
     id: 'qa-run-minions',
-    label: 'Run all minions',
+    label: 'Run All Minions',
     subtitle: 'Trigger all currently enabled minions',
     icon: '⚡',
     shortcut: '↵ Run',
@@ -89,33 +196,8 @@ const QUICK_ACTIONS = [
     },
   },
   {
-    id: 'qa-snapshot',
-    label: 'Save world snapshot',
-    subtitle: 'Snapshot with timestamp label',
-    icon: '📸',
-    shortcut: '↵ Save',
-    action: () => {
-      const label = `snapshot-${new Date().toISOString().slice(0, 19).replace('T', '_')}`;
-      document.dispatchEvent(new CustomEvent('command-palette:action', {
-        detail: { action: 'snapshot', label }, bubbles: true,
-      }));
-    },
-  },
-  {
-    id: 'qa-mission-ctrl',
-    label: 'Open command center',
-    subtitle: 'Open Mission Control',
-    icon: '🎛️',
-    shortcut: '↵ Open',
-    action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-        detail: { zoneId: 'missionctl', zoneName: 'Mission Control' }, bubbles: true,
-      }));
-    },
-  },
-  {
     id: 'qa-morning-brief',
-    label: 'Generate morning brief',
+    label: 'Generate Morning Brief',
     subtitle: 'Trigger the morning briefing agent',
     icon: '☀️',
     shortcut: '↵ Run',
@@ -127,7 +209,7 @@ const QUICK_ACTIONS = [
   },
   {
     id: 'qa-day-night',
-    label: 'Toggle day/night',
+    label: 'Toggle Day/Night',
     subtitle: 'Switch between day and night mode',
     icon: '🌙',
     shortcut: '↵ Toggle',
@@ -138,6 +220,39 @@ const QUICK_ACTIONS = [
     },
   },
 ];
+
+// ── Agent registry ───────────────────────────────────────────────────────────
+
+const AGENTS = [
+  { id: 'commander',  name: 'Commander',  emoji: '👑', subtitle: 'Strategic, decisive, task-oriented',      zone: 'dispatch' },
+  { id: 'librarian',  name: 'Librarian',  emoji: '📚', subtitle: 'Methodical, curious, knowledge-driven',  zone: 'brain'    },
+  { id: 'archivist',  name: 'Archivist',  emoji: '📜', subtitle: 'Meticulous, patient, detail-focused',    zone: 'archive'  },
+  { id: 'instructor', name: 'Instructor', emoji: '🎓', subtitle: 'Patient, adaptive, skill-focused',       zone: 'skills'   },
+  { id: 'dockmaster', name: 'Dockmaster', emoji: '⚓', subtitle: 'Practical, reliable, integration-savvy', zone: 'docks'    },
+];
+
+// ── Recent commands (localStorage) ───────────────────────────────────────────
+
+const RECENT_COMMANDS_KEY = 'cp-recent-commands';
+const MAX_RECENT = 5;
+
+function getRecentCommands() {
+  try {
+    const raw = localStorage.getItem(RECENT_COMMANDS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function pushRecentCommand(entry) {
+  try {
+    let recents = getRecentCommands();
+    // Remove duplicate by id
+    recents = recents.filter(r => r.id !== entry.id);
+    recents.unshift({ id: entry.id, label: entry.label, icon: entry.icon, category: entry.category, timestamp: Date.now() });
+    if (recents.length > MAX_RECENT) recents.length = MAX_RECENT;
+    localStorage.setItem(RECENT_COMMANDS_KEY, JSON.stringify(recents));
+  } catch { /* ignore quota errors */ }
+}
 
 // ── URL detector ──────────────────────────────────────────────────────────────
 
@@ -319,7 +434,7 @@ const SVG = {
 /**
  * @typedef {Object} ResultItem
  * @property {string} id
- * @property {string} category      — "Navigate" | "Quick Actions" | "Ask Claude" | "Recent Tasks" | "Search Tasks"
+ * @property {string} category      — "Recent" | "Ask Claude" | "Zones" | "Actions" | "Agents" | "Recent Tasks" | "Search Tasks"
  * @property {string} icon
  * @property {string} label
  * @property {string} [subtitle]
@@ -576,7 +691,7 @@ export class CommandPalette {
 
     this._results = [{
       id: `special-${type}`,
-      category: 'Quick Actions',
+      category: 'Actions',
       icon: labels[type]?.slice(0, 2) || '⚡',
       label: labels[type]?.slice(3) || query,
       subtitle: 'Special command',
@@ -615,7 +730,7 @@ export class CommandPalette {
     this._commandBadge.style.display = 'none';
     this._results = [{
       id: 'open-url',
-      category: 'Quick Actions',
+      category: 'Actions',
       icon: '🌐',
       label: `Open in Globe Room`,
       subtitle: url,
@@ -637,6 +752,49 @@ export class CommandPalette {
     const results = [];
 
     const prioritizeAI = shouldPrioritizeAI(query);
+
+    // ── Recent commands (shown when no query, or fuzzy matched)
+    const recentEntries = getRecentCommands();
+    const recentResults = [];
+    if (recentEntries.length > 0) {
+      for (const recent of recentEntries) {
+        const match = q ? fuzzyMatch(q, recent.label) : null;
+        if (!q || match) {
+          recentResults.push({
+            id: `recent-cmd-${recent.id}`,
+            category: 'Recent',
+            icon: recent.icon || '🕐',
+            label: recent.label,
+            subtitle: `Recently used${recent.category ? ' · ' + recent.category : ''}`,
+            shortcutBadge: '↵ Open',
+            matchScore: match ? match.score + 5 : 2, // slight boost for recents
+            matchIndices: match ? match.indices : [],
+            execute: () => {
+              // Re-execute: find from zones, actions, or agents
+              const zone = ZONES.find(z => recent.id === `nav-${z.id}`);
+              if (zone) {
+                document.dispatchEvent(new CustomEvent('command-palette:navigate', {
+                  detail: { zoneId: zone.id, zoneName: zone.name }, bubbles: true,
+                }));
+                return;
+              }
+              const qa = QUICK_ACTIONS.find(a => recent.id === a.id);
+              if (qa) { qa.action(); return; }
+              const agent = AGENTS.find(a => recent.id === `agent-${a.id}`);
+              if (agent) {
+                document.dispatchEvent(new CustomEvent('command-palette:navigate', {
+                  detail: { zoneId: agent.zone, zoneName: agent.name, focusAgent: agent.id }, bubbles: true,
+                }));
+              }
+            },
+          });
+        }
+      }
+    }
+    // Only show recents when there is no query (top of list) or when they match
+    if (!q && recentResults.length > 0) {
+      results.push(...recentResults);
+    }
 
     // ── Ask Claude result (appears at top when AI-intent detected, or always present when query exists)
     if (query.length >= 2) {
@@ -664,21 +822,24 @@ export class CommandPalette {
       }
     }
 
-    // ── Navigate results
+    // ── Navigate results (zones)
     const navResults = [];
     for (const zone of ZONES) {
-      const match = fuzzyMatch(q, zone.name);
+      // Match against zone name AND zone id for power users
+      const matchName = fuzzyMatch(q, zone.name);
+      const matchId   = q ? fuzzyMatch(q, zone.id) : null;
+      const match = matchName || matchId;
       if (!q || match) {
         navResults.push({
           id: `nav-${zone.id}`,
-          category: 'Navigate',
+          category: 'Zones',
           icon: zone.emoji,
           label: zone.name,
-          subtitle: zone.active ? 'Active zone' : 'Coming soon',
+          subtitle: zone.active ? 'Navigate to zone' : 'Coming soon',
           shortcutBadge: '↵ Open',
           locked: !zone.active,
           matchScore: match ? match.score : 1,
-          matchIndices: match ? match.indices : [],
+          matchIndices: matchName ? matchName.indices : [],
           execute: () => {
             document.dispatchEvent(new CustomEvent('command-palette:navigate', {
               detail: { zoneId: zone.id, zoneName: zone.name }, bubbles: true,
@@ -688,7 +849,12 @@ export class CommandPalette {
       }
     }
     navResults.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
-    results.push(...navResults);
+    // When there's a query, limit zones shown to top 8 to keep results tight
+    if (q) {
+      results.push(...navResults.slice(0, 8));
+    } else {
+      results.push(...navResults);
+    }
 
     // ── Quick Actions results
     const qaResults = [];
@@ -699,7 +865,7 @@ export class CommandPalette {
       if (!q || match) {
         qaResults.push({
           id: qa.id,
-          category: 'Quick Actions',
+          category: 'Actions',
           icon: qa.icon,
           label: qa.label,
           subtitle: qa.subtitle,
@@ -712,6 +878,40 @@ export class CommandPalette {
     }
     qaResults.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
     results.push(...qaResults);
+
+    // ── Agent results
+    if (q) {
+      const agentResults = [];
+      for (const agent of AGENTS) {
+        const matchName = fuzzyMatch(q, agent.name);
+        const matchSub  = fuzzyMatch(q, agent.subtitle || '');
+        const match = matchName || matchSub;
+        if (match) {
+          agentResults.push({
+            id: `agent-${agent.id}`,
+            category: 'Agents',
+            icon: agent.emoji,
+            label: agent.name,
+            subtitle: agent.subtitle,
+            shortcutBadge: '↵ Chat',
+            matchScore: matchName ? matchName.score : (matchSub ? matchSub.score - 5 : 1),
+            matchIndices: matchName ? matchName.indices : [],
+            execute: () => {
+              document.dispatchEvent(new CustomEvent('command-palette:navigate', {
+                detail: { zoneId: agent.zone, zoneName: agent.name, focusAgent: agent.id }, bubbles: true,
+              }));
+            },
+          });
+        }
+      }
+      agentResults.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+      results.push(...agentResults);
+
+      // Add matched recents when there IS a query
+      if (recentResults.length > 0) {
+        results.push(...recentResults);
+      }
+    }
 
     // Add "Ask Claude" after navigate/actions if not prioritized
     if (query.length >= 2 && !prioritizeAI && results._askLater) {
@@ -830,7 +1030,7 @@ export class CommandPalette {
     }
 
     // Group by category maintaining insertion order
-    const categoryOrder = ['Ask Claude', 'Navigate', 'Quick Actions', 'Recent Tasks', 'Search Tasks'];
+    const categoryOrder = ['Recent', 'Ask Claude', 'Zones', 'Actions', 'Agents', 'Recent Tasks', 'Search Tasks'];
     const grouped = new Map();
     for (const cat of categoryOrder) grouped.set(cat, []);
 
@@ -858,9 +1058,11 @@ export class CommandPalette {
     let flatIndex = 0;
 
     const CATEGORY_ICONS = {
-      'Navigate':      '🏙️',
-      'Quick Actions': '⚡',
+      'Recent':        '🕐',
+      'Zones':         '🏙️',
+      'Actions':       '⚡',
       'Ask Claude':    '✨',
+      'Agents':        '🤖',
       'Recent Tasks':  '📋',
       'Search Tasks':  '🔍',
     };
@@ -1036,6 +1238,11 @@ export class CommandPalette {
 
     if (!result || result.locked) return;
 
+    // Record to recent commands (skip the "Recent" category itself and "Ask Claude" dynamic entries)
+    if (result.category !== 'Recent' && result.id !== 'ask-claude') {
+      pushRecentCommand({ id: result.id, label: result.label, icon: result.icon, category: result.category });
+    }
+
     // Flash the selected row
     const selectedRow = this._resultsEl.querySelector('.cp-row--selected');
     if (selectedRow) {
@@ -1060,7 +1267,7 @@ export class CommandPalette {
    * @returns {ResultItem[]}
    */
   _getFlatResults() {
-    const categoryOrder = ['Ask Claude', 'Navigate', 'Quick Actions', 'Recent Tasks', 'Search Tasks'];
+    const categoryOrder = ['Recent', 'Ask Claude', 'Zones', 'Actions', 'Agents', 'Recent Tasks', 'Search Tasks'];
     const grouped = new Map();
     for (const cat of categoryOrder) grouped.set(cat, []);
     for (const result of this._results) {
@@ -1087,9 +1294,14 @@ export class CommandPalette {
     this._results = [];
     this._selectedIndex = 0;
 
-    // Show empty state immediately
-    this._resultsEl.innerHTML = '';
-    this._resultsEl.appendChild(this._emptyEl);
+    // Pre-populate with default results (recents + all zones + actions)
+    this._buildSyncResults('');
+    if (this._results.length > 0) {
+      this._render();
+    } else {
+      this._resultsEl.innerHTML = '';
+      this._resultsEl.appendChild(this._emptyEl);
+    }
 
     this._backdrop.classList.add('cp-backdrop--open');
     this._modal.classList.add('cp-modal--open');

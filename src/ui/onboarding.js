@@ -235,6 +235,94 @@ const STYLES = `
     line-height: 1.5;
   }
 
+  /* Progress indicator */
+  .cw-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .cw-progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #2d2d4e;
+    transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+  }
+
+  .cw-progress-dot.cw-active {
+    background: #7c3aed;
+    box-shadow: 0 0 8px rgba(124, 58, 237, 0.6);
+    transform: scale(1.25);
+  }
+
+  .cw-progress-dot.cw-done {
+    background: #a78bfa;
+  }
+
+  .cw-progress-label {
+    font-size: 11px;
+    color: #64748b;
+    letter-spacing: 0.05em;
+    margin-left: 8px;
+  }
+
+  /* Back button */
+  .cw-btn-back {
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid #2d2d4e;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+    margin-right: 12px;
+  }
+
+  .cw-btn-back:hover {
+    color: #e2e8f0;
+    border-color: #7c3aed;
+    background: rgba(124, 58, 237, 0.08);
+  }
+
+  .cw-btn-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+  }
+
+  /* Validation hint */
+  .cw-validation-hint {
+    font-size: 12px;
+    color: #ef4444;
+    min-height: 18px;
+    margin-bottom: 8px;
+    transition: opacity 0.2s;
+    opacity: 0;
+  }
+
+  .cw-validation-hint.cw-visible {
+    opacity: 1;
+  }
+
+  /* Error toast for createWorld failures */
+  .cw-error-toast {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 8px;
+    color: #fca5a5;
+    font-size: 13px;
+    padding: 10px 16px;
+    margin-top: 12px;
+    text-align: center;
+    animation: cw-fade-in 0.3s ease both;
+  }
+
   /* Commander avatar */
   .cw-commander-wrap {
     display: flex;
@@ -388,6 +476,12 @@ function buildOverlay() {
   step1.dataset.step = '1';
   step1.innerHTML = `
     <div class="cw-wordmark">Claude World</div>
+    <div class="cw-progress">
+      <div class="cw-progress-dot cw-active"></div>
+      <div class="cw-progress-dot"></div>
+      <div class="cw-progress-dot"></div>
+      <span class="cw-progress-label">Step 1 of 3</span>
+    </div>
     <h1 class="cw-title">Welcome to Claude World</h1>
     <div class="cw-divider"></div>
     <p class="cw-subtitle">Every great company starts with a name.</p>
@@ -399,14 +493,23 @@ function buildOverlay() {
       autocomplete="off"
       spellcheck="false"
     />
+    <div class="cw-validation-hint" aria-live="polite"></div>
     <button class="cw-btn-primary" disabled>Name My World &rarr;</button>
   `;
 
   const nameInput = step1.querySelector('.cw-input');
   const nameBtn   = step1.querySelector('.cw-btn-primary');
+  const validHint = step1.querySelector('.cw-validation-hint');
 
   nameInput.addEventListener('input', () => {
-    nameBtn.disabled = nameInput.value.trim().length < 2;
+    const val = nameInput.value.trim();
+    nameBtn.disabled = val.length < 2;
+    if (val.length > 0 && val.length < 2) {
+      validHint.textContent = 'Name must be at least 2 characters';
+      validHint.classList.add('cw-visible');
+    } else {
+      validHint.classList.remove('cw-visible');
+    }
   });
 
   nameInput.addEventListener('keydown', (e) => {
@@ -429,19 +532,19 @@ function buildOverlay() {
       id:    'startup_founder',
       emoji: '🚀',
       name:  'Startup Founder',
-      desc:  'Build a company.\nLegal, Sales, Treasury\npre-wired.',
+      desc:  'Dispatch + Brain Library + Legal Tower\nPerfect for founders.',
     },
     {
       id:    'developer',
       emoji: '💻',
       name:  'Developer',
-      desc:  'Automate everything.\nDocks, Minions,\nExchange ready.',
+      desc:  'Dispatch + Brain Library + Connector Docks\nBuild and integrate.',
     },
     {
       id:    'freelancer',
       emoji: '🎨',
       name:  'Freelancer',
-      desc:  'Create and deliver.\nSkills, Chat,\nMarketing first.',
+      desc:  'Dispatch + Brain Library + Skills Academy\nCreate and deliver.',
     },
   ];
 
@@ -455,14 +558,28 @@ function buildOverlay() {
 
   step2.innerHTML = `
     <div class="cw-wordmark">Claude World</div>
+    <div class="cw-progress">
+      <div class="cw-progress-dot cw-done"></div>
+      <div class="cw-progress-dot cw-active"></div>
+      <div class="cw-progress-dot"></div>
+      <span class="cw-progress-label">Step 2 of 3</span>
+    </div>
     <h1 class="cw-title">Choose how you'll use your world</h1>
     <div class="cw-divider"></div>
     <div class="cw-cards">${cardsHTML}</div>
-    <button class="cw-btn-primary" disabled>Build My World &rarr;</button>
+    <div class="cw-btn-row">
+      <button class="cw-btn-back">&larr; Back</button>
+      <button class="cw-btn-primary" disabled>Build My World &rarr;</button>
+    </div>
   `;
 
   const buildBtn = step2.querySelector('.cw-btn-primary');
+  const backBtn  = step2.querySelector('.cw-btn-back');
   let selectedTemplate = null;
+
+  backBtn.addEventListener('click', () => {
+    goToStep(1);
+  });
 
   step2.querySelectorAll('.cw-card').forEach(card => {
     const activate = () => {
@@ -493,6 +610,23 @@ function buildOverlay() {
       console.error('[OnboardingUI] createWorld failed:', err);
       buildBtn.disabled = false;
       buildBtn.innerHTML = 'Build My World &rarr;';
+      // Show error toast below the button row
+      let toast = step2.querySelector('.cw-error-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'cw-error-toast';
+        step2.appendChild(toast);
+      }
+      // Distinguish network errors from other failures
+      const isNetworkError = err.message && (
+        err.message.includes('fetch') ||
+        err.message.includes('network') ||
+        err.message.includes('ECONNREFUSED') ||
+        err.message.includes('Failed to fetch')
+      );
+      toast.textContent = isNetworkError
+        ? 'Network error — world creation works offline, but the database may not be ready. Please restart the app.'
+        : `Something went wrong: ${err.message || 'Unknown error'}. Please try again.`;
     }
   });
 
@@ -504,6 +638,12 @@ function buildOverlay() {
   step3.dataset.step = '3';
   step3.innerHTML = `
     <div class="cw-wordmark">Claude World</div>
+    <div class="cw-progress">
+      <div class="cw-progress-dot cw-done"></div>
+      <div class="cw-progress-dot cw-done"></div>
+      <div class="cw-progress-dot cw-active"></div>
+      <span class="cw-progress-label">Step 3 of 3</span>
+    </div>
     <div class="cw-commander-wrap">
       <div class="cw-commander-avatar"></div>
       <div class="cw-commander-label">Commander</div>

@@ -391,6 +391,11 @@ export class Dispatch {
     }, 100);
     this._timerIntervals.set(task.id, timerId);
 
+    // Notify TaskStream that a stream is starting
+    window.dispatchEvent(new CustomEvent('task:stream-start', {
+      detail: { id: task.id, model, provider },
+    }));
+
     // Execute the dispatch
     try {
       const result = await window.api.ai.dispatch({
@@ -412,10 +417,31 @@ export class Dispatch {
       task.elapsedMs = result.latencyMs || (Date.now() - task.startTime);
       task.model = result.model || model;
 
+      // Send response as a stream chunk so TaskStream can display it
+      window.dispatchEvent(new CustomEvent('task:stream-chunk', {
+        detail: { id: task.id, text: task.response },
+      }));
+
+      // Signal stream complete
+      window.dispatchEvent(new CustomEvent('task:stream-end', {
+        detail: {
+          id: task.id,
+          inputTokens: task.inputTokens,
+          outputTokens: task.outputTokens,
+          costUsd: task.costUsd,
+          latencyMs: task.elapsedMs,
+        },
+      }));
+
     } catch (err) {
       task.status = 'fail';
       task.response = `Error: ${err.message || 'Unknown error'}`;
       task.elapsedMs = Date.now() - task.startTime;
+
+      // Signal stream error
+      window.dispatchEvent(new CustomEvent('task:stream-end', {
+        detail: { id: task.id, error: err.message || 'Unknown error' },
+      }));
     }
 
     // Stop timer

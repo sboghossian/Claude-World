@@ -40,7 +40,7 @@ export class AgentRelationshipSystem {
     }
 
     // Load all agent_relationships for this world.
-    this._relationships = await window.api.db.getAgentRelationships(worldId);
+    this._relationships = await window.api.db.getAgentRelationships(worldId) || [];
 
     console.log(
       `[agent-relationships] Loaded ${this._relationships.length} relationships` +
@@ -108,7 +108,7 @@ export class AgentRelationshipSystem {
       worldId: this._worldId,
       zoneId: agent.zone_id ?? undefined,
       limit: 10,
-    });
+    }) || [];
 
     const taskSummary = recentTasks.length > 0
       ? recentTasks

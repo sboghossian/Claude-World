@@ -114,6 +114,10 @@ export class OnboardingSystem {
 
   #emit(eventName, detail = {}) {
     const event = new CustomEvent(eventName, { bubbles: true, detail });
+    // Dispatch on both document and window so all listeners receive the event.
+    // Some subsystems (audio, celebrations, particles) listen on window,
+    // while the main boot sequence and onboarding UI listen on document.
     document.dispatchEvent(event);
+    window.dispatchEvent(event);
   }
 }
