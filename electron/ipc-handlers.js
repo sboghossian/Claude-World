@@ -1226,6 +1226,372 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
+  // ── Settings ──────────────────────────────────────────────────────
+
+  ipcMain.handle('db:getSettings', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT key, value FROM settings WHERE world_id = ?'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:updateSettings', async (_event, worldId, key, value) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(key, 'string', 'key');
+    assertType(value, 'string', 'value');
+    return dbCall(
+      (database) => {
+        database.prepare(
+          `INSERT INTO settings (world_id, key, value, updated_at)
+           VALUES (?, ?, ?, datetime('now'))
+           ON CONFLICT(world_id, key) DO UPDATE SET value = excluded.value, updated_at = datetime('now')`
+        ).run(worldId, key, value);
+        return { success: true };
+      },
+      { success: true }
+    );
+  });
+
+  ipcMain.handle('db:exportWorld', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => {
+        const world = database.prepare('SELECT * FROM worlds WHERE id = ?').get(worldId);
+        if (!world) throw new Error('World not found');
+        const zones = database.prepare('SELECT * FROM zones WHERE world_id = ?').all(worldId);
+        const agents = database.prepare('SELECT * FROM agents WHERE world_id = ?').all(worldId);
+        const quests = database.prepare('SELECT * FROM quests WHERE world_id = ?').all(worldId);
+        const settings = database.prepare('SELECT key, value FROM settings WHERE world_id = ?').all(worldId);
+
+        let tasks = [];
+        try { tasks = database.prepare('SELECT * FROM tasks WHERE world_id = ? ORDER BY created_at DESC LIMIT 500').all(worldId); } catch (_) {}
+
+        let identity = null;
+        try { identity = database.prepare('SELECT * FROM identity WHERE world_id = ?').get(worldId); } catch (_) {}
+
+        return {
+          exportedAt: new Date().toISOString(),
+          version: '1.0',
+          world,
+          zones,
+          agents,
+          quests,
+          settings,
+          tasks,
+          identity,
+        };
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:getAppInfo', async () => {
+    return {
+      version: app.getVersion(),
+      electron: process.versions.electron || '—',
+      node: process.versions.node || '—',
+      chrome: process.versions.chrome || '—',
+    };
+  });
+
+  // ── Missing handlers (quest activation, skills, tasks, relationships) ──
+
+  ipcMain.handle('db:activateQuest', async (_event, questId) => {
+    return dbCall(
+      (database) => {
+        database.prepare('UPDATE quests SET status = ? WHERE id = ?').run('active', questId);
+        return database.prepare('SELECT * FROM quests WHERE id = ?').get(questId);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:getSkills', async (_event, worldId) => {
+    return dbCall(
+      (database) => database.prepare('SELECT * FROM skills WHERE world_id = ? ORDER BY created_at DESC').all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createSkill', async (_event, worldId, data) => {
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO skills (world_id, name, description, category, code, status) VALUES (?, ?, ?, ?, ?, ?)'
+        ).run(worldId, data.name || '', data.description || '', data.category || 'general', data.code || '', data.status || 'active');
+        return database.prepare('SELECT * FROM skills WHERE id = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:importSkills', async (_event, worldId, skills) => {
+    return dbCall(
+      (database) => {
+        const insert = database.prepare(
+          'INSERT OR IGNORE INTO skills (world_id, name, description, category, code, status) VALUES (?, ?, ?, ?, ?, ?)'
+        );
+        const tx = database.transaction(() => {
+          for (const s of skills) {
+            insert.run(worldId, s.name || '', s.description || '', s.category || 'general', s.code || '', s.status || 'active');
+          }
+        });
+        tx();
+        return database.prepare('SELECT * FROM skills WHERE world_id = ?').all(worldId);
+      },
+      []
+    );
+  });
+
+  ipcMain.handle('db:getTasks', async (_event, worldId, opts = {}) => {
+    return dbCall(
+      (database) => {
+        const limit = (opts && opts.limit) || 100;
+        return database.prepare('SELECT * FROM tasks WHERE world_id = ? ORDER BY created_at DESC LIMIT ?').all(worldId, limit);
+      },
+      []
+    );
+  });
+
+  ipcMain.handle('db:getAgentRelationships', async (_event, worldId) => {
+    return dbCall(
+      (database) => database.prepare('SELECT * FROM agent_relationships WHERE world_id = ?').all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:getMinionRuns', async (_event, worldId, limit = 500) => {
+    return dbCall(
+      (database) => database.prepare('SELECT * FROM minion_runs WHERE world_id = ? ORDER BY created_at DESC LIMIT ?').all(worldId, limit),
+      []
+    );
+  });
+
+  ipcMain.handle('db:saveExperiment', async (_event, worldId, data) => {
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO experiments (world_id, name, hypothesis, status, config, results) VALUES (?, ?, ?, ?, ?, ?)'
+        ).run(worldId, data.name || '', data.hypothesis || '', data.status || 'draft', JSON.stringify(data.config || {}), JSON.stringify(data.results || {}));
+        return database.prepare('SELECT * FROM experiments WHERE id = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:importWorldSnapshot', async (_event, worldId, data) => {
+    return dbCall(
+      (database) => {
+        const result = database.prepare(
+          'INSERT INTO world_snapshots (world_id, label, snapshot_data) VALUES (?, ?, ?)'
+        ).run(worldId, data.label || 'Imported snapshot', JSON.stringify(data));
+        return { id: result.lastInsertRowid };
+      },
+      null
+    );
+  });
+
+  // Raw SQL helpers (used by council.js for dynamic queries)
+  ipcMain.handle('db:run', async (_event, sql, params) => {
+    return dbCall(
+      (database) => database.prepare(sql).run(...(params || [])),
+      null
+    );
+  });
+
+  ipcMain.handle('db:all', async (_event, sql, params) => {
+    return dbCall(
+      (database) => database.prepare(sql).all(...(params || [])),
+      []
+    );
+  });
+
+  // ── Analytics ──────────────────────────────────────────────────────
+
+  ipcMain.handle('db:getAnalytics', async (_event, worldId, range) => {
+    assertPositiveInt(worldId, 'worldId');
+    const rangeKey = typeof range === 'string' ? range : '30d';
+    const daysMap = { '7d': 7, '30d': 30, '90d': 90, 'all': 0 };
+    const days = daysMap[rangeKey] ?? 30;
+
+    return dbCall(
+      (database) => {
+        const rawDb = database.db || database;
+        const dateFilter = days > 0
+          ? `AND created_at >= datetime('now', '-${days} days')`
+          : '';
+
+        // 1. Tasks per day
+        let tasksPerDay = [];
+        try {
+          tasksPerDay = rawDb.prepare(`
+            SELECT date(created_at) as date, COUNT(*) as count
+            FROM tasks
+            WHERE world_id = ? ${dateFilter}
+            GROUP BY date(created_at)
+            ORDER BY date ASC
+          `).all(worldId);
+        } catch (_) { /* table may not exist yet */ }
+
+        // 2. Zone usage (count tasks per zone)
+        let zoneUsage = [];
+        try {
+          zoneUsage = rawDb.prepare(`
+            SELECT zone_id as zone_type,
+                   COALESCE(zone_id, 'unknown') as zone_name,
+                   COUNT(*) as count
+            FROM tasks
+            WHERE world_id = ? AND zone_id IS NOT NULL ${dateFilter}
+            GROUP BY zone_id
+            ORDER BY count DESC
+            LIMIT 15
+          `).all(worldId);
+        } catch (_) { /* fallback */ }
+
+        // Enrich zone names from zones table
+        if (zoneUsage.length > 0) {
+          try {
+            const zones = rawDb.prepare(
+              'SELECT zone_type, name FROM zones WHERE world_id = ?'
+            ).all(worldId);
+            const zoneMap = new Map(zones.map(z => [z.zone_type, z.name]));
+            zoneUsage = zoneUsage.map(zu => ({
+              ...zu,
+              zone_name: zoneMap.get(zu.zone_type) || zu.zone_type || 'Unknown',
+            }));
+          } catch (_) { /* ignore */ }
+        }
+
+        // 3. Provider usage
+        let providerUsage = [];
+        try {
+          providerUsage = rawDb.prepare(`
+            SELECT provider, COUNT(*) as count
+            FROM tasks
+            WHERE world_id = ? AND provider IS NOT NULL ${dateFilter}
+            GROUP BY provider
+            ORDER BY count DESC
+          `).all(worldId);
+        } catch (_) { /* fallback */ }
+
+        // 4. Tokens per day
+        let tokensPerDay = [];
+        try {
+          tokensPerDay = rawDb.prepare(`
+            SELECT date(created_at) as date,
+                   COALESCE(SUM(input_tokens), 0) as input_tokens,
+                   COALESCE(SUM(output_tokens), 0) as output_tokens,
+                   COALESCE(SUM(cost_usd), 0) as cost
+            FROM tasks
+            WHERE world_id = ? ${dateFilter}
+            GROUP BY date(created_at)
+            ORDER BY date ASC
+          `).all(worldId);
+        } catch (_) { /* fallback */ }
+
+        // 5. Agent performance
+        let agentPerformance = [];
+        try {
+          agentPerformance = rawDb.prepare(`
+            SELECT agent_id,
+                   COALESCE(agent_id, 'unknown') as name,
+                   COUNT(*) as tasks_completed,
+                   AVG(latency_ms) as avg_latency
+            FROM tasks
+            WHERE world_id = ? AND status = 'completed' AND agent_id IS NOT NULL ${dateFilter}
+            GROUP BY agent_id
+            ORDER BY tasks_completed DESC
+          `).all(worldId);
+        } catch (_) { /* fallback */ }
+
+        // Enrich agent names from agents table
+        if (agentPerformance.length > 0) {
+          try {
+            const agents = rawDb.prepare(
+              'SELECT id, name FROM agents WHERE world_id = ?'
+            ).all(worldId);
+            const agentMap = new Map(agents.map(a => [String(a.id), a.name]));
+            agentPerformance = agentPerformance.map(ap => ({
+              ...ap,
+              name: agentMap.get(String(ap.agent_id)) || ap.agent_id || 'Unknown Agent',
+            }));
+          } catch (_) { /* ignore */ }
+        }
+
+        // 6. Summary stats
+        let totalTasks = 0;
+        let totalTokens = 0;
+        let totalCost = 0;
+        let avgLatency = 0;
+        try {
+          const stats = rawDb.prepare(`
+            SELECT COUNT(*) as total,
+                   COALESCE(SUM(input_tokens), 0) + COALESCE(SUM(output_tokens), 0) as tokens,
+                   COALESCE(SUM(cost_usd), 0) as cost,
+                   COALESCE(AVG(latency_ms), 0) as avg_lat
+            FROM tasks
+            WHERE world_id = ? ${dateFilter}
+          `).get(worldId);
+          totalTasks = stats?.total || 0;
+          totalTokens = stats?.tokens || 0;
+          totalCost = stats?.cost || 0;
+          avgLatency = stats?.avg_lat || 0;
+        } catch (_) { /* fallback */ }
+
+        // Health score: activity (0-40) + diversity (0-30) + quests (0-30)
+        const activityScore = Math.min(40, (totalTasks / Math.max(days || 30, 7)) * 8);
+        const diversityScore = Math.min(30, zoneUsage.length * 5);
+
+        let questScore = 0;
+        try {
+          const questStats = rawDb.prepare(`
+            SELECT COUNT(*) as total,
+                   SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as done
+            FROM quests
+            WHERE world_id = ?
+          `).get(worldId);
+          const qTotal = questStats?.total || 0;
+          const qDone = questStats?.done || 0;
+          questScore = qTotal > 0 ? (qDone / qTotal) * 30 : 0;
+        } catch (_) { /* fallback */ }
+
+        const healthScore = {
+          score: Math.round(activityScore + diversityScore + questScore),
+          activityScore: Math.round(activityScore),
+          diversityScore: Math.round(diversityScore),
+          questScore: Math.round(questScore),
+        };
+
+        return {
+          tasksPerDay,
+          zoneUsage,
+          providerUsage,
+          tokensPerDay,
+          agentPerformance,
+          healthScore,
+          summary: {
+            totalTasks,
+            totalTokens,
+            totalCost,
+            avgLatency,
+          },
+        };
+      },
+      {
+        tasksPerDay: [],
+        zoneUsage: [],
+        providerUsage: [],
+        tokensPerDay: [],
+        agentPerformance: [],
+        healthScore: { score: 0, activityScore: 0, diversityScore: 0, questScore: 0 },
+        summary: { totalTasks: 0, totalTokens: 0, totalCost: 0, avgLatency: 0 },
+      }
+    );
+  });
+
   // ── app:* handlers ────────────────────────────────────────────────
 
   ipcMain.handle('app:getVersion', async () => {

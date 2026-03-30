@@ -1,0 +1,329 @@
+/**
+ * shortcuts-overlay.css — Polished keyboard shortcuts help overlay
+ *
+ * Glass morphism full-screen overlay with styled key caps,
+ * multi-column responsive grid, and smooth transitions.
+ */
+
+/* ── Backdrop ───────────────────────────────────────────────────── */
+.shortcuts-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9600;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
+}
+
+.shortcuts-overlay-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Panel (glass card) ─────────────────────────────────────────── */
+.shortcuts-overlay {
+  width: 780px;
+  max-width: calc(100vw - 64px);
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  background: rgba(12, 12, 24, 0.88);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    var(--shadow-lg),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  padding: 32px 36px 28px;
+  transform: scale(0.94) translateY(12px);
+  transition:
+    transform var(--transition-normal),
+    opacity var(--transition-normal);
+  opacity: 0;
+}
+
+.shortcuts-overlay-backdrop.open .shortcuts-overlay {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* Scrollbar styling */
+.shortcuts-overlay::-webkit-scrollbar {
+  width: 6px;
+}
+
+.shortcuts-overlay::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.shortcuts-overlay::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.shortcuts-overlay::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+.shortcuts-overlay__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.shortcuts-overlay__title {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.shortcuts-overlay__close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.shortcuts-overlay__close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
+/* ── Search input ───────────────────────────────────────────────── */
+.shortcuts-overlay__search-wrap {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.shortcuts-overlay__search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.shortcuts-overlay__search {
+  width: 100%;
+  height: 40px;
+  padding: 0 16px 0 38px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--transition-fast);
+  box-sizing: border-box;
+}
+
+.shortcuts-overlay__search::placeholder {
+  color: var(--text-dim);
+}
+
+.shortcuts-overlay__search:focus {
+  border-color: var(--accent-blue);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.12);
+}
+
+/* ── Category columns grid ──────────────────────────────────────── */
+.shortcuts-overlay__columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px 36px;
+}
+
+@media (max-width: 640px) {
+  .shortcuts-overlay__columns {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* ── Category ───────────────────────────────────────────────────── */
+.shortcuts-overlay__category {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.shortcuts-overlay__category-header {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 10px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Category accent colors */
+.shortcuts-overlay__category[data-category="navigation"] .shortcuts-overlay__category-header {
+  color: var(--accent-blue);
+  border-bottom-color: rgba(74, 158, 255, 0.2);
+}
+
+.shortcuts-overlay__category[data-category="zones"] .shortcuts-overlay__category-header {
+  color: var(--accent-purple);
+  border-bottom-color: rgba(168, 85, 247, 0.2);
+}
+
+.shortcuts-overlay__category[data-category="ui"] .shortcuts-overlay__category-header {
+  color: var(--accent-green);
+  border-bottom-color: rgba(74, 255, 138, 0.2);
+}
+
+.shortcuts-overlay__category[data-category="world"] .shortcuts-overlay__category-header {
+  color: var(--accent-amber);
+  border-bottom-color: rgba(255, 184, 74, 0.2);
+}
+
+.shortcuts-overlay__category[data-category="debug"] .shortcuts-overlay__category-header {
+  color: var(--accent-red);
+  border-bottom-color: rgba(255, 74, 106, 0.2);
+}
+
+/* ── Shortcut row ───────────────────────────────────────────────── */
+.shortcuts-overlay__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  transition: opacity var(--transition-fast);
+}
+
+.shortcuts-overlay__row--hidden {
+  display: none;
+}
+
+.shortcuts-overlay__row:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.shortcuts-overlay__label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-secondary);
+  flex: 1;
+  margin-right: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Key caps container ─────────────────────────────────────────── */
+.shortcuts-overlay__keys {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.shortcuts-overlay__keys-separator {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin: 0 1px;
+}
+
+/* ── Key cap — styled like a physical macOS keyboard key ────────── */
+.shortcuts-overlay__keycap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 26px;
+  padding: 0 7px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.04) 100%
+    );
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom-width: 2px;
+  border-bottom-color: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 0 0 0.5px rgba(255, 255, 255, 0.06) inset;
+  white-space: nowrap;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Wide keys get extra padding */
+.shortcuts-overlay__keycap--wide {
+  padding: 0 10px;
+}
+
+/* ── No results ─────────────────────────────────────────────────── */
+.shortcuts-overlay__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+.shortcuts-overlay__empty-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+/* ── Footer hint ────────────────────────────────────────────────── */
+.shortcuts-overlay__footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.shortcuts-overlay__footer-hint {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shortcuts-overlay__footer-hint .shortcuts-overlay__keycap {
+  height: 20px;
+  min-width: 18px;
+  padding: 0 5px;
+  font-size: 10px;
+}

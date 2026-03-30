@@ -3,24 +3,51 @@
  *
  * Listens on document for key events and dispatches custom events.
  * Ignores shortcuts when user is typing in input/textarea.
+ *
+ * Exports SHORTCUTS_REGISTRY so the overlay can read it dynamically.
  */
 
-const SHORTCUT_DEFS = [
-  { key: 'k', meta: true, label: 'Open command palette', display: '\u2318K', action: 'shortcut:toggle-palette' },
-  { key: 'Escape', meta: false, label: 'Close / Back', display: 'Esc', action: 'shortcut:escape' },
-  { key: 'h', meta: false, label: 'Camera go home', display: 'H', action: 'shortcut:camera-home' },
-  { key: 'Tab', meta: false, label: 'Cycle zones', display: 'Tab', action: 'shortcut:cycle-zones' },
-  { key: ' ', meta: false, label: 'Pause / Resume day cycle', display: 'Space', action: 'shortcut:toggle-day-cycle' },
-  { key: '?', meta: false, shift: true, label: 'Show keyboard shortcuts', display: '?', action: 'shortcut:show-help' },
-  { key: '1', meta: false, label: 'Jump to zone 1', display: '1', action: 'shortcut:jump-zone', detail: { index: 0 } },
-  { key: '2', meta: false, label: 'Jump to zone 2', display: '2', action: 'shortcut:jump-zone', detail: { index: 1 } },
-  { key: '3', meta: false, label: 'Jump to zone 3', display: '3', action: 'shortcut:jump-zone', detail: { index: 2 } },
-  { key: '4', meta: false, label: 'Jump to zone 4', display: '4', action: 'shortcut:jump-zone', detail: { index: 3 } },
-  { key: '5', meta: false, label: 'Jump to zone 5', display: '5', action: 'shortcut:jump-zone', detail: { index: 4 } },
-  { key: '6', meta: false, label: 'Jump to zone 6', display: '6', action: 'shortcut:jump-zone', detail: { index: 5 } },
-  { key: '7', meta: false, label: 'Jump to zone 7', display: '7', action: 'shortcut:jump-zone', detail: { index: 6 } },
-  { key: '8', meta: false, label: 'Jump to zone 8', display: '8', action: 'shortcut:jump-zone', detail: { index: 7 } },
-  { key: '9', meta: false, label: 'Jump to zone 9', display: '9', action: 'shortcut:jump-zone', detail: { index: 8 } },
+import { ShortcutsOverlay } from './shortcuts-overlay.js';
+
+// ── Shortcuts registry ──────────────────────────────────────────────────────
+// Canonical list of all shortcuts. The overlay reads this to stay in sync.
+
+export const SHORTCUTS_REGISTRY = [
+  // Navigation
+  { key: 'h', meta: false, label: 'Camera go home', display: 'H', action: 'shortcut:camera-home', category: 'navigation' },
+  { key: 'Tab', meta: false, label: 'Cycle zones forward', display: 'Tab', action: 'shortcut:cycle-zones', category: 'navigation' },
+  { key: 'Tab', meta: false, shift: true, label: 'Cycle zones backward', display: 'Shift+Tab', action: 'shortcut:cycle-zones', category: 'navigation' },
+  { key: ' ', meta: false, label: 'Pause / Resume day cycle', display: 'Space', action: 'shortcut:toggle-day-cycle', category: 'navigation' },
+  // Zone quick-jump 1-9
+  { key: '1', meta: false, label: 'Jump to Dispatch Tower', display: '1', action: 'shortcut:jump-zone', detail: { index: 0 }, category: 'navigation' },
+  { key: '2', meta: false, label: 'Jump to Brain Library', display: '2', action: 'shortcut:jump-zone', detail: { index: 1 }, category: 'navigation' },
+  { key: '3', meta: false, label: 'Jump to Chat Rooms', display: '3', action: 'shortcut:jump-zone', detail: { index: 2 }, category: 'navigation' },
+  { key: '4', meta: false, label: 'Jump to Memory Vault', display: '4', action: 'shortcut:jump-zone', detail: { index: 3 }, category: 'navigation' },
+  { key: '5', meta: false, label: 'Jump to Skills Academy', display: '5', action: 'shortcut:jump-zone', detail: { index: 4 }, category: 'navigation' },
+  { key: '6', meta: false, label: 'Jump to Minion Tunnels', display: '6', action: 'shortcut:jump-zone', detail: { index: 5 }, category: 'navigation' },
+  { key: '7', meta: false, label: 'Jump to Treasury', display: '7', action: 'shortcut:jump-zone', detail: { index: 6 }, category: 'navigation' },
+  { key: '8', meta: false, label: 'Jump to Sales District', display: '8', action: 'shortcut:jump-zone', detail: { index: 7 }, category: 'navigation' },
+  { key: '9', meta: false, label: 'Jump to Marketing Plaza', display: '9', action: 'shortcut:jump-zone', detail: { index: 8 }, category: 'navigation' },
+  // Zones (Cmd shortcuts)
+  { key: 'd', meta: true, label: 'Dispatch Tower', display: '\u2318D', action: 'shortcut:zone-dispatch', category: 'zones' },
+  { key: 'b', meta: true, label: 'Brain Library', display: '\u2318B', action: 'shortcut:zone-brain', category: 'zones' },
+  { key: 'l', meta: true, label: 'Legal Tower', display: '\u2318L', action: 'shortcut:zone-legal', category: 'zones' },
+  { key: 'm', meta: true, label: 'Memory Vault', display: '\u2318M', action: 'shortcut:zone-memory', category: 'zones' },
+  { key: 's', meta: true, label: 'Skills Academy', display: '\u2318S', action: 'shortcut:zone-skills', category: 'zones' },
+  { key: 'e', meta: true, label: 'The Exchange', display: '\u2318E', action: 'shortcut:zone-exchange', category: 'zones' },
+  // UI
+  { key: 'k', meta: true, label: 'Command Palette', display: '\u2318K', action: 'shortcut:toggle-palette', category: 'ui' },
+  { key: ',', meta: true, label: 'Settings', display: '\u2318,', action: 'shortcut:settings', category: 'ui' },
+  { key: 'Escape', meta: false, label: 'Close current panel', display: 'Esc', action: 'shortcut:escape', category: 'ui' },
+  { key: '?', meta: false, shift: true, label: 'Shortcuts help', display: '?', action: 'shortcut:show-help', category: 'ui' },
+  { key: '/', meta: true, label: 'Shortcuts help', display: '\u2318/', action: 'shortcut:show-help', category: 'ui' },
+  // World
+  { key: 'n', meta: true, label: 'New task', display: '\u2318N', action: 'shortcut:new-task', category: 'world' },
+  { key: 'b', meta: true, shift: true, label: 'Morning Briefing', display: '\u2318\u21E7B', action: 'shortcut:morning-briefing', category: 'world' },
+  { key: 't', meta: false, label: 'Theme picker', display: 'T', action: 'shortcut:theme-picker', category: 'world' },
+  // Debug
+  { key: 'd', meta: true, shift: true, label: 'Open DevTools', display: '\u2318\u21E7D', action: 'shortcut:devtools', category: 'debug' },
+  { key: 'r', meta: true, label: 'Reload window', display: '\u2318R', action: 'shortcut:reload', category: 'debug' },
 ];
 
 
@@ -33,7 +60,7 @@ export class ShortcutManager {
   constructor({ palette, panels } = {}) {
     this._palette = palette;
     this._panels = panels;
-    this._helpVisible = false;
+    this._overlay = new ShortcutsOverlay();
 
     this._handleKeyDown = this._handleKeyDown.bind(this);
     document.addEventListener('keydown', this._handleKeyDown);
@@ -60,25 +87,85 @@ export class ShortcutManager {
     const isMac = navigator.platform.includes('Mac');
     const metaKey = isMac ? e.metaKey : e.ctrlKey;
 
-    // Cmd+K / Ctrl+K — always works, even in inputs
+    // ── Meta combos (work even in inputs) ────────────────────
+
+    // Cmd+K / Ctrl+K — command palette
     if (metaKey && e.key === 'k') {
       e.preventDefault();
       this._palette?.toggle();
       return;
     }
 
-    // "/" to open palette (when not typing)
-    if (e.key === '/' && !this._isTyping(e) && !this._palette?.isOpen) {
+    // Cmd+/ — shortcuts overlay
+    if (metaKey && e.key === '/') {
       e.preventDefault();
-      this._palette?.open();
+      this._overlay.toggle();
       return;
     }
 
-    // Escape — layered close: help overlay > palette > panel
+    // Cmd+, — settings
+    if (metaKey && !e.shiftKey && e.key === ',') {
+      e.preventDefault();
+      document.dispatchEvent(new CustomEvent('shortcut:settings', { bubbles: true }));
+      return;
+    }
+
+    // Cmd+N — new task
+    if (metaKey && !e.shiftKey && e.key === 'n') {
+      e.preventDefault();
+      document.dispatchEvent(new CustomEvent('shortcut:new-task', { bubbles: true }));
+      return;
+    }
+
+    // Cmd+Shift+B — morning briefing
+    if (metaKey && e.shiftKey && (e.key === 'b' || e.key === 'B')) {
+      e.preventDefault();
+      document.dispatchEvent(new CustomEvent('shortcut:morning-briefing', { bubbles: true }));
+      return;
+    }
+
+    // Cmd+Shift+D — DevTools
+    if (metaKey && e.shiftKey && (e.key === 'd' || e.key === 'D')) {
+      e.preventDefault();
+      document.dispatchEvent(new CustomEvent('shortcut:devtools', { bubbles: true }));
+      return;
+    }
+
+    // Cmd+R — Reload
+    if (metaKey && !e.shiftKey && e.key === 'r') {
+      // Allow native reload in Electron; just dispatch event as well
+      document.dispatchEvent(new CustomEvent('shortcut:reload', { bubbles: true }));
+      return;
+    }
+
+    // ── Zone shortcuts (Cmd+key) ─────────────────────────────
+
+    if (metaKey && !e.shiftKey) {
+      const zoneMap = {
+        d: 'dispatch',
+        b: 'brain',
+        l: 'legal',
+        m: 'memory',
+        s: 'skills',
+        e: 'exchange',
+      };
+      const zoneId = zoneMap[e.key.toLowerCase()];
+      if (zoneId) {
+        e.preventDefault();
+        document.dispatchEvent(new CustomEvent('shortcut:zone-navigate', {
+          detail: { zoneId },
+          bubbles: true,
+        }));
+        return;
+      }
+    }
+
+    // ── Escape — layered close ───────────────────────────────
+
     if (e.key === 'Escape') {
       e.preventDefault();
-      if (this._helpVisible) {
-        this._hideHelp();
+      if (this._overlay.isVisible) {
+        this._overlay.hide();
         return;
       }
       if (this._palette?.isOpen) {
@@ -89,25 +176,38 @@ export class ShortcutManager {
         this._panels.close();
         return;
       }
-      // Generic escape event for other systems (e.g., exit follow mode)
       document.dispatchEvent(new CustomEvent('shortcut:escape', { bubbles: true }));
+      return;
+    }
+
+    // "/" to open palette (when not typing)
+    if (e.key === '/' && !this._isTyping(e) && !metaKey && !this._palette?.isOpen) {
+      e.preventDefault();
+      this._palette?.open();
       return;
     }
 
     // Don't fire remaining shortcuts when typing
     if (this._isTyping(e)) return;
 
-    // ? — show help
+    // ? — show shortcuts overlay
     if (e.key === '?' || (e.key === '/' && e.shiftKey)) {
       e.preventDefault();
-      this._toggleHelp();
+      this._overlay.toggle();
       return;
     }
 
     // H — camera home
-    if (e.key === 'h' || e.key === 'H') {
+    if ((e.key === 'h' || e.key === 'H') && !metaKey) {
       e.preventDefault();
       document.dispatchEvent(new CustomEvent('shortcut:camera-home', { bubbles: true }));
+      return;
+    }
+
+    // T — theme picker
+    if ((e.key === 't' || e.key === 'T') && !metaKey) {
+      e.preventDefault();
+      document.dispatchEvent(new CustomEvent('shortcut:theme-picker', { bubbles: true }));
       return;
     }
 
@@ -140,110 +240,14 @@ export class ShortcutManager {
     }
   }
 
-  // ── Help overlay ────────────────────────────────────────────────
-
-  _toggleHelp() {
-    if (this._helpVisible) this._hideHelp();
-    else this._showHelp();
-  }
-
-  _showHelp() {
-    if (this._helpVisible) return;
-    this._helpVisible = true;
-
-    this._helpBackdrop = document.createElement('div');
-    this._helpBackdrop.className = 'shortcut-help-backdrop';
-    this._helpBackdrop.setAttribute('role', 'dialog');
-    this._helpBackdrop.setAttribute('aria-modal', 'true');
-    this._helpBackdrop.setAttribute('aria-label', 'Keyboard shortcuts');
-
-    const panel = document.createElement('div');
-    panel.className = 'shortcut-help';
-
-    // Title
-    const title = document.createElement('h2');
-    title.className = 'shortcut-help__title';
-    title.textContent = 'Keyboard Shortcuts';
-    panel.appendChild(title);
-
-    // Grid
-    const grid = document.createElement('div');
-    grid.className = 'shortcut-help__grid';
-
-    // Unique display shortcuts (deduplicate jump-zone to "1-9")
-    const displayItems = [
-      { display: '\u2318K', label: 'Open command palette' },
-      { display: '/', label: 'Quick open palette' },
-      { display: 'Esc', label: 'Close / Back' },
-      { display: 'H', label: 'Camera go home' },
-      { display: 'Tab', label: 'Cycle zones forward' },
-      { display: 'Shift+Tab', label: 'Cycle zones backward' },
-      { display: 'Space', label: 'Pause / Resume day cycle' },
-      { display: '1 - 9', label: 'Jump to zone by number' },
-      { display: '?', label: 'Show this help' },
-    ];
-
-    for (const item of displayItems) {
-      const row = document.createElement('div');
-      row.className = 'shortcut-help__row';
-
-      const kbd = document.createElement('kbd');
-      kbd.className = 'shortcut-help__key';
-      kbd.textContent = item.display;
-
-      const label = document.createElement('span');
-      label.className = 'shortcut-help__label';
-      label.textContent = item.label;
-
-      row.appendChild(kbd);
-      row.appendChild(label);
-      grid.appendChild(row);
-    }
-
-    panel.appendChild(grid);
-
-    // Dismiss hint
-    const hint = document.createElement('div');
-    hint.className = 'shortcut-help__hint';
-    hint.textContent = 'Press Esc or click outside to close';
-    panel.appendChild(hint);
-
-    this._helpBackdrop.appendChild(panel);
-    document.body.appendChild(this._helpBackdrop);
-
-    // Click outside to close
-    this._helpBackdrop.addEventListener('mousedown', (e) => {
-      if (e.target === this._helpBackdrop) {
-        this._hideHelp();
-      }
-    });
-
-    // Animate in
-    requestAnimationFrame(() => {
-      this._helpBackdrop.classList.add('open');
-    });
-  }
-
-  _hideHelp() {
-    if (!this._helpVisible) return;
-    this._helpVisible = false;
-    if (this._helpBackdrop) {
-      this._helpBackdrop.classList.remove('open');
-      setTimeout(() => {
-        this._helpBackdrop?.remove();
-        this._helpBackdrop = null;
-      }, 200);
-    }
-  }
-
   /** @returns {boolean} */
   get isHelpVisible() {
-    return this._helpVisible;
+    return this._overlay.isVisible;
   }
 
   /** Tear down. */
   destroy() {
     document.removeEventListener('keydown', this._handleKeyDown);
-    this._hideHelp();
+    this._overlay.destroy();
   }
 }

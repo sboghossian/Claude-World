@@ -97,7 +97,7 @@ export async function initWorld() {
     if (hitZone) {
       console.log(`[Claude World] Clicked zone: ${hitZone.name} (${hitZone.id})`, hitZone);
       // Dispatch custom event for the Electron shell to listen to
-      window.dispatchEvent(new CustomEvent('zone-click', { detail: hitZone }));
+      document.dispatchEvent(new CustomEvent('zone-click', { detail: hitZone }));
     }
   });
 

@@ -24,6 +24,8 @@ import { GlobeRoom } from '../zones/globe-room.js';
 import { BroadcastTower } from '../zones/broadcast-tower.js';
 import { WorldVersions } from '../zones/world-versions.js';
 import { MissionControl } from '../zones/mission-control.js';
+import { Analytics } from '../zones/analytics.js';
+import { Settings, buildSettingsContent } from '../zones/settings.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -49,6 +51,8 @@ const ZONE_INFO = {
   broadcast: { icon: '\u{1F4E1}', desc: 'Publish outputs, webhooks, and notifications.' },
   'mission-control': { icon: '\u{1F6F0}', desc: 'Real-time war room. All agents, zones, and events in one view.' },
   mission_control: { icon: '\u{1F6F0}', desc: 'Real-time war room. All agents, zones, and events in one view.' },
+  analytics: { icon: '\u{1F4CA}', desc: 'Usage analytics, charts, and world health score.' },
+  settings: { icon: '\u{2699}', desc: 'World settings, AI providers, appearance, audio, and privacy.' },
 };
 
 const AGENT_INFO = {
@@ -182,6 +186,17 @@ function buildZoneContent(zoneId) {
     const el = mc.render();
     mc.init(window.__claudeWorldId || 1);
     return el;
+  }
+
+  if (zoneId === 'analytics') {
+    const analytics = new Analytics();
+    const el = analytics.render();
+    analytics.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'settings') {
+    return buildSettingsContent({ worldId: window.__claudeWorldId || 1 });
   }
 
   const info = ZONE_INFO[zoneId] || { icon: '\u{1F3D7}', desc: 'Unknown zone.' };

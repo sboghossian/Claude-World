@@ -1,0 +1,624 @@
+/* ─────────────────────────────────────────────────────────────────────── */
+/* analytics.css — Analytics Dashboard zone                               */
+/* Data-driven dashboard with glass morphism cards, animated borders,     */
+/* and Canvas 2D charts. Dark theme with data-blue accent.                */
+/* ─────────────────────────────────────────────────────────────────────── */
+
+/* ── CSS custom properties ─────────────────────────────────────────────── */
+.analytics-dashboard {
+  --an-bg:            #06080e;
+  --an-surface:       rgba(15, 20, 35, 0.85);
+  --an-surface-2:     rgba(25, 32, 55, 0.75);
+  --an-border:        rgba(59, 130, 246, 0.12);
+  --an-border-hover:  rgba(59, 130, 246, 0.3);
+
+  --an-blue:          #3b82f6;
+  --an-blue-dim:      rgba(59, 130, 246, 0.15);
+  --an-blue-glow:     rgba(59, 130, 246, 0.35);
+  --an-blue-faint:    rgba(59, 130, 246, 0.07);
+
+  --an-green:         #22c55e;
+  --an-green-dim:     rgba(34, 197, 94, 0.15);
+  --an-amber:         #f59e0b;
+  --an-amber-dim:     rgba(245, 158, 11, 0.15);
+  --an-red:           #ef4444;
+  --an-purple:        #a78bfa;
+  --an-cyan:          #22d3ee;
+  --an-pink:          #f472b6;
+
+  --an-text:          #c8d0e0;
+  --an-text-muted:    #6b7a99;
+  --an-text-dim:      #3a4560;
+
+  --an-font:          'SF Mono', 'Fira Code', 'Consolas', monospace;
+  --an-font-sans:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --an-radius:        12px;
+  --an-radius-sm:     8px;
+  --an-transition:    200ms ease;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--an-bg);
+  color: var(--an-text);
+  font-family: var(--an-font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ── Animated gradient border keyframes ────────────────────────────────── */
+@keyframes an-gradient-border {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes an-count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes an-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes an-pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.1); }
+  50%      { box-shadow: 0 0 40px rgba(59, 130, 246, 0.2); }
+}
+
+@keyframes an-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+.an-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--an-border);
+  background: linear-gradient(180deg, var(--an-blue-faint) 0%, transparent 100%);
+  flex-shrink: 0;
+}
+
+.an-header__icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.an-header__title {
+  font-family: var(--an-font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--an-blue);
+  flex: 1;
+}
+
+.an-header__subtitle {
+  font-size: 11px;
+  color: var(--an-text-muted);
+  margin-left: 8px;
+  font-weight: 400;
+}
+
+/* ── Time range selector ───────────────────────────────────────────────── */
+.an-range-selector {
+  display: flex;
+  gap: 4px;
+  background: var(--an-surface);
+  border: 1px solid var(--an-border);
+  border-radius: 20px;
+  padding: 3px;
+}
+
+.an-range-btn {
+  font-family: var(--an-font);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--an-text-muted);
+  cursor: pointer;
+  transition: all var(--an-transition);
+  white-space: nowrap;
+}
+
+.an-range-btn:hover {
+  color: var(--an-text);
+  background: var(--an-blue-faint);
+}
+
+.an-range-btn--active {
+  background: var(--an-blue);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.an-range-btn--active:hover {
+  background: var(--an-blue);
+  color: #fff;
+}
+
+/* ── Scrollable body ───────────────────────────────────────────────────── */
+.an-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 20px 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--an-border) transparent;
+}
+
+.an-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.an-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.an-body::-webkit-scrollbar-thumb {
+  background: var(--an-border);
+  border-radius: 3px;
+}
+
+/* ── Dashboard grid ────────────────────────────────────────────────────── */
+.an-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.an-grid__full {
+  grid-column: 1 / -1;
+}
+
+/* ── Glass morphism card ───────────────────────────────────────────────── */
+.an-card {
+  position: relative;
+  background: var(--an-surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--an-border);
+  border-radius: var(--an-radius);
+  padding: 16px;
+  overflow: hidden;
+  transition: border-color var(--an-transition), box-shadow var(--an-transition);
+  animation: an-fade-in 400ms ease both;
+}
+
+.an-card:hover {
+  border-color: var(--an-border-hover);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Animated gradient border overlay */
+.an-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.2) 25%,
+    transparent 50%,
+    rgba(59, 130, 246, 0.15) 75%,
+    transparent 100%
+  );
+  background-size: 300% 300%;
+  animation: an-gradient-border 6s ease infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--an-transition);
+}
+
+.an-card:hover::before {
+  opacity: 1;
+}
+
+/* Staggered animation delays */
+.an-card:nth-child(1) { animation-delay: 0ms; }
+.an-card:nth-child(2) { animation-delay: 60ms; }
+.an-card:nth-child(3) { animation-delay: 120ms; }
+.an-card:nth-child(4) { animation-delay: 180ms; }
+.an-card:nth-child(5) { animation-delay: 240ms; }
+.an-card:nth-child(6) { animation-delay: 300ms; }
+
+/* ── Card header ───────────────────────────────────────────────────────── */
+.an-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.an-card__icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.an-card__title {
+  font-family: var(--an-font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--an-text);
+  flex: 1;
+}
+
+.an-card__badge {
+  font-family: var(--an-font);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--an-blue-dim);
+  color: var(--an-blue);
+  border: 1px solid var(--an-blue);
+}
+
+/* ── Chart canvas containers ───────────────────────────────────────────── */
+.an-chart-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: var(--an-radius-sm);
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.an-chart-wrap canvas {
+  display: block;
+  width: 100%;
+  border-radius: var(--an-radius-sm);
+}
+
+/* ── Health score — big number ─────────────────────────────────────────── */
+.an-health {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  text-align: center;
+  min-height: 180px;
+}
+
+.an-health__score {
+  font-family: var(--an-font);
+  font-size: 72px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  animation: an-count-up 600ms ease both;
+  background: linear-gradient(135deg, var(--an-blue), var(--an-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.an-health__label {
+  font-family: var(--an-font);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--an-text-muted);
+  margin-top: 8px;
+}
+
+.an-health__bar-wrap {
+  width: 100%;
+  max-width: 200px;
+  height: 6px;
+  background: var(--an-surface-2);
+  border-radius: 3px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.an-health__bar {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--an-blue), var(--an-cyan));
+  transition: width 800ms ease;
+}
+
+.an-health__breakdown {
+  display: flex;
+  gap: 16px;
+  margin-top: 14px;
+  font-size: 10px;
+  color: var(--an-text-muted);
+}
+
+.an-health__breakdown-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.an-health__breakdown-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Leaderboard ───────────────────────────────────────────────────────── */
+.an-leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.an-leader-row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--an-radius-sm);
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid transparent;
+  transition: border-color var(--an-transition), background var(--an-transition);
+}
+
+.an-leader-row:hover {
+  border-color: var(--an-border-hover);
+  background: var(--an-surface-2);
+}
+
+.an-leader-row:first-child {
+  border-color: rgba(255, 215, 0, 0.2);
+  background: rgba(255, 215, 0, 0.04);
+}
+
+.an-leader__rank {
+  font-family: var(--an-font);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--an-text-muted);
+  text-align: center;
+}
+
+.an-leader-row:first-child .an-leader__rank {
+  color: #ffd700;
+}
+
+.an-leader__name {
+  font-family: var(--an-font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--an-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.an-leader__tasks {
+  font-family: var(--an-font);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--an-blue);
+  white-space: nowrap;
+}
+
+.an-leader__time {
+  font-family: var(--an-font);
+  font-size: 10px;
+  color: var(--an-text-muted);
+  white-space: nowrap;
+}
+
+/* ── Summary stat row ──────────────────────────────────────────────────── */
+.an-stats-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.an-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.an-stat__value {
+  font-family: var(--an-font);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--an-blue);
+  font-variant-numeric: tabular-nums;
+  animation: an-count-up 500ms ease both;
+}
+
+.an-stat__label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--an-text-muted);
+}
+
+/* ── Token / cost summary ──────────────────────────────────────────────── */
+.an-token-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.an-token-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--an-radius-sm);
+  border: 1px solid var(--an-border);
+}
+
+.an-token-box__value {
+  font-family: var(--an-font);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--an-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.an-token-box__label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--an-text-muted);
+}
+
+/* ── Pie chart legend ──────────────────────────────────────────────────── */
+.an-pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.an-pie-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.an-pie-legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.an-pie-legend__name {
+  flex: 1;
+  color: var(--an-text);
+  font-weight: 500;
+}
+
+.an-pie-legend__value {
+  font-family: var(--an-font);
+  font-weight: 700;
+  color: var(--an-text-muted);
+}
+
+/* ── Empty state ───────────────────────────────────────────────────────── */
+.an-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  color: var(--an-text-dim);
+  font-size: 12px;
+  text-align: center;
+  gap: 8px;
+}
+
+.an-empty__icon {
+  font-size: 32px;
+  opacity: 0.5;
+}
+
+/* ── Loading shimmer ───────────────────────────────────────────────────── */
+.an-loading {
+  background: linear-gradient(
+    90deg,
+    var(--an-surface) 25%,
+    var(--an-surface-2) 50%,
+    var(--an-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: an-shimmer 1.5s ease infinite;
+  border-radius: var(--an-radius-sm);
+  min-height: 120px;
+}
+
+/* ── Responsive — narrow panel ─────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .an-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .an-header {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+  }
+
+  .an-range-selector {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .an-body {
+    padding: 12px 14px 20px;
+  }
+
+  .an-health__score {
+    font-size: 52px;
+  }
+
+  .an-token-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Selection highlight ───────────────────────────────────────────────── */
+.analytics-dashboard ::selection {
+  background: var(--an-blue-dim);
+  color: var(--an-blue);
+}
+
+/* ── Focus ring ────────────────────────────────────────────────────────── */
+.analytics-dashboard :focus-visible {
+  outline: 2px solid var(--an-blue);
+  outline-offset: 2px;
+}
+
+/* ── Scrollbar styling ─────────────────────────────────────────────────── */
+.analytics-dashboard * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--an-border) transparent;
+}
+
+.analytics-dashboard *::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.analytics-dashboard *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.analytics-dashboard *::-webkit-scrollbar-thumb {
+  background: var(--an-border);
+  border-radius: 3px;
+}

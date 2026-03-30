@@ -36,6 +36,7 @@ function loadStyles(basePath = '') {
     'panels.css',
     'agent-dialogue.css',
     'shortcuts.css',
+    'shortcuts-overlay.css',
     'quest-panel.css',
   ];
 

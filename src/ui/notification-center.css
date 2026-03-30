@@ -1,0 +1,371 @@
+/**
+ * notification-center.css — Slide-out notification panel for Claude World
+ *
+ * Glass morphism, dark theme, category color coding.
+ * All custom properties reference the --cw-* / variables.css tokens.
+ */
+
+/* ── Bell icon (positioned in top-right HUD area) ──────────────── */
+
+.nc-bell {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  backdrop-filter: var(--blur-light);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  pointer-events: auto;
+  -webkit-app-region: no-drag;
+}
+
+.nc-bell:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-light);
+}
+
+.nc-bell:active {
+  transform: scale(0.95);
+}
+
+.nc-bell__icon {
+  font-size: 18px;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Ring animation on new notification */
+.nc-bell--ring .nc-bell__icon {
+  animation: nc-bell-ring 0.6s ease;
+}
+
+@keyframes nc-bell-ring {
+  0%   { transform: rotate(0deg); }
+  15%  { transform: rotate(14deg); }
+  30%  { transform: rotate(-12deg); }
+  45%  { transform: rotate(10deg); }
+  60%  { transform: rotate(-6deg); }
+  75%  { transform: rotate(3deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* ── Unread badge ───────────────────────────────────────────────── */
+
+.nc-bell__badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--accent-red);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  pointer-events: none;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.nc-bell__badge--hidden {
+  transform: scale(0);
+  opacity: 0;
+}
+
+.nc-bell__badge--pulse {
+  animation: nc-badge-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes nc-badge-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 74, 106, 0.5); }
+  50%      { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(255, 74, 106, 0); }
+}
+
+
+/* ── Overlay backdrop (click to close) ──────────────────────────── */
+
+.nc-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-normal);
+}
+
+.nc-overlay--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* ── Slide-out panel ────────────────────────────────────────────── */
+
+.nc-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9600;
+  width: 380px;
+  max-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  border-left: 1px solid var(--border);
+  backdrop-filter: var(--blur);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(100%);
+  transition: transform var(--transition-slow);
+  pointer-events: none;
+}
+
+.nc-panel--open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+
+/* ── Panel header ───────────────────────────────────────────────── */
+
+.nc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.nc-header__title {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+.nc-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nc-header__btn {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.nc-header__btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-light);
+  background: var(--bg-hover);
+}
+
+.nc-header__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.nc-header__close:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+
+/* ── Notification list (scrollable) ─────────────────────────────── */
+
+.nc-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+  list-style: none;
+  margin: 0;
+}
+
+.nc-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.nc-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nc-list::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 2px;
+}
+
+
+/* ── Date group header ──────────────────────────────────────────── */
+
+.nc-date-group {
+  padding: 10px 20px 4px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+
+/* ── Individual notification item ───────────────────────────────── */
+
+.nc-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  position: relative;
+}
+
+.nc-item:hover {
+  background: var(--bg-hover);
+}
+
+.nc-item--unread::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 18px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  box-shadow: 0 0 6px var(--accent-blue);
+}
+
+/* Category icon circle */
+.nc-item__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Category color coding */
+.nc-item--system  .nc-item__icon { background: rgba(74, 158, 255, 0.15); }
+.nc-item--zone    .nc-item__icon { background: rgba(74, 255, 138, 0.15); }
+.nc-item--agent   .nc-item__icon { background: rgba(168, 85, 247, 0.15); }
+.nc-item--quest   .nc-item__icon { background: rgba(255, 184, 74, 0.15); }
+.nc-item--achievement .nc-item__icon { background: rgba(255, 215, 0, 0.15); }
+
+.nc-item__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.nc-item__title {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nc-item--unread .nc-item__title {
+  font-weight: 600;
+}
+
+.nc-item__body {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nc-item__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.nc-item__time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.nc-item__zone-link {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: var(--accent-blue);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.nc-item__zone-link:hover {
+  color: var(--text-primary);
+}
+
+
+/* ── Empty state ────────────────────────────────────────────────── */
+
+.nc-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.nc-empty__icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+  opacity: 0.3;
+}
+
+.nc-empty__text {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text-dim);
+}

@@ -92,6 +92,33 @@ contextBridge.exposeInMainWorld('api', {
     getExperiments: (worldId, limit) => ipcRenderer.invoke('db:getExperiments', worldId, limit),
     createExperiment: (worldId, data) => ipcRenderer.invoke('db:createExperiment', worldId, data),
     updateExperiment: (experimentId, updates) => ipcRenderer.invoke('db:updateExperiment', experimentId, updates),
+    saveExperiment: (worldId, data) => ipcRenderer.invoke('db:saveExperiment', worldId, data),
+    // Quest activation
+    activateQuest: (questId) => ipcRenderer.invoke('db:activateQuest', questId),
+    // Skills
+    getSkills: (worldId) => ipcRenderer.invoke('db:getSkills', worldId),
+    createSkill: (worldId, data) => ipcRenderer.invoke('db:createSkill', worldId, data),
+    importSkills: (worldId, skills) => ipcRenderer.invoke('db:importSkills', worldId, skills),
+    // Tasks
+    getTasks: (worldId, opts) => ipcRenderer.invoke('db:getTasks', worldId, opts),
+    // Agent relationships
+    getAgentRelationships: (worldId) => ipcRenderer.invoke('db:getAgentRelationships', worldId),
+    // Minion runs
+    getMinionRuns: (worldId, limit) => ipcRenderer.invoke('db:getMinionRuns', worldId, limit),
+    // World snapshots (aliases used by archive/airport)
+    getWorldSnapshots: (worldId) => ipcRenderer.invoke('db:getSnapshots', worldId),
+    restoreWorldSnapshot: (worldId, snapshotId) => ipcRenderer.invoke('db:restoreSnapshot', worldId, snapshotId),
+    importWorldSnapshot: (worldId, data) => ipcRenderer.invoke('db:importWorldSnapshot', worldId, data),
+    // Settings
+    getSettings: (worldId) => ipcRenderer.invoke('db:getSettings', worldId),
+    updateSettings: (worldId, key, value) => ipcRenderer.invoke('db:updateSettings', worldId, key, value),
+    exportWorld: (worldId) => ipcRenderer.invoke('db:exportWorld', worldId),
+    getAppInfo: () => ipcRenderer.invoke('db:getAppInfo'),
+    // Analytics
+    getAnalytics: (worldId, range) => ipcRenderer.invoke('db:getAnalytics', worldId, range),
+    // Raw query helpers (used by council.js)
+    run: (sql, params) => ipcRenderer.invoke('db:run', sql, params),
+    all: (sql, params) => ipcRenderer.invoke('db:all', sql, params),
   },
 
   // ── AI dispatch ────────────────────────────────────────────────────
