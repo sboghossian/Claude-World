@@ -106,6 +106,11 @@ contextBridge.exposeInMainWorld('api', {
     createKanbanCard: (worldId, data) => ipcRenderer.invoke('db:createKanbanCard', worldId, data),
     updateKanbanCard: (cardId, updates) => ipcRenderer.invoke('db:updateKanbanCard', cardId, updates),
     deleteKanbanCard: (cardId) => ipcRenderer.invoke('db:deleteKanbanCard', cardId),
+    // Calendar Events
+    getCalendarEvents: (worldId) => ipcRenderer.invoke('db:getCalendarEvents', worldId),
+    createCalendarEvent: (worldId, data) => ipcRenderer.invoke('db:createCalendarEvent', worldId, data),
+    updateCalendarEvent: (eventId, updates) => ipcRenderer.invoke('db:updateCalendarEvent', eventId, updates),
+    deleteCalendarEvent: (eventId) => ipcRenderer.invoke('db:deleteCalendarEvent', eventId),
     // Workflows (Automation Builder)
     getWorkflows: (worldId) => ipcRenderer.invoke('db:getWorkflows', worldId),
     saveWorkflow: (worldId, data) => ipcRenderer.invoke('db:saveWorkflow', worldId, data),

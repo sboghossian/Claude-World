@@ -34,6 +34,8 @@ import { Kanban } from '../zones/kanban.js';
 import { KnowledgeGraph } from '../zones/knowledge-graph.js';
 import { AutomationBuilder } from '../zones/automation-builder.js';
 import { SkillTree } from '../zones/skill-tree.js';
+import { Calendar } from '../zones/calendar.js';
+import { Sharing } from '../zones/sharing.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -69,6 +71,8 @@ const ZONE_INFO = {
   'knowledge-graph': { icon: '\u{1F578}', desc: 'Force-directed graph of zones, agents, tasks, and skills.' },
   automations: { icon: '\u{2699}', desc: 'Visual workflow builder for automating tasks.' },
   'skill-tree': { icon: '\u{1F333}', desc: 'Agent skill trees with XP-based unlock progression.' },
+  calendar: { icon: '\u{1F4C5}', desc: 'Calendar with scheduled tasks, events, and milestones.' },
+  sharing: { icon: '\u{1F4E4}', desc: 'Export, import, and share your world.' },
 };
 
 const AGENT_INFO = {
@@ -268,6 +272,20 @@ function buildZoneContent(zoneId) {
     const st = new SkillTree();
     const el = st.render();
     st.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'calendar') {
+    const cal = new Calendar();
+    const el = cal.render();
+    cal.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'sharing') {
+    const sharing = new Sharing();
+    const el = sharing.render();
+    sharing.init(window.__claudeWorldId || 1);
     return el;
   }
 

@@ -1,0 +1,176 @@
+/**
+ * perf-monitor.css — Performance monitoring overlay styles
+ * Dark, semi-transparent panel with monospace metrics and Canvas graphs.
+ */
+
+/* ── Panel container ──────────────────────────────────────────────── */
+
+.perf-monitor {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  width: 250px;
+  max-height: 360px;
+  background: rgba(10, 10, 20, 0.80);
+  backdrop-filter: var(--blur-light, blur(12px));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--radius-md, 10px);
+  box-shadow: var(--shadow, 0 8px 32px rgba(0, 0, 0, 0.4));
+  font-family: var(--font-mono, 'SF Mono', 'Fira Code', monospace);
+  font-size: 11px;
+  color: var(--text-primary, #e8e8f0);
+  z-index: 99999;
+  user-select: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: opacity var(--transition-fast, 150ms ease);
+}
+
+.perf-monitor.hidden {
+  display: none;
+}
+
+/* ── Drag handle / header ─────────────────────────────────────────── */
+
+.perf-monitor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  cursor: grab;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: rgba(20, 25, 40, 0.6);
+  flex-shrink: 0;
+}
+
+.perf-monitor__header:active {
+  cursor: grabbing;
+}
+
+.perf-monitor__title {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary, #8888a0);
+}
+
+.perf-monitor__close {
+  background: none;
+  border: none;
+  color: var(--text-dim, #555570);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color var(--transition-fast, 150ms ease);
+}
+
+.perf-monitor__close:hover {
+  color: var(--text-primary, #e8e8f0);
+}
+
+/* ── FPS graph canvas ─────────────────────────────────────────────── */
+
+.perf-monitor__graph-section {
+  padding: 6px 8px 4px;
+  flex-shrink: 0;
+}
+
+.perf-monitor__graph-label {
+  font-size: 9px;
+  color: var(--text-dim, #555570);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+
+.perf-monitor__canvas {
+  width: 100%;
+  height: 40px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  display: block;
+}
+
+/* ── Metrics list ─────────────────────────────────────────────────── */
+
+.perf-monitor__metrics {
+  padding: 4px 8px 6px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.perf-monitor__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 2px 0;
+  line-height: 1.5;
+}
+
+.perf-monitor__label {
+  color: var(--text-secondary, #8888a0);
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 8px;
+}
+
+.perf-monitor__value {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+/* ── Color-coded thresholds ───────────────────────────────────────── */
+
+.perf-monitor__value--green {
+  color: var(--accent-green, #4aff8a);
+}
+
+.perf-monitor__value--yellow {
+  color: var(--accent-amber, #ffb84a);
+}
+
+.perf-monitor__value--red {
+  color: var(--accent-red, #ff4a6a);
+}
+
+.perf-monitor__value--blue {
+  color: var(--accent-blue, #4a9eff);
+}
+
+/* ── Copy button ──────────────────────────────────────────────────── */
+
+.perf-monitor__footer {
+  padding: 4px 8px 6px;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  flex-shrink: 0;
+}
+
+.perf-monitor__copy-btn {
+  width: 100%;
+  padding: 4px 0;
+  background: rgba(40, 50, 80, 0.5);
+  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.12));
+  border-radius: var(--radius-sm, 6px);
+  color: var(--text-secondary, #8888a0);
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  cursor: pointer;
+  transition: background var(--transition-fast, 150ms ease),
+              color var(--transition-fast, 150ms ease);
+}
+
+.perf-monitor__copy-btn:hover {
+  background: rgba(50, 70, 120, 0.6);
+  color: var(--text-primary, #e8e8f0);
+}
+
+.perf-monitor__copy-btn:active {
+  background: rgba(50, 70, 120, 0.8);
+}

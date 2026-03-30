@@ -107,6 +107,7 @@
     import { initPersonalityEngine } from '../systems/agent-personalities.js';
     import { ThoughtBubbles } from '../ui/thought-bubbles.js';
     import { initVFX } from './vfx.js';
+    import { initParticles } from './particles.js';
     import { initCityLife } from './city-life.js';
     import { initDataFlows } from './data-flows.js';
     import { OnboardingCinema } from '../systems/onboarding-cinema.js';
@@ -121,6 +122,8 @@
     import { FocusMode } from '../systems/focus-mode.js';
     import { TaskStream } from '../ui/task-stream.js';
     import { AgentChat } from '../ui/agent-chat.js';
+    import { StatusBar } from '../ui/status-bar.js';
+    import { PerfMonitor } from '../ui/perf-monitor.js';
 
     // IPC-based reputation listener — awards points via window.api for DOM events
     function initReputationListener(worldId) {
@@ -143,7 +146,7 @@
 
     async function boot() {
       const splash = new SplashScreen();
-      const TOTAL_STEPS = 30;
+      const TOTAL_STEPS = 32;
       try {
         // ── 1. Start the isometric world ──────────────────────────────
         splash.setProgress(1, TOTAL_STEPS, 'Initializing world renderer...');
@@ -333,6 +336,9 @@
           if (pixiApp) {
             const vfx = initVFX(pixiApp);
             window.__vfx = vfx;
+            const particles = initParticles(pixiApp);
+            window.__particles = particles;
+            console.log('[boot] ParticleSystem started');
             const cityLife = initCityLife(pixiApp, pixiApp.stage);
             window.__cityLife = cityLife;
             console.log('[boot] VFX + CityLife started');
@@ -529,6 +535,27 @@
           console.log('[boot] Agent chat ready');
         } catch (err) {
           console.warn('[boot] Agent chat init failed (non-critical):', err.message);
+        }
+
+        // ── 31. Status bar ────────────────────────────────────────────
+        splash.setProgress(31, TOTAL_STEPS, 'Mounting status bar...');
+        try {
+          const statusBar = new StatusBar();
+          statusBar.mount();
+          window.__statusBar = statusBar;
+          console.log('[boot] Status bar mounted');
+        } catch (err) {
+          console.warn('[boot] Status bar init failed (non-critical):', err.message);
+        }
+
+        // ── 32. Performance monitor (dev only) ───────────────────────
+        splash.setProgress(32, TOTAL_STEPS, 'Ready!');
+        try {
+          const perfMonitor = new PerfMonitor();
+          window.__perfMonitor = perfMonitor;
+          console.log('[boot] Perf monitor ready (Cmd+Shift+P to toggle)');
+        } catch (err) {
+          console.warn('[boot] Perf monitor init failed (non-critical):', err.message);
         }
 
         // ── Done — fade out the splash screen ────────────────────────

@@ -14,6 +14,7 @@ import { BuildingManager } from './buildings.js';
 import { FogOfWar } from './fog.js';
 import { DayNightCycle } from './daynight.js';
 import { WeatherSystem } from './weather.js';
+import { WeatherEffects } from './weather-effects.js';
 import worldState from '../systems/world-state.js';
 
 /** @type {Application | null} */
@@ -28,6 +29,8 @@ let fog = null;
 let dayNight = null;
 /** @type {WeatherSystem | null} */
 let weatherSystem = null;
+/** @type {WeatherEffects | null} */
+let weatherEffects = null;
 
 /**
  * Initialize the Claude World renderer.
@@ -89,6 +92,35 @@ export async function initWorld() {
   // Initialize weather with current state
   weatherSystem.setState(worldState.getState());
 
+  // ── Visual weather effects (rain, snow, fog, etc.) ───────────────
+  weatherEffects = new WeatherEffects(app, worldContainer);
+
+  // Map world state weather strings to visual effects
+  const mapWeatherToEffect = (weather) => {
+    switch (weather) {
+      case 'storm': return 'storm';
+      case 'rain': return 'rain';
+      case 'cloudy': return 'cloudy';
+      case 'clear': return 'clear';
+      case 'sunny': return 'sunny';
+      default: return 'clear';
+    }
+  };
+
+  // Wire world state changes to visual weather effects
+  worldState.onChange((snapshot) => {
+    const effectType = mapWeatherToEffect(snapshot.weather);
+    const intensity = 1.0 - snapshot.moodScore; // lower mood = more intense weather
+    weatherEffects.setWeather(effectType, intensity);
+  });
+
+  // Initialize visual effects with current state
+  const initState = worldState.getState();
+  weatherEffects.setWeather(
+    mapWeatherToEffect(initState.weather),
+    1.0 - initState.moodScore
+  );
+
   // ── Click handler ─────────────────────────────────────────────
   canvas.addEventListener('click', (e) => {
     if (!camera || !buildingManager) return;
@@ -139,6 +171,12 @@ function startRenderLoop() {
     }
     if (weatherSystem) {
       weatherSystem.update(dt);
+    }
+    if (weatherEffects) {
+      if (dayNight) {
+        weatherEffects.setDayNightIntensity(dayNight.nightIntensity);
+      }
+      weatherEffects.update(dt);
     }
     // Data flow visualization (attached at runtime via window.__dataFlows)
     if (window.__dataFlows) {
@@ -193,6 +231,14 @@ export function getDayNight() {
  */
 export function getWeatherSystem() {
   return weatherSystem;
+}
+
+/**
+ * Get the visual weather effects instance.
+ * @returns {WeatherEffects | null}
+ */
+export function getWeatherEffects() {
+  return weatherEffects;
 }
 
 /**

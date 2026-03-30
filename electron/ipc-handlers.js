@@ -2122,6 +2122,101 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
+  // ── Calendar Events ──────────────────────────────────────────────
+
+  // Ensure the calendar_events table exists
+  if (db) {
+    try {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS calendar_events (
+          id TEXT PRIMARY KEY,
+          world_id INTEGER NOT NULL,
+          title TEXT NOT NULL,
+          description TEXT DEFAULT '',
+          event_type TEXT NOT NULL DEFAULT 'task',
+          event_date TEXT NOT NULL,
+          start_time TEXT DEFAULT NULL,
+          end_time TEXT DEFAULT NULL,
+          all_day INTEGER NOT NULL DEFAULT 1,
+          recurrence TEXT NOT NULL DEFAULT 'none',
+          recurrence_end TEXT DEFAULT NULL,
+          color TEXT DEFAULT NULL,
+          created_at TEXT NOT NULL DEFAULT (datetime('now')),
+          updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )
+      `);
+      db.exec('CREATE INDEX IF NOT EXISTS idx_calendar_world_date ON calendar_events(world_id, event_date)');
+      db.exec('CREATE INDEX IF NOT EXISTS idx_calendar_type ON calendar_events(world_id, event_type)');
+    } catch (err) {
+      console.warn('[ipc] Could not create calendar_events table:', err.message);
+    }
+  }
+
+  ipcMain.handle('db:getCalendarEvents', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM calendar_events WHERE world_id = ? ORDER BY event_date ASC, start_time ASC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createCalendarEvent', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.title, 'string', 'title');
+    return dbCall(
+      (database) => {
+        const id = require('crypto').randomBytes(8).toString('hex');
+        database.prepare(
+          `INSERT INTO calendar_events (id, world_id, title, description, event_type, event_date, start_time, end_time, all_day, recurrence, recurrence_end)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        ).run(
+          id, worldId,
+          data.title,
+          data.description || '',
+          data.event_type || 'task',
+          data.event_date,
+          data.start_time || null,
+          data.end_time || null,
+          data.all_day ? 1 : 0,
+          data.recurrence || 'none',
+          data.recurrence_end || null
+        );
+        return database.prepare('SELECT * FROM calendar_events WHERE id = ?').get(id);
+      },
+      { id: 'mock', ...data, world_id: worldId }
+    );
+  });
+
+  ipcMain.handle('db:updateCalendarEvent', async (_event, eventId, updates) => {
+    assertType(eventId, 'string', 'eventId');
+    return dbCall(
+      (database) => {
+        const allowed = ['title', 'description', 'event_type', 'event_date', 'start_time', 'end_time', 'all_day', 'recurrence', 'recurrence_end', 'color'];
+        const fields = Object.keys(updates).filter(k => allowed.includes(k));
+        if (fields.length === 0) return { changes: 0 };
+        const sets = fields.map(f => `${f} = ?`).join(', ');
+        const vals = fields.map(f => updates[f]);
+        return database.prepare(
+          `UPDATE calendar_events SET ${sets}, updated_at = datetime('now') WHERE id = ?`
+        ).run(...vals, eventId);
+      },
+      { changes: 0 }
+    );
+  });
+
+  ipcMain.handle('db:deleteCalendarEvent', async (_event, eventId) => {
+    assertType(eventId, 'string', 'eventId');
+    return dbCall(
+      (database) => {
+        database.prepare('DELETE FROM calendar_events WHERE id = ?').run(eventId);
+        return { success: true };
+      },
+      { success: true }
+    );
+  });
+
   ipcMain.handle('app:getVersion', async () => {
     return app.getVersion();
   });
