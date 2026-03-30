@@ -26,6 +26,8 @@ import { WorldVersions } from '../zones/world-versions.js';
 import { MissionControl } from '../zones/mission-control.js';
 import { Analytics } from '../zones/analytics.js';
 import { Settings, buildSettingsContent } from '../zones/settings.js';
+import { Reports } from '../zones/reports.js';
+import { AchievementsPanel } from './achievements-panel.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -53,6 +55,8 @@ const ZONE_INFO = {
   mission_control: { icon: '\u{1F6F0}', desc: 'Real-time war room. All agents, zones, and events in one view.' },
   analytics: { icon: '\u{1F4CA}', desc: 'Usage analytics, charts, and world health score.' },
   settings: { icon: '\u{2699}', desc: 'World settings, AI providers, appearance, audio, and privacy.' },
+  reports: { icon: '\u{1F4CB}', desc: 'Generate and export weekly, cost, and performance reports.' },
+  achievements: { icon: '\u{1F3C6}', desc: 'Badges, milestones, and progression tracking.' },
 };
 
 const AGENT_INFO = {
@@ -197,6 +201,20 @@ function buildZoneContent(zoneId) {
 
   if (zoneId === 'settings') {
     return buildSettingsContent({ worldId: window.__claudeWorldId || 1 });
+  }
+
+  if (zoneId === 'reports') {
+    const reports = new Reports();
+    const el = reports.render();
+    reports.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'achievements') {
+    const achievements = new AchievementsPanel();
+    const el = achievements.render();
+    achievements.init(window.__claudeWorldId || 1);
+    return el;
   }
 
   const info = ZONE_INFO[zoneId] || { icon: '\u{1F3D7}', desc: 'Unknown zone.' };

@@ -116,6 +116,9 @@ contextBridge.exposeInMainWorld('api', {
     getAppInfo: () => ipcRenderer.invoke('db:getAppInfo'),
     // Analytics
     getAnalytics: (worldId, range) => ipcRenderer.invoke('db:getAnalytics', worldId, range),
+    // Achievements
+    getAchievements: (worldId) => ipcRenderer.invoke('db:getAchievements', worldId),
+    unlockAchievement: (worldId, achievementId) => ipcRenderer.invoke('db:unlockAchievement', worldId, achievementId),
     // Global search
     globalSearch: (worldId, query, limit) => ipcRenderer.invoke('db:globalSearch', worldId, query, limit),
     // Raw query helpers (used by council.js)

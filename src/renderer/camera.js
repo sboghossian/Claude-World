@@ -42,6 +42,9 @@ export class Camera {
     // Follow target
     this._followTarget = null;
 
+    // External drag-drop lock (set by DragDropSystem)
+    this._dragDisabledByDragDrop = false;
+
     // Key state
     this._keys = new Set();
 
@@ -142,6 +145,7 @@ export class Camera {
     c.addEventListener('pointerdown', (e) => {
       // Only start drag on primary button on empty space
       if (e.button !== 0) return;
+      if (this._dragDisabledByDragDrop) return;
       this._dragging = true;
       this._dragStartX = e.clientX;
       this._dragStartY = e.clientY;

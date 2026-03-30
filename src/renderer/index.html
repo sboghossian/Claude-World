@@ -103,6 +103,7 @@
     import { initThemePicker } from '../ui/theme-picker.js';
     import { initCelebrations } from '../systems/celebrations.js';
     import { initAudio } from '../systems/audio.js';
+    import { ZoneAmbience } from '../systems/zone-ambience.js';
     import { initPersonalityEngine } from '../systems/agent-personalities.js';
     import { ThoughtBubbles } from '../ui/thought-bubbles.js';
     import { initVFX } from './vfx.js';
@@ -112,6 +113,10 @@
     import { Minimap } from '../ui/minimap.js';
     import { ActivityFeed } from '../ui/activity-feed.js';
     import { initAgentSprites } from './agent-sprites.js';
+    import { DragDropSystem } from './drag-drop.js';
+    import { ContextMenu } from '../ui/context-menu.js';
+    import { getAchievementEngine } from '../systems/achievements.js';
+    import { TutorialEngine } from '../systems/tutorial.js';
 
     // IPC-based reputation listener — awards points via window.api for DOM events
     function initReputationListener(worldId) {
@@ -134,7 +139,7 @@
 
     async function boot() {
       const splash = new SplashScreen();
-      const TOTAL_STEPS = 23;
+      const TOTAL_STEPS = 27;
       try {
         // ── 1. Start the isometric world ──────────────────────────────
         splash.setProgress(1, TOTAL_STEPS, 'Initializing world renderer...');
@@ -291,6 +296,22 @@
         const celebrations = initCelebrations();
         const audio = initAudio();
         window.__audio = audio;
+
+        // Zone-specific ambient soundscapes (shares AudioContext with main audio)
+        // Lazy-init: ZoneAmbience needs a running AudioContext, which is created
+        // on first user gesture inside AudioSystem. We listen for the first
+        // zone-click to bootstrap it if the context exists by then.
+        let zoneAmbience = null;
+        function ensureZoneAmbience() {
+          if (zoneAmbience) return;
+          const ctx = audio._ctx;
+          if (!ctx) return;
+          zoneAmbience = new ZoneAmbience(ctx);
+          window.__zoneAmbience = zoneAmbience;
+          console.log('[boot] ZoneAmbience initialized');
+        }
+        document.addEventListener('zone-click', () => ensureZoneAmbience());
+
         console.log('[boot] Celebrations + Audio initialized');
 
         // ── 15. Agent personalities + thought bubbles ─────────────────
@@ -399,6 +420,64 @@
           }
         } catch (err) {
           console.warn('[boot] Tooltips init failed (non-critical):', err.message);
+        }
+
+        // ── 24. Drag-drop zone rearranging ─────────────────────────
+        splash.setProgress(24, TOTAL_STEPS, 'Enabling drag & drop...');
+        try {
+          const cam = getCamera();
+          const bm = getBuildingManager();
+          const pixiApp = getApp();
+          if (pixiApp && cam && bm) {
+            const dragDrop = new DragDropSystem(pixiApp, cam, bm);
+            dragDrop.enable();
+            window.__dragDrop = dragDrop;
+            console.log('[boot] Drag-drop enabled');
+          }
+        } catch (err) {
+          console.warn('[boot] Drag-drop init failed (non-critical):', err.message);
+        }
+
+        // ── 25. Context menu ─────────────────────────────────────────
+        splash.setProgress(25, TOTAL_STEPS, 'Enabling context menu...');
+        try {
+          const cam = getCamera();
+          const bm = getBuildingManager();
+          const worldCanvas = document.getElementById('world-canvas');
+          if (worldCanvas && cam && bm) {
+            const ctxMenu = new ContextMenu(worldCanvas, cam, bm);
+            ctxMenu.enable();
+            window.__contextMenu = ctxMenu;
+            console.log('[boot] Context menu enabled');
+          }
+        } catch (err) {
+          console.warn('[boot] Context menu init failed (non-critical):', err.message);
+        }
+
+        // ── 26. Achievements engine ──────────────────────────────────
+        splash.setProgress(26, TOTAL_STEPS, 'Loading achievements...');
+        try {
+          const achieveEngine = getAchievementEngine();
+          const wid = window.__claudeWorldId || 1;
+          await achieveEngine.init(wid);
+          window.__achievements = achieveEngine;
+          console.log('[boot] Achievements loaded');
+        } catch (err) {
+          console.warn('[boot] Achievements init failed (non-critical):', err.message);
+        }
+
+        // ── 27. Tutorial system ──────────────────────────────────────
+        splash.setProgress(27, TOTAL_STEPS, 'Preparing tutorials...');
+        try {
+          const tutorials = new TutorialEngine();
+          window.__tutorials = tutorials;
+          // Auto-start "Getting Started" for first-time users
+          if (!tutorials.isComplete('getting-started') && onboarding.isComplete()) {
+            setTimeout(() => tutorials.start('getting-started'), 2000);
+          }
+          console.log('[boot] Tutorial system ready');
+        } catch (err) {
+          console.warn('[boot] Tutorial init failed (non-critical):', err.message);
         }
 
         // ── Done — fade out the splash screen ────────────────────────

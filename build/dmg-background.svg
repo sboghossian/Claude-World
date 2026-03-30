@@ -1,0 +1,224 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 380" width="540" height="380">
+  <defs>
+    <!-- Background gradient -->
+    <radialGradient id="bgGrad" cx="30%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1a0a2e"/>
+      <stop offset="60%" stop-color="#0e0820"/>
+      <stop offset="100%" stop-color="#0a0a14"/>
+    </radialGradient>
+
+    <!-- Purple glow behind wordmark -->
+    <radialGradient id="glowLeft" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Subtle right glow (Applications side) -->
+    <radialGradient id="glowRight" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Arrow gradient -->
+    <linearGradient id="arrowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.4"/>
+      <stop offset="50%" stop-color="#a855f7" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#2563eb" stop-opacity="0.4"/>
+    </linearGradient>
+
+    <!-- Text gradient for wordmark -->
+    <linearGradient id="wordmarkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e9d5ff"/>
+      <stop offset="50%" stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+
+    <!-- Glow filter -->
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Text glow -->
+    <filter id="textGlow" x="-10%" y="-30%" width="120%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Subtle shadow -->
+    <filter id="subtleShadow" x="-5%" y="-5%" width="110%" height="120%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="540" height="380" fill="url(#bgGrad)"/>
+
+  <!-- Isometric grid lines (subtle city map suggestion) -->
+  <g opacity="0.055" stroke="#7c3aed" stroke-width="0.8" fill="none">
+    <!-- Horizontal zigzag rows -->
+    <polyline points="0,80  45,60  90,80  135,60  180,80  225,60  270,80  315,60  360,80  405,60  450,80  495,60  540,80"/>
+    <polyline points="0,120 45,100 90,120 135,100 180,120 225,100 270,120 315,100 360,120 405,100 450,120 495,100 540,120"/>
+    <polyline points="0,160 45,140 90,160 135,140 180,160 225,140 270,160 315,140 360,160 405,140 450,160 495,140 540,160"/>
+    <polyline points="0,200 45,180 90,200 135,180 180,200 225,180 270,200 315,180 360,200 405,180 450,200 495,180 540,200"/>
+    <polyline points="0,240 45,220 90,240 135,220 180,240 225,220 270,240 315,220 360,240 405,220 450,240 495,220 540,240"/>
+    <polyline points="0,280 45,260 90,280 135,260 180,280 225,260 270,280 315,260 360,280 405,260 450,280 495,260 540,280"/>
+    <polyline points="0,320 45,300 90,320 135,300 180,320 225,300 270,320 315,300 360,320 405,300 450,320 495,300 540,320"/>
+    <polyline points="0,360 45,340 90,360 135,340 180,360 225,340 270,360 315,340 360,360 405,340 450,360 495,340 540,360"/>
+    <!-- Vertical diagonal lines -->
+    <line x1="45"  y1="0"   x2="45"  y2="380"/>
+    <line x1="90"  y1="0"   x2="90"  y2="380"/>
+    <line x1="135" y1="0"   x2="135" y2="380"/>
+    <line x1="180" y1="0"   x2="180" y2="380"/>
+    <line x1="225" y1="0"   x2="225" y2="380"/>
+    <line x1="270" y1="0"   x2="270" y2="380"/>
+    <line x1="315" y1="0"   x2="315" y2="380"/>
+    <line x1="360" y1="0"   x2="360" y2="380"/>
+    <line x1="405" y1="0"   x2="405" y2="380"/>
+    <line x1="450" y1="0"   x2="450" y2="380"/>
+    <line x1="495" y1="0"   x2="495" y2="380"/>
+  </g>
+
+  <!-- Purple ambient glow — left zone (app icon area) -->
+  <ellipse cx="135" cy="185" rx="130" ry="110" fill="url(#glowLeft)" filter="url(#softGlow)"/>
+
+  <!-- Blue ambient glow — right zone (Applications folder area) -->
+  <ellipse cx="405" cy="185" rx="110" ry="90" fill="url(#glowRight)" filter="url(#softGlow)"/>
+
+  <!-- Horizontal drag guide line (very subtle) -->
+  <line x1="100" y1="185" x2="440" y2="185"
+        stroke="url(#arrowGrad)" stroke-width="1" opacity="0.3" stroke-dasharray="4 6"/>
+
+  <!-- Arrow body — pointing right, center of canvas -->
+  <g opacity="0.55" filter="url(#subtleShadow)">
+    <!-- Arrow shaft -->
+    <rect x="218" y="181" width="104" height="8" rx="4" fill="url(#arrowGrad)"/>
+    <!-- Arrow head -->
+    <polygon points="322,172 342,185 322,198" fill="#a855f7" opacity="0.8"/>
+  </g>
+
+  <!-- Left drop zone indicator (subtle circle) -->
+  <circle cx="135" cy="185" r="54"
+          fill="none" stroke="#7c3aed" stroke-width="1" stroke-dasharray="5 5" opacity="0.2"/>
+
+  <!-- Right drop zone indicator -->
+  <circle cx="405" cy="185" r="54"
+          fill="none" stroke="#2563eb" stroke-width="1" stroke-dasharray="5 5" opacity="0.15"/>
+
+  <!-- ============================================================ -->
+  <!-- WORDMARK — "Claude World"                                   -->
+  <!-- ============================================================ -->
+
+  <!-- Wordmark glow layer -->
+  <text x="270" y="96"
+        font-family="'SF Pro Display', 'Helvetica Neue', 'Arial', sans-serif"
+        font-size="46"
+        font-weight="700"
+        letter-spacing="-1"
+        text-anchor="middle"
+        fill="#7c3aed"
+        opacity="0.4"
+        filter="url(#softGlow)">Claude World</text>
+
+  <!-- Wordmark main -->
+  <text x="270" y="96"
+        font-family="'SF Pro Display', 'Helvetica Neue', 'Arial', sans-serif"
+        font-size="46"
+        font-weight="700"
+        letter-spacing="-1"
+        text-anchor="middle"
+        fill="url(#wordmarkGrad)"
+        filter="url(#textGlow)">Claude World</text>
+
+  <!-- Tagline -->
+  <text x="270" y="122"
+        font-family="'SF Pro Text', 'Helvetica Neue', 'Arial', sans-serif"
+        font-size="13"
+        font-weight="400"
+        letter-spacing="3"
+        text-anchor="middle"
+        fill="#a78bfa"
+        opacity="0.65">YOUR AI-NATIVE WORLD</text>
+
+  <!-- Thin separator line under tagline -->
+  <line x1="200" y1="134" x2="340" y2="134"
+        stroke="#7c3aed" stroke-width="0.75" opacity="0.3"/>
+
+  <!-- ============================================================ -->
+  <!-- ZONE LABELS                                                 -->
+  <!-- ============================================================ -->
+
+  <!-- App icon label -->
+  <text x="135" y="252"
+        font-family="'SF Pro Text', 'Helvetica Neue', 'Arial', sans-serif"
+        font-size="12"
+        font-weight="500"
+        text-anchor="middle"
+        fill="#c4b5fd"
+        opacity="0.7">Claude World</text>
+
+  <!-- Applications label -->
+  <text x="405" y="252"
+        font-family="'SF Pro Text', 'Helvetica Neue', 'Arial', sans-serif"
+        font-size="12"
+        font-weight="500"
+        text-anchor="middle"
+        fill="#93c5fd"
+        opacity="0.7">Applications</text>
+
+  <!-- ============================================================ -->
+  <!-- DECORATIVE PARTICLES                                        -->
+  <!-- ============================================================ -->
+  <g opacity="0.7">
+    <!-- Gold sparks -->
+    <circle cx="58"  cy="52"  r="2"   fill="#f59e0b" opacity="0.8"/>
+    <circle cx="482" cy="48"  r="1.5" fill="#f59e0b" opacity="0.75"/>
+    <circle cx="30"  cy="310" r="1.5" fill="#f59e0b" opacity="0.65"/>
+    <circle cx="510" cy="320" r="2"   fill="#f59e0b" opacity="0.7"/>
+    <circle cx="270" cy="22"  r="1.5" fill="#fcd34d" opacity="0.8"/>
+    <circle cx="268" cy="360" r="1.5" fill="#fcd34d" opacity="0.7"/>
+
+    <!-- Purple sparks -->
+    <circle cx="18"  cy="160" r="2"   fill="#c084fc" opacity="0.75"/>
+    <circle cx="522" cy="200" r="2"   fill="#c084fc" opacity="0.7"/>
+    <circle cx="90"  cy="345" r="1.5" fill="#a78bfa" opacity="0.65"/>
+    <circle cx="450" cy="340" r="1.5" fill="#a78bfa" opacity="0.65"/>
+    <circle cx="150" cy="35"  r="1.5" fill="#c084fc" opacity="0.7"/>
+    <circle cx="395" cy="30"  r="2"   fill="#c084fc" opacity="0.75"/>
+
+    <!-- Blue sparks -->
+    <circle cx="22"  cy="240" r="1.5" fill="#60a5fa" opacity="0.7"/>
+    <circle cx="518" cy="130" r="1.5" fill="#60a5fa" opacity="0.65"/>
+    <circle cx="200" cy="358" r="2"   fill="#93c5fd" opacity="0.65"/>
+    <circle cx="340" cy="362" r="1.5" fill="#7dd3fc" opacity="0.7"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- BOTTOM INSTALL TEXT                                         -->
+  <!-- ============================================================ -->
+  <text x="270" y="363"
+        font-family="'SF Pro Text', 'Helvetica Neue', 'Arial', sans-serif"
+        font-size="11"
+        font-weight="400"
+        letter-spacing="1.5"
+        text-anchor="middle"
+        fill="#6d28d9"
+        opacity="0.55">Drag to install</text>
+
+  <!-- Bottom thin border accent -->
+  <line x1="0" y1="375" x2="540" y2="375"
+        stroke="#7c3aed" stroke-width="0.5" opacity="0.15"/>
+  <line x1="0" y1="0"   x2="540" y2="0"
+        stroke="#7c3aed" stroke-width="0.5" opacity="0.15"/>
+</svg>

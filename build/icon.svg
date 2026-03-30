@@ -1,0 +1,388 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a0a2e"/>
+      <stop offset="100%" stop-color="#0a0a14"/>
+    </radialGradient>
+
+    <!-- Main tower gradient (left face) -->
+    <linearGradient id="towerLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9d5cf5"/>
+      <stop offset="100%" stop-color="#5b21b6"/>
+    </linearGradient>
+
+    <!-- Main tower gradient (right face) -->
+    <linearGradient id="towerRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4c1d95"/>
+      <stop offset="100%" stop-color="#2e1065"/>
+    </linearGradient>
+
+    <!-- Main tower gradient (top face) -->
+    <linearGradient id="towerTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+
+    <!-- Blue building left face -->
+    <linearGradient id="blueLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+
+    <!-- Blue building right face -->
+    <linearGradient id="blueRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e40af"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+
+    <!-- Blue building top -->
+    <linearGradient id="blueTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+
+    <!-- Small purple building -->
+    <linearGradient id="smallPurpleLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+
+    <!-- Gold accent building top -->
+    <linearGradient id="goldTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fcd34d"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+
+    <!-- Halo glow filter -->
+    <filter id="haloGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="30" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Soft glow filter for windows -->
+    <filter id="windowGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Building edge glow -->
+    <filter id="edgeGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Particle glow -->
+    <filter id="particleGlow" x="-200%" y="-200%" width="500%" height="500%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Hexagon clip -->
+    <clipPath id="hexClip">
+      <polygon points="512,80 868,288 868,736 512,944 156,736 156,288"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="url(#bgGrad)"/>
+
+  <!-- Outer hexagonal frame -->
+  <polygon points="512,72 876,284 876,740 512,952 148,740 148,284"
+           fill="none" stroke="#7c3aed" stroke-width="2.5" opacity="0.35"/>
+  <polygon points="512,92 856,296 856,728 512,932 168,728 168,296"
+           fill="none" stroke="#7c3aed" stroke-width="1" opacity="0.15"/>
+
+  <!-- Hex grid overlay lines (isometric grid suggestion) -->
+  <g opacity="0.08" stroke="#a78bfa" stroke-width="1" fill="none">
+    <!-- Horizontal zig-zag grid lines -->
+    <polyline points="148,400 300,320 460,400 620,320 780,400 876,356"/>
+    <polyline points="148,480 300,400 460,480 620,400 780,480 876,436"/>
+    <polyline points="148,560 300,480 460,560 620,480 780,560 876,516"/>
+    <polyline points="148,640 300,560 460,640 620,560 780,640 876,596"/>
+    <!-- Diagonal lines left -->
+    <line x1="300" y1="320" x2="300" y2="560"/>
+    <line x1="460" y1="400" x2="460" y2="640"/>
+    <line x1="620" y1="320" x2="620" y2="560"/>
+    <line x1="780" y1="400" x2="780" y2="640"/>
+  </g>
+
+  <!-- Purple halo behind main tower -->
+  <ellipse cx="512" cy="500" rx="200" ry="120"
+           fill="#7c3aed" opacity="0.22" filter="url(#haloGlow)"/>
+  <ellipse cx="512" cy="510" rx="130" ry="80"
+           fill="#a855f7" opacity="0.18" filter="url(#haloGlow)"/>
+
+  <!-- ============================================================ -->
+  <!-- CITYSCAPE — back row buildings (smaller, behind main tower) -->
+  <!-- ============================================================ -->
+
+  <!-- Back-left small building -->
+  <!-- Top face -->
+  <polygon points="290,390 350,355 410,390 350,425" fill="url(#blueTop)" opacity="0.7"/>
+  <!-- Left face -->
+  <polygon points="290,390 350,425 350,490 290,455" fill="url(#blueLeft)" opacity="0.8"/>
+  <!-- Right face -->
+  <polygon points="410,390 350,425 350,490 410,455" fill="url(#blueRight)" opacity="0.8"/>
+  <!-- Windows left face -->
+  <rect x="298" y="410" width="14" height="10" rx="1" fill="#93c5fd" opacity="0.9" filter="url(#windowGlow)"/>
+  <rect x="320" y="420" width="14" height="10" rx="1" fill="#bfdbfe" opacity="0.7"/>
+  <rect x="298" y="432" width="14" height="10" rx="1" fill="#60a5fa" opacity="0.8"/>
+  <rect x="320" y="442" width="14" height="10" rx="1" fill="#93c5fd" opacity="0.6"/>
+
+  <!-- Back-right small building -->
+  <polygon points="614,370 674,335 734,370 674,405" fill="url(#goldTop)" opacity="0.8"/>
+  <polygon points="614,370 674,405 674,470 614,435" fill="#92400e" opacity="0.85"/>
+  <polygon points="734,370 674,405 674,470 734,435" fill="#78350f" opacity="0.85"/>
+  <!-- Gold antenna -->
+  <line x1="674" y1="335" x2="674" y2="300" stroke="#fcd34d" stroke-width="3"/>
+  <circle cx="674" cy="298" r="5" fill="#fbbf24"/>
+  <!-- Windows -->
+  <rect x="623" y="390" width="12" height="9" rx="1" fill="#fde68a" opacity="0.9" filter="url(#windowGlow)"/>
+  <rect x="643" y="400" width="12" height="9" rx="1" fill="#fcd34d" opacity="0.8"/>
+  <rect x="623" y="413" width="12" height="9" rx="1" fill="#fde68a" opacity="0.7"/>
+
+  <!-- Far-back center small building -->
+  <polygon points="462,338 512,308 562,338 512,368" fill="#c084fc" opacity="0.6"/>
+  <polygon points="462,338 512,368 512,420 462,390" fill="#7c3aed" opacity="0.7"/>
+  <polygon points="562,338 512,368 512,420 562,390" fill="#5b21b6" opacity="0.7"/>
+
+  <!-- ============================================================ -->
+  <!-- MAIN TOWER — central isometric skyscraper                   -->
+  <!-- ============================================================ -->
+
+  <!-- Tower shadow / base glow -->
+  <ellipse cx="512" cy="640" rx="140" ry="50" fill="#7c3aed" opacity="0.15" filter="url(#haloGlow)"/>
+
+  <!-- Tower base platform -->
+  <polygon points="370,620 512,548 654,620 512,692" fill="#1e1040" opacity="0.9"/>
+  <polygon points="370,620 512,548 512,568 370,640" fill="#2e1065" opacity="0.8"/>
+  <polygon points="654,620 512,548 512,568 654,640" fill="#1e0a40" opacity="0.8"/>
+
+  <!-- Tower body — LEFT face -->
+  <polygon points="410,595 512,540 512,280 410,335" fill="url(#towerLeft)" filter="url(#edgeGlow)"/>
+  <!-- Tower body — RIGHT face -->
+  <polygon points="614,595 512,540 512,280 614,335" fill="url(#towerRight)"/>
+  <!-- Tower body — TOP face -->
+  <polygon points="512,280 410,335 512,390 614,335" fill="url(#towerTop)"/>
+
+  <!-- Tower windows — LEFT face (lit grid) -->
+  <g filter="url(#windowGlow)">
+    <!-- Row 1 (top) -->
+    <rect x="422" y="346" width="16" height="12" rx="2" fill="#e9d5ff" opacity="0.95"/>
+    <rect x="448" y="340" width="16" height="12" rx="2" fill="#c4b5fd" opacity="0.9"/>
+    <rect x="474" y="334" width="16" height="12" rx="2" fill="#e9d5ff" opacity="0.95"/>
+    <!-- Row 2 -->
+    <rect x="422" y="372" width="16" height="12" rx="2" fill="#a78bfa" opacity="0.85"/>
+    <rect x="448" y="366" width="16" height="12" rx="2" fill="#e9d5ff" opacity="0.95"/>
+    <rect x="474" y="360" width="16" height="12" rx="2" fill="#c4b5fd" opacity="0.8"/>
+    <!-- Row 3 -->
+    <rect x="422" y="398" width="16" height="12" rx="2" fill="#e9d5ff" opacity="0.9"/>
+    <rect x="448" y="392" width="16" height="12" rx="2" fill="#fde68a" opacity="0.95"/>
+    <rect x="474" y="386" width="16" height="12" rx="2" fill="#e9d5ff" opacity="0.85"/>
+    <!-- Row 4 -->
+    <rect x="422" y="424" width="16" height="12" rx="2" fill="#c4b5fd" opacity="0.8"/>
+    <rect x="448" y="418" width="16" height="12" rx="2" fill="#e9d5ff" opacity="0.9"/>
+    <rect x="474" y="412" width="16" height="12" rx="2" fill="#a78bfa" opacity="0.7"/>
+    <!-- Row 5 -->
+    <rect x="422" y="450" width="16" height="12" rx="2" fill="#e9d5ff" opacity="0.85"/>
+    <rect x="448" y="444" width="16" height="12" rx="2" fill="#fde68a" opacity="0.9"/>
+    <rect x="474" y="438" width="16" height="12" rx="2" fill="#e9d5ff" opacity="0.75"/>
+    <!-- Row 6 -->
+    <rect x="422" y="476" width="16" height="12" rx="2" fill="#a78bfa" opacity="0.7"/>
+    <rect x="448" y="470" width="16" height="12" rx="2" fill="#c4b5fd" opacity="0.85"/>
+    <rect x="474" y="464" width="16" height="12" rx="2" fill="#e9d5ff" opacity="0.8"/>
+    <!-- Row 7 (near base) -->
+    <rect x="422" y="502" width="16" height="12" rx="2" fill="#e9d5ff" opacity="0.75"/>
+    <rect x="448" y="496" width="16" height="12" rx="2" fill="#e9d5ff" opacity="0.7"/>
+    <rect x="474" y="490" width="16" height="12" rx="2" fill="#fde68a" opacity="0.85"/>
+  </g>
+
+  <!-- Tower windows — RIGHT face -->
+  <g filter="url(#windowGlow)">
+    <rect x="524" y="346" width="16" height="12" rx="2" fill="#7dd3fc" opacity="0.9"/>
+    <rect x="550" y="352" width="16" height="12" rx="2" fill="#93c5fd" opacity="0.8"/>
+    <rect x="576" y="358" width="16" height="12" rx="2" fill="#7dd3fc" opacity="0.85"/>
+    <rect x="524" y="372" width="16" height="12" rx="2" fill="#93c5fd" opacity="0.75"/>
+    <rect x="550" y="378" width="16" height="12" rx="2" fill="#fde68a" opacity="0.8"/>
+    <rect x="576" y="384" width="16" height="12" rx="2" fill="#93c5fd" opacity="0.7"/>
+    <rect x="524" y="398" width="16" height="12" rx="2" fill="#7dd3fc" opacity="0.8"/>
+    <rect x="550" y="404" width="16" height="12" rx="2" fill="#93c5fd" opacity="0.85"/>
+    <rect x="576" y="410" width="16" height="12" rx="2" fill="#60a5fa" opacity="0.7"/>
+    <rect x="524" y="424" width="16" height="12" rx="2" fill="#93c5fd" opacity="0.75"/>
+    <rect x="550" y="430" width="16" height="12" rx="2" fill="#7dd3fc" opacity="0.8"/>
+    <rect x="576" y="436" width="16" height="12" rx="2" fill="#fde68a" opacity="0.7"/>
+    <rect x="524" y="450" width="16" height="12" rx="2" fill="#60a5fa" opacity="0.7"/>
+    <rect x="550" y="456" width="16" height="12" rx="2" fill="#93c5fd" opacity="0.75"/>
+    <rect x="576" y="462" width="16" height="12" rx="2" fill="#7dd3fc" opacity="0.65"/>
+    <rect x="524" y="476" width="16" height="12" rx="2" fill="#93c5fd" opacity="0.7"/>
+    <rect x="550" y="482" width="16" height="12" rx="2" fill="#60a5fa" opacity="0.65"/>
+    <rect x="576" y="488" width="16" height="12" rx="2" fill="#93c5fd" opacity="0.6"/>
+  </g>
+
+  <!-- Tower spire -->
+  <polygon points="512,280 488,308 512,296 536,308" fill="#ddd6fe"/>
+  <line x1="512" y1="280" x2="512" y2="215" stroke="#c4b5fd" stroke-width="3"/>
+  <circle cx="512" cy="212" r="8" fill="#f59e0b" filter="url(#particleGlow)"/>
+  <circle cx="512" cy="212" r="14" fill="#f59e0b" opacity="0.25" filter="url(#particleGlow)"/>
+
+  <!-- Top cap glow line -->
+  <polygon points="512,280 410,335 512,390 614,335" fill="none" stroke="#c084fc" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- ============================================================ -->
+  <!-- SIDE BUILDINGS — flanking the main tower                    -->
+  <!-- ============================================================ -->
+
+  <!-- Left medium building -->
+  <polygon points="282,560 370,512 370,390 282,438" fill="url(#smallPurpleLeft)" opacity="0.85"/>
+  <polygon points="458,560 370,512 370,390 458,438" fill="#3b0764" opacity="0.85"/>
+  <polygon points="282,560 370,512 458,560 370,608" fill="#6d28d9" opacity="0.8"/>
+  <!-- Windows left building -->
+  <g filter="url(#windowGlow)">
+    <rect x="296" y="452" width="12" height="9" rx="1" fill="#c4b5fd" opacity="0.9"/>
+    <rect x="316" y="446" width="12" height="9" rx="1" fill="#e9d5ff" opacity="0.85"/>
+    <rect x="336" y="440" width="12" height="9" rx="1" fill="#c4b5fd" opacity="0.8"/>
+    <rect x="296" y="474" width="12" height="9" rx="1" fill="#a78bfa" opacity="0.85"/>
+    <rect x="316" y="468" width="12" height="9" rx="1" fill="#e9d5ff" opacity="0.9"/>
+    <rect x="336" y="462" width="12" height="9" rx="1" fill="#fde68a" opacity="0.8"/>
+    <rect x="296" y="496" width="12" height="9" rx="1" fill="#c4b5fd" opacity="0.8"/>
+    <rect x="316" y="490" width="12" height="9" rx="1" fill="#a78bfa" opacity="0.75"/>
+    <rect x="336" y="484" width="12" height="9" rx="1" fill="#e9d5ff" opacity="0.8"/>
+    <rect x="296" y="518" width="12" height="9" rx="1" fill="#a78bfa" opacity="0.7"/>
+    <rect x="316" y="512" width="12" height="9" rx="1" fill="#c4b5fd" opacity="0.75"/>
+    <rect x="336" y="506" width="12" height="9" rx="1" fill="#a78bfa" opacity="0.65"/>
+  </g>
+
+  <!-- Right medium building (blue) -->
+  <polygon points="566,560 654,512 654,390 566,438" fill="url(#blueLeft)" opacity="0.85"/>
+  <polygon points="742,560 654,512 654,390 742,438" fill="#1e3a8a" opacity="0.85"/>
+  <polygon points="566,560 654,512 742,560 654,608" fill="url(#blueTop)" opacity="0.8"/>
+  <!-- Windows right building -->
+  <g filter="url(#windowGlow)">
+    <rect x="576" y="452" width="12" height="9" rx="1" fill="#93c5fd" opacity="0.9"/>
+    <rect x="596" y="446" width="12" height="9" rx="1" fill="#bfdbfe" opacity="0.85"/>
+    <rect x="616" y="440" width="12" height="9" rx="1" fill="#93c5fd" opacity="0.8"/>
+    <rect x="576" y="474" width="12" height="9" rx="1" fill="#60a5fa" opacity="0.85"/>
+    <rect x="596" y="468" width="12" height="9" rx="1" fill="#bfdbfe" opacity="0.9"/>
+    <rect x="616" y="462" width="12" height="9" rx="1" fill="#fde68a" opacity="0.8"/>
+    <rect x="576" y="496" width="12" height="9" rx="1" fill="#93c5fd" opacity="0.8"/>
+    <rect x="596" y="490" width="12" height="9" rx="1" fill="#60a5fa" opacity="0.75"/>
+    <rect x="616" y="484" width="12" height="9" rx="1" fill="#bfdbfe" opacity="0.8"/>
+    <rect x="576" y="518" width="12" height="9" rx="1" fill="#60a5fa" opacity="0.7"/>
+    <rect x="596" y="512" width="12" height="9" rx="1" fill="#93c5fd" opacity="0.75"/>
+    <rect x="616" y="506" width="12" height="9" rx="1" fill="#60a5fa" opacity="0.65"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- SMALL FOREGROUND BUILDINGS                                  -->
+  <!-- ============================================================ -->
+
+  <!-- Front-left tiny building -->
+  <polygon points="318,670 390,628 390,590 318,632" fill="#6d28d9" opacity="0.75"/>
+  <polygon points="462,670 390,628 390,590 462,632" fill="#3b0764" opacity="0.75"/>
+  <polygon points="318,670 390,628 462,670 390,712" fill="#7c3aed" opacity="0.7"/>
+  <rect x="328" y="638" width="10" height="8" rx="1" fill="#c4b5fd" opacity="0.85" filter="url(#windowGlow)"/>
+  <rect x="346" y="632" width="10" height="8" rx="1" fill="#a78bfa" opacity="0.8" filter="url(#windowGlow)"/>
+  <rect x="364" y="626" width="10" height="8" rx="1" fill="#e9d5ff" opacity="0.75" filter="url(#windowGlow)"/>
+
+  <!-- Front-right tiny building -->
+  <polygon points="562,670 634,628 634,590 562,632" fill="#1d4ed8" opacity="0.75"/>
+  <polygon points="706,670 634,628 634,590 706,632" fill="#1e3a8a" opacity="0.75"/>
+  <polygon points="562,670 634,628 706,670 634,712" fill="#2563eb" opacity="0.7"/>
+  <rect x="572" y="638" width="10" height="8" rx="1" fill="#93c5fd" opacity="0.85" filter="url(#windowGlow)"/>
+  <rect x="590" y="632" width="10" height="8" rx="1" fill="#7dd3fc" opacity="0.8" filter="url(#windowGlow)"/>
+  <rect x="608" y="626" width="10" height="8" rx="1" fill="#fde68a" opacity="0.75" filter="url(#windowGlow)"/>
+
+  <!-- Ground plane / street -->
+  <polygon points="200,720 512,570 824,720 512,870"
+           fill="#0f0720" opacity="0.6"/>
+  <polygon points="200,720 512,570 512,590 200,740"
+           fill="#1a0a2e" opacity="0.4"/>
+  <polygon points="824,720 512,570 512,590 824,740"
+           fill="#0a0514" opacity="0.4"/>
+
+  <!-- Street grid lines on ground -->
+  <g opacity="0.12" stroke="#7c3aed" stroke-width="1" fill="none">
+    <line x1="356" y1="645" x2="512" y2="725"/>
+    <line x1="668" y1="645" x2="512" y2="725"/>
+    <line x1="432" y1="607" x2="512" y2="647"/>
+    <line x1="592" y1="607" x2="512" y2="647"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- PARTICLE DOTS — activity suggestion                         -->
+  <!-- ============================================================ -->
+  <g filter="url(#particleGlow)">
+    <!-- Scattered gold particles -->
+    <circle cx="195" cy="340" r="4" fill="#f59e0b" opacity="0.9"/>
+    <circle cx="820" cy="380" r="3" fill="#f59e0b" opacity="0.8"/>
+    <circle cx="240" cy="650" r="3.5" fill="#f59e0b" opacity="0.7"/>
+    <circle cx="790" cy="290" r="3" fill="#f59e0b" opacity="0.85"/>
+    <circle cx="160" cy="520" r="2.5" fill="#fcd34d" opacity="0.75"/>
+    <circle cx="860" cy="560" r="3" fill="#fcd34d" opacity="0.7"/>
+    <circle cx="320" cy="270" r="2.5" fill="#f59e0b" opacity="0.65"/>
+    <circle cx="700" cy="250" r="3" fill="#f59e0b" opacity="0.8"/>
+    <circle cx="185" cy="450" r="2" fill="#fbbf24" opacity="0.6"/>
+    <circle cx="840" cy="470" r="2.5" fill="#fbbf24" opacity="0.65"/>
+
+    <!-- Purple particles -->
+    <circle cx="300" cy="750" r="3" fill="#c084fc" opacity="0.8"/>
+    <circle cx="730" cy="760" r="3.5" fill="#a78bfa" opacity="0.75"/>
+    <circle cx="170" cy="610" r="2.5" fill="#c084fc" opacity="0.65"/>
+    <circle cx="855" cy="630" r="3" fill="#a78bfa" opacity="0.7"/>
+    <circle cx="445" cy="210" r="3" fill="#c084fc" opacity="0.8"/>
+    <circle cx="580" cy="198" r="2.5" fill="#e9d5ff" opacity="0.7"/>
+    <circle cx="380" cy="800" r="2" fill="#c084fc" opacity="0.6"/>
+    <circle cx="650" cy="810" r="2.5" fill="#a78bfa" opacity="0.6"/>
+
+    <!-- Blue particles -->
+    <circle cx="220" cy="390" r="2.5" fill="#60a5fa" opacity="0.75"/>
+    <circle cx="808" cy="420" r="3" fill="#60a5fa" opacity="0.7"/>
+    <circle cx="150" cy="700" r="2" fill="#93c5fd" opacity="0.6"/>
+    <circle cx="875" cy="700" r="2" fill="#93c5fd" opacity="0.6"/>
+    <circle cx="490" cy="170" r="2" fill="#60a5fa" opacity="0.7"/>
+    <circle cx="540" cy="178" r="3" fill="#7dd3fc" opacity="0.75"/>
+
+    <!-- Tiny sparkles close to tower spire -->
+    <circle cx="490" cy="235" r="1.5" fill="#fde68a" opacity="0.9"/>
+    <circle cx="535" cy="228" r="1.5" fill="#fde68a" opacity="0.85"/>
+    <circle cx="470" cy="255" r="1.5" fill="#e9d5ff" opacity="0.8"/>
+    <circle cx="555" cy="245" r="1.5" fill="#e9d5ff" opacity="0.75"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- INNER HEX FRAME ACCENT                                      -->
+  <!-- ============================================================ -->
+  <polygon points="512,130 820,304 820,720 512,894 204,720 204,304"
+           fill="none" stroke="#a855f7" stroke-width="1" opacity="0.12"/>
+
+  <!-- Corner accent dots on hex frame -->
+  <circle cx="512" cy="130" r="4" fill="#a855f7" opacity="0.5"/>
+  <circle cx="820" cy="304" r="4" fill="#a855f7" opacity="0.5"/>
+  <circle cx="820" cy="720" r="4" fill="#a855f7" opacity="0.5"/>
+  <circle cx="512" cy="894" r="4" fill="#a855f7" opacity="0.5"/>
+  <circle cx="204" cy="720" r="4" fill="#a855f7" opacity="0.5"/>
+  <circle cx="204" cy="304" r="4" fill="#a855f7" opacity="0.5"/>
+
+  <!-- Outer hex corner dots -->
+  <circle cx="512" cy="72" r="3" fill="#7c3aed" opacity="0.7"/>
+  <circle cx="876" cy="284" r="3" fill="#7c3aed" opacity="0.7"/>
+  <circle cx="876" cy="740" r="3" fill="#7c3aed" opacity="0.7"/>
+  <circle cx="512" cy="952" r="3" fill="#7c3aed" opacity="0.7"/>
+  <circle cx="148" cy="740" r="3" fill="#7c3aed" opacity="0.7"/>
+  <circle cx="148" cy="284" r="3" fill="#7c3aed" opacity="0.7"/>
+</svg>

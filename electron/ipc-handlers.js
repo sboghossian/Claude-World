@@ -1758,6 +1758,29 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
+  // ── Achievements ──────────────────────────────────────────────────
+
+  ipcMain.handle('db:getAchievements', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM achievements WHERE world_id = ? ORDER BY unlocked_at DESC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:unlockAchievement', async (_event, worldId, achievementId) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(achievementId, 'string', 'achievementId');
+    return dbCall(
+      (database) => database.prepare(
+        `INSERT OR IGNORE INTO achievements (world_id, achievement_id) VALUES (?, ?)`
+      ).run(worldId, achievementId),
+      { changes: 0 }
+    );
+  });
+
   // ── app:* handlers ────────────────────────────────────────────────
 
   ipcMain.handle('app:getVersion', async () => {

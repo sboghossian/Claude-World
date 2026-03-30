@@ -1,0 +1,372 @@
+/**
+ * tutorial-overlay.css — Styles for the Claude World tutorial system
+ * References design tokens from variables.css.
+ */
+
+/* ═══════════════════════════════════════════════════════════════════
+   1. Overlay Container
+   ═══════════════════════════════════════════════════════════════════ */
+
+.tut-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  pointer-events: all;
+  opacity: 0;
+  transition: opacity var(--transition-slow, 400ms ease);
+}
+
+.tut-overlay--visible {
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   2. SVG Spotlight Layer
+   ═══════════════════════════════════════════════════════════════════ */
+
+.tut-overlay__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.tut-overlay__bg {
+  pointer-events: all;
+}
+
+/* Cutout transitions — smooth movement between steps */
+.tut-spotlight-cutout {
+  transition:
+    x 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    y 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    width 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    height 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tut-spotlight-border {
+  transition:
+    x 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    y 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    width 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    height 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+/* Pulse animation on the spotlight border */
+.tut-spotlight-pulse {
+  transition:
+    x 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    y 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    width 350ms cubic-bezier(0.4, 0, 0.2, 1),
+    height 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  animation: tut-pulse-ring 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes tut-pulse-ring {
+  0%, 100% {
+    stroke-opacity: 0.3;
+    stroke-width: 2;
+  }
+  50% {
+    stroke-opacity: 0.7;
+    stroke-width: 4;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   3. Tooltip Card
+   ═══════════════════════════════════════════════════════════════════ */
+
+.tut-tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 8001;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  padding: 20px;
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.12));
+
+  /* Glass morphism */
+  background: rgba(15, 18, 35, 0.88);
+  backdrop-filter: var(--blur, blur(20px));
+  -webkit-backdrop-filter: var(--blur, blur(20px));
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(74, 158, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  /* Transitions */
+  opacity: 0;
+  transform: translate(0, 0);
+  transition:
+    opacity var(--transition-normal, 250ms ease),
+    transform 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: all;
+}
+
+.tut-tooltip--visible {
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   4. Arrow / Caret
+   ═══════════════════════════════════════════════════════════════════ */
+
+.tut-tooltip__arrow {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: rgba(15, 18, 35, 0.88);
+  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.12));
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+/* Arrow points UP (tooltip is below target) */
+.tut-tooltip__arrow--top {
+  top: -8px;
+  left: 50%;
+  margin-left: -7px;
+  border-right: none;
+  border-bottom: none;
+}
+
+/* Arrow points DOWN (tooltip is above target) */
+.tut-tooltip__arrow--bottom {
+  bottom: -8px;
+  left: 50%;
+  margin-left: -7px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Arrow points LEFT (tooltip is to the right) */
+.tut-tooltip__arrow--left {
+  left: -8px;
+  top: 50%;
+  margin-top: -7px;
+  border-right: none;
+  border-top: none;
+}
+
+/* Arrow points RIGHT (tooltip is to the left) */
+.tut-tooltip__arrow--right {
+  right: -8px;
+  top: 50%;
+  margin-top: -7px;
+  border-left: none;
+  border-bottom: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   5. Tooltip Text
+   ═══════════════════════════════════════════════════════════════════ */
+
+.tut-tooltip__text {
+  margin: 0 0 16px 0;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary, #e8e8f0);
+  letter-spacing: 0.01em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   6. Step Dots
+   ═══════════════════════════════════════════════════════════════════ */
+
+.tut-tooltip__dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.tut-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim, #555570);
+  transition:
+    background var(--transition-fast, 150ms ease),
+    transform var(--transition-fast, 150ms ease),
+    box-shadow var(--transition-fast, 150ms ease);
+}
+
+.tut-dot--active {
+  background: var(--accent-blue, #4a9eff);
+  transform: scale(1.3);
+  box-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+}
+
+.tut-dot--done {
+  background: var(--accent-green, #4aff8a);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   7. Footer Row
+   ═══════════════════════════════════════════════════════════════════ */
+
+.tut-tooltip__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tut-tooltip__counter {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-mono, 'SF Mono', monospace);
+  font-size: 11px;
+  color: var(--text-secondary, #8888a0);
+  user-select: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   8. Buttons
+   ═══════════════════════════════════════════════════════════════════ */
+
+.tut-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 16px;
+  border-radius: var(--radius-sm, 6px);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition:
+    background var(--transition-fast, 150ms ease),
+    color var(--transition-fast, 150ms ease),
+    box-shadow var(--transition-fast, 150ms ease),
+    transform 100ms ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.tut-btn:active {
+  transform: scale(0.96);
+}
+
+.tut-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-blue, #4a9eff);
+}
+
+/* Primary "Next" / "Done" */
+.tut-btn--primary {
+  background: var(--accent-blue, #4a9eff);
+  color: var(--text-inverse, #0a0a14);
+}
+
+.tut-btn--primary:hover {
+  background: #5eadff;
+  box-shadow: 0 4px 16px rgba(74, 158, 255, 0.35);
+}
+
+/* Ghost "Skip" / "Back" */
+.tut-btn--ghost {
+  background: transparent;
+  color: var(--text-secondary, #8888a0);
+}
+
+.tut-btn--ghost:hover {
+  background: var(--bg-hover, rgba(40, 50, 80, 0.8));
+  color: var(--text-primary, #e8e8f0);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   9. Animations
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Tooltip entrance */
+@keyframes tut-tooltip-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tut-tooltip--visible .tut-tooltip__text {
+  animation: tut-tooltip-enter 300ms ease-out both;
+}
+
+/* Glow shimmer on the spotlight border */
+@keyframes tut-glow-shimmer {
+  0%, 100% {
+    stroke: rgba(74, 158, 255, 0.4);
+  }
+  50% {
+    stroke: rgba(74, 158, 255, 0.8);
+  }
+}
+
+.tut-spotlight-border {
+  animation: tut-glow-shimmer 2.5s ease-in-out infinite;
+}
+
+/* Dot pop-in */
+@keyframes tut-dot-pop {
+  0%   { transform: scale(0); }
+  60%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.tut-dot {
+  animation: tut-dot-pop 300ms ease-out both;
+}
+
+.tut-dot:nth-child(1)  { animation-delay:  0ms; }
+.tut-dot:nth-child(2)  { animation-delay: 40ms; }
+.tut-dot:nth-child(3)  { animation-delay: 80ms; }
+.tut-dot:nth-child(4)  { animation-delay: 120ms; }
+.tut-dot:nth-child(5)  { animation-delay: 160ms; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   10. Responsive
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+  .tut-tooltip {
+    width: calc(100vw - 32px);
+    max-width: none;
+    padding: 16px;
+  }
+
+  .tut-tooltip__text {
+    font-size: 13px;
+  }
+
+  .tut-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   11. Reduced Motion
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .tut-overlay,
+  .tut-tooltip,
+  .tut-spotlight-cutout,
+  .tut-spotlight-border,
+  .tut-spotlight-pulse,
+  .tut-dot {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}

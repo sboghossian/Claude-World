@@ -1,0 +1,228 @@
+/**
+ * context-menu.css — Custom right-click context menu for zone buildings
+ *
+ * Dark glassmorphism card with submenus, priority dots,
+ * keyboard focus rings, and fade-in animation.
+ */
+
+/* ── Container ──────────────────────────────────────────────────── */
+
+.ctx-menu {
+  position: fixed;
+  z-index: 9999;
+  min-width: 220px;
+  max-width: 280px;
+  padding: 6px 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  pointer-events: auto;
+  opacity: 0;
+  transform: scale(0.96) translateY(-4px);
+  animation: ctx-fade-in 100ms ease forwards;
+  user-select: none;
+}
+
+@keyframes ctx-fade-in {
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ── Menu item ──────────────────────────────────────────────────── */
+
+.ctx-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  position: relative;
+  outline: none;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  line-height: 1.4;
+}
+
+.ctx-menu__item:hover,
+.ctx-menu__item--focused {
+  background: var(--bg-hover);
+  color: #fff;
+}
+
+/* Keyboard focus ring */
+.ctx-menu__item:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+
+.ctx-menu__item--disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ── Icon slot ──────────────────────────────────────────────────── */
+
+.ctx-menu__icon {
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* ── Label ──────────────────────────────────────────────────────── */
+
+.ctx-menu__label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Chevron for submenu ────────────────────────────────────────── */
+
+.ctx-menu__chevron {
+  flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+  font-size: 10px;
+  opacity: 0.5;
+  margin-left: auto;
+}
+
+.ctx-menu__item:hover .ctx-menu__chevron,
+.ctx-menu__item--focused .ctx-menu__chevron {
+  opacity: 0.9;
+}
+
+/* ── Separator ──────────────────────────────────────────────────── */
+
+.ctx-menu__separator {
+  height: 1px;
+  margin: 5px 10px;
+  background: var(--border);
+}
+
+/* ── Submenu ────────────────────────────────────────────────────── */
+
+.ctx-menu__submenu {
+  position: absolute;
+  top: -6px;
+  left: 100%;
+  min-width: 180px;
+  padding: 6px 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateX(-6px);
+  animation: ctx-sub-in 100ms ease forwards;
+  pointer-events: auto;
+}
+
+/* Flip submenu to the left when near right edge */
+.ctx-menu__submenu--flip {
+  left: auto;
+  right: 100%;
+  transform: translateX(6px);
+}
+
+@keyframes ctx-sub-in {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Priority dots ──────────────────────────────────────────────── */
+
+.ctx-menu__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ctx-menu__dot--high {
+  background: var(--accent-red);
+  box-shadow: 0 0 6px var(--accent-red);
+}
+
+.ctx-menu__dot--medium {
+  background: var(--accent-amber);
+  box-shadow: 0 0 6px var(--accent-amber);
+}
+
+.ctx-menu__dot--low {
+  background: var(--accent-green);
+  box-shadow: 0 0 6px var(--accent-green);
+}
+
+/* ── Info card (mini) ───────────────────────────────────────────── */
+
+.ctx-menu__info-card {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ctx-menu__info-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.ctx-menu__info-district {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ctx-menu__info-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.ctx-menu__info-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ctx-menu__info-badge--active {
+  background: rgba(74, 255, 138, 0.15);
+  color: var(--accent-green);
+}
+
+.ctx-menu__info-badge--locked {
+  background: rgba(255, 74, 106, 0.15);
+  color: var(--accent-red);
+}
