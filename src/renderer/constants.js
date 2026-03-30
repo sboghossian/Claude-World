@@ -11,10 +11,10 @@ export const TILE_HEIGHT = 32;
 export const GRID_SIZE = 40;
 
 // ── Camera ───────────────────────────────────────────────────────────
-export const ZOOM_MIN = 0.5;
-export const ZOOM_MAX = 2.0;
-export const ZOOM_SPEED = 0.1;
-export const PAN_SPEED = 8;
+export const ZOOM_MIN = 0.3;
+export const ZOOM_MAX = 3.0;
+export const ZOOM_SPEED = 0.12;
+export const PAN_SPEED = 12;
 export const FOLLOW_EASING = 0.08;
 export const CAMERA_LERP_SPEED = 0.1;
 

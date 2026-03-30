@@ -112,17 +112,21 @@ export class Camera {
       this.targetY = -this._followTarget.y;
     }
 
-    // ── Edge clamping ─────────────────────────────────────────────
-    const hw = this.canvas.width / (2 * this.targetZoom);
-    const hh = this.canvas.height / (2 * this.targetZoom);
+    // ── Edge clamping (use CSS size, not pixel buffer) ────────────
+    const vw = (this.canvas.clientWidth || this.canvas.width) / this.targetZoom;
+    const vh = (this.canvas.clientHeight || this.canvas.height) / this.targetZoom;
+    const hw = vw / 2;
+    const hh = vh / 2;
 
+    // Allow generous padding so the entire map is explorable
+    const pad = 200;
     this.targetX = Math.max(
-      -this._worldMaxX + hw,
-      Math.min(-this._worldMinX - hw, this.targetX),
+      -this._worldMaxX - pad + hw,
+      Math.min(-this._worldMinX + pad - hw, this.targetX),
     );
     this.targetY = Math.max(
-      -this._worldMaxY + hh,
-      Math.min(-this._worldMinY - hh, this.targetY),
+      -this._worldMaxY - pad + hh,
+      Math.min(-this._worldMinY + pad - hh, this.targetY),
     );
 
     // ── Smooth lerp to target ─────────────────────────────────────
@@ -133,9 +137,11 @@ export class Camera {
 
     // ── Apply to world container ──────────────────────────────────
     this.world.scale.set(this.zoom);
+    const cw = this.canvas.clientWidth || this.canvas.width;
+    const ch = this.canvas.clientHeight || this.canvas.height;
     this.world.position.set(
-      this.canvas.width / 2 + this.x * this.zoom,
-      this.canvas.height / 2 + this.y * this.zoom,
+      cw / 2 + this.x * this.zoom,
+      ch / 2 + this.y * this.zoom,
     );
   }
 
@@ -198,8 +204,10 @@ export class Camera {
 
     // ── Keyboard ──────────────────────────────────────────────────
     window.addEventListener("keydown", (e) => {
+      // Don't capture keys when typing in inputs/textareas
+      const tag = e.target?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target?.isContentEditable) return;
       this._keys.add(e.code);
-      // Home key shortcut
       if (e.code === "KeyH") this.goHome();
     });
     window.addEventListener("keyup", (e) => {
