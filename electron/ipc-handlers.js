@@ -1380,9 +1380,10 @@ function registerHandlers(ipcMain, db) {
   // ── Kanban Board — Cards ──────────────────────────────────────────
 
   // Ensure the kanban_cards table exists (safe to call multiple times)
-  if (db) {
+  const rawDb = db?.db || db;
+  if (rawDb) {
     try {
-      db.exec(`
+      rawDb.exec(`
         CREATE TABLE IF NOT EXISTS kanban_cards (
           id TEXT PRIMARY KEY,
           world_id INTEGER NOT NULL,
@@ -1397,7 +1398,7 @@ function registerHandlers(ipcMain, db) {
           updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         )
       `);
-      db.exec('CREATE INDEX IF NOT EXISTS idx_kanban_world ON kanban_cards(world_id, column_key)');
+      rawDb.exec('CREATE INDEX IF NOT EXISTS idx_kanban_world ON kanban_cards(world_id, column_key)');
     } catch (err) {
       console.warn('[ipc] Could not create kanban_cards table:', err.message);
     }
@@ -2224,9 +2225,9 @@ function registerHandlers(ipcMain, db) {
   // ── Calendar Events ──────────────────────────────────────────────
 
   // Ensure the calendar_events table exists
-  if (db) {
+  if (rawDb) {
     try {
-      db.exec(`
+      rawDb.exec(`
         CREATE TABLE IF NOT EXISTS calendar_events (
           id TEXT PRIMARY KEY,
           world_id INTEGER NOT NULL,
@@ -2244,8 +2245,8 @@ function registerHandlers(ipcMain, db) {
           updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         )
       `);
-      db.exec('CREATE INDEX IF NOT EXISTS idx_calendar_world_date ON calendar_events(world_id, event_date)');
-      db.exec('CREATE INDEX IF NOT EXISTS idx_calendar_type ON calendar_events(world_id, event_type)');
+      rawDb.exec('CREATE INDEX IF NOT EXISTS idx_calendar_world_date ON calendar_events(world_id, event_date)');
+      rawDb.exec('CREATE INDEX IF NOT EXISTS idx_calendar_type ON calendar_events(world_id, event_type)');
     } catch (err) {
       console.warn('[ipc] Could not create calendar_events table:', err.message);
     }
