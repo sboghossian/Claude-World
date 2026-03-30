@@ -23,8 +23,8 @@ export const TARGET_FPS = 30;
 export const FRAME_INTERVAL = 1000 / TARGET_FPS;
 
 // ── Building Heights (in isometric units, 1 unit = TILE_HEIGHT/2 px) ─
-export const HEIGHT_DISPATCH = 5;
-export const HEIGHT_BRAIN = 3;
+export const HEIGHT_DISPATCH = 6;
+export const HEIGHT_BRAIN = 4;
 export const HEIGHT_DEFAULT = 2;
 export const HEIGHT_RUIN = 1;
 
@@ -33,13 +33,54 @@ export const HEIGHT_UNIT_PX = TILE_HEIGHT / 2;
 
 // ── Colors ───────────────────────────────────────────────────────────
 export const COLORS = {
-  // Ground tiles
+  // Ground tiles - legacy (kept for compat)
   grass: 0x5a8f3c,
   grassAlt: 0x4e7d34,
   path: 0xc4b28a,
   pathEdge: 0xb3a07a,
   water: 0x3a7cbf,
   waterDeep: 0x2d6199,
+
+  // District ground palettes
+  ground: {
+    // Ring 0-1: Dark polished stone
+    core: [0x3a3a42, 0x35353d, 0x404048],
+    coreGrid: 0x50505a,
+    // Ring 2: Lighter concrete
+    business: [0x8a857d, 0x837e76, 0x918c84],
+    businessGrid: 0x9e998f,
+    // Ring 3: Tech dark floor with circuit accents
+    advanced: [0x1e1e2a, 0x1a1a26, 0x22222e],
+    advancedGlow: 0x2288cc,
+    // Ring 4: Rough terrain / grass
+    edge: [0x4a7a30, 0x437226, 0x528838],
+    edgeDirt: [0x7a6b50, 0x716248, 0x836f55],
+  },
+
+  // Road colors
+  road: {
+    main: 0x555555,
+    secondary: 0x606060,
+    marking: 0x999999,
+    intersection: 0x4a4a4a,
+    curb: 0x3a3a3a,
+    manhole: 0x2a2a2a,
+    manholeRim: 0x444444,
+  },
+
+  // Park colors
+  park: {
+    grass: 0x3a6e22,
+    grassAlt: 0x347020,
+    tree: 0x2d5a1a,
+    treeDark: 0x1e4010,
+    trunk: 0x5a4030,
+  },
+
+  // Water (expanded)
+  waterShallow: 0x4a90cc,
+  waterMid: 0x3a7cbf,
+  waterDeepAlt: 0x264f80,
 
   // District palette  (top, left, right faces)
   core: {
@@ -61,6 +102,34 @@ export const COLORS = {
     top: 0xe8893c,
     left: 0xba6e30,
     right: 0x8c5324,
+  },
+
+  // Intelligence district (analytics, reports, knowledge-graph)
+  intel: {
+    top: 0x7c4dff,
+    left: 0x6539cc,
+    right: 0x4e2d99,
+  },
+
+  // Social district (conversations, agent-profile, leaderboard)
+  social: {
+    top: 0xe8577a,
+    left: 0xc04563,
+    right: 0x98354d,
+  },
+
+  // Infrastructure district (mcp-hub, plugins, backups, sharing)
+  infra: {
+    top: 0x6b8fa3,
+    left: 0x567386,
+    right: 0x415869,
+  },
+
+  // Management district (kanban, calendar, automations)
+  mgmt: {
+    top: 0x26a69a,
+    left: 0x1e857b,
+    right: 0x17665e,
   },
 
   // Ruin (locked) palette

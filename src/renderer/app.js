@@ -15,6 +15,7 @@ import { FogOfWar } from "./fog.js";
 import { DayNightCycle } from "./daynight.js";
 import { WeatherSystem } from "./weather.js";
 import { WeatherEffects } from "./weather-effects.js";
+import { Decorations } from "./decorations.js";
 import worldState from "../systems/world-state.js";
 
 /** @type {Application | null} */
@@ -31,6 +32,8 @@ let dayNight = null;
 let weatherSystem = null;
 /** @type {WeatherEffects | null} */
 let weatherEffects = null;
+/** @type {Decorations | null} */
+let decorations = null;
 
 /**
  * Initialize the Claude World renderer.
@@ -127,6 +130,10 @@ export async function initWorld() {
     1.0 - initState.moodScore,
   );
 
+  // ── Decorations (trees, lamps, vehicles, clouds, birds, etc.) ──
+  decorations = new Decorations(app, worldContainer);
+  decorations.init();
+
   // ── Click handler ─────────────────────────────────────────────
   canvas.addEventListener("click", (e) => {
     if (!camera || !buildingManager) return;
@@ -179,6 +186,9 @@ function startRenderLoop() {
       if (buildingManager) {
         buildingManager.setNightGlow(dayNight.nightIntensity);
       }
+      if (decorations) {
+        decorations.setDayNight(dayNight.nightIntensity);
+      }
     }
     if (weatherSystem) {
       weatherSystem.update(dt);
@@ -188,6 +198,9 @@ function startRenderLoop() {
         weatherEffects.setDayNightIntensity(dayNight.nightIntensity);
       }
       weatherEffects.update(dt);
+    }
+    if (decorations) {
+      decorations.update(dt);
     }
     // Data flow visualization (attached at runtime via window.__dataFlows)
     if (window.__dataFlows) {
@@ -250,6 +263,14 @@ export function getWeatherSystem() {
  */
 export function getWeatherEffects() {
   return weatherEffects;
+}
+
+/**
+ * Get the decorations instance.
+ * @returns {Decorations | null}
+ */
+export function getDecorations() {
+  return decorations;
 }
 
 /**

@@ -13,7 +13,7 @@
  *   1.0         — complete: full height, full colors, all windows, no scaffold
  */
 
-import { Container, Graphics } from "pixi.js";
+import { Container, Graphics, Text } from "pixi.js";
 import {
   TILE_WIDTH,
   TILE_HEIGHT,
@@ -122,25 +122,61 @@ export class BuildingManager {
    * @returns {BuildingSprite}
    */
   _createEntry(zone) {
+    const wrapper = new Container();
     const gfx = new Graphics();
 
     // Position at the correct screen location (top-left tile of the zone)
     const pos = tileToScreen(zone.tileX, zone.tileY);
-    gfx.position.set(pos.x, pos.y);
+    wrapper.position.set(pos.x, pos.y);
+
+    wrapper.addChild(gfx);
+
+    // Zone label text below building
+    const label = new Text({
+      text: zone.name,
+      style: {
+        fontFamily: "Arial",
+        fontSize: 7,
+        fill: 0xffffff,
+        align: "center",
+        dropShadow: {
+          alpha: 0.6,
+          angle: 0,
+          blur: 2,
+          color: 0x000000,
+          distance: 0,
+        },
+      },
+    });
+    const hw = TILE_WIDTH / 2;
+    const hh = TILE_HEIGHT / 4;
+    const botY = (zone.w + zone.h) * hh;
+    const botX = (zone.w - zone.h) * hw;
+    label.anchor.set(0.5, 0);
+    label.position.set(botX, botY + 2);
+    wrapper.addChild(label);
 
     // Store interactive flag
-    gfx.eventMode = "static";
-    gfx.cursor = "pointer";
+    wrapper.eventMode = "static";
+    wrapper.cursor = "pointer";
 
     // Initial progress: 1.0 if already active, 0.0 if locked
     const progress = zone.active ? 1.0 : 0.0;
 
     /** @type {BuildingSprite} */
-    const entry = { zoneId: zone.id, gfx, hovered: false, zone, progress };
+    const entry = {
+      zoneId: zone.id,
+      gfx: wrapper,
+      _gfx: gfx,
+      _label: label,
+      hovered: false,
+      zone,
+      progress,
+    };
 
     // Hover events
-    gfx.on("pointerenter", () => this._onHover(entry, true));
-    gfx.on("pointerleave", () => this._onHover(entry, false));
+    wrapper.on("pointerenter", () => this._onHover(entry, true));
+    wrapper.on("pointerleave", () => this._onHover(entry, false));
 
     // Draw initial appearance
     this._rebuildBuilding(entry);
@@ -241,20 +277,29 @@ export class BuildingManager {
    * @param {BuildingSprite} entry
    */
   _rebuildBuilding(entry) {
-    const { gfx, zone, progress } = entry;
+    const gfx = entry._gfx;
+    const { zone, progress } = entry;
 
     // Clear previous drawing
     gfx.clear();
 
     const p = progress;
 
+    // Draw shadow beneath building
+    this._drawShadow(gfx, zone, this._effectiveHeight(entry));
+
     if (p >= STAGE_COMPLETE) {
       // ── Fully complete ──────────────────────────────────────────
       this._drawIsoBox(gfx, zone, zone.height, COLORS[zone.district], false);
+      this._drawFaceWindows(gfx, zone, zone.height, COLORS[zone.district]);
+      this._drawDoor(gfx, zone, zone.height, COLORS[zone.district]);
       this._drawWindowGlow(gfx, zone, zone.height, 1.0);
+      // Antenna/flag on tall buildings
+      if (zone.height >= 5) {
+        this._drawAntenna(gfx, zone, zone.height, COLORS[zone.district]);
+      }
     } else if (p >= STAGE_FINISH_START) {
       // ── Near-complete (0.75–0.99) ───────────────────────────────
-      // t runs 0→1 within this stage
       const t =
         (p - STAGE_FINISH_START) / (STAGE_COMPLETE - STAGE_FINISH_START);
       const palette = COLORS[zone.district];
@@ -269,14 +314,10 @@ export class BuildingManager {
       this._drawScaffolding(gfx, zone, zone.height, 1.0, scaffoldAlpha);
     } else if (p >= STAGE_WALLS_START) {
       // ── Walls rising (0.35–0.75) ────────────────────────────────
-      // t runs 0→1 within this stage
       const t =
         (p - STAGE_WALLS_START) / (STAGE_FINISH_START - STAGE_WALLS_START);
 
-      // Height grows from HEIGHT_RUIN up to full zone.height
       const currentHeight = lerp(HEIGHT_RUIN, zone.height, t);
-
-      // Color mixes from ruin grey toward the district palette
       const palette = lerpPalette(COLORS.ruin, COLORS[zone.district], t);
 
       this._drawIsoBox(gfx, zone, currentHeight, palette, false);
@@ -285,8 +326,7 @@ export class BuildingManager {
       this._drawScaffolding(gfx, zone, zone.height, 1.0, 1.0);
     } else if (p > STAGE_SCAFFOLD_START) {
       // ── Scaffolding phase (0.0–0.35) ────────────────────────────
-      // Ruins base, then scaffold density grows with progress
-      const scaffoldDensity = p / STAGE_WALLS_START; // 0→1
+      const scaffoldDensity = p / STAGE_WALLS_START;
 
       this._drawIsoBox(gfx, zone, HEIGHT_RUIN, COLORS.ruin, true);
       this._drawGhostOutline(gfx, zone);
@@ -558,6 +598,137 @@ export class BuildingManager {
         drawn++;
       }
     }
+  }
+
+  // ── Enhanced visuals ─────────────────────────────────────────────
+
+  /**
+   * Draw a subtle shadow ellipse beneath the building.
+   * @param {Graphics} gfx
+   * @param {import('./zones.js').ZoneDef} zone
+   * @param {number} height
+   */
+  _drawShadow(gfx, zone, height) {
+    const hw = TILE_WIDTH / 2;
+    const hh = TILE_HEIGHT / 4;
+    const botX = (zone.w - zone.h) * hw;
+    const botY = (zone.w + zone.h) * hh;
+    const rx = (zone.w + zone.h) * hw * 0.35;
+    const ry = (zone.w + zone.h) * hh * 0.25;
+    const offset = Math.min(height * 1.5, 6);
+
+    gfx.ellipse(botX + offset, botY + 2, rx, ry);
+    gfx.fill({ color: 0x000000, alpha: 0.18 });
+  }
+
+  /**
+   * Draw window rows on the left and right faces of completed buildings.
+   * These are small lighter rectangles that give the building texture.
+   * @param {Graphics} gfx
+   * @param {import('./zones.js').ZoneDef} zone
+   * @param {number} height
+   * @param {{ top: number, left: number, right: number }} palette
+   */
+  _drawFaceWindows(gfx, zone, height, palette) {
+    const hw = TILE_WIDTH / 2;
+    const hh = TILE_HEIGHT / 4;
+    const w = zone.w;
+    const h = zone.h;
+    const hPx = height * HEIGHT_UNIT_PX;
+
+    const rightX = w * hw;
+    const rightY = w * hh;
+    const botX = (w - h) * hw;
+    const botY = (w + h) * hh;
+    const leftX = -h * hw;
+    const leftY = h * hh;
+
+    // Window color: lighter version of face color
+    const leftWinColor = lerpColor(palette.left, 0xffffff, 0.35);
+    const rightWinColor = lerpColor(palette.right, 0xffffff, 0.35);
+
+    const rows = Math.max(1, Math.floor(height - 0.5));
+    const cols = Math.max(1, Math.min(zone.w, 3));
+
+    // Right face windows
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < Math.min(zone.h, 3); col++) {
+        const t = (col + 0.5) / Math.max(zone.h, 1);
+        const yBase = -hPx * 0.2 - row * (hPx * 0.22);
+        const wx = rightX + (botX - rightX) * t;
+        const wy = rightY + (botY - rightY) * t + yBase;
+        gfx.rect(wx - 1.5, wy - 1.5, 3, 3);
+        gfx.fill({ color: rightWinColor, alpha: 0.5 });
+      }
+    }
+
+    // Left face windows
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < Math.min(zone.w, 3); col++) {
+        const t = (col + 0.5) / Math.max(zone.w, 1);
+        const yBase = -hPx * 0.2 - row * (hPx * 0.22);
+        const wx = leftX + (botX - leftX) * t;
+        const wy = leftY + (botY - leftY) * t + yBase;
+        gfx.rect(wx - 1.5, wy - 1.5, 3, 3);
+        gfx.fill({ color: leftWinColor, alpha: 0.5 });
+      }
+    }
+  }
+
+  /**
+   * Draw a door/entrance on the front (bottom) face of completed buildings.
+   * @param {Graphics} gfx
+   * @param {import('./zones.js').ZoneDef} zone
+   * @param {number} height
+   * @param {{ top: number, left: number, right: number }} palette
+   */
+  _drawDoor(gfx, zone, height, palette) {
+    const hw = TILE_WIDTH / 2;
+    const hh = TILE_HEIGHT / 4;
+    const w = zone.w;
+    const h = zone.h;
+    const rightX = w * hw;
+    const rightY = w * hh;
+    const botX = (w - h) * hw;
+    const botY = (w + h) * hh;
+
+    // Place door at bottom center of right face
+    const doorT = 0.5;
+    const doorX = rightX + (botX - rightX) * doorT;
+    const doorY = rightY + (botY - rightY) * doorT;
+    const doorColor = lerpColor(palette.right, 0x000000, 0.4);
+
+    // Isometric door shape (small parallelogram)
+    gfx.rect(doorX - 2, doorY - 5, 4, 5);
+    gfx.fill({ color: doorColor, alpha: 0.8 });
+  }
+
+  /**
+   * Draw an antenna/flag on top of tall buildings.
+   * @param {Graphics} gfx
+   * @param {import('./zones.js').ZoneDef} zone
+   * @param {number} height
+   * @param {{ top: number, left: number, right: number }} palette
+   */
+  _drawAntenna(gfx, zone, height, palette) {
+    const hPx = height * HEIGHT_UNIT_PX;
+    // Antenna pole from top-center of building
+    const poleX = 0;
+    const poleBaseY = -hPx;
+    const poleTopY = poleBaseY - 10;
+
+    // Thin pole
+    gfx.moveTo(poleX, poleBaseY);
+    gfx.lineTo(poleX, poleTopY);
+    gfx.stroke({ color: 0x666666, alpha: 0.9, width: 1.5 });
+
+    // Small colored flag/beacon
+    gfx.poly([poleX, poleTopY, poleX + 6, poleTopY + 2, poleX, poleTopY + 4]);
+    gfx.fill({ color: palette.top, alpha: 0.9 });
+
+    // Blinking light at top
+    gfx.circle(poleX, poleTopY, 1.5);
+    gfx.fill({ color: 0xff3333, alpha: 0.9 });
   }
 
   // ── Interaction ──────────────────────────────────────────────────
