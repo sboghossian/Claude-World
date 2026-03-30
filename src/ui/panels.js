@@ -909,7 +909,26 @@ export class PanelManager {
     this._show("zone", zoneId, info.icon, zoneName, _createLoadingIndicator());
 
     // Lazy-load the zone module and swap in the real content
-    const contentEl = await buildZoneContent(zoneId);
+    let contentEl;
+    try {
+      contentEl = await buildZoneContent(zoneId);
+    } catch (err) {
+      console.error(`[PanelManager] Failed to load zone "${zoneId}":`, err);
+      // Only show the error if this zone is still the active panel
+      if (
+        this._currentType === "zone" &&
+        this._currentId === zoneId &&
+        this.isOpen
+      ) {
+        this._body.innerHTML = "";
+        const errorEl = document.createElement("div");
+        errorEl.style.cssText =
+          "padding:32px 16px;text-align:center;color:#ff6b6b;font-size:14px;";
+        errorEl.textContent = `Failed to load zone "${zoneId}". ${err.message || ""}`;
+        this._body.appendChild(errorEl);
+      }
+      return;
+    }
 
     // Only replace if this zone is still the active panel (user may have
     // navigated away or closed the panel while the module was loading)
@@ -951,10 +970,28 @@ export class PanelManager {
       _createLoadingIndicator(),
     );
 
-    const { buildSettingsContent } = await _loadZoneModule(
-      "../zones/settings.js",
-    );
-    const contentEl = buildSettingsContent();
+    let contentEl;
+    try {
+      const { buildSettingsContent } = await _loadZoneModule(
+        "../zones/settings.js",
+      );
+      contentEl = buildSettingsContent();
+    } catch (err) {
+      console.error("[PanelManager] Failed to load settings:", err);
+      if (
+        this._currentType === "settings" &&
+        this._currentId === "settings" &&
+        this.isOpen
+      ) {
+        this._body.innerHTML = "";
+        const errorEl = document.createElement("div");
+        errorEl.style.cssText =
+          "padding:32px 16px;text-align:center;color:#ff6b6b;font-size:14px;";
+        errorEl.textContent = `Failed to load settings. ${err.message || ""}`;
+        this._body.appendChild(errorEl);
+      }
+      return;
+    }
 
     if (
       this._currentType === "settings" &&
@@ -974,6 +1011,10 @@ export class PanelManager {
     document.body.classList.remove("panel-open");
     this._currentType = null;
     this._currentId = null;
+
+    // Clear panel body to release DOM references and stop any zone-internal
+    // timers / listeners that were attached to the now-closed panel content.
+    this._body.innerHTML = "";
 
     document.dispatchEvent(new CustomEvent("panel:closed", { bubbles: true }));
   }

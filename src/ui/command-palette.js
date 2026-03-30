@@ -1435,21 +1435,17 @@ export class CommandPalette {
 
   _updateSelectionHighlight() {
     const rows = this._resultsEl.querySelectorAll(".cp-row");
-    rows.forEach((row, i) => {
-      const isSelected = Number(row.dataset.index) === this._selectedIndex;
+    const flatResults = this._getFlatResults();
+    rows.forEach((row) => {
+      const itemIndex = Number(row.dataset.index);
+      const isSelected = itemIndex === this._selectedIndex;
       row.classList.toggle("cp-row--selected", isSelected);
       row.setAttribute("aria-selected", isSelected ? "true" : "false");
 
       // Show/hide shortcut badge text
       const badge = row.querySelector(".cp-badge:not(.cp-badge--locked)");
       if (badge) {
-        // Re-look up badge label from results
-        const result = this._results.find(
-          (r) =>
-            r.id &&
-            `${r.id}` ===
-              row.querySelector("[data-result-id]")?.dataset.resultId,
-        );
+        const result = flatResults[itemIndex];
         if (isSelected && result?.shortcutBadge) {
           badge.textContent = result.shortcutBadge;
         } else if (!isSelected) {

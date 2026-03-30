@@ -114,7 +114,8 @@ export class Camera {
 
     // ── Edge clamping (use CSS size, not pixel buffer) ────────────
     const vw = (this.canvas.clientWidth || this.canvas.width) / this.targetZoom;
-    const vh = (this.canvas.clientHeight || this.canvas.height) / this.targetZoom;
+    const vh =
+      (this.canvas.clientHeight || this.canvas.height) / this.targetZoom;
     const hw = vw / 2;
     const hh = vh / 2;
 
@@ -206,7 +207,8 @@ export class Camera {
     window.addEventListener("keydown", (e) => {
       // Don't capture keys when typing in inputs/textareas
       const tag = e.target?.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target?.isContentEditable) return;
+      if (tag === "INPUT" || tag === "TEXTAREA" || e.target?.isContentEditable)
+        return;
       this._keys.add(e.code);
       if (e.code === "KeyH") this.goHome();
     });

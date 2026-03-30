@@ -83,6 +83,7 @@ const MOOD_COLORS = {
 
 /** Format a number with commas: 2450 → "2,450" */
 function fmtNum(n) {
+  if (typeof n !== "number" || Number.isNaN(n)) return "0";
   return n.toLocaleString("en-US");
 }
 
@@ -288,7 +289,10 @@ export class HUD {
   }
 
   _updateXP() {
-    const pct = Math.min(100, (this._xp.xp / this._xp.xpMax) * 100);
+    const pct =
+      this._xp.xpMax > 0
+        ? Math.min(100, (this._xp.xp / this._xp.xpMax) * 100)
+        : 0;
     this._xpFill.style.width = `${pct}%`;
     this._xpText.textContent = `${fmtNum(this._xp.xp)} / ${fmtNum(this._xp.xpMax)}`;
     // Sync level badge
@@ -298,7 +302,8 @@ export class HUD {
   }
 
   _updateBudget() {
-    const ratio = this._budget.spent / this._budget.budget;
+    const ratio =
+      this._budget.budget > 0 ? this._budget.spent / this._budget.budget : 0;
     let colorVar = "var(--accent-green)";
     if (ratio >= 0.8) colorVar = "var(--accent-red)";
     else if (ratio >= 0.5) colorVar = "var(--accent-amber)";
@@ -757,6 +762,7 @@ export class HUD {
    * }} state
    */
   setWorldState(state) {
+    if (!state || typeof state !== "object") return;
     if (state.worldName) {
       this._identity.worldName = state.worldName;
       this._tcWorldName.textContent = state.worldName;
