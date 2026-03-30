@@ -7,7 +7,7 @@
   <script type="importmap">
   {
     "imports": {
-      "pixi.js": "https://cdn.jsdelivr.net/npm/pixi.js@8.6.6/dist/pixi.min.mjs"
+      "pixi.js": "../../node_modules/pixi.js/dist/pixi.min.mjs"
     }
   }
   </script>
@@ -90,43 +90,87 @@
 
   <canvas id="world-canvas"></canvas>
   <div id="ui-root"></div>
+  <script>
+    // Global error catcher for module load failures
+    window.addEventListener('error', (e) => {
+      console.error('[BOOT ERROR]', e.message, e.filename, e.lineno);
+      const label = document.querySelector('.splash__progress-label');
+      if (label) label.textContent = 'Error: ' + e.message;
+      const sub = document.querySelector('.splash__subtitle');
+      if (sub) sub.textContent = (e.filename || '') + ':' + (e.lineno || '');
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      console.error('[BOOT REJECTION]', e.reason);
+      const label = document.querySelector('.splash__progress-label');
+      if (label) label.textContent = 'Error: ' + (e.reason?.message || e.reason);
+    });
+  </script>
   <script type="module">
-    import { SplashScreen } from '../ui/splash-screen.js';
-    import { initWorld, getWorldState, getBuildingManager, getApp, getCamera } from './app.js';
-    import { initUI } from '../ui/index.js';
-    import { MorningBriefing } from '../systems/morning-briefing.js';
-    import { OnboardingSystem } from '../systems/onboarding.js';
-    import { initOnboarding } from '../ui/onboarding.js';
-    import { AgentRelationshipSystem } from '../systems/agent-relationships.js';
-    import { IncidentPanel } from '../ui/incident-panel.js';
-    import { initThemes } from '../systems/themes.js';
-    import { initThemePicker } from '../ui/theme-picker.js';
-    import { initCelebrations } from '../systems/celebrations.js';
-    import { initAudio } from '../systems/audio.js';
-    import { ZoneAmbience } from '../systems/zone-ambience.js';
-    import { initPersonalityEngine } from '../systems/agent-personalities.js';
-    import { ThoughtBubbles } from '../ui/thought-bubbles.js';
-    import { getQualityManager } from '../systems/quality.js';
-    import { initVFX } from './vfx.js';
-    import { initParticles } from './particles.js';
-    import { initCityLife } from './city-life.js';
-    import { initDataFlows } from './data-flows.js';
-    import { OnboardingCinema } from '../systems/onboarding-cinema.js';
-    import { NotificationCenter } from '../ui/notification-center.js';
-    import { Minimap } from '../ui/minimap.js';
-    import { ActivityFeed } from '../ui/activity-feed.js';
-    import { initAgentSprites } from './agent-sprites.js';
-    import { DragDropSystem } from './drag-drop.js';
-    import { ContextMenu } from '../ui/context-menu.js';
-    import { getAchievementEngine } from '../systems/achievements.js';
-    import { TutorialEngine } from '../systems/tutorial.js';
-    import { FocusMode } from '../systems/focus-mode.js';
-    import { TaskStream } from '../ui/task-stream.js';
-    import { AgentChat } from '../ui/agent-chat.js';
-    import { StatusBar } from '../ui/status-bar.js';
-    import { PerfMonitor } from '../ui/perf-monitor.js';
+    // ── Dynamic imports (with progress logging on splash) ─────────
+    const _log = (m) => { const el = document.querySelector('.splash__progress-label'); if (el) el.textContent = m; console.log('[boot]', m); };
 
-    // IPC-based reputation listener — awards points via window.api for DOM events
+    let SplashScreen, initWorld, getWorldState, getBuildingManager, getApp, getCamera, getDayNight;
+    let initUI, MorningBriefing, OnboardingSystem, initOnboarding;
+    let AgentRelationshipSystem, IncidentPanel;
+    let initThemes, initThemePicker, initCelebrations, initAudio, ZoneAmbience;
+    let initPersonalityEngine, ThoughtBubbles, getQualityManager;
+    let initVFX, initParticles, initCityLife, initDataFlows;
+    let OnboardingCinema, NotificationCenter, Minimap, ActivityFeed;
+    let initAgentSprites, DragDropSystem, ContextMenu;
+    let getAchievementEngine, TutorialEngine, FocusMode;
+    let TaskStream, AgentChat, StatusBar, PerfMonitor;
+
+    try {
+      _log('Loading core renderer...');
+      ({ SplashScreen } = await import('../ui/splash-screen.js'));
+      ({ initWorld, getWorldState, getBuildingManager, getApp, getCamera, getDayNight } = await import('./app.js'));
+      _log('Loading UI framework...');
+      ({ initUI } = await import('../ui/index.js'));
+      _log('Loading systems...');
+      ({ MorningBriefing } = await import('../systems/morning-briefing.js'));
+      ({ OnboardingSystem } = await import('../systems/onboarding.js'));
+      ({ initOnboarding } = await import('../ui/onboarding.js'));
+      ({ AgentRelationshipSystem } = await import('../systems/agent-relationships.js'));
+      ({ IncidentPanel } = await import('../ui/incident-panel.js'));
+      ({ initThemes } = await import('../systems/themes.js'));
+      ({ initThemePicker } = await import('../ui/theme-picker.js'));
+      ({ initCelebrations } = await import('../systems/celebrations.js'));
+      ({ initAudio } = await import('../systems/audio.js'));
+      ({ ZoneAmbience } = await import('../systems/zone-ambience.js'));
+      ({ initPersonalityEngine } = await import('../systems/agent-personalities.js'));
+      ({ ThoughtBubbles } = await import('../ui/thought-bubbles.js'));
+      ({ getQualityManager } = await import('../systems/quality.js'));
+      _log('Loading visual effects...');
+      ({ initVFX } = await import('./vfx.js'));
+      ({ initParticles } = await import('./particles.js'));
+      ({ initCityLife } = await import('./city-life.js'));
+      ({ initDataFlows } = await import('./data-flows.js'));
+      _log('Loading UI components...');
+      ({ OnboardingCinema } = await import('../systems/onboarding-cinema.js'));
+      ({ NotificationCenter } = await import('../ui/notification-center.js'));
+      ({ Minimap } = await import('../ui/minimap.js'));
+      ({ ActivityFeed } = await import('../ui/activity-feed.js'));
+      ({ initAgentSprites } = await import('./agent-sprites.js'));
+      ({ DragDropSystem } = await import('./drag-drop.js'));
+      ({ ContextMenu } = await import('../ui/context-menu.js'));
+      _log('Loading game systems...');
+      ({ getAchievementEngine } = await import('../systems/achievements.js'));
+      ({ TutorialEngine } = await import('../systems/tutorial.js'));
+      ({ FocusMode } = await import('../systems/focus-mode.js'));
+      ({ TaskStream } = await import('../ui/task-stream.js'));
+      ({ AgentChat } = await import('../ui/agent-chat.js'));
+      ({ StatusBar } = await import('../ui/status-bar.js'));
+      ({ PerfMonitor } = await import('../ui/perf-monitor.js'));
+      _log('All modules loaded!');
+    } catch (err) {
+      console.error('[boot] Module import failed:', err);
+      _log('ERROR: ' + err.message);
+      const sub = document.querySelector('.splash__subtitle');
+      if (sub) sub.textContent = String(err.stack || '').split('\n')[0];
+      throw err;
+    }
+
+    // ── Reputation listener ───────────────────────────────────────
     function initReputationListener(worldId) {
       const POINTS = {
         'dispatch:task-complete':   { key: 'task_complete',   pts: 5,  desc: (d) => d.description || 'Task completed' },
@@ -145,6 +189,7 @@
       }
     }
 
+    // ── Main boot sequence ────────────────────────────────────────
     async function boot() {
       const splash = new SplashScreen();
       const TOTAL_STEPS = 32;
