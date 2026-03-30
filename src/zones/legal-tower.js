@@ -17,7 +17,7 @@
  * @returns {string}
  */
 function escapeHTML(str) {
-  const div = document.createElement('div');
+  const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
 }
@@ -28,12 +28,12 @@ function escapeHTML(str) {
  * @returns {string}
  */
 function formatDate(iso) {
-  if (!iso) return '';
+  if (!iso) return "";
   try {
     return new Date(iso).toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   } catch {
     return iso.slice(0, 10);
@@ -96,8 +96,8 @@ export class LegalTower {
    * Tear down and clean up.
    */
   destroy() {
-    this._container.innerHTML = '';
-    this._container.classList.remove('legal-tower');
+    this._container.innerHTML = "";
+    this._container.classList.remove("legal-tower");
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -105,41 +105,42 @@ export class LegalTower {
   // ═══════════════════════════════════════════════════════════════════
 
   _build() {
-    this._container.innerHTML = '';
-    this._container.classList.add('legal-tower');
-    this._container.setAttribute('role', 'region');
-    this._container.setAttribute('aria-label', 'Legal Tower');
+    this._container.innerHTML = "";
+    this._container.classList.add("legal-tower");
+    this._container.setAttribute("role", "region");
+    this._container.setAttribute("aria-label", "Legal Tower");
 
     // ── Header ──
-    this._headerEl = this._el('header', 'lt-header');
+    this._headerEl = this._el("header", "lt-header");
 
-    const titleRow = this._el('div', 'lt-header__title-row');
-    const title = this._el('h2', 'lt-header__title');
-    title.textContent = '\u2696\uFE0F Legal Tower';
-    const subtitle = this._el('p', 'lt-header__subtitle');
-    subtitle.textContent = 'Lex \u2014 Your AI Legal Guardian';
+    const titleRow = this._el("div", "lt-header__title-row");
+    const title = this._el("h2", "lt-header__title");
+    title.textContent = "\u2696\uFE0F Legal Tower";
+    const subtitle = this._el("p", "lt-header__subtitle");
+    subtitle.textContent = "Lex \u2014 Your AI Legal Guardian";
     titleRow.appendChild(title);
     titleRow.appendChild(subtitle);
 
-    const agentRow = this._el('div', 'lt-header__agent-row');
-    const avatar = this._el('div', 'lt-agent-avatar');
-    avatar.setAttribute('aria-hidden', 'true');
-    avatar.innerHTML = '<span class="lt-agent-avatar__icon">\u2696\uFE0F</span>';
-    const agentInfo = this._el('div', 'lt-agent-info');
-    const agentName = this._el('span', 'lt-agent-info__name');
-    agentName.textContent = 'Lex';
-    this._agentStatusEl = this._el('span', 'lt-agent-info__status');
-    this._agentStatusEl.textContent = 'Ready to protect your work';
+    const agentRow = this._el("div", "lt-header__agent-row");
+    const avatar = this._el("div", "lt-agent-avatar");
+    avatar.setAttribute("aria-hidden", "true");
+    avatar.innerHTML =
+      '<span class="lt-agent-avatar__icon">\u2696\uFE0F</span>';
+    const agentInfo = this._el("div", "lt-agent-info");
+    const agentName = this._el("span", "lt-agent-info__name");
+    agentName.textContent = "Lex";
+    this._agentStatusEl = this._el("span", "lt-agent-info__status");
+    this._agentStatusEl.textContent = "Ready to protect your work";
     agentInfo.appendChild(agentName);
     agentInfo.appendChild(this._agentStatusEl);
     agentRow.appendChild(avatar);
     agentRow.appendChild(agentInfo);
 
-    this._statsEl = this._el('div', 'lt-header__stats');
-    this._statDocsEl = this._el('span', 'lt-stat-badge');
-    this._statDocsEl.setAttribute('aria-live', 'polite');
-    this._statRisksEl = this._el('span', 'lt-stat-badge lt-stat-badge--risk');
-    this._statRisksEl.setAttribute('aria-live', 'polite');
+    this._statsEl = this._el("div", "lt-header__stats");
+    this._statDocsEl = this._el("span", "lt-stat-badge");
+    this._statDocsEl.setAttribute("aria-live", "polite");
+    this._statRisksEl = this._el("span", "lt-stat-badge lt-stat-badge--risk");
+    this._statRisksEl.setAttribute("aria-live", "polite");
     this._statsEl.appendChild(this._statDocsEl);
     this._statsEl.appendChild(this._statRisksEl);
 
@@ -149,39 +150,40 @@ export class LegalTower {
     this._container.appendChild(this._headerEl);
 
     // ── Main body (list + editor) ──
-    this._bodyEl = this._el('div', 'lt-body');
+    this._bodyEl = this._el("div", "lt-body");
 
     // Left panel: document list
-    this._listPanelEl = this._el('aside', 'lt-list-panel');
-    this._listPanelEl.setAttribute('aria-label', 'Documents');
+    this._listPanelEl = this._el("aside", "lt-list-panel");
+    this._listPanelEl.setAttribute("aria-label", "Documents");
 
-    const listActions = this._el('div', 'lt-list-panel__actions');
-    this._newDocBtn = this._el('button', 'lt-new-doc-btn');
-    this._newDocBtn.textContent = 'New Document +';
-    this._newDocBtn.setAttribute('aria-label', 'Create a new legal document');
+    const listActions = this._el("div", "lt-list-panel__actions");
+    this._newDocBtn = this._el("button", "lt-new-doc-btn");
+    this._newDocBtn.textContent = "New Document +";
+    this._newDocBtn.setAttribute("aria-label", "Create a new legal document");
     listActions.appendChild(this._newDocBtn);
     this._listPanelEl.appendChild(listActions);
 
-    this._docListEl = this._el('div', 'lt-doc-list');
-    this._docListEl.setAttribute('role', 'list');
+    this._docListEl = this._el("div", "lt-doc-list");
+    this._docListEl.setAttribute("role", "list");
     this._listPanelEl.appendChild(this._docListEl);
 
     // Right panel: editor + analysis
-    this._editorPanelEl = this._el('section', 'lt-editor-panel');
-    this._editorPanelEl.setAttribute('aria-label', 'Document editor');
+    this._editorPanelEl = this._el("section", "lt-editor-panel");
+    this._editorPanelEl.setAttribute("aria-label", "Document editor");
 
-    this._emptyStateEl = this._el('div', 'lt-empty-state');
-    const emptyIcon = this._el('div', 'lt-empty-state__icon');
-    emptyIcon.textContent = '\u2696\uFE0F';
-    const emptyText = this._el('div', 'lt-empty-state__text');
-    emptyText.textContent = 'Select a document or create a new one to get started.';
+    this._emptyStateEl = this._el("div", "lt-empty-state");
+    const emptyIcon = this._el("div", "lt-empty-state__icon");
+    emptyIcon.textContent = "\u2696\uFE0F";
+    const emptyText = this._el("div", "lt-empty-state__text");
+    emptyText.textContent =
+      "Select a document or create a new one to get started.";
     this._emptyStateEl.appendChild(emptyIcon);
     this._emptyStateEl.appendChild(emptyText);
     this._editorPanelEl.appendChild(this._emptyStateEl);
 
     // Editor form (hidden until a doc is open)
-    this._editorFormEl = this._el('div', 'lt-editor-form');
-    this._editorFormEl.setAttribute('aria-hidden', 'true');
+    this._editorFormEl = this._el("div", "lt-editor-form");
+    this._editorFormEl.setAttribute("aria-hidden", "true");
     this._buildEditorForm();
     this._editorPanelEl.appendChild(this._editorFormEl);
 
@@ -192,35 +194,36 @@ export class LegalTower {
 
   _buildEditorForm() {
     // Title field
-    const titleField = this._el('div', 'lt-field');
-    const titleLabel = this._el('label', 'lt-field__label');
-    titleLabel.textContent = 'Document Title';
-    titleLabel.setAttribute('for', 'lt-doc-title');
-    this._docTitleInput = this._el('input', 'lt-field__input');
-    this._docTitleInput.id = 'lt-doc-title';
-    this._docTitleInput.type = 'text';
-    this._docTitleInput.placeholder = 'e.g. Service Agreement, NDA with Acme Corp';
-    this._docTitleInput.setAttribute('autocomplete', 'off');
+    const titleField = this._el("div", "lt-field");
+    const titleLabel = this._el("label", "lt-field__label");
+    titleLabel.textContent = "Document Title";
+    titleLabel.setAttribute("for", "lt-doc-title");
+    this._docTitleInput = this._el("input", "lt-field__input");
+    this._docTitleInput.id = "lt-doc-title";
+    this._docTitleInput.type = "text";
+    this._docTitleInput.placeholder =
+      "e.g. Service Agreement, NDA with Acme Corp";
+    this._docTitleInput.setAttribute("autocomplete", "off");
     titleField.appendChild(titleLabel);
     titleField.appendChild(this._docTitleInput);
     this._editorFormEl.appendChild(titleField);
 
     // Type selector
-    const typeField = this._el('div', 'lt-field lt-field--inline');
-    const typeLabel = this._el('label', 'lt-field__label');
-    typeLabel.textContent = 'Document Type';
-    typeLabel.setAttribute('for', 'lt-doc-type');
-    this._docTypeSelect = this._el('select', 'lt-field__select');
-    this._docTypeSelect.id = 'lt-doc-type';
+    const typeField = this._el("div", "lt-field lt-field--inline");
+    const typeLabel = this._el("label", "lt-field__label");
+    typeLabel.textContent = "Document Type";
+    typeLabel.setAttribute("for", "lt-doc-type");
+    this._docTypeSelect = this._el("select", "lt-field__select");
+    this._docTypeSelect.id = "lt-doc-type";
     const docTypes = [
-      { value: 'contract', label: 'Contract' },
-      { value: 'nda', label: 'NDA' },
-      { value: 'terms', label: 'Terms of Service' },
-      { value: 'policy', label: 'Privacy Policy' },
-      { value: 'other', label: 'Other' },
+      { value: "contract", label: "Contract" },
+      { value: "nda", label: "NDA" },
+      { value: "terms", label: "Terms of Service" },
+      { value: "policy", label: "Privacy Policy" },
+      { value: "other", label: "Other" },
     ];
     for (const { value, label } of docTypes) {
-      const opt = document.createElement('option');
+      const opt = document.createElement("option");
       opt.value = value;
       opt.textContent = label;
       this._docTypeSelect.appendChild(opt);
@@ -230,62 +233,63 @@ export class LegalTower {
     this._editorFormEl.appendChild(typeField);
 
     // Content textarea
-    const contentField = this._el('div', 'lt-field lt-field--grow');
-    const contentLabel = this._el('label', 'lt-field__label');
-    contentLabel.textContent = 'Document Content';
-    contentLabel.setAttribute('for', 'lt-doc-content');
-    this._docContentTextarea = this._el('textarea', 'lt-field__textarea');
-    this._docContentTextarea.id = 'lt-doc-content';
+    const contentField = this._el("div", "lt-field lt-field--grow");
+    const contentLabel = this._el("label", "lt-field__label");
+    contentLabel.textContent = "Document Content";
+    contentLabel.setAttribute("for", "lt-doc-content");
+    this._docContentTextarea = this._el("textarea", "lt-field__textarea");
+    this._docContentTextarea.id = "lt-doc-content";
     this._docContentTextarea.placeholder =
-      'Paste or type your contract, NDA, or legal document here\u2026';
-    this._docContentTextarea.setAttribute('spellcheck', 'true');
+      "Paste or type your contract, NDA, or legal document here\u2026";
+    this._docContentTextarea.setAttribute("spellcheck", "true");
     contentField.appendChild(contentLabel);
     contentField.appendChild(this._docContentTextarea);
     this._editorFormEl.appendChild(contentField);
 
     // Editor action bar
-    const editorActions = this._el('div', 'lt-editor-actions');
+    const editorActions = this._el("div", "lt-editor-actions");
 
-    this._saveDocBtn = this._el('button', 'lt-btn lt-btn--secondary');
-    this._saveDocBtn.textContent = 'Save';
-    this._saveDocBtn.setAttribute('aria-label', 'Save document');
+    this._saveDocBtn = this._el("button", "lt-btn lt-btn--secondary");
+    this._saveDocBtn.textContent = "Save";
+    this._saveDocBtn.setAttribute("aria-label", "Save document");
 
-    this._analyzeBtn = this._el('button', 'lt-btn lt-btn--primary');
-    this._analyzeBtn.textContent = '\uD83D\uDD0D Analyze with Lex';
-    this._analyzeBtn.setAttribute('aria-label', 'Analyze document with Lex');
+    this._analyzeBtn = this._el("button", "lt-btn lt-btn--primary");
+    this._analyzeBtn.textContent = "\uD83D\uDD0D Analyze with Lex";
+    this._analyzeBtn.setAttribute("aria-label", "Analyze document with Lex");
 
     editorActions.appendChild(this._saveDocBtn);
     editorActions.appendChild(this._analyzeBtn);
     this._editorFormEl.appendChild(editorActions);
 
     // Analysis panel (hidden until analysis is done)
-    this._analysisPanelEl = this._el('div', 'lt-analysis-panel');
-    this._analysisPanelEl.setAttribute('aria-hidden', 'true');
+    this._analysisPanelEl = this._el("div", "lt-analysis-panel");
+    this._analysisPanelEl.setAttribute("aria-hidden", "true");
     this._buildAnalysisPanel();
     this._editorFormEl.appendChild(this._analysisPanelEl);
   }
 
   _buildAnalysisPanel() {
-    const panelHeader = this._el('div', 'lt-analysis-panel__header');
-    const panelTitle = this._el('h3', 'lt-analysis-panel__title');
-    panelTitle.textContent = 'Lex\u2019s Analysis';
-    this._riskBadgeEl = this._el('span', 'lt-risk-badge');
-    this._riskBadgeEl.setAttribute('aria-live', 'polite');
+    const panelHeader = this._el("div", "lt-analysis-panel__header");
+    const panelTitle = this._el("h3", "lt-analysis-panel__title");
+    panelTitle.textContent = "Lex\u2019s Analysis";
+    this._riskBadgeEl = this._el("span", "lt-risk-badge");
+    this._riskBadgeEl.setAttribute("aria-live", "polite");
     panelHeader.appendChild(panelTitle);
     panelHeader.appendChild(this._riskBadgeEl);
     this._analysisPanelEl.appendChild(panelHeader);
 
-    this._analysisContentEl = this._el('div', 'lt-analysis-content');
-    this._analysisContentEl.setAttribute('role', 'status');
-    this._analysisContentEl.setAttribute('aria-live', 'polite');
+    this._analysisContentEl = this._el("div", "lt-analysis-content");
+    this._analysisContentEl.setAttribute("role", "status");
+    this._analysisContentEl.setAttribute("aria-live", "polite");
     this._analysisPanelEl.appendChild(this._analysisContentEl);
 
-    const panelActions = this._el('div', 'lt-analysis-panel__actions');
-    this._generateClauseBtn = this._el('button', 'lt-btn lt-btn--gold');
-    this._generateClauseBtn.textContent = '\uD83D\uDCCB Generate Protection Clause';
+    const panelActions = this._el("div", "lt-analysis-panel__actions");
+    this._generateClauseBtn = this._el("button", "lt-btn lt-btn--gold");
+    this._generateClauseBtn.textContent =
+      "\uD83D\uDCCB Generate Protection Clause";
     this._generateClauseBtn.setAttribute(
-      'aria-label',
-      'Generate a protection clause based on the analysis'
+      "aria-label",
+      "Generate a protection clause based on the analysis",
     );
     panelActions.appendChild(this._generateClauseBtn);
     this._analysisPanelEl.appendChild(panelActions);
@@ -296,21 +300,23 @@ export class LegalTower {
   // ═══════════════════════════════════════════════════════════════════
 
   _bindEvents() {
-    this._newDocBtn.addEventListener('click', () => this._openNewDoc());
-    this._saveDocBtn.addEventListener('click', () => this._onSaveDoc());
-    this._analyzeBtn.addEventListener('click', () => this._onAnalyze());
-    this._generateClauseBtn.addEventListener('click', () => this._onGenerateClause());
+    this._newDocBtn.addEventListener("click", () => this._openNewDoc());
+    this._saveDocBtn.addEventListener("click", () => this._onSaveDoc());
+    this._analyzeBtn.addEventListener("click", () => this._onAnalyze());
+    this._generateClauseBtn.addEventListener("click", () =>
+      this._onGenerateClause(),
+    );
 
     // Auto-save title changes back to the active doc object (in memory)
-    this._docTitleInput.addEventListener('input', () => {
+    this._docTitleInput.addEventListener("input", () => {
       if (this._activeDoc) {
         this._activeDoc.title = this._docTitleInput.value;
       }
     });
 
     // Keyboard: Escape clears active doc
-    this._container.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this._activeDoc) {
+    this._container.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && this._activeDoc) {
         this._closeEditor();
       }
     });
@@ -336,7 +342,7 @@ export class LegalTower {
   async _saveDocToDb(doc) {
     if (!this._worldId) return null;
     try {
-      const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
+      const now = new Date().toISOString().replace("T", " ").slice(0, 19);
       if (doc.id && !doc._isNew) {
         // Update existing
         await window.api.db.updateLegalDoc({
@@ -346,7 +352,7 @@ export class LegalTower {
           content: doc.content,
           analysis: doc.analysis || null,
           risk_level: doc.risk_level || null,
-          status: doc.status || 'draft',
+          status: doc.status || "draft",
           updated_at: now,
         });
         return doc;
@@ -354,9 +360,9 @@ export class LegalTower {
         // Insert new
         const saved = await window.api.db.createLegalDoc({
           world_id: this._worldId,
-          title: doc.title || 'Untitled Document',
-          doc_type: doc.doc_type || 'contract',
-          content: doc.content || '',
+          title: doc.title || "Untitled Document",
+          doc_type: doc.doc_type || "contract",
+          content: doc.content || "",
         });
         return saved;
       }
@@ -370,11 +376,11 @@ export class LegalTower {
   // ═══════════════════════════════════════════════════════════════════
 
   _renderDocList() {
-    this._docListEl.innerHTML = '';
+    this._docListEl.innerHTML = "";
 
     if (this._docs.length === 0) {
-      const empty = this._el('div', 'lt-doc-list__empty');
-      empty.textContent = 'No documents yet. Create your first legal document.';
+      const empty = this._el("div", "lt-doc-list__empty");
+      empty.textContent = "No documents yet. Create your first legal document.";
       this._docListEl.appendChild(empty);
       return;
     }
@@ -389,41 +395,47 @@ export class LegalTower {
    * @returns {HTMLElement}
    */
   _renderDocCard(doc) {
-    const card = this._el('div', 'lt-doc-card');
-    card.setAttribute('role', 'listitem');
-    card.setAttribute('tabindex', '0');
+    const card = this._el("div", "lt-doc-card");
+    card.setAttribute("role", "listitem");
+    card.setAttribute("tabindex", "0");
     card.dataset.docId = doc.id;
 
     if (this._activeDoc && this._activeDoc.id === doc.id) {
-      card.classList.add('lt-doc-card--active');
+      card.classList.add("lt-doc-card--active");
     }
 
-    const cardTop = this._el('div', 'lt-doc-card__top');
-    const cardTitle = this._el('span', 'lt-doc-card__title');
-    cardTitle.textContent = doc.title || 'Untitled Document';
+    const cardTop = this._el("div", "lt-doc-card__top");
+    const cardTitle = this._el("span", "lt-doc-card__title");
+    cardTitle.textContent = doc.title || "Untitled Document";
     cardTop.appendChild(cardTitle);
 
-    const badges = this._el('div', 'lt-doc-card__badges');
-    const typeBadge = this._el('span', `lt-type-badge lt-type-badge--${doc.doc_type || 'other'}`);
+    const badges = this._el("div", "lt-doc-card__badges");
+    const typeBadge = this._el(
+      "span",
+      `lt-type-badge lt-type-badge--${doc.doc_type || "other"}`,
+    );
     typeBadge.textContent = this._typeLabel(doc.doc_type);
     badges.appendChild(typeBadge);
 
     if (doc.risk_level) {
-      const riskBadge = this._el('span', `lt-risk-badge lt-risk-badge--${doc.risk_level}`);
+      const riskBadge = this._el(
+        "span",
+        `lt-risk-badge lt-risk-badge--${doc.risk_level}`,
+      );
       riskBadge.textContent = this._riskLabel(doc.risk_level);
       badges.appendChild(riskBadge);
     }
 
-    const cardDate = this._el('span', 'lt-doc-card__date');
+    const cardDate = this._el("span", "lt-doc-card__date");
     cardDate.textContent = formatDate(doc.updated_at || doc.created_at);
 
     card.appendChild(cardTop);
     card.appendChild(badges);
     card.appendChild(cardDate);
 
-    card.addEventListener('click', () => this._openDoc(doc));
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
+    card.addEventListener("click", () => this._openDoc(doc));
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         this._openDoc(doc);
       }
@@ -435,11 +447,11 @@ export class LegalTower {
   _updateStats() {
     const total = this._docs.length;
     const risksCount = this._docs.filter(
-      (d) => d.risk_level === 'high' || d.risk_level === 'medium'
+      (d) => d.risk_level === "high" || d.risk_level === "medium",
     ).length;
 
-    this._statDocsEl.textContent = `${total} document${total !== 1 ? 's' : ''} reviewed`;
-    this._statRisksEl.textContent = `${risksCount} risk${risksCount !== 1 ? 's' : ''} flagged`;
+    this._statDocsEl.textContent = `${total} document${total !== 1 ? "s" : ""} reviewed`;
+    this._statRisksEl.textContent = `${risksCount} risk${risksCount !== 1 ? "s" : ""} flagged`;
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -450,12 +462,12 @@ export class LegalTower {
     const newDoc = {
       _isNew: true,
       id: null,
-      title: '',
-      doc_type: 'contract',
-      content: '',
+      title: "",
+      doc_type: "contract",
+      content: "",
       analysis: null,
       risk_level: null,
-      status: 'draft',
+      status: "draft",
     };
     this._openDoc(newDoc);
     requestAnimationFrame(() => this._docTitleInput.focus());
@@ -469,39 +481,42 @@ export class LegalTower {
     this._activeDoc = doc;
 
     // Populate fields
-    this._docTitleInput.value = doc.title || '';
-    this._docTypeSelect.value = doc.doc_type || 'contract';
-    this._docContentTextarea.value = doc.content || '';
+    this._docTitleInput.value = doc.title || "";
+    this._docTypeSelect.value = doc.doc_type || "contract";
+    this._docContentTextarea.value = doc.content || "";
 
     // Show / hide analysis panel
     if (doc.analysis) {
       this._showAnalysis(doc.analysis, doc.risk_level);
     } else {
-      this._analysisPanelEl.setAttribute('aria-hidden', 'true');
-      this._analysisPanelEl.classList.remove('lt-analysis-panel--visible');
+      this._analysisPanelEl.setAttribute("aria-hidden", "true");
+      this._analysisPanelEl.classList.remove("lt-analysis-panel--visible");
     }
 
     // Show editor form, hide empty state
-    this._emptyStateEl.style.display = 'none';
-    this._editorFormEl.setAttribute('aria-hidden', 'false');
-    this._editorFormEl.style.display = 'flex';
+    this._emptyStateEl.style.display = "none";
+    this._editorFormEl.setAttribute("aria-hidden", "false");
+    this._editorFormEl.style.display = "flex";
 
     // Update active highlight in list
-    for (const card of this._docListEl.querySelectorAll('.lt-doc-card')) {
-      card.classList.toggle('lt-doc-card--active', card.dataset.docId === doc.id);
+    for (const card of this._docListEl.querySelectorAll(".lt-doc-card")) {
+      card.classList.toggle(
+        "lt-doc-card--active",
+        card.dataset.docId === doc.id,
+      );
     }
   }
 
   _closeEditor() {
     this._activeDoc = null;
-    this._emptyStateEl.style.display = '';
-    this._editorFormEl.setAttribute('aria-hidden', 'true');
-    this._editorFormEl.style.display = 'none';
-    this._analysisPanelEl.setAttribute('aria-hidden', 'true');
-    this._analysisPanelEl.classList.remove('lt-analysis-panel--visible');
+    this._emptyStateEl.style.display = "";
+    this._editorFormEl.setAttribute("aria-hidden", "true");
+    this._editorFormEl.style.display = "none";
+    this._analysisPanelEl.setAttribute("aria-hidden", "true");
+    this._analysisPanelEl.classList.remove("lt-analysis-panel--visible");
 
-    for (const card of this._docListEl.querySelectorAll('.lt-doc-card')) {
-      card.classList.remove('lt-doc-card--active');
+    for (const card of this._docListEl.querySelectorAll(".lt-doc-card")) {
+      card.classList.remove("lt-doc-card--active");
     }
   }
 
@@ -512,12 +527,13 @@ export class LegalTower {
   async _onSaveDoc() {
     if (!this._activeDoc) return;
 
-    this._activeDoc.title = this._docTitleInput.value.trim() || 'Untitled Document';
+    this._activeDoc.title =
+      this._docTitleInput.value.trim() || "Untitled Document";
     this._activeDoc.doc_type = this._docTypeSelect.value;
     this._activeDoc.content = this._docContentTextarea.value;
 
     this._saveDocBtn.disabled = true;
-    this._saveDocBtn.textContent = 'Saving\u2026';
+    this._saveDocBtn.textContent = "Saving\u2026";
 
     const saved = await this._saveDocToDb(this._activeDoc);
 
@@ -528,14 +544,15 @@ export class LegalTower {
         this._docs.unshift(this._activeDoc);
       } else {
         const idx = this._docs.findIndex((d) => d.id === this._activeDoc.id);
-        if (idx !== -1) this._docs[idx] = { ...this._docs[idx], ...this._activeDoc };
+        if (idx !== -1)
+          this._docs[idx] = { ...this._docs[idx], ...this._activeDoc };
       }
       this._renderDocList();
       this._updateStats();
     }
 
     this._saveDocBtn.disabled = false;
-    this._saveDocBtn.textContent = 'Save';
+    this._saveDocBtn.textContent = "Save";
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -555,29 +572,30 @@ export class LegalTower {
     }
 
     // Save current state first
-    this._activeDoc.title = this._docTitleInput.value.trim() || 'Untitled Document';
+    this._activeDoc.title =
+      this._docTitleInput.value.trim() || "Untitled Document";
     this._activeDoc.doc_type = this._docTypeSelect.value;
     this._activeDoc.content = content;
 
     this._analyzing = true;
     this._analyzeBtn.disabled = true;
-    this._analyzeBtn.textContent = 'Analyzing\u2026';
-    this._agentStatusEl.textContent = 'Reviewing your document\u2026';
+    this._analyzeBtn.textContent = "Analyzing\u2026";
+    this._agentStatusEl.textContent = "Reviewing your document\u2026";
 
     // Show analysis panel in loading state
-    this._analysisPanelEl.setAttribute('aria-hidden', 'false');
-    this._analysisPanelEl.classList.add('lt-analysis-panel--visible');
-    this._riskBadgeEl.className = 'lt-risk-badge';
-    this._riskBadgeEl.textContent = '';
+    this._analysisPanelEl.setAttribute("aria-hidden", "false");
+    this._analysisPanelEl.classList.add("lt-analysis-panel--visible");
+    this._riskBadgeEl.className = "lt-risk-badge";
+    this._riskBadgeEl.textContent = "";
     this._analysisContentEl.innerHTML =
       '<div class="lt-analysis-loading"><span class="lt-spinner"></span> Lex is reading the document\u2026</div>';
 
     const systemPrompt =
-      'You are Lex, an AI legal guardian for a tech startup. Analyze the following document for risks, missing protections, and compliance issues. Be specific and practical. Format your response with clear sections: ## Key Issues Found, ## Suggested Protections, ## Missing Clauses, ## Overall Assessment.';
+      "You are Lex, an AI legal guardian for a tech startup. Analyze the following document for risks, missing protections, and compliance issues. Be specific and practical. Format your response with clear sections: ## Key Issues Found, ## Suggested Protections, ## Missing Clauses, ## Overall Assessment.";
 
     const userPrompt = `Please analyze this legal document:\n\n${content}`;
 
-    let fullAnalysis = '';
+    let fullAnalysis = "";
 
     try {
       await window.api.ai.dispatch({
@@ -585,7 +603,8 @@ export class LegalTower {
         userPrompt,
         onChunk: (chunk) => {
           fullAnalysis += chunk;
-          this._analysisContentEl.innerHTML = this._formatAnalysis(fullAnalysis);
+          this._analysisContentEl.innerHTML =
+            this._formatAnalysis(fullAnalysis);
         },
         onDone: async () => {
           this._activeDoc.analysis = fullAnalysis;
@@ -610,39 +629,42 @@ export class LegalTower {
           this._updateStats();
 
           // Re-highlight active card
-          for (const card of this._docListEl.querySelectorAll('.lt-doc-card')) {
+          for (const card of this._docListEl.querySelectorAll(".lt-doc-card")) {
             card.classList.toggle(
-              'lt-doc-card--active',
-              card.dataset.docId === this._activeDoc.id
+              "lt-doc-card--active",
+              card.dataset.docId === this._activeDoc.id,
             );
           }
 
-          this._agentStatusEl.textContent = 'Analysis complete \u2014 your document is protected';
+          this._agentStatusEl.textContent =
+            "Analysis complete \u2014 your document is protected";
           this._analyzing = false;
           this._analyzeBtn.disabled = false;
-          this._analyzeBtn.textContent = '\uD83D\uDD0D Analyze with Lex';
+          this._analyzeBtn.textContent = "\uD83D\uDD0D Analyze with Lex";
 
           // Emit task complete
-          this._emit('dispatch:task-complete', {
+          this._emit("dispatch:task-complete", {
             worldId: this._worldId,
-            zoneType: 'legal',
+            zoneType: "legal",
             success: true,
           });
         },
         onError: (err) => {
           this._analysisContentEl.innerHTML = `<div class="lt-analysis-error">Lex encountered an error: ${escapeHTML(String(err))}</div>`;
-          this._agentStatusEl.textContent = 'Analysis failed \u2014 please try again';
+          this._agentStatusEl.textContent =
+            "Analysis failed \u2014 please try again";
           this._analyzing = false;
           this._analyzeBtn.disabled = false;
-          this._analyzeBtn.textContent = '\uD83D\uDD0D Analyze with Lex';
+          this._analyzeBtn.textContent = "\uD83D\uDD0D Analyze with Lex";
         },
       });
     } catch (err) {
       this._analysisContentEl.innerHTML = `<div class="lt-analysis-error">Could not reach Lex: ${escapeHTML(String(err))}</div>`;
-      this._agentStatusEl.textContent = 'Analysis failed \u2014 please try again';
+      this._agentStatusEl.textContent =
+        "Analysis failed \u2014 please try again";
       this._analyzing = false;
       this._analyzeBtn.disabled = false;
-      this._analyzeBtn.textContent = '\uD83D\uDD0D Analyze with Lex';
+      this._analyzeBtn.textContent = "\uD83D\uDD0D Analyze with Lex";
     }
   }
 
@@ -653,25 +675,25 @@ export class LegalTower {
     if (!this._activeDoc || !this._activeDoc.analysis) return;
 
     this._generateClauseBtn.disabled = true;
-    this._generateClauseBtn.textContent = 'Generating\u2026';
+    this._generateClauseBtn.textContent = "Generating\u2026";
 
     const systemPrompt =
-      'You are Lex, an AI legal guardian for a tech startup. Based on the legal analysis provided, generate a single concise protection clause that addresses the most critical risk identified. Output only the clause text, ready to be inserted into a contract.';
+      "You are Lex, an AI legal guardian for a tech startup. Based on the legal analysis provided, generate a single concise protection clause that addresses the most critical risk identified. Output only the clause text, ready to be inserted into a contract.";
 
     const userPrompt = `Based on this analysis:\n\n${this._activeDoc.analysis}\n\nGenerate a protection clause for the document titled "${this._activeDoc.title}".`;
 
-    let clause = '';
+    let clause = "";
 
     // Show clause area
-    let clauseEl = this._analysisPanelEl.querySelector('.lt-generated-clause');
+    let clauseEl = this._analysisPanelEl.querySelector(".lt-generated-clause");
     if (!clauseEl) {
-      clauseEl = this._el('div', 'lt-generated-clause');
+      clauseEl = this._el("div", "lt-generated-clause");
       this._analysisPanelEl.insertBefore(
         clauseEl,
-        this._analysisPanelEl.querySelector('.lt-analysis-panel__actions')
+        this._analysisPanelEl.querySelector(".lt-analysis-panel__actions"),
       );
     }
-    clauseEl.innerHTML = '<em>Generating clause\u2026</em>';
+    clauseEl.innerHTML = "<em>Generating clause\u2026</em>";
 
     try {
       await window.api.ai.dispatch({
@@ -683,18 +705,21 @@ export class LegalTower {
         },
         onDone: () => {
           this._generateClauseBtn.disabled = false;
-          this._generateClauseBtn.textContent = '\uD83D\uDCCB Generate Protection Clause';
+          this._generateClauseBtn.textContent =
+            "\uD83D\uDCCB Generate Protection Clause";
         },
         onError: () => {
-          clauseEl.textContent = 'Failed to generate clause. Please try again.';
+          clauseEl.textContent = "Failed to generate clause. Please try again.";
           this._generateClauseBtn.disabled = false;
-          this._generateClauseBtn.textContent = '\uD83D\uDCCB Generate Protection Clause';
+          this._generateClauseBtn.textContent =
+            "\uD83D\uDCCB Generate Protection Clause";
         },
       });
     } catch {
-      clauseEl.textContent = 'Failed to generate clause. Please try again.';
+      clauseEl.textContent = "Failed to generate clause. Please try again.";
       this._generateClauseBtn.disabled = false;
-      this._generateClauseBtn.textContent = '\uD83D\uDCCB Generate Protection Clause';
+      this._generateClauseBtn.textContent =
+        "\uD83D\uDCCB Generate Protection Clause";
     }
   }
 
@@ -709,21 +734,21 @@ export class LegalTower {
    */
   _formatAnalysis(text) {
     // Convert ## Section headers and basic formatting to HTML
-    const lines = escapeHTML(text).split('\n');
+    const lines = escapeHTML(text).split("\n");
     const html = [];
     for (const line of lines) {
       const trimmed = line.trim();
-      if (trimmed.startsWith('## ')) {
+      if (trimmed.startsWith("## ")) {
         html.push(`<h4 class="lt-analysis-section">${trimmed.slice(3)}</h4>`);
-      } else if (trimmed.startsWith('- ') || trimmed.startsWith('\u2022 ')) {
+      } else if (trimmed.startsWith("- ") || trimmed.startsWith("\u2022 ")) {
         html.push(`<li class="lt-analysis-item">${trimmed.slice(2)}</li>`);
-      } else if (trimmed === '') {
-        html.push('<br>');
+      } else if (trimmed === "") {
+        html.push("<br>");
       } else {
         html.push(`<p class="lt-analysis-p">${trimmed}</p>`);
       }
     }
-    return html.join('');
+    return html.join("");
   }
 
   /**
@@ -733,11 +758,24 @@ export class LegalTower {
    */
   _detectRiskLevel(analysis) {
     const lower = analysis.toLowerCase();
-    const highKeywords = ['high risk', 'critical', 'severe', 'major concern', 'immediately', 'dangerous'];
-    const medKeywords = ['moderate', 'medium risk', 'some concern', 'should consider', 'potential issue'];
-    if (highKeywords.some((k) => lower.includes(k))) return 'high';
-    if (medKeywords.some((k) => lower.includes(k))) return 'medium';
-    return 'low';
+    const highKeywords = [
+      "high risk",
+      "critical",
+      "severe",
+      "major concern",
+      "immediately",
+      "dangerous",
+    ];
+    const medKeywords = [
+      "moderate",
+      "medium risk",
+      "some concern",
+      "should consider",
+      "potential issue",
+    ];
+    if (highKeywords.some((k) => lower.includes(k))) return "high";
+    if (medKeywords.some((k) => lower.includes(k))) return "medium";
+    return "low";
   }
 
   /**
@@ -746,8 +784,8 @@ export class LegalTower {
    * @param {string|null} riskLevel
    */
   _showAnalysis(analysis, riskLevel) {
-    this._analysisPanelEl.setAttribute('aria-hidden', 'false');
-    this._analysisPanelEl.classList.add('lt-analysis-panel--visible');
+    this._analysisPanelEl.setAttribute("aria-hidden", "false");
+    this._analysisPanelEl.classList.add("lt-analysis-panel--visible");
     this._analysisContentEl.innerHTML = this._formatAnalysis(analysis);
     this._setRiskBadge(riskLevel);
   }
@@ -757,7 +795,7 @@ export class LegalTower {
    * @param {string|null} level
    */
   _setRiskBadge(level) {
-    this._riskBadgeEl.className = `lt-risk-badge lt-risk-badge--${level || 'unknown'}`;
+    this._riskBadgeEl.className = `lt-risk-badge lt-risk-badge--${level || "unknown"}`;
     this._riskBadgeEl.textContent = this._riskLabel(level);
   }
 
@@ -771,13 +809,13 @@ export class LegalTower {
    */
   _typeLabel(type) {
     const labels = {
-      contract: 'Contract',
-      nda: 'NDA',
-      terms: 'Terms',
-      policy: 'Policy',
-      other: 'Other',
+      contract: "Contract",
+      nda: "NDA",
+      terms: "Terms",
+      policy: "Policy",
+      other: "Other",
     };
-    return labels[type] || 'Other';
+    return labels[type] || "Other";
   }
 
   /**
@@ -786,11 +824,11 @@ export class LegalTower {
    */
   _riskLabel(level) {
     const labels = {
-      low: 'Low Risk',
-      medium: 'Medium Risk',
-      high: 'High Risk',
+      low: "Low Risk",
+      medium: "Medium Risk",
+      high: "High Risk",
     };
-    return labels[level] || 'Unknown';
+    return labels[level] || "Unknown";
   }
 
   // ═══════════════════════════════════════════════════════════════════

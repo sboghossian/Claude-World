@@ -16,42 +16,42 @@ It's not a chat interface. It's not a dashboard. It's a **place** your AI agents
 
 ### The City Zones (35+)
 
-| Zone | Color | Purpose |
-|------|-------|---------|
-| **Dispatch HQ** | Cyan | Run AI tasks — single or multi-step agent dispatch |
-| **Brain Library** | Purple | Memory, knowledge, long-term storage |
-| **Skills Academy** | Amber | Build and train custom skills |
-| **Legal Tower** | Gold | AI-drafted legal docs, contracts, NDAs |
-| **The Council** | Multi | Multi-model debates (Claude vs GPT-4 vs Gemini) |
-| **The Archive** | Blue | World snapshots and experiments |
-| **R&D Lab** | Teal | Long-horizon research and experimentation |
-| **Identity Panel** | Lavender | World identity, reputation, XP system |
-| **Sales District** | Emerald | Lead tracking and AI sales workflows |
-| **Marketing Plaza** | Purple | Content pipeline and campaign management |
-| **The Exchange** | Orange | API integrations and webhook management |
-| **The Market** | Pink | Install community tools and extensions |
-| **The Airport** | Sky | Deploy agents to external environments |
-| **Globe Room** | Indigo | Global research and intelligence |
-| **Broadcast Tower** | Red | Channels and broadcast messaging |
-| **World Versions** | Violet | Version control for your entire world |
-| **Mission Control** | Green | Command center — terminal + analytics |
-| **Treasury** | Gold | Budget tracking and cost management |
-| **Chat Rooms** | Blue | Agent communication and logs |
-| **Connector Docks** | Teal | External API connections |
-| **Minion Tunnels** | Gray | Background automation pipelines |
-| **Memory Vault** | Purple | Persistent agent memory store |
-| **Analytics Dashboard** | Blue | Real-time metrics, charts, and world statistics |
-| **Settings** | Slate | App configuration, preferences, API keys |
-| **Reports** | Indigo | Generate and export structured reports |
-| **Timeline** | Amber | Chronological view of all world activity |
-| **Home Dashboard** | White | At-a-glance overview — recent activity, quick actions |
-| **Kanban Board** | Green | Drag-and-drop task management with columns |
-| **Knowledge Graph** | Violet | Visual map of connected concepts and entities |
-| **Automation Builder** | Orange | No-code workflow builder with triggers and actions |
-| **Skill Trees** | Emerald | Visual progression trees for agent capabilities |
-| **Calendar** | Blue | Schedule tasks, deadlines, and agent activities |
-| **Sharing / Export** | Teal | Share snapshots, export data, publish reports |
-| **Achievements Gallery** | Gold | Track milestones, badges, and world accomplishments |
+| Zone                     | Color    | Purpose                                               |
+| ------------------------ | -------- | ----------------------------------------------------- |
+| **Dispatch HQ**          | Cyan     | Run AI tasks — single or multi-step agent dispatch    |
+| **Brain Library**        | Purple   | Memory, knowledge, long-term storage                  |
+| **Skills Academy**       | Amber    | Build and train custom skills                         |
+| **Legal Tower**          | Gold     | AI-drafted legal docs, contracts, NDAs                |
+| **The Council**          | Multi    | Multi-model debates (Claude vs GPT-4 vs Gemini)       |
+| **The Archive**          | Blue     | World snapshots and experiments                       |
+| **R&D Lab**              | Teal     | Long-horizon research and experimentation             |
+| **Identity Panel**       | Lavender | World identity, reputation, XP system                 |
+| **Sales District**       | Emerald  | Lead tracking and AI sales workflows                  |
+| **Marketing Plaza**      | Purple   | Content pipeline and campaign management              |
+| **The Exchange**         | Orange   | API integrations and webhook management               |
+| **The Market**           | Pink     | Install community tools and extensions                |
+| **The Airport**          | Sky      | Deploy agents to external environments                |
+| **Globe Room**           | Indigo   | Global research and intelligence                      |
+| **Broadcast Tower**      | Red      | Channels and broadcast messaging                      |
+| **World Versions**       | Violet   | Version control for your entire world                 |
+| **Mission Control**      | Green    | Command center — terminal + analytics                 |
+| **Treasury**             | Gold     | Budget tracking and cost management                   |
+| **Chat Rooms**           | Blue     | Agent communication and logs                          |
+| **Connector Docks**      | Teal     | External API connections                              |
+| **Minion Tunnels**       | Gray     | Background automation pipelines                       |
+| **Memory Vault**         | Purple   | Persistent agent memory store                         |
+| **Analytics Dashboard**  | Blue     | Real-time metrics, charts, and world statistics       |
+| **Settings**             | Slate    | App configuration, preferences, API keys              |
+| **Reports**              | Indigo   | Generate and export structured reports                |
+| **Timeline**             | Amber    | Chronological view of all world activity              |
+| **Home Dashboard**       | White    | At-a-glance overview — recent activity, quick actions |
+| **Kanban Board**         | Green    | Drag-and-drop task management with columns            |
+| **Knowledge Graph**      | Violet   | Visual map of connected concepts and entities         |
+| **Automation Builder**   | Orange   | No-code workflow builder with triggers and actions    |
+| **Skill Trees**          | Emerald  | Visual progression trees for agent capabilities       |
+| **Calendar**             | Blue     | Schedule tasks, deadlines, and agent activities       |
+| **Sharing / Export**     | Teal     | Share snapshots, export data, publish reports         |
+| **Achievements Gallery** | Gold     | Track milestones, badges, and world accomplishments   |
 
 ### Visual Systems
 
@@ -181,14 +181,14 @@ claude-world/                    # 99K+ lines · 191 files
 
 ## Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Cmd+K` | Command Palette — search zones, run tasks, jump anywhere |
+| Shortcut      | Action                                                    |
+| ------------- | --------------------------------------------------------- |
+| `Cmd+K`       | Command Palette — search zones, run tasks, jump anywhere  |
 | `Cmd+Shift+F` | Focus Mode — dim the city, hide UI, spotlight active zone |
-| `Cmd+Shift+P` | Performance Monitor — FPS, memory, render stats |
-| `?` | Shortcuts Overlay — show all available shortcuts |
-| `V` | Toggle Data Flows — show/hide animated data connections |
-| `1`–`9` | Zone Quick Jump — jump directly to your pinned zones |
+| `Cmd+Shift+P` | Performance Monitor — FPS, memory, render stats           |
+| `?`           | Shortcuts Overlay — show all available shortcuts          |
+| `V`           | Toggle Data Flows — show/hide animated data connections   |
+| `1`–`9`       | Zone Quick Jump — jump directly to your pinned zones      |
 
 ---
 
@@ -215,6 +215,7 @@ npm start
 ```
 
 Open DevTools automatically:
+
 ```bash
 NODE_ENV=development npm start
 ```
@@ -222,6 +223,7 @@ NODE_ENV=development npm start
 ### First Launch
 
 On first launch, the onboarding system walks you through:
+
 1. Naming your world
 2. Choosing a template (Startup / Developer / Freelancer)
 3. Connecting your first API key
@@ -232,6 +234,7 @@ On first launch, the onboarding system walks you through:
 Keys are stored encrypted via Electron's `safeStorage`. Enter them in **Connector Docks** zone → API Keys tab. No keys are ever sent anywhere except the respective AI provider APIs.
 
 Supported providers:
+
 - Anthropic (Claude 3.5 Sonnet, Haiku)
 - OpenAI (GPT-4o, GPT-4o mini)
 - Google (Gemini 1.5 Pro) — via OpenAI-compatible endpoint
@@ -263,11 +266,12 @@ Claude World is open source and we'd love your help! Here's how to contribute:
 ### Ways to Contribute
 
 **New Zones** — Each zone lives in `src/zones/name.js` + `src/zones/name.css`. A zone is:
+
 ```js
 export class MyZone {
   render() {
-    const el = document.createElement('div');
-    el.className = 'my-zone';
+    const el = document.createElement("div");
+    el.className = "my-zone";
     // build your UI here
     return el;
   }
@@ -276,6 +280,7 @@ export class MyZone {
   }
 }
 ```
+
 Then wire it into `src/ui/panels.js` (routing), `electron/ipc-handlers.js` (IPC), and `electron/preload.js` (API bridge).
 
 **Visual improvements** — `src/renderer/` is the PixiJS engine. Great targets: new building types, agent sprites, particle effects, zone-specific animations.
@@ -296,7 +301,9 @@ Then wire it into `src/ui/panels.js` (routing), `electron/ipc-handlers.js` (IPC)
 
 1. Fork the repo
 2. Create a branch: `git checkout -b feature/my-zone
+
 # Fork first: https://github.com/sboghossian/Claude-World/fork`
+
 3. Make your changes
 4. Test with `npm start`
 5. Open a PR with a screenshot or demo GIF
@@ -304,6 +311,7 @@ Then wire it into `src/ui/panels.js` (routing), `electron/ipc-handlers.js` (IPC)
 ### Reporting Issues
 
 Please include:
+
 - macOS version
 - Node.js version
 - Steps to reproduce
@@ -348,6 +356,7 @@ MIT — see [LICENSE](LICENSE)
 ## Credits
 
 Built with:
+
 - [Electron](https://www.electronjs.org/) — Desktop shell
 - [PixiJS](https://pixijs.com/) — WebGL renderer
 - [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) — SQLite

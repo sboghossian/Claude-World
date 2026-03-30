@@ -15,7 +15,9 @@
   display: flex;
   flex-direction: column;
   pointer-events: none;
-  transition: height var(--transition-normal), opacity var(--transition-normal);
+  transition:
+    height var(--transition-normal),
+    opacity var(--transition-normal);
 }
 
 .af-root--collapsed {
@@ -28,7 +30,6 @@
   height: 0;
   overflow: hidden;
 }
-
 
 /* ── Header bar ─────────────────────────────────────────────────── */
 
@@ -102,7 +103,6 @@
   color: var(--text-primary);
 }
 
-
 /* ── Event list ─────────────────────────────────────────────────── */
 
 .af-list {
@@ -115,7 +115,9 @@
   border-top: none;
   border-radius: 0 0 var(--radius-sm) var(--radius-sm);
   pointer-events: auto;
-  transition: opacity var(--transition-normal), height var(--transition-normal);
+  transition:
+    opacity var(--transition-normal),
+    height var(--transition-normal);
 
   /* Fade-out mask at the top */
   -webkit-mask-image: linear-gradient(
@@ -148,7 +150,6 @@
   border-radius: 1px;
 }
 
-
 /* ── Individual event ───────────────────────────────────────────── */
 
 .af-event {
@@ -173,7 +174,9 @@
 .af-event--fade {
   opacity: 0 !important;
   transform: translateY(-4px) !important;
-  transition: opacity 400ms ease, transform 400ms ease;
+  transition:
+    opacity 400ms ease,
+    transform 400ms ease;
 }
 
 .af-event--exit {
@@ -181,7 +184,10 @@
   height: 0;
   padding: 0 8px;
   overflow: hidden;
-  transition: opacity 200ms ease, height 300ms ease, padding 300ms ease;
+  transition:
+    opacity 200ms ease,
+    height 300ms ease,
+    padding 300ms ease;
 }
 
 .af-event--clickable {
@@ -220,25 +226,58 @@
   white-space: nowrap;
 }
 
-
 /* ── Event type color accents ───────────────────────────────────── */
 
-.af-event--task-dispatched .af-event__icon { color: var(--accent-blue); }
-.af-event--task-complete   .af-event__icon { color: var(--accent-green); }
-.af-event--zone-unlock     .af-event__icon { color: var(--accent-gold); }
-.af-event--agent-moved     .af-event__icon { color: var(--accent-blue); }
-.af-event--quest-progress  .af-event__icon { color: var(--accent-amber); }
-.af-event--quest-complete  .af-event__icon { color: var(--accent-gold); }
-.af-event--xp-earned       .af-event__icon { color: var(--accent-gold); }
-.af-event--skill-created   .af-event__icon { color: var(--accent-purple); }
-.af-event--minion-run      .af-event__icon { color: var(--accent-amber); }
-.af-event--council-vote    .af-event__icon { color: var(--accent-purple); }
-.af-event--reputation      .af-event__icon { color: var(--accent-green); }
-.af-event--system          .af-event__icon { color: var(--text-secondary); }
+.af-event--task-dispatched .af-event__icon {
+  color: var(--accent-blue);
+}
+.af-event--task-complete .af-event__icon {
+  color: var(--accent-green);
+}
+.af-event--zone-unlock .af-event__icon {
+  color: var(--accent-gold);
+}
+.af-event--agent-moved .af-event__icon {
+  color: var(--accent-blue);
+}
+.af-event--quest-progress .af-event__icon {
+  color: var(--accent-amber);
+}
+.af-event--quest-complete .af-event__icon {
+  color: var(--accent-gold);
+}
+.af-event--xp-earned .af-event__icon {
+  color: var(--accent-gold);
+}
+.af-event--skill-created .af-event__icon {
+  color: var(--accent-purple);
+}
+.af-event--minion-run .af-event__icon {
+  color: var(--accent-amber);
+}
+.af-event--council-vote .af-event__icon {
+  color: var(--accent-purple);
+}
+.af-event--reputation .af-event__icon {
+  color: var(--accent-green);
+}
+.af-event--system .af-event__icon {
+  color: var(--text-secondary);
+}
 
 /* Subtle left-border accent per type */
-.af-event--task-complete   { border-left: 2px solid rgba(74, 255, 138, 0.25); }
-.af-event--zone-unlock     { border-left: 2px solid rgba(255, 215, 0, 0.25); }
-.af-event--quest-complete  { border-left: 2px solid rgba(255, 215, 0, 0.25); }
-.af-event--xp-earned       { border-left: 2px solid rgba(255, 215, 0, 0.2); }
-.af-event--skill-created   { border-left: 2px solid rgba(168, 85, 247, 0.25); }
+.af-event--task-complete {
+  border-left: 2px solid rgba(74, 255, 138, 0.25);
+}
+.af-event--zone-unlock {
+  border-left: 2px solid rgba(255, 215, 0, 0.25);
+}
+.af-event--quest-complete {
+  border-left: 2px solid rgba(255, 215, 0, 0.25);
+}
+.af-event--xp-earned {
+  border-left: 2px solid rgba(255, 215, 0, 0.2);
+}
+.af-event--skill-created {
+  border-left: 2px solid rgba(168, 85, 247, 0.25);
+}

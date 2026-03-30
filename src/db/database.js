@@ -1,10 +1,15 @@
-'use strict';
+"use strict";
 
-const path = require('path');
-const fs = require('fs');
-const zlib = require('zlib');
-const BetterSqlite3 = require('better-sqlite3');
-const { seedDefaultZones, seedDefaultAgents, seedQuestChain, applyTemplate } = require('./seed');
+const path = require("path");
+const fs = require("fs");
+const zlib = require("zlib");
+const BetterSqlite3 = require("better-sqlite3");
+const {
+  seedDefaultZones,
+  seedDefaultAgents,
+  seedQuestChain,
+  applyTemplate,
+} = require("./seed");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -39,9 +44,9 @@ function levelForXP(totalXP) {
  */
 function buildPartialUpdate(table, pkCol, pkVal, updates) {
   const keys = Object.keys(updates);
-  if (keys.length === 0) throw new Error('No update fields provided');
+  if (keys.length === 0) throw new Error("No update fields provided");
   const setClauses = keys.map((k) => `${k} = @${k}`);
-  const sql = `UPDATE ${table} SET ${setClauses.join(', ')} WHERE ${pkCol} = @__pk`;
+  const sql = `UPDATE ${table} SET ${setClauses.join(", ")} WHERE ${pkCol} = @__pk`;
   const params = { ...updates, __pk: pkVal };
   return { sql, params };
 }
@@ -76,9 +81,9 @@ class Database {
     this.db = new BetterSqlite3(filePath);
 
     // Performance pragmas
-    this.db.pragma('journal_mode = WAL');
-    this.db.pragma('foreign_keys = ON');
-    this.db.pragma('busy_timeout = 5000');
+    this.db.pragma("journal_mode = WAL");
+    this.db.pragma("foreign_keys = ON");
+    this.db.pragma("busy_timeout = 5000");
 
     this._runMigrations();
     this._prepareStatements();
@@ -103,24 +108,24 @@ class Database {
 
     const applied = new Set(
       this.db
-        .prepare('SELECT name FROM _migrations')
+        .prepare("SELECT name FROM _migrations")
         .all()
-        .map((r) => r.name)
+        .map((r) => r.name),
     );
 
-    const migrationsDir = path.join(__dirname, 'migrations');
+    const migrationsDir = path.join(__dirname, "migrations");
     if (!fs.existsSync(migrationsDir)) return;
 
     const files = fs
       .readdirSync(migrationsDir)
-      .filter((f) => f.endsWith('.sql'))
+      .filter((f) => f.endsWith(".sql"))
       .sort();
 
     for (const file of files) {
       if (applied.has(file)) continue;
-      const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf-8');
+      const sql = fs.readFileSync(path.join(migrationsDir, file), "utf-8");
       this.db.exec(sql);
-      this.db.prepare('INSERT INTO _migrations (name) VALUES (?)').run(file);
+      this.db.prepare("INSERT INTO _migrations (name) VALUES (?)").run(file);
     }
   }
 
@@ -332,7 +337,10 @@ class Database {
    */
   createWorld(name, template = null) {
     const world = this.db.transaction(() => {
-      const info = this._stmts.insertWorld.run({ name, template: template || null });
+      const info = this._stmts.insertWorld.run({
+        name,
+        template: template || null,
+      });
       const { id } = this._stmts.getWorldIdFromRowid.get(info.lastInsertRowid);
 
       const zones = seedDefaultZones(this, id);
@@ -370,7 +378,7 @@ class Database {
     if (row) {
       return this.getWorld(row.id);
     }
-    return this.createWorld('My World');
+    return this.createWorld("My World");
   }
 
   /**
@@ -381,8 +389,11 @@ class Database {
    * @returns {object|undefined}  The updated world row.
    */
   updateWorld(id, updates) {
-    const safeUpdates = { ...updates, updated_at: new Date().toISOString().replace('T', ' ').slice(0, 19) };
-    const { sql, params } = buildPartialUpdate('worlds', 'id', id, safeUpdates);
+    const safeUpdates = {
+      ...updates,
+      updated_at: new Date().toISOString().replace("T", " ").slice(0, 19),
+    };
+    const { sql, params } = buildPartialUpdate("worlds", "id", id, safeUpdates);
     this.db.prepare(sql).run(params);
     return this.getWorld(id);
   }
@@ -503,7 +514,12 @@ class Database {
    * @returns {object|undefined}  The updated agent.
    */
   updateAgentState(id, state, tileX, tileY) {
-    this._stmts.updateAgentState.run({ id, state, tile_x: tileX, tile_y: tileY });
+    this._stmts.updateAgentState.run({
+      id,
+      state,
+      tile_x: tileX,
+      tile_y: tileY,
+    });
     return this.getAgent(id);
   }
 
@@ -520,9 +536,15 @@ class Database {
       const agent = this._stmts.getAgentById.get(id);
       const newLevel = levelForXP(agent.xp);
       if (newLevel !== agent.level) {
-        this.db.prepare('UPDATE agents SET level = ? WHERE id = ?').run(newLevel, id);
+        this.db
+          .prepare("UPDATE agents SET level = ? WHERE id = ?")
+          .run(newLevel, id);
       }
-      return { xp: agent.xp, level: newLevel, leveledUp: newLevel > agent.level };
+      return {
+        xp: agent.xp,
+        level: newLevel,
+        leveledUp: newLevel > agent.level,
+      };
     })();
   }
 
@@ -554,10 +576,10 @@ class Database {
       quest_id: task.quest_id || null,
       provider: task.provider,
       model: task.model,
-      status: task.status || 'pending',
+      status: task.status || "pending",
       prompt: task.prompt,
       system_prompt: task.system_prompt || null,
-      metadata_json: task.metadata_json || '{}',
+      metadata_json: task.metadata_json || "{}",
     };
     const info = this._stmts.insertTask.run(params);
     const { id } = this._stmts.getTaskIdFromRowid.get(info.lastInsertRowid);
@@ -572,7 +594,7 @@ class Database {
    * @returns {object|undefined}  The updated task row.
    */
   updateTask(id, updates) {
-    const { sql, params } = buildPartialUpdate('tasks', 'id', id, updates);
+    const { sql, params } = buildPartialUpdate("tasks", "id", id, updates);
     this.db.prepare(sql).run(params);
     return { ...this._stmts.getTask.get(id) };
   }
@@ -585,7 +607,9 @@ class Database {
    * @returns {object[]}
    */
   getRecentTasks(worldId, limit = 20) {
-    return this._stmts.getRecentTasks.all(worldId, limit).map((r) => ({ ...r }));
+    return this._stmts.getRecentTasks
+      .all(worldId, limit)
+      .map((r) => ({ ...r }));
   }
 
   /**
@@ -596,7 +620,9 @@ class Database {
    * @returns {object[]}
    */
   searchTasks(worldId, query) {
-    return this._stmts.searchTasksFTS.all(query, worldId).map((r) => ({ ...r }));
+    return this._stmts.searchTasksFTS
+      .all(query, worldId)
+      .map((r) => ({ ...r }));
   }
 
   /**
@@ -671,7 +697,10 @@ class Database {
       this._stmts.completeQuest.run(id);
 
       // Auto-activate next quest in the chain
-      const next = this._stmts.getNextLockedQuest.get(quest.world_id, quest.chain_id);
+      const next = this._stmts.getNextLockedQuest.get(
+        quest.world_id,
+        quest.chain_id,
+      );
       if (next) {
         this._stmts.activateQuest.run(next.id);
       }
@@ -691,7 +720,11 @@ class Database {
    */
   checkQuestTrigger(worldId, triggerType, triggerValue) {
     return this.db.transaction(() => {
-      const quest = this._stmts.findMatchingQuest.get(worldId, triggerType, triggerValue);
+      const quest = this._stmts.findMatchingQuest.get(
+        worldId,
+        triggerType,
+        triggerValue,
+      );
       if (!quest) return null;
 
       const rewardXP = this.completeQuest(quest.id);
@@ -715,22 +748,42 @@ class Database {
    */
   createSnapshot(worldId, label) {
     return this.db.transaction(() => {
-      const world = this.db.prepare('SELECT * FROM worlds WHERE id = ?').get(worldId);
-      const zones = this.db.prepare('SELECT * FROM zones WHERE world_id = ?').all(worldId);
-      const agents = this.db.prepare('SELECT * FROM agents WHERE world_id = ?').all(worldId);
-      const quests = this.db.prepare('SELECT * FROM quests WHERE world_id = ?').all(worldId);
-      const relationships = this.db.prepare(`
+      const world = this.db
+        .prepare("SELECT * FROM worlds WHERE id = ?")
+        .get(worldId);
+      const zones = this.db
+        .prepare("SELECT * FROM zones WHERE world_id = ?")
+        .all(worldId);
+      const agents = this.db
+        .prepare("SELECT * FROM agents WHERE world_id = ?")
+        .all(worldId);
+      const quests = this.db
+        .prepare("SELECT * FROM quests WHERE world_id = ?")
+        .all(worldId);
+      const relationships = this.db
+        .prepare(
+          `
         SELECT r.* FROM relationships r
         JOIN agents a ON r.agent_a = a.id
         WHERE a.world_id = ?
-      `).all(worldId);
+      `,
+        )
+        .all(worldId);
 
-      const payload = JSON.stringify({ world, zones, agents, quests, relationships });
-      const compressed = zlib.gzipSync(Buffer.from(payload, 'utf-8'));
+      const payload = JSON.stringify({
+        world,
+        zones,
+        agents,
+        quests,
+        relationships,
+      });
+      const compressed = zlib.gzipSync(Buffer.from(payload, "utf-8"));
 
       // Find the latest snapshot for this world to use as parent
       const latest = this.db
-        .prepare('SELECT id FROM snapshots WHERE world_id = ? ORDER BY created_at DESC LIMIT 1')
+        .prepare(
+          "SELECT id FROM snapshots WHERE world_id = ? ORDER BY created_at DESC LIMIT 1",
+        )
         .get(worldId);
 
       const info = this._stmts.insertSnapshot.run({
@@ -741,8 +794,12 @@ class Database {
         size_bytes: compressed.length,
       });
 
-      const { id } = this._stmts.getSnapshotIdFromRowid.get(info.lastInsertRowid);
-      const row = this._stmts.listSnapshots.all(worldId).find((s) => s.id === id);
+      const { id } = this._stmts.getSnapshotIdFromRowid.get(
+        info.lastInsertRowid,
+      );
+      const row = this._stmts.listSnapshots
+        .all(worldId)
+        .find((s) => s.id === id);
       return { ...row };
     })();
   }
@@ -769,29 +826,40 @@ class Database {
       const snap = this._stmts.getSnapshot.get(snapshotId);
       if (!snap) throw new Error(`Snapshot ${snapshotId} not found`);
 
-      const decompressed = zlib.gunzipSync(snap.data_json).toString('utf-8');
+      const decompressed = zlib.gunzipSync(snap.data_json).toString("utf-8");
       const data = JSON.parse(decompressed);
       const worldId = data.world.id;
 
       // Clear existing data for this world (order matters for FK constraints)
-      this.db.prepare('DELETE FROM relationships WHERE agent_a IN (SELECT id FROM agents WHERE world_id = ?)').run(worldId);
-      this.db.prepare('DELETE FROM agents WHERE world_id = ?').run(worldId);
-      this.db.prepare('DELETE FROM quests WHERE world_id = ?').run(worldId);
-      this.db.prepare('DELETE FROM zones WHERE world_id = ?').run(worldId);
+      this.db
+        .prepare(
+          "DELETE FROM relationships WHERE agent_a IN (SELECT id FROM agents WHERE world_id = ?)",
+        )
+        .run(worldId);
+      this.db.prepare("DELETE FROM agents WHERE world_id = ?").run(worldId);
+      this.db.prepare("DELETE FROM quests WHERE world_id = ?").run(worldId);
+      this.db.prepare("DELETE FROM zones WHERE world_id = ?").run(worldId);
 
       // Restore world row
       const worldCols = Object.keys(data.world);
-      const worldPlaceholders = worldCols.map((c) => `@${c}`).join(', ');
-      this.db.prepare(`
-        UPDATE worlds SET ${worldCols.filter((c) => c !== 'id').map((c) => `${c} = @${c}`).join(', ')}
+      const worldPlaceholders = worldCols.map((c) => `@${c}`).join(", ");
+      this.db
+        .prepare(
+          `
+        UPDATE worlds SET ${worldCols
+          .filter((c) => c !== "id")
+          .map((c) => `${c} = @${c}`)
+          .join(", ")}
         WHERE id = @id
-      `).run(data.world);
+      `,
+        )
+        .run(data.world);
 
       // Restore zones
       if (data.zones && data.zones.length > 0) {
         const zoneCols = Object.keys(data.zones[0]);
         const zoneInsert = this.db.prepare(`
-          INSERT INTO zones (${zoneCols.join(', ')}) VALUES (${zoneCols.map((c) => `@${c}`).join(', ')})
+          INSERT INTO zones (${zoneCols.join(", ")}) VALUES (${zoneCols.map((c) => `@${c}`).join(", ")})
         `);
         for (const zone of data.zones) {
           zoneInsert.run(zone);
@@ -802,7 +870,7 @@ class Database {
       if (data.agents && data.agents.length > 0) {
         const agentCols = Object.keys(data.agents[0]);
         const agentInsert = this.db.prepare(`
-          INSERT INTO agents (${agentCols.join(', ')}) VALUES (${agentCols.map((c) => `@${c}`).join(', ')})
+          INSERT INTO agents (${agentCols.join(", ")}) VALUES (${agentCols.map((c) => `@${c}`).join(", ")})
         `);
         for (const agent of data.agents) {
           agentInsert.run(agent);
@@ -813,7 +881,7 @@ class Database {
       if (data.quests && data.quests.length > 0) {
         const questCols = Object.keys(data.quests[0]);
         const questInsert = this.db.prepare(`
-          INSERT INTO quests (${questCols.join(', ')}) VALUES (${questCols.map((c) => `@${c}`).join(', ')})
+          INSERT INTO quests (${questCols.join(", ")}) VALUES (${questCols.map((c) => `@${c}`).join(", ")})
         `);
         for (const quest of data.quests) {
           questInsert.run(quest);
@@ -824,7 +892,7 @@ class Database {
       if (data.relationships && data.relationships.length > 0) {
         const relCols = Object.keys(data.relationships[0]);
         const relInsert = this.db.prepare(`
-          INSERT INTO relationships (${relCols.join(', ')}) VALUES (${relCols.map((c) => `@${c}`).join(', ')})
+          INSERT INTO relationships (${relCols.join(", ")}) VALUES (${relCols.map((c) => `@${c}`).join(", ")})
         `);
         for (const rel of data.relationships) {
           relInsert.run(rel);

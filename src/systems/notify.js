@@ -17,16 +17,23 @@
  * @param {{ zoneId?: string, icon?: string }} [opts]
  */
 export function notify(category, title, body, opts = {}) {
-  document.dispatchEvent(new CustomEvent('notification:push', {
-    detail: { category, title, body, ...opts },
-  }));
+  document.dispatchEvent(
+    new CustomEvent("notification:push", {
+      detail: { category, title, body, ...opts },
+    }),
+  );
 }
 
 /**
  * Convenience shortcuts for each category.
  */
-export const notifySystem      = (title, body, opts) => notify('system', title, body, opts);
-export const notifyZone        = (title, body, opts) => notify('zone', title, body, opts);
-export const notifyAgent       = (title, body, opts) => notify('agent', title, body, opts);
-export const notifyQuest       = (title, body, opts) => notify('quest', title, body, opts);
-export const notifyAchievement = (title, body, opts) => notify('achievement', title, body, opts);
+export const notifySystem = (title, body, opts) =>
+  notify("system", title, body, opts);
+export const notifyZone = (title, body, opts) =>
+  notify("zone", title, body, opts);
+export const notifyAgent = (title, body, opts) =>
+  notify("agent", title, body, opts);
+export const notifyQuest = (title, body, opts) =>
+  notify("quest", title, body, opts);
+export const notifyAchievement = (title, body, opts) =>
+  notify("achievement", title, body, opts);

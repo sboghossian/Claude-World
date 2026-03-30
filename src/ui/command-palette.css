@@ -8,13 +8,21 @@
 /* ── Keyframe animations ──────────────────────────────────────────────────── */
 
 @keyframes cp-backdrop-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes cp-backdrop-out {
-  from { opacity: 1; }
-  to   { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes cp-modal-in {
@@ -51,16 +59,24 @@
 }
 
 @keyframes cp-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes cp-cursor-blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 @keyframes cp-pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow:
       0 0 0 0 rgba(139, 92, 246, 0),
       0 0 12px rgba(139, 92, 246, 0.15);
@@ -73,48 +89,55 @@
 }
 
 @keyframes cp-dot-pulse {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50%       { opacity: 1;   transform: scale(1.4); }
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
 }
 
 /* ── Design tokens (scoped to palette) ────────────────────────────────────── */
 
 .cp-backdrop {
   /* Colors */
-  --cp-purple-100:  #f3e8ff;
-  --cp-purple-400:  #c084fc;
-  --cp-purple-500:  #a855f7;
-  --cp-purple-600:  #9333ea;
-  --cp-purple-700:  #7e22ce;
+  --cp-purple-100: #f3e8ff;
+  --cp-purple-400: #c084fc;
+  --cp-purple-500: #a855f7;
+  --cp-purple-600: #9333ea;
+  --cp-purple-700: #7e22ce;
   --cp-purple-glow: rgba(139, 92, 246, 0.35);
 
-  --cp-bg-overlay:  rgba(8, 8, 16, 0.72);
-  --cp-bg-modal:    rgba(14, 14, 24, 0.88);
-  --cp-bg-row-hover:    rgba(139, 92, 246, 0.08);
-  --cp-bg-row-active:   rgba(139, 92, 246, 0.16);
+  --cp-bg-overlay: rgba(8, 8, 16, 0.72);
+  --cp-bg-modal: rgba(14, 14, 24, 0.88);
+  --cp-bg-row-hover: rgba(139, 92, 246, 0.08);
+  --cp-bg-row-active: rgba(139, 92, 246, 0.16);
 
-  --cp-border:         rgba(255, 255, 255, 0.08);
-  --cp-border-strong:  rgba(139, 92, 246, 0.4);
-  --cp-border-input:   rgba(255, 255, 255, 0.06);
+  --cp-border: rgba(255, 255, 255, 0.08);
+  --cp-border-strong: rgba(139, 92, 246, 0.4);
+  --cp-border-input: rgba(255, 255, 255, 0.06);
 
-  --cp-text-primary:   rgba(255, 255, 255, 0.95);
+  --cp-text-primary: rgba(255, 255, 255, 0.95);
   --cp-text-secondary: rgba(255, 255, 255, 0.55);
-  --cp-text-dim:       rgba(255, 255, 255, 0.30);
-  --cp-text-accent:    #c084fc;
+  --cp-text-dim: rgba(255, 255, 255, 0.3);
+  --cp-text-accent: #c084fc;
 
-  --cp-mark-color:     #c084fc;
+  --cp-mark-color: #c084fc;
 
   /* Geometry */
-  --cp-modal-width:     640px;
+  --cp-modal-width: 640px;
   --cp-modal-max-height: 520px;
-  --cp-radius:          14px;
-  --cp-radius-sm:       6px;
-  --cp-radius-xs:       4px;
+  --cp-radius: 14px;
+  --cp-radius-sm: 6px;
+  --cp-radius-xs: 4px;
 
   /* Motion */
-  --cp-ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
-  --cp-ease-in:   cubic-bezier(0.4, 0, 1, 1);
-  --cp-duration:  120ms;
+  --cp-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --cp-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --cp-duration: 120ms;
 }
 
 /* ── Backdrop ──────────────────────────────────────────────────────────────── */
@@ -235,13 +258,18 @@
 
 /* Purple focus-glow on the input area border-bottom */
 .cp-input-area::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -1px;
   left: 20px;
   right: 20px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--cp-purple-500), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--cp-purple-500),
+    transparent
+  );
   opacity: 0;
   transition: opacity 200ms var(--cp-ease-out);
 }
@@ -277,7 +305,7 @@
   border-radius: 20px;
   background: rgba(139, 92, 246, 0.15);
   border: 1px solid rgba(139, 92, 246, 0.3);
-  font-family: var(--font-mono, 'SF Mono', 'Fira Code', monospace);
+  font-family: var(--font-mono, "SF Mono", "Fira Code", monospace);
   font-size: 11px;
   color: var(--cp-purple-400);
   white-space: nowrap;
@@ -366,7 +394,7 @@
 }
 
 .cp-row::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: 0;
@@ -483,7 +511,7 @@
 }
 
 .cp-badge {
-  font-family: var(--font-mono, 'SF Mono', 'Fira Code', monospace);
+  font-family: var(--font-mono, "SF Mono", "Fira Code", monospace);
   font-size: 10px;
   font-weight: 500;
   color: var(--cp-purple-400);

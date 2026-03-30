@@ -6,16 +6,16 @@
  * frame skipping to conserve battery.
  */
 
-import { Application, Container } from 'pixi.js';
-import { FRAME_INTERVAL } from './constants.js';
-import { createTileGrid, screenToTile } from './tiles.js';
-import { Camera } from './camera.js';
-import { BuildingManager } from './buildings.js';
-import { FogOfWar } from './fog.js';
-import { DayNightCycle } from './daynight.js';
-import { WeatherSystem } from './weather.js';
-import { WeatherEffects } from './weather-effects.js';
-import worldState from '../systems/world-state.js';
+import { Application, Container } from "pixi.js";
+import { FRAME_INTERVAL } from "./constants.js";
+import { createTileGrid, screenToTile } from "./tiles.js";
+import { Camera } from "./camera.js";
+import { BuildingManager } from "./buildings.js";
+import { FogOfWar } from "./fog.js";
+import { DayNightCycle } from "./daynight.js";
+import { WeatherSystem } from "./weather.js";
+import { WeatherEffects } from "./weather-effects.js";
+import worldState from "../systems/world-state.js";
 
 /** @type {Application | null} */
 let app = null;
@@ -38,9 +38,9 @@ let weatherEffects = null;
  * @returns {Promise<void>}
  */
 export async function initWorld() {
-  const canvas = document.getElementById('world-canvas');
+  const canvas = document.getElementById("world-canvas");
   if (!canvas) {
-    throw new Error('Canvas element #world-canvas not found');
+    throw new Error("Canvas element #world-canvas not found");
   }
 
   // ── Create PixiJS Application ─────────────────────────────────
@@ -98,12 +98,18 @@ export async function initWorld() {
   // Map world state weather strings to visual effects
   const mapWeatherToEffect = (weather) => {
     switch (weather) {
-      case 'storm': return 'storm';
-      case 'rain': return 'rain';
-      case 'cloudy': return 'cloudy';
-      case 'clear': return 'clear';
-      case 'sunny': return 'sunny';
-      default: return 'clear';
+      case "storm":
+        return "storm";
+      case "rain":
+        return "rain";
+      case "cloudy":
+        return "cloudy";
+      case "clear":
+        return "clear";
+      case "sunny":
+        return "sunny";
+      default:
+        return "clear";
     }
   };
 
@@ -118,23 +124,28 @@ export async function initWorld() {
   const initState = worldState.getState();
   weatherEffects.setWeather(
     mapWeatherToEffect(initState.weather),
-    1.0 - initState.moodScore
+    1.0 - initState.moodScore,
   );
 
   // ── Click handler ─────────────────────────────────────────────
-  canvas.addEventListener('click', (e) => {
+  canvas.addEventListener("click", (e) => {
     if (!camera || !buildingManager) return;
     const worldPos = camera.screenToWorld(e.clientX, e.clientY);
     const hitZone = buildingManager.hitTest(worldPos.x, worldPos.y);
     if (hitZone) {
-      console.log(`[Claude World] Clicked zone: ${hitZone.name} (${hitZone.id})`, hitZone);
+      console.log(
+        `[Claude World] Clicked zone: ${hitZone.name} (${hitZone.id})`,
+        hitZone,
+      );
       // Dispatch custom event for the Electron shell to listen to
-      document.dispatchEvent(new CustomEvent('zone-click', { detail: hitZone }));
+      document.dispatchEvent(
+        new CustomEvent("zone-click", { detail: hitZone }),
+      );
     }
   });
 
   // ── Window resize ─────────────────────────────────────────────
-  window.addEventListener('resize', () => {
+  window.addEventListener("resize", () => {
     if (app) {
       app.renderer.resize(window.innerWidth, window.innerHeight);
     }
@@ -143,7 +154,7 @@ export async function initWorld() {
   // ── Start render loop ─────────────────────────────────────────
   startRenderLoop();
 
-  console.log('[Claude World] Renderer initialized');
+  console.log("[Claude World] Renderer initialized");
 }
 
 /**

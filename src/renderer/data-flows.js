@@ -14,14 +14,14 @@
  * All rendering uses PixiJS v8 Graphics — no sprites or textures.
  */
 
-import { Container, Graphics } from 'pixi.js';
-import { TILE_WIDTH, TILE_HEIGHT, HEIGHT_UNIT_PX } from './constants.js';
-import { ZONE_DEFS } from './zones.js';
-import { tileToScreen } from './tiles.js';
+import { Container, Graphics } from "pixi.js";
+import { TILE_WIDTH, TILE_HEIGHT, HEIGHT_UNIT_PX } from "./constants.js";
+import { ZONE_DEFS } from "./zones.js";
+import { tileToScreen } from "./tiles.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const lerp  = (a, b, t) => a + (b - a) * t;
+const lerp = (a, b, t) => a + (b - a) * t;
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 /** Evaluate a quadratic bezier at t (0..1). */
@@ -35,7 +35,7 @@ function bezierPoint(p0x, p0y, cpx, cpy, p1x, p1y, t) {
 
 /** Get the screen-space center (top of roof) for a zone. */
 function zoneCenterScreen(zoneId) {
-  const zone = ZONE_DEFS.find(z => z.id === zoneId);
+  const zone = ZONE_DEFS.find((z) => z.id === zoneId);
   if (!zone) return null;
   const cx = zone.tileX + zone.w / 2;
   const cy = zone.tileY + zone.h / 2;
@@ -48,58 +48,58 @@ function zoneCenterScreen(zoneId) {
 
 const FLOW_STYLES = {
   task: {
-    color:        0x4a9eff,   // blue
-    glowColor:    0x4a9eff,
+    color: 0x4a9eff, // blue
+    glowColor: 0x4a9eff,
     particleSize: 3,
     particleCount: 5,
-    speed:        0.4,        // full traversal per second
-    lineAlpha:    0.15,
-    lineWidth:    1.5,
-    dashed:       false,
+    speed: 0.4, // full traversal per second
+    lineAlpha: 0.15,
+    lineWidth: 1.5,
+    dashed: false,
     bidirectional: false,
   },
   sync: {
-    color:        0xa855f7,   // purple
-    glowColor:    0xa855f7,
+    color: 0xa855f7, // purple
+    glowColor: 0xa855f7,
     particleSize: 3.5,
     particleCount: 4,
-    speed:        0.3,
-    lineAlpha:    0.2,
-    lineWidth:    2,
-    dashed:       false,
+    speed: 0.3,
+    lineAlpha: 0.2,
+    lineWidth: 2,
+    dashed: false,
     bidirectional: true,
   },
   api: {
-    color:        0xffb84a,   // orange
-    glowColor:    0xffb84a,
+    color: 0xffb84a, // orange
+    glowColor: 0xffb84a,
     particleSize: 2.5,
     particleCount: 3,
-    speed:        0.5,
-    lineAlpha:    0.2,
-    lineWidth:    1.5,
-    dashed:       true,
+    speed: 0.5,
+    lineAlpha: 0.2,
+    lineWidth: 1.5,
+    dashed: true,
     bidirectional: false,
   },
   agent: {
-    color:        0x4aff8a,   // green
-    glowColor:    0x4aff8a,
+    color: 0x4aff8a, // green
+    glowColor: 0x4aff8a,
     particleSize: 2,
     particleCount: 6,
-    speed:        0.35,
-    lineAlpha:    0.1,
-    lineWidth:    1,
-    dashed:       true,
+    speed: 0.35,
+    lineAlpha: 0.1,
+    lineWidth: 1,
+    dashed: true,
     bidirectional: false,
   },
   broadcast: {
-    color:        0xff4a6a,   // red
-    glowColor:    0xff4a6a,
-    particleSize: 0,          // broadcast uses rings, not particles
+    color: 0xff4a6a, // red
+    glowColor: 0xff4a6a,
+    particleSize: 0, // broadcast uses rings, not particles
     particleCount: 0,
-    speed:        0.6,
-    lineAlpha:    0,
-    lineWidth:    0,
-    dashed:       false,
+    speed: 0.6,
+    lineAlpha: 0,
+    lineWidth: 0,
+    dashed: false,
     bidirectional: false,
   },
 };
@@ -132,14 +132,14 @@ export class DataFlowSystem {
    */
   constructor(app, buildingManager) {
     this._app = app;
-    this._bm  = buildingManager;
+    this._bm = buildingManager;
 
     /** @type {Container} */
     this.container = new Container();
-    this.container.zIndex = 1.5;  // between buildings (1) and fog (2)
+    this.container.zIndex = 1.5; // between buildings (1) and fog (2)
 
     // Two layers: lines underneath, particles on top
-    this._lineGfx     = new Graphics();
+    this._lineGfx = new Graphics();
     this._particleGfx = new Graphics();
     this.container.addChild(this._lineGfx);
     this.container.addChild(this._particleGfx);
@@ -158,7 +158,7 @@ export class DataFlowSystem {
 
     // ── Keyboard toggle (V key) ──────────────────────────────────
     this._onKeyDown = this._onKeyDown.bind(this);
-    document.addEventListener('keydown', this._onKeyDown);
+    document.addEventListener("keydown", this._onKeyDown);
 
     // ── Auto-listen to game events ───────────────────────────────
     this._boundListeners = [];
@@ -174,9 +174,9 @@ export class DataFlowSystem {
    * @param {string} type      - 'task' | 'sync' | 'api' | 'agent' | 'broadcast'
    * @returns {number} flow id
    */
-  addFlow(fromZone, toZone, type = 'task') {
+  addFlow(fromZone, toZone, type = "task") {
     const from = zoneCenterScreen(fromZone);
-    const to   = zoneCenterScreen(toZone);
+    const to = zoneCenterScreen(toZone);
     if (!from || !to) return -1;
 
     // Compute bezier control point: perpendicular offset for organic curve
@@ -190,7 +190,7 @@ export class DataFlowSystem {
     const side = Math.random() > 0.5 ? 1 : -1;
     const cp = {
       x: mx + (-dy / dist) * dist * perpScale * side,
-      y: my + ( dx / dist) * dist * perpScale * side,
+      y: my + (dx / dist) * dist * perpScale * side,
     };
 
     const style = FLOW_STYLES[type] || FLOW_STYLES.task;
@@ -204,10 +204,15 @@ export class DataFlowSystem {
     const id = _nextFlowId++;
     /** @type {FlowEntry} */
     const entry = {
-      id, fromZone, toZone, type,
+      id,
+      fromZone,
+      toZone,
+      type,
       intensity: 0.5,
       age: 0,
-      from, to, cp,
+      from,
+      to,
+      cp,
       particleTs,
       ringT: 0,
     };
@@ -264,7 +269,7 @@ export class DataFlowSystem {
     for (const [, flow] of this._flows) {
       flow.age += dt;
 
-      if (flow.type === 'broadcast') {
+      if (flow.type === "broadcast") {
         this._updateBroadcast(flow, dt);
       } else {
         this._drawFlowLine(flow);
@@ -281,7 +286,7 @@ export class DataFlowSystem {
    * Clean up all resources.
    */
   destroy() {
-    document.removeEventListener('keydown', this._onKeyDown);
+    document.removeEventListener("keydown", this._onKeyDown);
     for (const { event, handler } of this._boundListeners) {
       document.removeEventListener(event, handler);
     }
@@ -301,29 +306,31 @@ export class DataFlowSystem {
     const style = FLOW_STYLES[flow.type] || FLOW_STYLES.task;
     if (style.lineAlpha <= 0) return;
 
-    const gfx    = this._lineGfx;
-    const alpha  = style.lineAlpha * this._opacity;
+    const gfx = this._lineGfx;
+    const alpha = style.lineAlpha * this._opacity;
     const { from, to, cp } = flow;
 
     // Idle flows pulse slowly
-    const pulseAlpha = flow.intensity < 0.3
-      ? alpha * (0.5 + 0.5 * Math.sin(flow.age * 1.5))
-      : alpha;
+    const pulseAlpha =
+      flow.intensity < 0.3
+        ? alpha * (0.5 + 0.5 * Math.sin(flow.age * 1.5))
+        : alpha;
 
     if (style.dashed) {
       // Draw dashed bezier
       const segments = 30;
-      const dashLen  = 0.04;
-      const gapLen   = 0.03;
-      let drawing    = true;
-      let accum      = 0;
-      let prev       = bezierPoint(from.x, from.y, cp.x, cp.y, to.x, to.y, 0);
+      const dashLen = 0.04;
+      const gapLen = 0.03;
+      let drawing = true;
+      let accum = 0;
+      let prev = bezierPoint(from.x, from.y, cp.x, cp.y, to.x, to.y, 0);
 
       for (let i = 1; i <= segments; i++) {
-        const t   = i / segments;
-        const pt  = bezierPoint(from.x, from.y, cp.x, cp.y, to.x, to.y, t);
+        const t = i / segments;
+        const pt = bezierPoint(from.x, from.y, cp.x, cp.y, to.x, to.y, t);
         const seg = Math.sqrt((pt.x - prev.x) ** 2 + (pt.y - prev.y) ** 2);
-        const segT = seg / (Math.sqrt((to.x - from.x) ** 2 + (to.y - from.y) ** 2) || 1);
+        const segT =
+          seg / (Math.sqrt((to.x - from.x) ** 2 + (to.y - from.y) ** 2) || 1);
 
         accum += segT;
         const threshold = drawing ? dashLen : gapLen;
@@ -335,25 +342,37 @@ export class DataFlowSystem {
         if (drawing) {
           gfx.moveTo(prev.x, prev.y);
           gfx.lineTo(pt.x, pt.y);
-          gfx.stroke({ color: style.color, alpha: pulseAlpha, width: style.lineWidth });
+          gfx.stroke({
+            color: style.color,
+            alpha: pulseAlpha,
+            width: style.lineWidth,
+          });
         }
         prev = pt;
       }
 
       // Arrowhead for API calls
-      if (flow.type === 'api') {
+      if (flow.type === "api") {
         this._drawArrowhead(gfx, flow, style, pulseAlpha);
       }
     } else {
       // Solid bezier curve
       gfx.moveTo(from.x, from.y);
       gfx.quadraticCurveTo(cp.x, cp.y, to.x, to.y);
-      gfx.stroke({ color: style.color, alpha: pulseAlpha, width: style.lineWidth });
+      gfx.stroke({
+        color: style.color,
+        alpha: pulseAlpha,
+        width: style.lineWidth,
+      });
 
       // Soft glow underneath (slightly wider, more transparent)
       gfx.moveTo(from.x, from.y);
       gfx.quadraticCurveTo(cp.x, cp.y, to.x, to.y);
-      gfx.stroke({ color: style.glowColor, alpha: pulseAlpha * 0.3, width: style.lineWidth + 3 });
+      gfx.stroke({
+        color: style.glowColor,
+        alpha: pulseAlpha * 0.3,
+        width: style.lineWidth + 3,
+      });
     }
   }
 
@@ -383,7 +402,8 @@ export class DataFlowSystem {
     const ay = p1.y;
 
     gfx.poly([
-      ax, ay,
+      ax,
+      ay,
       ax - nx * arrowSize - ny * arrowSize * 0.5,
       ay - ny * arrowSize + nx * arrowSize * 0.5,
       ax - nx * arrowSize + ny * arrowSize * 0.5,
@@ -426,7 +446,7 @@ export class DataFlowSystem {
     const baseAlpha = this._opacity * (0.6 + flow.intensity * 0.4);
 
     for (let i = 0; i < flow.particleTs.length; i++) {
-      const t  = flow.particleTs[i];
+      const t = flow.particleTs[i];
       const pt = bezierPoint(from.x, from.y, cp.x, cp.y, to.x, to.y, t);
 
       // Fade at endpoints
@@ -445,7 +465,7 @@ export class DataFlowSystem {
     // Bidirectional: draw reverse particles
     if (style.bidirectional) {
       for (let i = 0; i < flow.particleTs.length; i++) {
-        const t  = 1 - flow.particleTs[i]; // reversed
+        const t = 1 - flow.particleTs[i]; // reversed
         const pt = bezierPoint(from.x, from.y, cp.x, cp.y, to.x, to.y, t);
 
         const edgeFade = Math.min(t * 5, (1 - t) * 5, 1);
@@ -489,15 +509,15 @@ export class DataFlowSystem {
    * @param {number} dt
    */
   _drawBroadcastRings(dt) {
-    const gfx   = this._particleGfx;
-    const alive  = [];
+    const gfx = this._particleGfx;
+    const alive = [];
 
     for (const ring of this._rings) {
       ring.t += dt * 0.5;
       if (ring.t >= 1) continue; // expired
 
       const radius = ring.t * ring.maxRadius;
-      const alpha  = this._opacity * (1 - ring.t) * 0.35;
+      const alpha = this._opacity * (1 - ring.t) * 0.35;
 
       // Outer ring
       gfx.circle(ring.x, ring.y, radius);
@@ -517,10 +537,14 @@ export class DataFlowSystem {
 
   /** @param {KeyboardEvent} e */
   _onKeyDown(e) {
-    if (e.key === 'v' || e.key === 'V') {
+    if (e.key === "v" || e.key === "V") {
       // Ignore if user is typing in an input
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' ||
-          e.target.isContentEditable) return;
+      if (
+        e.target.tagName === "INPUT" ||
+        e.target.tagName === "TEXTAREA" ||
+        e.target.isContentEditable
+      )
+        return;
       this.setVisible(!this._visible);
     }
   }
@@ -535,11 +559,11 @@ export class DataFlowSystem {
     this._eventFlows = new Map();
 
     // ── Task flow: dispatch → zone on task dispatch ─────────────
-    this._listen('dispatch:task-start', (e) => {
+    this._listen("dispatch:task-start", (e) => {
       const zone = e.detail?.zoneType;
       if (!zone) return;
       const key = `task:${zone}:${Date.now()}`;
-      const id = this.addFlow('dispatch', zone, 'task');
+      const id = this.addFlow("dispatch", zone, "task");
       if (id > 0) {
         this._eventFlows.set(key, id);
         this.setIntensity(id, 0.8);
@@ -552,11 +576,11 @@ export class DataFlowSystem {
     });
 
     // ── Task complete: brief flash ──────────────────────────────
-    this._listen('dispatch:task-complete', (e) => {
+    this._listen("dispatch:task-complete", (e) => {
       const zone = e.detail?.zoneType;
       if (!zone) return;
       const key = `task-done:${zone}:${Date.now()}`;
-      const id = this.addFlow('dispatch', zone, 'task');
+      const id = this.addFlow("dispatch", zone, "task");
       if (id > 0) {
         this.setIntensity(id, 1.0);
         this._eventFlows.set(key, id);
@@ -568,9 +592,9 @@ export class DataFlowSystem {
     });
 
     // ── Data sync: brain ↔ memory (persistent while both active) ─
-    this._listen('zone:unlock', (e) => {
+    this._listen("zone:unlock", (e) => {
       const zone = e.detail?.zoneType;
-      if (zone === 'memory' || zone === 'brain') {
+      if (zone === "memory" || zone === "brain") {
         this._ensureSyncFlow();
       }
     });
@@ -578,10 +602,10 @@ export class DataFlowSystem {
     setTimeout(() => this._ensureSyncFlow(), 1000);
 
     // ── API calls: exchange → external zones ────────────────────
-    this._listen('connector-docks:api-call', (e) => {
-      const target = e.detail?.targetZone || 'docks';
+    this._listen("connector-docks:api-call", (e) => {
+      const target = e.detail?.targetZone || "docks";
       const key = `api:${target}:${Date.now()}`;
-      const id = this.addFlow('exchange', target, 'api');
+      const id = this.addFlow("exchange", target, "api");
       if (id > 0) {
         this.setIntensity(id, 0.9);
         this._eventFlows.set(key, id);
@@ -593,11 +617,11 @@ export class DataFlowSystem {
     });
 
     // ── Agent movement: any → any ───────────────────────────────
-    this._listen('agent:move', (e) => {
+    this._listen("agent:move", (e) => {
       const { fromZone, toZone } = e.detail || {};
       if (!fromZone || !toZone) return;
       const key = `agent:${fromZone}:${toZone}:${Date.now()}`;
-      const id = this.addFlow(fromZone, toZone, 'agent');
+      const id = this.addFlow(fromZone, toZone, "agent");
       if (id > 0) {
         this.setIntensity(id, 0.6);
         this._eventFlows.set(key, id);
@@ -609,11 +633,11 @@ export class DataFlowSystem {
     });
 
     // ── Broadcast: broadcast tower → all active zones ───────────
-    this._listen('broadcast:send', () => {
-      const src = zoneCenterScreen('broadcast');
+    this._listen("broadcast:send", () => {
+      const src = zoneCenterScreen("broadcast");
       if (!src) return;
       const key = `broadcast:${Date.now()}`;
-      const id = this.addFlow('broadcast', 'dispatch', 'broadcast');
+      const id = this.addFlow("broadcast", "dispatch", "broadcast");
       if (id > 0) {
         this.setIntensity(id, 1.0);
         this._eventFlows.set(key, id);
@@ -637,14 +661,14 @@ export class DataFlowSystem {
 
   /** Create the persistent brain ↔ memory sync flow if both zones exist. */
   _ensureSyncFlow() {
-    if (this._eventFlows.has('sync:brain-memory')) return;
-    const brain  = zoneCenterScreen('brain');
-    const memory = zoneCenterScreen('memory');
+    if (this._eventFlows.has("sync:brain-memory")) return;
+    const brain = zoneCenterScreen("brain");
+    const memory = zoneCenterScreen("memory");
     if (!brain || !memory) return;
-    const id = this.addFlow('brain', 'memory', 'sync');
+    const id = this.addFlow("brain", "memory", "sync");
     if (id > 0) {
       this.setIntensity(id, 0.3); // idle pulse
-      this._eventFlows.set('sync:brain-memory', id);
+      this._eventFlows.set("sync:brain-memory", id);
     }
   }
 }

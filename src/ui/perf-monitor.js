@@ -11,14 +11,14 @@
  *   perf.toggle();   // or perf.show() / perf.hide()
  */
 
-import { getApp } from '../renderer/app.js';
+import { getApp } from "../renderer/app.js";
 
 // ── Constants ────────────────────────────────────────────────────────
 
-const GRAPH_HISTORY = 120;           // frames of FPS history
-const GRAPH_HEIGHT  = 40;
-const SLOW_UPDATE_INTERVAL = 1000;   // ms between "slow" metric refreshes
-const FPS_GREEN  = 24;
+const GRAPH_HISTORY = 120; // frames of FPS history
+const GRAPH_HEIGHT = 40;
+const SLOW_UPDATE_INTERVAL = 1000; // ms between "slow" metric refreshes
+const FPS_GREEN = 24;
 const FPS_YELLOW = 15;
 
 // ── IPC call counter (monkey-patch hook) ─────────────────────────────
@@ -39,14 +39,16 @@ function _hookIPC() {
     // Wrap any method that looks like an IPC call
     for (const key of Object.keys(ipc)) {
       const orig = ipc[key];
-      if (typeof orig === 'function') {
+      if (typeof orig === "function") {
         ipc[key] = (...args) => {
           _ipcCallCount++;
           return orig.apply(ipc, args);
         };
       }
     }
-  } catch { /* not in Electron — ignore */ }
+  } catch {
+    /* not in Electron — ignore */
+  }
 }
 
 // ── Boot time tracking ───────────────────────────────────────────────
@@ -58,7 +60,7 @@ function _captureBootTime() {
   const observer = new MutationObserver((mutations) => {
     for (const m of mutations) {
       for (const node of m.removedNodes) {
-        if (node.id === 'splash' || node.classList?.contains('splash-screen')) {
+        if (node.id === "splash" || node.classList?.contains("splash-screen")) {
           _bootTime = performance.now();
           observer.disconnect();
           return;
@@ -67,10 +69,12 @@ function _captureBootTime() {
     }
     // Also check style changes (opacity → 0)
     for (const m of mutations) {
-      if (m.type === 'attributes' && m.attributeName === 'style') {
+      if (m.type === "attributes" && m.attributeName === "style") {
         const el = m.target;
-        if ((el.id === 'splash' || el.classList?.contains('splash-screen')) &&
-            (el.style.opacity === '0' || el.style.display === 'none')) {
+        if (
+          (el.id === "splash" || el.classList?.contains("splash-screen")) &&
+          (el.style.opacity === "0" || el.style.display === "none")
+        ) {
           _bootTime = performance.now();
           observer.disconnect();
           return;
@@ -82,22 +86,22 @@ function _captureBootTime() {
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ['style', 'class'],
+    attributeFilter: ["style", "class"],
   });
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
 function fpsColor(fps) {
-  if (fps >= FPS_GREEN) return 'green';
-  if (fps >= FPS_YELLOW) return 'yellow';
-  return 'red';
+  if (fps >= FPS_GREEN) return "green";
+  if (fps >= FPS_YELLOW) return "yellow";
+  return "red";
 }
 
 function fpsHex(fps) {
-  if (fps >= FPS_GREEN) return '#4aff8a';
-  if (fps >= FPS_YELLOW) return '#ffb84a';
-  return '#ff4a6a';
+  if (fps >= FPS_GREEN) return "#4aff8a";
+  if (fps >= FPS_YELLOW) return "#ffb84a";
+  return "#ff4a6a";
 }
 
 function formatBytes(bytes) {
@@ -164,7 +168,7 @@ export class PerfMonitor {
     _captureBootTime();
 
     // Register keyboard shortcut
-    document.addEventListener('keydown', this._onKeyDown);
+    document.addEventListener("keydown", this._onKeyDown);
   }
 
   // ── Public API ───────────────────────────────────────────────────
@@ -177,7 +181,7 @@ export class PerfMonitor {
   show() {
     if (this._destroyed) return;
     if (!this._el) this._build();
-    this._el.classList.remove('hidden');
+    this._el.classList.remove("hidden");
     this._visible = true;
     this._lastFrameTs = performance.now();
     this._frameTimeMin = Infinity;
@@ -188,7 +192,7 @@ export class PerfMonitor {
   }
 
   hide() {
-    if (this._el) this._el.classList.add('hidden');
+    if (this._el) this._el.classList.add("hidden");
     this._visible = false;
     if (this._rafId) {
       cancelAnimationFrame(this._rafId);
@@ -199,9 +203,9 @@ export class PerfMonitor {
   destroy() {
     this._destroyed = true;
     this.hide();
-    document.removeEventListener('keydown', this._onKeyDown);
-    document.removeEventListener('mousemove', this._onMouseMove);
-    document.removeEventListener('mouseup', this._onMouseUp);
+    document.removeEventListener("keydown", this._onKeyDown);
+    document.removeEventListener("mousemove", this._onMouseMove);
+    document.removeEventListener("mouseup", this._onMouseUp);
     if (this._el && this._el.parentNode) {
       this._el.parentNode.removeChild(this._el);
     }
@@ -211,8 +215,8 @@ export class PerfMonitor {
   // ── Build DOM ────────────────────────────────────────────────────
 
   _build() {
-    const el = document.createElement('div');
-    el.className = 'perf-monitor hidden';
+    const el = document.createElement("div");
+    el.className = "perf-monitor hidden";
 
     el.innerHTML = `
       <div class="perf-monitor__header">
@@ -286,31 +290,35 @@ export class PerfMonitor {
     this._el = el;
 
     // Cache metric elements
-    el.querySelectorAll('[data-metric]').forEach((span) => {
+    el.querySelectorAll("[data-metric]").forEach((span) => {
       this._metricEls[span.dataset.metric] = span;
     });
 
     // FPS canvas
     this._fpsCanvas = el.querySelector('[data-graph="fps"]');
-    this._fpsCanvas.width = 234;  // 250 - 2*8 padding
+    this._fpsCanvas.width = 234; // 250 - 2*8 padding
     this._fpsCanvas.height = GRAPH_HEIGHT;
-    this._fpsCtx = this._fpsCanvas.getContext('2d');
+    this._fpsCtx = this._fpsCanvas.getContext("2d");
 
     // Memory canvas
     this._memCanvas = el.querySelector('[data-graph="mem"]');
     this._memCanvas.width = 234;
     this._memCanvas.height = GRAPH_HEIGHT;
-    this._memCtx = this._memCanvas.getContext('2d');
+    this._memCtx = this._memCanvas.getContext("2d");
 
     // Close button
-    el.querySelector('.perf-monitor__close').addEventListener('click', () => this.hide());
+    el.querySelector(".perf-monitor__close").addEventListener("click", () =>
+      this.hide(),
+    );
 
     // Copy button
-    el.querySelector('.perf-monitor__copy-btn').addEventListener('click', () => this._copyStats());
+    el.querySelector(".perf-monitor__copy-btn").addEventListener("click", () =>
+      this._copyStats(),
+    );
 
     // Drag handling on header
-    const header = el.querySelector('.perf-monitor__header');
-    header.addEventListener('mousedown', this._onMouseDown);
+    const header = el.querySelector(".perf-monitor__header");
+    header.addEventListener("mousedown", this._onMouseDown);
   }
 
   // ── Frame tick ───────────────────────────────────────────────────
@@ -337,8 +345,8 @@ export class PerfMonitor {
 
       // Update FPS display every frame
       const avgFps = Math.round(fps);
-      this._setMetric('fps', `${avgFps}`, fpsColor(avgFps));
-      this._setMetric('frameTime', `${dt.toFixed(1)} ms`, fpsColor(fps));
+      this._setMetric("fps", `${avgFps}`, fpsColor(avgFps));
+      this._setMetric("frameTime", `${dt.toFixed(1)} ms`, fpsColor(fps));
 
       // Draw FPS graph
       this._drawFpsGraph();
@@ -364,7 +372,7 @@ export class PerfMonitor {
     ctx.clearRect(0, 0, w, h);
 
     // Background grid lines at 15 and 30 fps
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.strokeStyle = "rgba(255,255,255,0.06)";
     ctx.lineWidth = 1;
     for (const threshold of [15, 24, 30, 60]) {
       const y = h - (threshold / 60) * h;
@@ -400,7 +408,10 @@ export class PerfMonitor {
     ctx.lineTo(lastX, h);
     ctx.lineTo(0, h);
     ctx.closePath();
-    ctx.fillStyle = color.replace(')', ',0.15)').replace('rgb', 'rgba').replace('#', '');
+    ctx.fillStyle = color
+      .replace(")", ",0.15)")
+      .replace("rgb", "rgba")
+      .replace("#", "");
     // Use a simpler alpha fill
     ctx.globalAlpha = 0.12;
     ctx.fillStyle = color;
@@ -425,7 +436,7 @@ export class PerfMonitor {
     ctx.clearRect(0, 0, w, h);
 
     // Grid
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.strokeStyle = "rgba(255,255,255,0.06)";
     ctx.lineWidth = 1;
     for (let frac = 0.25; frac <= 1; frac += 0.25) {
       const y = h - frac * h;
@@ -450,7 +461,7 @@ export class PerfMonitor {
       else ctx.lineTo(x, y);
     }
 
-    ctx.strokeStyle = '#4a9eff';
+    ctx.strokeStyle = "#4a9eff";
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
@@ -460,7 +471,7 @@ export class PerfMonitor {
     ctx.lineTo(0, h);
     ctx.closePath();
     ctx.globalAlpha = 0.1;
-    ctx.fillStyle = '#4a9eff';
+    ctx.fillStyle = "#4a9eff";
     ctx.fill();
     ctx.globalAlpha = 1;
   }
@@ -471,9 +482,10 @@ export class PerfMonitor {
     // Frame min/max/avg
     if (this._frameCount > 0) {
       const avg = (this._frameTimeSum / this._frameCount).toFixed(1);
-      const min = this._frameTimeMin === Infinity ? '--' : this._frameTimeMin.toFixed(1);
+      const min =
+        this._frameTimeMin === Infinity ? "--" : this._frameTimeMin.toFixed(1);
       const max = this._frameTimeMax.toFixed(1);
-      this._setMetric('frameMinMax', `${min} / ${max} ms`);
+      this._setMetric("frameMinMax", `${min} / ${max} ms`);
 
       // Reset for next interval
       this._frameTimeMin = Infinity;
@@ -487,30 +499,38 @@ export class PerfMonitor {
     if (mem) {
       const usedMB = mem.usedJSHeapSize / 1048576;
       const totalMB = mem.totalJSHeapSize / 1048576;
-      this._setMetric('memory', `${usedMB.toFixed(1)} / ${totalMB.toFixed(0)} MB`, 'blue');
+      this._setMetric(
+        "memory",
+        `${usedMB.toFixed(1)} / ${totalMB.toFixed(0)} MB`,
+        "blue",
+      );
       this._drawMemGraph(usedMB);
     } else {
-      this._setMetric('memory', 'N/A');
+      this._setMetric("memory", "N/A");
     }
 
     // PixiJS stats
     this._updatePixiStats();
 
     // DOM nodes
-    const domCount = document.querySelectorAll('*').length;
-    this._setMetric('domNodes', `${domCount}`);
+    const domCount = document.querySelectorAll("*").length;
+    this._setMetric("domNodes", `${domCount}`);
 
     // Event listeners estimate
-    this._setMetric('listeners', `${this._estimateListeners()}`);
+    this._setMetric("listeners", `${this._estimateListeners()}`);
 
     // Boot time
     if (_bootTime !== null) {
-      this._setMetric('boot', `${(_bootTime / 1000).toFixed(2)}s`, 'green');
+      this._setMetric("boot", `${(_bootTime / 1000).toFixed(2)}s`, "green");
     } else {
       // Fall back to navigation timing
-      const nav = performance.getEntriesByType?.('navigation')?.[0];
+      const nav = performance.getEntriesByType?.("navigation")?.[0];
       if (nav) {
-        this._setMetric('boot', `${(nav.loadEventEnd / 1000).toFixed(2)}s`, 'blue');
+        this._setMetric(
+          "boot",
+          `${(nav.loadEventEnd / 1000).toFixed(2)}s`,
+          "blue",
+        );
       }
     }
 
@@ -522,8 +542,11 @@ export class PerfMonitor {
       _ipcCallCount = 0;
       _ipcLastReset = now;
     }
-    this._setMetric('dbQps', `${_ipcCallsPerSec}`,
-      _ipcCallsPerSec > 50 ? 'red' : _ipcCallsPerSec > 20 ? 'yellow' : 'green');
+    this._setMetric(
+      "dbQps",
+      `${_ipcCallsPerSec}`,
+      _ipcCallsPerSec > 50 ? "red" : _ipcCallsPerSec > 20 ? "yellow" : "green",
+    );
   }
 
   // ── PixiJS stats ─────────────────────────────────────────────────
@@ -531,30 +554,37 @@ export class PerfMonitor {
   _updatePixiStats() {
     const pixiApp = getApp();
     if (!pixiApp) {
-      this._setMetric('drawCalls', 'N/A');
-      this._setMetric('textures', 'N/A');
-      this._setMetric('containers', 'N/A');
+      this._setMetric("drawCalls", "N/A");
+      this._setMetric("textures", "N/A");
+      this._setMetric("containers", "N/A");
       return;
     }
 
     // Draw calls — PixiJS v8 exposes renderer.renderPipes or lastObjectRendered
-    let drawCalls = '--';
+    let drawCalls = "--";
     try {
       const renderer = pixiApp.renderer;
       // v8: check for instrumentation or renderGroup info
       if (renderer.renderPipes?.batch?.renderer?._drawCallCount != null) {
         drawCalls = renderer.renderPipes.batch.renderer._drawCallCount;
-      } else if (renderer.lastObjectRendered?.renderGroup?.structGroup?.instructionSet?.instructions) {
-        drawCalls = renderer.lastObjectRendered.renderGroup.structGroup.instructionSet.instructions.length;
+      } else if (
+        renderer.lastObjectRendered?.renderGroup?.structGroup?.instructionSet
+          ?.instructions
+      ) {
+        drawCalls =
+          renderer.lastObjectRendered.renderGroup.structGroup.instructionSet
+            .instructions.length;
       } else if (renderer.gl) {
         // WebGL — estimate from render pipes
-        drawCalls = '~';
+        drawCalls = "~";
       }
-    } catch { /* ignore */ }
-    this._setMetric('drawCalls', `${drawCalls}`);
+    } catch {
+      /* ignore */
+    }
+    this._setMetric("drawCalls", `${drawCalls}`);
 
     // Texture count
-    let texCount = '--';
+    let texCount = "--";
     try {
       const renderer = pixiApp.renderer;
       if (renderer.texture?.managedTextures) {
@@ -562,8 +592,10 @@ export class PerfMonitor {
       } else if (renderer.texture?._managedTextures) {
         texCount = renderer.texture._managedTextures.length;
       }
-    } catch { /* ignore */ }
-    this._setMetric('textures', `${texCount}`);
+    } catch {
+      /* ignore */
+    }
+    this._setMetric("textures", `${texCount}`);
 
     // Container count (walk stage tree)
     let containerCount = 0;
@@ -575,8 +607,10 @@ export class PerfMonitor {
     };
     try {
       walk(pixiApp.stage);
-    } catch { /* ignore */ }
-    this._setMetric('containers', `${containerCount}`);
+    } catch {
+      /* ignore */
+    }
+    this._setMetric("containers", `${containerCount}`);
   }
 
   // ── Listener estimation ──────────────────────────────────────────
@@ -585,10 +619,21 @@ export class PerfMonitor {
     // Use getEventListeners if available (Chrome DevTools protocol),
     // otherwise count elements with common event attributes
     let count = 0;
-    const attrs = ['onclick', 'onmousedown', 'onmouseup', 'onmousemove',
-      'onkeydown', 'onkeyup', 'onchange', 'oninput', 'onscroll',
-      'onwheel', 'ontouchstart', 'onpointerdown'];
-    const allEls = document.querySelectorAll('*');
+    const attrs = [
+      "onclick",
+      "onmousedown",
+      "onmouseup",
+      "onmousemove",
+      "onkeydown",
+      "onkeyup",
+      "onchange",
+      "oninput",
+      "onscroll",
+      "onwheel",
+      "ontouchstart",
+      "onpointerdown",
+    ];
+    const allEls = document.querySelectorAll("*");
     for (const el of allEls) {
       for (const attr of attrs) {
         if (el[attr]) count++;
@@ -608,10 +653,10 @@ export class PerfMonitor {
 
     // Remove old color classes
     el.classList.remove(
-      'perf-monitor__value--green',
-      'perf-monitor__value--yellow',
-      'perf-monitor__value--red',
-      'perf-monitor__value--blue',
+      "perf-monitor__value--green",
+      "perf-monitor__value--yellow",
+      "perf-monitor__value--red",
+      "perf-monitor__value--blue",
     );
     if (colorClass) {
       el.classList.add(`perf-monitor__value--${colorClass}`);
@@ -621,23 +666,29 @@ export class PerfMonitor {
   // ── Copy stats to clipboard ──────────────────────────────────────
 
   _copyStats() {
-    const lines = ['=== Claude World Perf Stats ==='];
+    const lines = ["=== Claude World Perf Stats ==="];
     for (const [key, el] of Object.entries(this._metricEls)) {
-      const label = el.closest('.perf-monitor__row')
-        ?.querySelector('.perf-monitor__label')?.textContent ?? key;
+      const label =
+        el.closest(".perf-monitor__row")?.querySelector(".perf-monitor__label")
+          ?.textContent ?? key;
       lines.push(`${label}: ${el.textContent}`);
     }
     lines.push(`Timestamp: ${new Date().toISOString()}`);
-    const text = lines.join('\n');
+    const text = lines.join("\n");
 
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = this._el.querySelector('.perf-monitor__copy-btn');
-      const orig = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(() => { btn.textContent = orig; }, 1200);
-    }).catch(() => {
-      console.warn('[PerfMonitor] Failed to copy to clipboard');
-    });
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        const btn = this._el.querySelector(".perf-monitor__copy-btn");
+        const orig = btn.textContent;
+        btn.textContent = "Copied!";
+        setTimeout(() => {
+          btn.textContent = orig;
+        }, 1200);
+      })
+      .catch(() => {
+        console.warn("[PerfMonitor] Failed to copy to clipboard");
+      });
   }
 
   // ── Keyboard shortcut ────────────────────────────────────────────
@@ -645,14 +696,14 @@ export class PerfMonitor {
   _onKeyDown(e) {
     // Cmd+Shift+P (Mac) / Ctrl+Shift+P (Win)
     const modKey = e.metaKey || e.ctrlKey;
-    if (modKey && e.shiftKey && e.code === 'KeyP') {
+    if (modKey && e.shiftKey && e.code === "KeyP") {
       e.preventDefault();
       e.stopPropagation();
       this.toggle();
       return;
     }
     // F12
-    if (e.code === 'F12') {
+    if (e.code === "F12") {
       e.preventDefault();
       this.toggle();
     }
@@ -666,8 +717,8 @@ export class PerfMonitor {
     const rect = this._el.getBoundingClientRect();
     this._dragOffset.x = e.clientX - rect.left;
     this._dragOffset.y = e.clientY - rect.top;
-    document.addEventListener('mousemove', this._onMouseMove);
-    document.addEventListener('mouseup', this._onMouseUp);
+    document.addEventListener("mousemove", this._onMouseMove);
+    document.addEventListener("mouseup", this._onMouseUp);
     e.preventDefault();
   }
 
@@ -681,12 +732,12 @@ export class PerfMonitor {
     const maxY = window.innerHeight - this._el.offsetHeight;
     this._el.style.left = `${Math.max(0, Math.min(x, maxX))}px`;
     this._el.style.top = `${Math.max(0, Math.min(y, maxY))}px`;
-    this._el.style.right = 'auto';
+    this._el.style.right = "auto";
   }
 
   _onMouseUp() {
     this._dragging = false;
-    document.removeEventListener('mousemove', this._onMouseMove);
-    document.removeEventListener('mouseup', this._onMouseUp);
+    document.removeEventListener("mousemove", this._onMouseMove);
+    document.removeEventListener("mouseup", this._onMouseUp);
   }
 }

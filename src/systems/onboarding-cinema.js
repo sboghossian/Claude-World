@@ -52,9 +52,9 @@ export class OnboardingCinema {
       if (e !== SKIP_SIGNAL) throw e;
     } finally {
       this._teardown();
-      this._dispatchEvent('cinema:complete', { worldId, worldName });
+      this._dispatchEvent("cinema:complete", { worldId, worldName });
       // Auto-open Dispatch panel
-      this._dispatchEvent('zone:open', { zone: 'dispatch' });
+      this._dispatchEvent("zone:open", { zone: "dispatch" });
     }
   }
 
@@ -64,13 +64,13 @@ export class OnboardingCinema {
 
   /** Step 0 — black overlay fades out revealing the city (0.5 s) */
   async _step0_fadeIn() {
-    const curtain = this._overlay.querySelector('.oc-curtain');
-    curtain.style.opacity = '1';
+    const curtain = this._overlay.querySelector(".oc-curtain");
+    curtain.style.opacity = "1";
     await this._wait(50);
-    curtain.style.transition = 'opacity 0.5s ease-out';
-    curtain.style.opacity = '0';
+    curtain.style.transition = "opacity 0.5s ease-out";
+    curtain.style.opacity = "0";
     await this._raceSkip(500);
-    curtain.style.display = 'none';
+    curtain.style.display = "none";
   }
 
   /** Step 1 — camera sweep + "Welcome to [worldName]" (2 s) */
@@ -79,7 +79,8 @@ export class OnboardingCinema {
     const bm = this._options.getBuildingManager?.();
 
     // Determine world center
-    let cx = 0, cy = 0;
+    let cx = 0,
+      cy = 0;
     if (bm) {
       const bounds = bm.getWorldBounds?.() ?? { cx: 0, cy: 0 };
       cx = bounds.cx ?? 0;
@@ -90,7 +91,7 @@ export class OnboardingCinema {
     camera?.panTo?.({ x: cx - 200, y: cy }, 2000);
 
     // Show welcome text
-    const mainText = this._overlay.querySelector('.oc-main-text');
+    const mainText = this._overlay.querySelector(".oc-main-text");
     mainText.textContent = `Welcome to ${worldName}`;
     await this._fadeIn(mainText, 400);
 
@@ -101,22 +102,22 @@ export class OnboardingCinema {
 
   /** Step 2 — Commander introduction with typewriter effect (3 s) */
   async _step2_commanderIntro() {
-    const mainText  = this._overlay.querySelector('.oc-main-text');
-    const subText   = this._overlay.querySelector('.oc-sub-text');
-    const commander = this._overlay.querySelector('.oc-commander');
-    const dialogue  =
-      'Commander here. This is your world. ' +
-      'Every building is a tool. Every agent, a team member. ' +
+    const mainText = this._overlay.querySelector(".oc-main-text");
+    const subText = this._overlay.querySelector(".oc-sub-text");
+    const commander = this._overlay.querySelector(".oc-commander");
+    const dialogue =
+      "Commander here. This is your world. " +
+      "Every building is a tool. Every agent, a team member. " +
       "Let's build something great.";
 
     // Show commander emoji
-    commander.style.opacity = '0';
-    commander.style.display = 'block';
+    commander.style.opacity = "0";
+    commander.style.display = "block";
     await this._fadeIn(commander, 300);
 
     // Typewriter into subText
-    subText.textContent = '';
-    subText.style.opacity = '1';
+    subText.textContent = "";
+    subText.style.opacity = "1";
 
     await this._typewriter(subText, dialogue, 28);
 
@@ -127,37 +128,37 @@ export class OnboardingCinema {
       this._fadeOut(subText, 300),
       this._fadeOut(mainText, 200),
     ]);
-    commander.style.display = 'none';
+    commander.style.display = "none";
   }
 
   /** Step 3 — Zone spotlight: pan to each zone, highlight, name it (1 s each) */
   async _step3_zoneSpotlight() {
     const camera = this._options.getCamera?.();
-    const bm     = this._options.getBuildingManager?.();
+    const bm = this._options.getBuildingManager?.();
 
     const zones = [
       {
-        id: 'dispatch',
-        label: 'Dispatch Center',
-        tagline: 'Send tasks. Direct your agents.',
-        color: '#7c3aed',
+        id: "dispatch",
+        label: "Dispatch Center",
+        tagline: "Send tasks. Direct your agents.",
+        color: "#7c3aed",
       },
       {
-        id: 'brain',
-        label: 'The Brain',
-        tagline: 'Memory, knowledge, long-term thinking.',
-        color: '#2563eb',
+        id: "brain",
+        label: "The Brain",
+        tagline: "Memory, knowledge, long-term thinking.",
+        color: "#2563eb",
       },
       {
-        id: 'chat',
-        label: 'Chat Hub',
-        tagline: 'Talk to your world in real time.',
-        color: '#f59e0b',
+        id: "chat",
+        label: "Chat Hub",
+        tagline: "Talk to your world in real time.",
+        color: "#f59e0b",
       },
     ];
 
-    const mainText = this._overlay.querySelector('.oc-main-text');
-    const subText  = this._overlay.querySelector('.oc-sub-text');
+    const mainText = this._overlay.querySelector(".oc-main-text");
+    const subText = this._overlay.querySelector(".oc-sub-text");
 
     for (const zone of zones) {
       if (this._skipped) break;
@@ -167,7 +168,7 @@ export class OnboardingCinema {
       camera?.panTo?.({ x: pos.x, y: pos.y }, 600);
 
       // Spotlight VFX event
-      this._dispatchEvent('vfx:spotlight', {
+      this._dispatchEvent("vfx:spotlight", {
         zone: zone.id,
         color: zone.color,
         duration: 1000,
@@ -176,8 +177,8 @@ export class OnboardingCinema {
       // Overlay text
       mainText.textContent = zone.label;
       mainText.style.color = zone.color;
-      subText.textContent  = zone.tagline;
-      subText.style.opacity = '1';
+      subText.textContent = zone.tagline;
+      subText.style.opacity = "1";
 
       await this._fadeIn(mainText, 250);
       await this._raceSkip(900);
@@ -186,24 +187,24 @@ export class OnboardingCinema {
     }
 
     // Reset text color
-    mainText.style.color = '';
+    mainText.style.color = "";
   }
 
   /** Step 4 — "Your first task" with arrow animation + dispatch pulse (5 s) */
   async _step4_firstTask() {
-    const camera   = this._options.getCamera?.();
-    const bm       = this._options.getBuildingManager?.();
-    const mainText = this._overlay.querySelector('.oc-main-text');
-    const subText  = this._overlay.querySelector('.oc-sub-text');
-    const arrow    = this._overlay.querySelector('.oc-arrow');
+    const camera = this._options.getCamera?.();
+    const bm = this._options.getBuildingManager?.();
+    const mainText = this._overlay.querySelector(".oc-main-text");
+    const subText = this._overlay.querySelector(".oc-sub-text");
+    const arrow = this._overlay.querySelector(".oc-arrow");
 
     // Pan back to dispatch center
-    const dispatchPos = bm?.getBuildingPosition?.('dispatch') ?? { x: 0, y: 0 };
+    const dispatchPos = bm?.getBuildingPosition?.("dispatch") ?? { x: 0, y: 0 };
     camera?.panTo?.({ x: dispatchPos.x, y: dispatchPos.y }, 800);
 
-    mainText.textContent = 'Your first task is ready.';
-    subText.textContent  = "Let's dispatch something.";
-    subText.style.opacity = '1';
+    mainText.textContent = "Your first task is ready.";
+    subText.textContent = "Let's dispatch something.";
+    subText.style.opacity = "1";
 
     await this._fadeIn(mainText, 400);
     await this._fadeIn(arrow, 300);
@@ -211,9 +212,9 @@ export class OnboardingCinema {
     // Pulse dispatch zone 3 times
     for (let i = 0; i < 3; i++) {
       if (this._skipped) break;
-      this._dispatchEvent('vfx:spotlight', {
-        zone: 'dispatch',
-        color: '#7c3aed',
+      this._dispatchEvent("vfx:spotlight", {
+        zone: "dispatch",
+        color: "#7c3aed",
         duration: 600,
       });
       await this._raceSkip(700);
@@ -230,25 +231,25 @@ export class OnboardingCinema {
 
   /** Step 5 — fade to play, camera home, emit cinema:complete (0.5 s) */
   async _step5_fadeToPlay() {
-    const camera  = this._options.getCamera?.();
-    const curtain = this._overlay.querySelector('.oc-curtain');
+    const camera = this._options.getCamera?.();
+    const curtain = this._overlay.querySelector(".oc-curtain");
 
     // Fade to black briefly
-    curtain.style.display = 'block';
-    curtain.style.transition = 'opacity 0.4s ease-in';
-    curtain.style.opacity = '0';
+    curtain.style.display = "block";
+    curtain.style.transition = "opacity 0.4s ease-in";
+    curtain.style.opacity = "0";
     await this._wait(20);
-    curtain.style.opacity = '1';
+    curtain.style.opacity = "1";
     await this._raceSkip(400);
 
     // Return camera to default
     camera?.resetToDefault?.();
 
     // Fade back in
-    curtain.style.transition = 'opacity 0.4s ease-out';
-    curtain.style.opacity = '0';
+    curtain.style.transition = "opacity 0.4s ease-out";
+    curtain.style.opacity = "0";
     await this._raceSkip(400);
-    curtain.style.display = 'none';
+    curtain.style.display = "none";
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -271,7 +272,9 @@ export class OnboardingCinema {
     if (this._skipped) return Promise.reject(SKIP_SIGNAL);
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
-        this._skipResolvers = this._skipResolvers.filter(r => r !== skipResolve);
+        this._skipResolvers = this._skipResolvers.filter(
+          (r) => r !== skipResolve,
+        );
         resolve();
       }, ms);
 
@@ -288,8 +291,8 @@ export class OnboardingCinema {
   // ─────────────────────────────────────────────────────────────
 
   _buildOverlay(worldName) {
-    const el = document.createElement('div');
-    el.className = 'oc-overlay';
+    const el = document.createElement("div");
+    el.className = "oc-overlay";
     el.innerHTML = `
       <div class="oc-curtain"></div>
 
@@ -309,22 +312,29 @@ export class OnboardingCinema {
     `;
 
     // Skip button
-    el.querySelector('.oc-skip-btn').addEventListener('click', () => this._skip());
+    el.querySelector(".oc-skip-btn").addEventListener("click", () =>
+      this._skip(),
+    );
 
     // Escape key
-    this._escHandler = (e) => { if (e.key === 'Escape') this._skip(); };
-    document.addEventListener('keydown', this._escHandler);
+    this._escHandler = (e) => {
+      if (e.key === "Escape") this._skip();
+    };
+    document.addEventListener("keydown", this._escHandler);
 
     this._overlay = el;
   }
 
   _teardown() {
-    document.removeEventListener('keydown', this._escHandler);
+    document.removeEventListener("keydown", this._escHandler);
     if (this._overlay && this._overlay.parentNode) {
       // Fade out the entire overlay
-      this._overlay.style.transition = 'opacity 0.4s ease-out';
-      this._overlay.style.opacity = '0';
-      setTimeout(() => this._overlay?.parentNode?.removeChild(this._overlay), 450);
+      this._overlay.style.transition = "opacity 0.4s ease-out";
+      this._overlay.style.opacity = "0";
+      setTimeout(
+        () => this._overlay?.parentNode?.removeChild(this._overlay),
+        450,
+      );
     }
     this._overlay = null;
   }
@@ -334,23 +344,23 @@ export class OnboardingCinema {
   // ─────────────────────────────────────────────────────────────
 
   _fadeIn(el, ms = 300) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       el.style.transition = `opacity ${ms}ms ease-in`;
-      el.style.opacity = '1';
+      el.style.opacity = "1";
       setTimeout(resolve, ms);
     });
   }
 
   _fadeOut(el, ms = 300) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       el.style.transition = `opacity ${ms}ms ease-out`;
-      el.style.opacity = '0';
+      el.style.opacity = "0";
       setTimeout(resolve, ms);
     });
   }
 
   _wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -363,8 +373,8 @@ export class OnboardingCinema {
       return;
     }
 
-    const cursor = this._overlay.querySelector('.oc-cursor');
-    cursor.style.display = 'inline-block';
+    const cursor = this._overlay.querySelector(".oc-cursor");
+    cursor.style.display = "inline-block";
 
     for (let i = 0; i <= text.length; i++) {
       if (this._skipped) {
@@ -375,7 +385,7 @@ export class OnboardingCinema {
       await this._wait(charDelay);
     }
 
-    cursor.style.display = 'none';
+    cursor.style.display = "none";
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -399,4 +409,4 @@ export class OnboardingCinema {
 }
 
 // Sentinel value used to signal a skip through Promise rejection
-const SKIP_SIGNAL = Symbol('CINEMA_SKIP');
+const SKIP_SIGNAL = Symbol("CINEMA_SKIP");

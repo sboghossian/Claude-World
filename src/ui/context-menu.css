@@ -44,7 +44,9 @@
   gap: 10px;
   padding: 7px 14px;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
   position: relative;
   outline: none;
   border: none;

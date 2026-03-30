@@ -12,7 +12,8 @@ const SCRIPT_TAG_RE = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi;
 const EVENT_HANDLER_RE = /\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi;
 
 // Matches javascript: URLs in href, src, action, formaction, data, etc.
-const JS_URL_RE = /(href|src|action|formaction|data)\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi;
+const JS_URL_RE =
+  /(href|src|action|formaction|data)\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi;
 
 // Matches <iframe>, <object>, <embed>, <applet> tags
 const DANGEROUS_TAGS_RE = /<\/?\s*(iframe|object|embed|applet)\b[^>]*>/gi;
@@ -27,22 +28,22 @@ const DANGEROUS_TAGS_RE = /<\/?\s*(iframe|object|embed|applet)\b[^>]*>/gi;
  * @returns {string} — sanitized HTML safe for innerHTML insertion
  */
 export function sanitizeHTML(html) {
-  if (typeof html !== 'string') return '';
+  if (typeof html !== "string") return "";
 
   let clean = html;
 
   // Remove <script>...</script> blocks (run twice for nested edge cases)
-  clean = clean.replace(SCRIPT_TAG_RE, '');
-  clean = clean.replace(SCRIPT_TAG_RE, '');
+  clean = clean.replace(SCRIPT_TAG_RE, "");
+  clean = clean.replace(SCRIPT_TAG_RE, "");
 
   // Remove event handler attributes
-  clean = clean.replace(EVENT_HANDLER_RE, '');
+  clean = clean.replace(EVENT_HANDLER_RE, "");
 
   // Remove javascript: URLs
-  clean = clean.replace(JS_URL_RE, '');
+  clean = clean.replace(JS_URL_RE, "");
 
   // Remove dangerous embed tags
-  clean = clean.replace(DANGEROUS_TAGS_RE, '');
+  clean = clean.replace(DANGEROUS_TAGS_RE, "");
 
   return clean;
 }
@@ -55,11 +56,11 @@ export function sanitizeHTML(html) {
  * @returns {string} — escaped text safe for innerHTML / attribute values
  */
 export function escapeHTML(text) {
-  if (typeof text !== 'string') return '';
+  if (typeof text !== "string") return "";
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }

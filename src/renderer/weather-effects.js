@@ -7,7 +7,7 @@
  * Respects day/night cycle for lighting adjustments.
  */
 
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics } from "pixi.js";
 
 // ── Constants ──────────────────────────────────────────────────────────
 
@@ -92,8 +92,8 @@ export class WeatherEffects {
     this._world = worldContainer;
 
     // Current and target weather for transitions
-    this._currentWeather = 'clear';
-    this._targetWeather = 'clear';
+    this._currentWeather = "clear";
+    this._targetWeather = "clear";
     this._intensity = 0.5;
     this._transitionProgress = 1.0; // 1 = fully transitioned
     this._nightLevel = 0;
@@ -122,7 +122,7 @@ export class WeatherEffects {
     // Effects layer sits above world content in the stage (screen-space)
     this._container = new Container();
     this._container.zIndex = 50;
-    this._container.eventMode = 'none';
+    this._container.eventMode = "none";
     this._container.interactiveChildren = false;
 
     // We add to the stage so effects are in screen-space, not world-space
@@ -184,8 +184,13 @@ export class WeatherEffects {
     this._rainPool = [];
     for (let i = 0; i < RAIN_POOL_SIZE; i++) {
       this._rainPool.push({
-        x: 0, y: 0, vx: 0, vy: 0,
-        length: 10, alpha: 0.4, active: false,
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
+        length: 10,
+        alpha: 0.4,
+        active: false,
       });
     }
 
@@ -193,8 +198,14 @@ export class WeatherEffects {
     this._snowPool = [];
     for (let i = 0; i < SNOW_POOL_SIZE; i++) {
       this._snowPool.push({
-        x: 0, y: 0, vy: 0, size: 2,
-        alpha: 0.6, phase: 0, swaySpeed: 1, swayAmp: 20,
+        x: 0,
+        y: 0,
+        vy: 0,
+        size: 2,
+        alpha: 0.6,
+        phase: 0,
+        swaySpeed: 1,
+        swayAmp: 20,
         active: false,
       });
     }
@@ -203,7 +214,12 @@ export class WeatherEffects {
     this._splashPool = [];
     for (let i = 0; i < SPLASH_POOL_SIZE; i++) {
       this._splashPool.push({
-        x: 0, y: 0, life: 0, maxLife: 0.3, size: 3, active: false,
+        x: 0,
+        y: 0,
+        life: 0,
+        maxLife: 0.3,
+        size: 3,
+        active: false,
       });
     }
 
@@ -211,7 +227,12 @@ export class WeatherEffects {
     this._streakPool = [];
     for (let i = 0; i < STREAK_POOL_SIZE; i++) {
       this._streakPool.push({
-        x: 0, y: 0, vx: 0, alpha: 0.3, length: 30, active: false,
+        x: 0,
+        y: 0,
+        vx: 0,
+        alpha: 0.3,
+        length: 30,
+        active: false,
       });
     }
   }
@@ -224,7 +245,10 @@ export class WeatherEffects {
    * @param {number} [intensity=0.5] - 0..1 intensity
    */
   setWeather(type, intensity = 0.5) {
-    if (type === this._targetWeather && Math.abs(intensity - this._intensity) < 0.01) {
+    if (
+      type === this._targetWeather &&
+      Math.abs(intensity - this._intensity) < 0.01
+    ) {
       return;
     }
 
@@ -344,30 +368,30 @@ export class WeatherEffects {
   /** @private */
   _renderWeatherType(type, alpha, dt, w, h) {
     switch (type) {
-      case 'rain':
+      case "rain":
         this._updateRain(dt, alpha, w, h, false);
         this._drawFogOverlay(alpha * 0.1, w, h, 0x4466aa);
         break;
-      case 'storm':
+      case "storm":
         this._updateRain(dt, alpha, w, h, true);
         this._drawFogOverlay(alpha * 0.15, w, h, 0x222244);
         break;
-      case 'snow':
+      case "snow":
         this._updateSnow(dt, alpha, w, h);
         this._updateSnowAccumulation(dt, alpha, w, h);
         break;
-      case 'fog':
-      case 'cloudy':
+      case "fog":
+      case "cloudy":
         this._updateFog(dt, alpha, w, h);
         break;
-      case 'sunny':
-      case 'clear':
+      case "sunny":
+      case "clear":
         this._updateSunny(dt, alpha, w, h);
         break;
-      case 'wind':
+      case "wind":
         this._updateWind(dt, alpha, w, h);
         break;
-      case 'aurora':
+      case "aurora":
         this._updateAurora(dt, alpha, w, h);
         break;
     }
@@ -384,7 +408,7 @@ export class WeatherEffects {
     // Spawn drops
     const toSpawn = Math.floor(spawnRate * dt);
     for (let i = 0; i < toSpawn; i++) {
-      const drop = this._rainPool.find(d => !d.active);
+      const drop = this._rainPool.find((d) => !d.active);
       if (!drop) break;
 
       drop.active = true;
@@ -423,7 +447,11 @@ export class WeatherEffects {
 
       this._rainGfx.moveTo(drop.x, drop.y);
       this._rainGfx.lineTo(endX, endY);
-      this._rainGfx.stroke({ color, alpha: dropAlpha, width: isStorm ? 1.5 : 1 });
+      this._rainGfx.stroke({
+        color,
+        alpha: dropAlpha,
+        width: isStorm ? 1.5 : 1,
+      });
     }
 
     // Update splashes
@@ -447,7 +475,7 @@ export class WeatherEffects {
 
   /** @private */
   _spawnSplash(x, y) {
-    const splash = this._splashPool.find(s => !s.active);
+    const splash = this._splashPool.find((s) => !s.active);
     if (!splash) return;
     splash.active = true;
     splash.x = x;
@@ -468,7 +496,7 @@ export class WeatherEffects {
     // Spawn flakes
     const toSpawn = Math.floor(spawnRate * dt);
     for (let i = 0; i < toSpawn; i++) {
-      const flake = this._snowPool.find(f => !f.active);
+      const flake = this._snowPool.find((f) => !f.active);
       if (!flake) break;
 
       flake.active = true;
@@ -492,7 +520,11 @@ export class WeatherEffects {
       const swayX = Math.sin(flake.phase) * flake.swayAmp * dt;
       flake.x += swayX;
 
-      if (flake.y > h + 20 || flake.x < BOUNDS.left - 30 || flake.x > BOUNDS.right + 30) {
+      if (
+        flake.y > h + 20 ||
+        flake.x < BOUNDS.left - 30 ||
+        flake.x > BOUNDS.right + 30
+      ) {
         flake.active = false;
         continue;
       }
@@ -508,7 +540,7 @@ export class WeatherEffects {
   /** @private */
   _updateSnowAccumulation(dt, alpha, w, h) {
     // Slowly grow snow accumulation while snowing
-    if (this._targetWeather === 'snow' && this._transitionProgress >= 0.5) {
+    if (this._targetWeather === "snow" && this._transitionProgress >= 0.5) {
       this._snowAccum = Math.min(this._snowAccum + dt * 1.5, 12);
     } else {
       // Melt away
@@ -532,15 +564,17 @@ export class WeatherEffects {
 
   /** @private */
   _updateLightning(dt, w, h) {
-    const isStorm = this._targetWeather === 'storm' ||
-                    (this._outgoingWeather === 'storm' && this._outgoingAlpha > 0.3);
+    const isStorm =
+      this._targetWeather === "storm" ||
+      (this._outgoingWeather === "storm" && this._outgoingAlpha > 0.3);
 
     // Decay flash
     if (this._lightningFlash > 0) {
       this._lightningFlash -= dt * 4; // fast decay
       if (this._lightningFlash < 0) this._lightningFlash = 0;
 
-      const flashAlpha = this._lightningFlash * (this._nightLevel > 0.5 ? 0.7 : 0.4);
+      const flashAlpha =
+        this._lightningFlash * (this._nightLevel > 0.5 ? 0.7 : 0.4);
       this._flashGfx.rect(0, 0, w, h);
       this._flashGfx.fill({ color: 0xeeeeff, alpha: flashAlpha });
     }
@@ -578,7 +612,7 @@ export class WeatherEffects {
     const amp = this._shakeIntensity * t;
     this._container.position.set(
       (Math.random() - 0.5) * amp * 2,
-      (Math.random() - 0.5) * amp * 2
+      (Math.random() - 0.5) * amp * 2,
     );
   }
 
@@ -586,14 +620,16 @@ export class WeatherEffects {
 
   /** @private */
   _updateFog(dt, alpha, w, h) {
-    const isCloudy = this._targetWeather === 'cloudy' || this._outgoingWeather === 'cloudy';
+    const isCloudy =
+      this._targetWeather === "cloudy" || this._outgoingWeather === "cloudy";
     const baseAlpha = isCloudy ? 0.08 : 0.18;
     const cloudAlpha = alpha * (isCloudy ? 0.12 : 0.2);
 
     // Draw drifting fog clouds using layered sine waves (perlin-like)
     for (let i = 0; i < FOG_CLOUD_COUNT; i++) {
       const phase = i * 1.3 + this._time * (0.02 + i * 0.008);
-      const cx = (Math.sin(phase) * 0.5 + 0.5) * w + Math.cos(phase * 0.7) * 100;
+      const cx =
+        (Math.sin(phase) * 0.5 + 0.5) * w + Math.cos(phase * 0.7) * 100;
       const cy = h * (0.2 + i * 0.09) + Math.sin(phase * 1.3 + i) * 40;
       const cloudW = 200 + Math.sin(phase * 0.5) * 60;
       const cloudH = 60 + Math.sin(phase * 0.8) * 20;
@@ -606,7 +642,12 @@ export class WeatherEffects {
     }
 
     // Screen-wide fog overlay
-    this._drawFogOverlay(baseAlpha * alpha, w, h, this._nightLevel > 0.5 ? 0x222233 : 0x999aaa);
+    this._drawFogOverlay(
+      baseAlpha * alpha,
+      w,
+      h,
+      this._nightLevel > 0.5 ? 0x222233 : 0x999aaa,
+    );
   }
 
   /** @private */
@@ -624,7 +665,7 @@ export class WeatherEffects {
     if (this._nightLevel > 0.6) return;
 
     const dayStr = 1.0 - this._nightLevel;
-    const isSunny = this._targetWeather === 'sunny';
+    const isSunny = this._targetWeather === "sunny";
     const rayAlpha = alpha * dayStr * (isSunny ? 0.12 : 0.06);
 
     // God rays from top-right corner
@@ -644,7 +685,8 @@ export class WeatherEffects {
       const x2 = originX + Math.cos(angle + spreadHalf) * rayLen;
       const y2 = originY + Math.sin(angle + spreadHalf) * rayLen;
 
-      const rAlpha = rayAlpha * (0.6 + Math.sin(this._time * 0.7 + i * 1.5) * 0.4);
+      const rAlpha =
+        rayAlpha * (0.6 + Math.sin(this._time * 0.7 + i * 1.5) * 0.4);
       const color = isSunny ? 0xfff8cc : 0xffffee;
 
       this._sunGfx.moveTo(originX, originY);
@@ -669,7 +711,10 @@ export class WeatherEffects {
 
         // Outer glow
         this._sunGfx.circle(fx, fy, fSize * 3);
-        this._sunGfx.fill({ color: 0xfff4cc, alpha: clamp(fAlpha * 0.3, 0, 0.08) });
+        this._sunGfx.fill({
+          color: 0xfff4cc,
+          alpha: clamp(fAlpha * 0.3, 0, 0.08),
+        });
       }
     }
   }
@@ -683,7 +728,7 @@ export class WeatherEffects {
     // Spawn streaks
     const toSpawn = Math.floor(spawnRate * dt);
     for (let i = 0; i < toSpawn; i++) {
-      const streak = this._streakPool.find(s => !s.active);
+      const streak = this._streakPool.find((s) => !s.active);
       if (!streak) break;
 
       streak.active = true;
@@ -741,15 +786,20 @@ export class WeatherEffects {
         const x1 = s * segW - 50;
         const x2 = (s + 1) * segW - 50;
 
-        const y1Top = baseY + Math.sin(x1 * 0.008 + phaseShift) * 25
-                     + Math.sin(x1 * 0.003 + phaseShift * 0.7) * 15;
+        const y1Top =
+          baseY +
+          Math.sin(x1 * 0.008 + phaseShift) * 25 +
+          Math.sin(x1 * 0.003 + phaseShift * 0.7) * 15;
         const y1Bot = y1Top + 30 + Math.sin(x1 * 0.005 + phaseShift * 1.3) * 10;
 
-        const y2Top = baseY + Math.sin(x2 * 0.008 + phaseShift) * 25
-                     + Math.sin(x2 * 0.003 + phaseShift * 0.7) * 15;
+        const y2Top =
+          baseY +
+          Math.sin(x2 * 0.008 + phaseShift) * 25 +
+          Math.sin(x2 * 0.003 + phaseShift * 0.7) * 15;
         const y2Bot = y2Top + 30 + Math.sin(x2 * 0.005 + phaseShift * 1.3) * 10;
 
-        const segAlpha = bandAlpha * (0.5 + Math.sin(s * 0.5 + phaseShift) * 0.5);
+        const segAlpha =
+          bandAlpha * (0.5 + Math.sin(s * 0.5 + phaseShift) * 0.5);
 
         this._auroraGfx.moveTo(x1, y1Top);
         this._auroraGfx.lineTo(x2, y2Top);

@@ -46,10 +46,10 @@ export class ChatRooms {
    * @returns {HTMLElement}
    */
   render() {
-    const el = document.createElement('div');
-    el.className = 'chat-rooms';
-    el.setAttribute('role', 'region');
-    el.setAttribute('aria-label', 'Chat Rooms');
+    const el = document.createElement("div");
+    el.className = "chat-rooms";
+    el.setAttribute("role", "region");
+    el.setAttribute("aria-label", "Chat Rooms");
 
     el.innerHTML = `
       <!-- Left sidebar: project list -->
@@ -148,7 +148,7 @@ export class ChatRooms {
 
       // Ensure a default "General" project always exists
       if (!projects || projects.length === 0) {
-        const general = await this.createProject(worldId, 'General', '💬');
+        const general = await this.createProject(worldId, "General", "💬");
         projects = [general];
       }
 
@@ -156,12 +156,12 @@ export class ChatRooms {
       this._renderProjectList();
 
       // Auto-select first (pinned or most recent)
-      const first = this.projects.find(p => p.pinned) || this.projects[0];
+      const first = this.projects.find((p) => p.pinned) || this.projects[0];
       if (first) {
         await this._selectProject(first);
       }
     } catch (err) {
-      console.error('[ChatRooms] init error:', err);
+      console.error("[ChatRooms] init error:", err);
     }
   }
 
@@ -172,7 +172,7 @@ export class ChatRooms {
    * @param {string} [icon='💬']
    * @returns {Promise<Object>} Created project record
    */
-  async createProject(worldId, name, icon = '💬') {
+  async createProject(worldId, name, icon = "💬") {
     const project = await window.api.db.createProject({ worldId, name, icon });
     return project;
   }
@@ -192,22 +192,28 @@ export class ChatRooms {
     const userMsg = await window.api.db.saveMessage({
       projectId: project.id,
       worldId: this.worldId,
-      role: 'user',
+      role: "user",
       content: content.trim(),
     });
 
-    this.messages.push(userMsg || { role: 'user', content: content.trim(), created_at: new Date().toISOString() });
+    this.messages.push(
+      userMsg || {
+        role: "user",
+        content: content.trim(),
+        created_at: new Date().toISOString(),
+      },
+    );
 
     // 2. Render user bubble immediately
-    this._appendMessageBubble({ role: 'user', content: content.trim() });
+    this._appendMessageBubble({ role: "user", content: content.trim() });
     this._updateProjectPreview(project.id, content.trim());
 
     // 3. Show thinking animation
     this._showThinking();
 
     // 4. Build conversation history (last 20 messages)
-    const history = this.messages.slice(-20).map(m => ({
-      role: m.role === 'assistant' ? 'assistant' : 'user',
+    const history = this.messages.slice(-20).map((m) => ({
+      role: m.role === "assistant" ? "assistant" : "user",
       content: m.content,
     }));
 
@@ -215,9 +221,12 @@ export class ChatRooms {
       // 5. Dispatch to AI
       const response = await window.api.ai.dispatch({ messages: history });
 
-      const assistantContent = (typeof response === 'string')
-        ? response
-        : (response?.content ?? response?.message ?? JSON.stringify(response));
+      const assistantContent =
+        typeof response === "string"
+          ? response
+          : (response?.content ??
+            response?.message ??
+            JSON.stringify(response));
 
       // 6. Replace thinking bubble with real response
       this._resolveThinking(assistantContent);
@@ -226,35 +235,40 @@ export class ChatRooms {
       const assistantMsg = await window.api.db.saveMessage({
         projectId: project.id,
         worldId: this.worldId,
-        role: 'assistant',
+        role: "assistant",
         content: assistantContent,
-        agentName: 'Commander',
+        agentName: "Commander",
         model: response?.model ?? null,
         costUsd: response?.cost_usd ?? 0,
         tokensUsed: response?.tokens_used ?? 0,
       });
 
-      this.messages.push(assistantMsg || {
-        role: 'assistant',
-        content: assistantContent,
-        agent_name: 'Commander',
-        created_at: new Date().toISOString(),
-      });
+      this.messages.push(
+        assistantMsg || {
+          role: "assistant",
+          content: assistantContent,
+          agent_name: "Commander",
+          created_at: new Date().toISOString(),
+        },
+      );
 
       this._updateProjectPreview(project.id, assistantContent, true);
 
       // 8. Emit completion event
-      this._emitEvent('dispatch:task-complete', {
+      this._emitEvent("dispatch:task-complete", {
         worldId: this.worldId,
-        zoneType: 'chat',
+        zoneType: "chat",
         success: true,
       });
     } catch (err) {
-      console.error('[ChatRooms] sendMessage error:', err);
-      this._resolveThinking('Sorry, something went wrong. Please try again.', true);
-      this._emitEvent('dispatch:task-complete', {
+      console.error("[ChatRooms] sendMessage error:", err);
+      this._resolveThinking(
+        "Sorry, something went wrong. Please try again.",
+        true,
+      );
+      this._emitEvent("dispatch:task-complete", {
         worldId: this.worldId,
-        zoneType: 'chat',
+        zoneType: "chat",
         success: false,
         error: err?.message,
       });
@@ -276,23 +290,29 @@ export class ChatRooms {
     this.activeProject = project;
 
     // Update sidebar active state
-    this.container?.querySelectorAll('.chat-project-card').forEach(card => {
-      card.classList.toggle('chat-project-card--active', card.dataset.id === project.id);
-      card.setAttribute('aria-selected', String(card.dataset.id === project.id));
+    this.container?.querySelectorAll(".chat-project-card").forEach((card) => {
+      card.classList.toggle(
+        "chat-project-card--active",
+        card.dataset.id === project.id,
+      );
+      card.setAttribute(
+        "aria-selected",
+        String(card.dataset.id === project.id),
+      );
     });
 
     // Update header
-    const headerIcon = this.container?.querySelector('.chat-header__icon');
-    const headerName = this.container?.querySelector('.chat-header__name');
-    if (headerIcon) headerIcon.textContent = project.icon || '💬';
+    const headerIcon = this.container?.querySelector(".chat-header__icon");
+    const headerName = this.container?.querySelector(".chat-header__name");
+    if (headerIcon) headerIcon.textContent = project.icon || "💬";
     if (headerName) headerName.textContent = project.name;
 
     // Enable input
     this._setInputEnabled(true);
 
     // Clear thread
-    const thread = this.container?.querySelector('.chat-thread');
-    if (thread) thread.innerHTML = '';
+    const thread = this.container?.querySelector(".chat-thread");
+    if (thread) thread.innerHTML = "";
 
     // Load message history
     try {
@@ -308,10 +328,10 @@ export class ChatRooms {
           </div>
         `;
       } else {
-        this.messages.forEach(msg => this._appendMessageBubble(msg));
+        this.messages.forEach((msg) => this._appendMessageBubble(msg));
       }
     } catch (err) {
-      console.error('[ChatRooms] _selectProject load messages error:', err);
+      console.error("[ChatRooms] _selectProject load messages error:", err);
       this.messages = [];
     }
 
@@ -324,7 +344,7 @@ export class ChatRooms {
    * @private
    */
   _renderProjectList() {
-    const listEl = this.container?.querySelector('.chat-sidebar__projects');
+    const listEl = this.container?.querySelector(".chat-sidebar__projects");
     if (!listEl) return;
 
     if (this.projects.length === 0) {
@@ -333,8 +353,8 @@ export class ChatRooms {
     }
 
     listEl.innerHTML = this.projects
-      .map(p => this._renderProjectCard(p))
-      .join('');
+      .map((p) => this._renderProjectCard(p))
+      .join("");
   }
 
   /**
@@ -347,25 +367,23 @@ export class ChatRooms {
     const isActive = this.activeProject?.id === project.id;
     const preview = project._lastMessage
       ? this._truncate(project._lastMessage, 40)
-      : 'No messages yet';
-    const time = project.updated_at
-      ? this._formatTime(project.updated_at)
-      : '';
+      : "No messages yet";
+    const time = project.updated_at ? this._formatTime(project.updated_at) : "";
 
     return `
       <div
-        class="chat-project-card${isActive ? ' chat-project-card--active' : ''}"
+        class="chat-project-card${isActive ? " chat-project-card--active" : ""}"
         data-id="${project.id}"
         role="listitem button"
         tabindex="0"
         aria-selected="${isActive}"
         aria-label="${this._escapeHtml(project.name)} project"
       >
-        <span class="chat-project-card__icon" aria-hidden="true">${this._escapeHtml(project.icon || '💬')}</span>
+        <span class="chat-project-card__icon" aria-hidden="true">${this._escapeHtml(project.icon || "💬")}</span>
         <div class="chat-project-card__body">
           <div class="chat-project-card__top">
             <span class="chat-project-card__name">${this._escapeHtml(project.name)}</span>
-            ${time ? `<span class="chat-project-card__time">${time}</span>` : ''}
+            ${time ? `<span class="chat-project-card__time">${time}</span>` : ""}
           </div>
           <span class="chat-project-card__preview">${this._escapeHtml(preview)}</span>
         </div>
@@ -381,20 +399,22 @@ export class ChatRooms {
    * @private
    */
   _updateProjectPreview(projectId, content, isAssistant = false) {
-    const project = this.projects.find(p => p.id === projectId);
+    const project = this.projects.find((p) => p.id === projectId);
     if (project) {
-      project._lastMessage = (isAssistant ? 'Commander: ' : 'You: ') + content;
+      project._lastMessage = (isAssistant ? "Commander: " : "You: ") + content;
       project.updated_at = new Date().toISOString();
     }
 
-    const card = this.container?.querySelector(`.chat-project-card[data-id="${projectId}"]`);
+    const card = this.container?.querySelector(
+      `.chat-project-card[data-id="${projectId}"]`,
+    );
     if (!card) return;
 
-    const previewEl = card.querySelector('.chat-project-card__preview');
-    const timeEl = card.querySelector('.chat-project-card__time');
+    const previewEl = card.querySelector(".chat-project-card__preview");
+    const timeEl = card.querySelector(".chat-project-card__time");
 
     if (previewEl) {
-      const label = isAssistant ? 'Commander: ' : 'You: ';
+      const label = isAssistant ? "Commander: " : "You: ";
       previewEl.textContent = label + this._truncate(content, 40);
     }
     if (timeEl) {
@@ -410,24 +430,24 @@ export class ChatRooms {
    * @private
    */
   _appendMessageBubble(msg) {
-    const thread = this.container?.querySelector('.chat-thread');
+    const thread = this.container?.querySelector(".chat-thread");
     if (!thread) return;
 
     // Remove empty state if present
-    const emptyState = thread.querySelector('.chat-empty-state');
+    const emptyState = thread.querySelector(".chat-empty-state");
     if (emptyState) emptyState.remove();
 
-    const wrapper = document.createElement('div');
+    const wrapper = document.createElement("div");
     wrapper.className = `chat-message chat-message--${msg.role}`;
 
-    if (msg.role === 'user') {
+    if (msg.role === "user") {
       wrapper.innerHTML = `
         <div class="chat-bubble chat-bubble--user">
           <p class="chat-bubble__text">${this._escapeHtml(msg.content)}</p>
         </div>
       `;
     } else {
-      const agentName = msg.agent_name || 'Commander';
+      const agentName = msg.agent_name || "Commander";
       wrapper.innerHTML = `
         <div class="chat-agent-avatar" aria-hidden="true" title="${this._escapeHtml(agentName)}">C</div>
         <div class="chat-bubble chat-bubble--assistant">
@@ -437,11 +457,11 @@ export class ChatRooms {
     }
 
     // Trigger fade-in on next frame
-    wrapper.style.opacity = '0';
+    wrapper.style.opacity = "0";
     thread.appendChild(wrapper);
     requestAnimationFrame(() => {
-      wrapper.style.opacity = '';
-      wrapper.classList.add('chat-message--enter');
+      wrapper.style.opacity = "";
+      wrapper.classList.add("chat-message--enter");
     });
 
     this._scrollToBottom();
@@ -452,11 +472,12 @@ export class ChatRooms {
    * @private
    */
   _showThinking() {
-    const thread = this.container?.querySelector('.chat-thread');
+    const thread = this.container?.querySelector(".chat-thread");
     if (!thread) return;
 
-    const wrapper = document.createElement('div');
-    wrapper.className = 'chat-message chat-message--assistant chat-message--thinking';
+    const wrapper = document.createElement("div");
+    wrapper.className =
+      "chat-message chat-message--assistant chat-message--thinking";
     wrapper.innerHTML = `
       <div class="chat-agent-avatar chat-agent-avatar--pulse" aria-hidden="true">C</div>
       <div class="chat-bubble chat-bubble--assistant chat-bubble--thinking" aria-label="Commander is thinking">
@@ -480,20 +501,22 @@ export class ChatRooms {
   _resolveThinking(content, isError = false) {
     if (!this._thinkingBubble) {
       // Fallback: just append
-      this._appendMessageBubble({ role: 'assistant', content });
+      this._appendMessageBubble({ role: "assistant", content });
       return;
     }
 
-    const bubble = this._thinkingBubble.querySelector('.chat-bubble--thinking');
+    const bubble = this._thinkingBubble.querySelector(".chat-bubble--thinking");
     if (bubble) {
-      bubble.classList.remove('chat-bubble--thinking');
-      bubble.innerHTML = `<p class="chat-bubble__text${isError ? ' chat-bubble__text--error' : ''}">${this._escapeHtml(content)}</p>`;
+      bubble.classList.remove("chat-bubble--thinking");
+      bubble.innerHTML = `<p class="chat-bubble__text${isError ? " chat-bubble__text--error" : ""}">${this._escapeHtml(content)}</p>`;
     }
 
-    const avatar = this._thinkingBubble.querySelector('.chat-agent-avatar--pulse');
-    if (avatar) avatar.classList.remove('chat-agent-avatar--pulse');
+    const avatar = this._thinkingBubble.querySelector(
+      ".chat-agent-avatar--pulse",
+    );
+    if (avatar) avatar.classList.remove("chat-agent-avatar--pulse");
 
-    this._thinkingBubble.classList.remove('chat-message--thinking');
+    this._thinkingBubble.classList.remove("chat-message--thinking");
     this._thinkingBubble = null;
 
     this._scrollToBottom();
@@ -509,7 +532,7 @@ export class ChatRooms {
     const el = this.container;
 
     // Delegated click handler
-    el.addEventListener('click', async (e) => {
+    el.addEventListener("click", async (e) => {
       // New project button
       if (e.target.closest('[data-action="new-project"]')) {
         this._openNewProjectModal();
@@ -535,49 +558,49 @@ export class ChatRooms {
       }
 
       // Project card selection
-      const card = e.target.closest('.chat-project-card');
+      const card = e.target.closest(".chat-project-card");
       if (card && card.dataset.id) {
-        const project = this.projects.find(p => p.id === card.dataset.id);
+        const project = this.projects.find((p) => p.id === card.dataset.id);
         if (project) await this._selectProject(project);
         return;
       }
     });
 
     // Keyboard: project cards
-    el.addEventListener('keydown', async (e) => {
-      const card = e.target.closest('.chat-project-card');
-      if (card && (e.key === 'Enter' || e.key === ' ')) {
+    el.addEventListener("keydown", async (e) => {
+      const card = e.target.closest(".chat-project-card");
+      if (card && (e.key === "Enter" || e.key === " ")) {
         e.preventDefault();
-        const project = this.projects.find(p => p.id === card.dataset.id);
+        const project = this.projects.find((p) => p.id === card.dataset.id);
         if (project) await this._selectProject(project);
         return;
       }
 
       // Close modal on Escape
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         this._closeNewProjectModal();
         return;
       }
 
       // Modal Enter key on name input
-      const nameInput = e.target.closest('#new-project-name');
-      if (nameInput && e.key === 'Enter') {
+      const nameInput = e.target.closest("#new-project-name");
+      if (nameInput && e.key === "Enter") {
         await this._handleCreateProject();
         return;
       }
     });
 
     // Textarea input: auto-resize + send on Enter
-    const textarea = el.querySelector('.chat-input');
+    const textarea = el.querySelector(".chat-input");
     if (textarea) {
-      textarea.addEventListener('keydown', async (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+      textarea.addEventListener("keydown", async (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
           await this._handleSend();
         }
       });
 
-      textarea.addEventListener('input', () => {
+      textarea.addEventListener("input", () => {
         this._autoResizeTextarea(textarea);
       });
     }
@@ -588,11 +611,11 @@ export class ChatRooms {
    * @private
    */
   async _handleSend() {
-    const textarea = this.container?.querySelector('.chat-input');
+    const textarea = this.container?.querySelector(".chat-input");
     if (!textarea) return;
     const content = textarea.value;
     if (!content.trim()) return;
-    textarea.value = '';
+    textarea.value = "";
     this._autoResizeTextarea(textarea);
     await this.sendMessage(content);
   }
@@ -603,8 +626,8 @@ export class ChatRooms {
    * @private
    */
   _autoResizeTextarea(el) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 160) + "px";
   }
 
   /**
@@ -613,7 +636,7 @@ export class ChatRooms {
    * @private
    */
   _setInputEnabled(enabled) {
-    const textarea = this.container?.querySelector('.chat-input');
+    const textarea = this.container?.querySelector(".chat-input");
     const sendBtn = this.container?.querySelector('[data-action="send"]');
     if (textarea) textarea.disabled = !enabled;
     if (sendBtn) sendBtn.disabled = !enabled;
@@ -624,7 +647,7 @@ export class ChatRooms {
    * @private
    */
   _focusInput() {
-    const textarea = this.container?.querySelector('.chat-input');
+    const textarea = this.container?.querySelector(".chat-input");
     if (textarea && !textarea.disabled) {
       textarea.focus();
     }
@@ -640,9 +663,9 @@ export class ChatRooms {
     const modal = this.container?.querySelector('[data-modal="new-project"]');
     if (!modal) return;
     modal.hidden = false;
-    const nameInput = modal.querySelector('#new-project-name');
+    const nameInput = modal.querySelector("#new-project-name");
     if (nameInput) {
-      nameInput.value = '';
+      nameInput.value = "";
       nameInput.focus();
     }
   }
@@ -664,16 +687,19 @@ export class ChatRooms {
     const modal = this.container?.querySelector('[data-modal="new-project"]');
     if (!modal) return;
 
-    const nameInput = modal.querySelector('#new-project-name');
-    const iconInput = modal.querySelector('#new-project-icon');
+    const nameInput = modal.querySelector("#new-project-name");
+    const iconInput = modal.querySelector("#new-project-icon");
 
     const name = nameInput?.value.trim();
-    const icon = iconInput?.value.trim() || '💬';
+    const icon = iconInput?.value.trim() || "💬";
 
     if (!name) {
       nameInput?.focus();
-      nameInput?.classList.add('chat-modal__input--error');
-      setTimeout(() => nameInput?.classList.remove('chat-modal__input--error'), 1500);
+      nameInput?.classList.add("chat-modal__input--error");
+      setTimeout(
+        () => nameInput?.classList.remove("chat-modal__input--error"),
+        1500,
+      );
       return;
     }
 
@@ -685,7 +711,7 @@ export class ChatRooms {
       this._renderProjectList();
       await this._selectProject(project);
     } catch (err) {
-      console.error('[ChatRooms] _handleCreateProject error:', err);
+      console.error("[ChatRooms] _handleCreateProject error:", err);
     }
   }
 
@@ -696,7 +722,7 @@ export class ChatRooms {
    * @private
    */
   _scrollToBottom() {
-    const thread = this.container?.querySelector('.chat-thread');
+    const thread = this.container?.querySelector(".chat-thread");
     if (thread) {
       thread.scrollTop = thread.scrollHeight;
     }
@@ -716,12 +742,15 @@ export class ChatRooms {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'just now';
+    if (diffMins < 1) return "just now";
     if (diffMins < 60) return `${diffMins}m`;
     if (diffHours < 24) return `${diffHours}h`;
     if (diffDays < 7) return `${diffDays}d`;
 
-    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+    });
   }
 
   /**
@@ -732,8 +761,8 @@ export class ChatRooms {
    * @private
    */
   _truncate(str, max) {
-    if (!str) return '';
-    return str.length <= max ? str : str.slice(0, max) + '…';
+    if (!str) return "";
+    return str.length <= max ? str : str.slice(0, max) + "…";
   }
 
   /**
@@ -743,8 +772,8 @@ export class ChatRooms {
    * @private
    */
   _escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
+    if (!str) return "";
+    const div = document.createElement("div");
     div.textContent = str;
     return div.innerHTML;
   }

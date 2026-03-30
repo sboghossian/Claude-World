@@ -9,18 +9,18 @@
  * Uses PixiJS v8 Container, Graphics, Text, and Ticker.
  */
 
-import { Container, Graphics, Text } from 'pixi.js';
-import { TILE_WIDTH, TILE_HEIGHT } from './constants.js';
-import { tileToScreen } from './tiles.js';
-import { ZONE_DEFS } from './zones.js';
-import { AGENT_PERSONALITIES } from '../systems/agent-personalities.js';
+import { Container, Graphics, Text } from "pixi.js";
+import { TILE_WIDTH, TILE_HEIGHT } from "./constants.js";
+import { tileToScreen } from "./tiles.js";
+import { ZONE_DEFS } from "./zones.js";
+import { AGENT_PERSONALITIES } from "../systems/agent-personalities.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const rand    = (lo, hi) => lo + Math.random() * (hi - lo);
+const rand = (lo, hi) => lo + Math.random() * (hi - lo);
 const randInt = (lo, hi) => Math.floor(rand(lo, hi + 1));
-const lerp    = (a, b, t) => a + (b - a) * t;
-const clamp   = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 /**
  * Parse a CSS hex color string (#rrggbb) into a numeric 0xRRGGBB value.
@@ -28,7 +28,7 @@ const clamp   = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
  * @returns {number}
  */
 function hexToNum(hex) {
-  return parseInt(hex.replace('#', ''), 16);
+  return parseInt(hex.replace("#", ""), 16);
 }
 
 // ── Agent ↔ Zone mapping ─────────────────────────────────────────────────────
@@ -38,11 +38,11 @@ function hexToNum(hex) {
  * Maps personality key → zone id from ZONE_DEFS.
  */
 const HOME_ZONES = {
-  commander:  'dispatch',
-  librarian:  'brain',
-  archivist:  'memory',
-  instructor: 'skills',
-  dockmaster: 'docks',
+  commander: "dispatch",
+  librarian: "brain",
+  archivist: "memory",
+  instructor: "skills",
+  dockmaster: "docks",
 };
 
 /**
@@ -50,11 +50,11 @@ const HOME_ZONES = {
  * Keeps agents visually close to their domain.
  */
 const WANDER_ZONES = {
-  commander:  ['dispatch', 'brain', 'memory', 'skills', 'chat', 'minions'],
-  librarian:  ['brain', 'dispatch', 'chat', 'memory', 'council'],
-  archivist:  ['memory', 'dispatch', 'brain', 'treasury', 'archive'],
-  instructor: ['skills', 'dispatch', 'brain', 'minions', 'rnd'],
-  dockmaster: ['docks', 'skills', 'archive', 'dispatch', 'marketing'],
+  commander: ["dispatch", "brain", "memory", "skills", "chat", "minions"],
+  librarian: ["brain", "dispatch", "chat", "memory", "council"],
+  archivist: ["memory", "dispatch", "brain", "treasury", "archive"],
+  instructor: ["skills", "dispatch", "brain", "minions", "rnd"],
+  dockmaster: ["docks", "skills", "archive", "dispatch", "marketing"],
 };
 
 /** Seconds between random wander decisions. */
@@ -72,19 +72,19 @@ const BOB_FREQUENCY = 3.5;
 
 // ── Agent sprite dimensions ──────────────────────────────────────────────────
 
-const BODY_W      = 12;
-const BODY_H      = 20;
+const BODY_W = 12;
+const BODY_H = 20;
 const HEAD_RADIUS = 6;
-const SHADOW_RX   = 10;
-const SHADOW_RY   = 4;
-const STATUS_R    = 3;
+const SHADOW_RX = 10;
+const SHADOW_RY = 4;
+const STATUS_R = 3;
 
 // ── Status colors ────────────────────────────────────────────────────────────
 
 const STATUS_COLORS = {
-  active:   0x22c55e, // green
+  active: 0x22c55e, // green
   thinking: 0xeab308, // yellow
-  idle:     0x9ca3af, // gray
+  idle: 0x9ca3af, // gray
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -98,27 +98,28 @@ class AgentSprite {
    * @param {Container} worldContainer
    */
   constructor(id, personality, worldContainer) {
-    this.id          = id;
+    this.id = id;
     this.personality = personality;
-    this.color       = hexToNum(personality.color);
-    this.homeZone    = HOME_ZONES[id] || 'dispatch';
+    this.color = hexToNum(personality.color);
+    this.homeZone = HOME_ZONES[id] || "dispatch";
     this.currentZone = this.homeZone;
-    this.status      = 'idle'; // 'active' | 'thinking' | 'idle'
+    this.status = "idle"; // 'active' | 'thinking' | 'idle'
 
     // ── Position state (in screen px, relative to worldContainer) ──────
-    const homeZoneDef = ZONE_DEFS.find(z => z.id === this.homeZone) || ZONE_DEFS[0];
-    const homeScreen  = this._zoneCenterScreen(homeZoneDef);
-    this.x  = homeScreen.x + rand(-8, 8);
-    this.y  = homeScreen.y + rand(-8, 8);
+    const homeZoneDef =
+      ZONE_DEFS.find((z) => z.id === this.homeZone) || ZONE_DEFS[0];
+    const homeScreen = this._zoneCenterScreen(homeZoneDef);
+    this.x = homeScreen.x + rand(-8, 8);
+    this.y = homeScreen.y + rand(-8, 8);
 
     // ── Movement interpolation ────────────────────────────────────────
-    this.moving   = false;
-    this.fromX    = this.x;
-    this.fromY    = this.y;
-    this.toX      = this.x;
-    this.toY      = this.y;
-    this.walkTime = 0;       // elapsed seconds since walk start
-    this.walkDur  = 2.5;     // total seconds for current walk
+    this.moving = false;
+    this.fromX = this.x;
+    this.fromY = this.y;
+    this.toX = this.x;
+    this.toY = this.y;
+    this.walkTime = 0; // elapsed seconds since walk start
+    this.walkDur = 2.5; // total seconds for current walk
     this.facingRight = true;
 
     // ── Wander timer ─────────────────────────────────────────────────
@@ -127,8 +128,8 @@ class AgentSprite {
     // ── Build PixiJS display objects ─────────────────────────────────
     this.container = new Container();
     this.container.sortableChildren = true;
-    this.container.eventMode = 'static';
-    this.container.cursor    = 'pointer';
+    this.container.eventMode = "static";
+    this.container.cursor = "pointer";
 
     this._buildGraphics();
 
@@ -170,12 +171,12 @@ class AgentSprite {
 
     // Name label — tiny text below
     this._label = new Text({
-      text: this.personality.name.split(' ').pop(), // last word of name
+      text: this.personality.name.split(" ").pop(), // last word of name
       style: {
-        fontFamily: 'monospace',
-        fontSize:   8,
-        fill:       0xffffff,
-        align:      'center',
+        fontFamily: "monospace",
+        fontSize: 8,
+        fill: 0xffffff,
+        align: "center",
         letterSpacing: 0.2,
       },
     });
@@ -190,17 +191,15 @@ class AgentSprite {
     this._body.clear();
     // Draw a rounded rectangle centered horizontally, above shadow
     this._body.roundRect(
-      -BODY_W / 2, -BODY_H,
-      BODY_W, BODY_H,
+      -BODY_W / 2,
+      -BODY_H,
+      BODY_W,
+      BODY_H,
       4, // corner radius
     );
     this._body.fill({ color: this.color });
     // Subtle outline
-    this._body.roundRect(
-      -BODY_W / 2, -BODY_H,
-      BODY_W, BODY_H,
-      4,
-    );
+    this._body.roundRect(-BODY_W / 2, -BODY_H, BODY_W, BODY_H, 4);
     this._body.stroke({ color: 0x000000, alpha: 0.3, width: 1 });
   }
 
@@ -224,8 +223,8 @@ class AgentSprite {
    */
   _lighten(color, amount) {
     const r = clamp(Math.round(((color >> 16) & 0xff) + 255 * amount), 0, 255);
-    const g = clamp(Math.round(((color >> 8)  & 0xff) + 255 * amount), 0, 255);
-    const b = clamp(Math.round((color         & 0xff) + 255 * amount), 0, 255);
+    const g = clamp(Math.round(((color >> 8) & 0xff) + 255 * amount), 0, 255);
+    const b = clamp(Math.round((color & 0xff) + 255 * amount), 0, 255);
     return (r << 16) | (g << 8) | b;
   }
 
@@ -249,7 +248,7 @@ class AgentSprite {
    * @returns {{ x: number, y: number }}
    */
   _randomPosNearZone(zoneId) {
-    const zone = ZONE_DEFS.find(z => z.id === zoneId);
+    const zone = ZONE_DEFS.find((z) => z.id === zoneId);
     if (!zone) {
       const fallback = ZONE_DEFS[0];
       const c = this._zoneCenterScreen(fallback);
@@ -270,19 +269,19 @@ class AgentSprite {
    */
   walkToZone(zoneId) {
     const dest = this._randomPosNearZone(zoneId);
-    this.fromX    = this.x;
-    this.fromY    = this.y;
-    this.toX      = dest.x;
-    this.toY      = dest.y;
+    this.fromX = this.x;
+    this.fromY = this.y;
+    this.toX = dest.x;
+    this.toY = dest.y;
     this.walkTime = 0;
 
     // Duration proportional to distance, clamped to reasonable range
-    const dx   = this.toX - this.fromX;
-    const dy   = this.toY - this.fromY;
+    const dx = this.toX - this.fromX;
+    const dy = this.toY - this.fromY;
     const dist = Math.sqrt(dx * dx + dy * dy);
     this.walkDur = clamp(dist / 80, WALK_DURATION_MIN, WALK_DURATION_MAX);
 
-    this.moving      = true;
+    this.moving = true;
     this.currentZone = zoneId;
 
     // Determine facing direction
@@ -297,9 +296,8 @@ class AgentSprite {
   wander() {
     const zones = WANDER_ZONES[this.id] || [this.homeZone];
     // Weighted: 40% chance to go home, 60% chance random wander zone
-    const target = Math.random() < 0.4
-      ? this.homeZone
-      : zones[randInt(0, zones.length - 1)];
+    const target =
+      Math.random() < 0.4 ? this.homeZone : zones[randInt(0, zones.length - 1)];
     this.walkToZone(target);
   }
 
@@ -330,7 +328,8 @@ class AgentSprite {
       this.y = lerp(this.fromY, this.toY, smooth);
 
       // Walking bob (oscillating Y offset)
-      const bobOffset = Math.sin(this.walkTime * BOB_FREQUENCY * Math.PI * 2) * BOB_AMPLITUDE;
+      const bobOffset =
+        Math.sin(this.walkTime * BOB_FREQUENCY * Math.PI * 2) * BOB_AMPLITUDE;
 
       this.container.x = this.x;
       this.container.y = this.y + bobOffset;
@@ -399,7 +398,7 @@ function findPath(startX, startY, goalX, goalY) {
   // A full A* can be plugged in here without changing the rest of the system.
   return [
     { tileX: startX, tileY: startY },
-    { tileX: goalX,  tileY: goalY  },
+    { tileX: goalX, tileY: goalY },
   ];
 }
 
@@ -413,7 +412,7 @@ export class AgentSpriteSystem {
    * @param {import('pixi.js').Container}   worldContainer
    */
   constructor(app, worldContainer) {
-    this._app            = app;
+    this._app = app;
     this._worldContainer = worldContainer;
 
     /** @type {Map<string, AgentSprite>} personality key → AgentSprite */
@@ -540,7 +539,7 @@ export class AgentSpriteSystem {
     }
     this._boundEventHandlers = [];
 
-    console.log('[AgentSprites] Destroyed');
+    console.log("[AgentSprites] Destroyed");
   }
 
   // ── Internal: Ticker ───────────────────────────────────────────────────────
@@ -561,25 +560,25 @@ export class AgentSpriteSystem {
   _bindZoneEvents() {
     // Map event names → which agent should respond and which zone to visit.
     const eventMap = [
-      { event: 'dispatch:task-assigned',  agent: 'commander',  zone: 'dispatch' },
-      { event: 'dispatch:task-complete',  agent: 'commander',  zone: 'dispatch' },
-      { event: 'dispatch:task-failed',    agent: 'commander',  zone: 'dispatch' },
-      { event: 'brain:query',             agent: 'librarian',  zone: 'brain' },
-      { event: 'brain:index-complete',    agent: 'librarian',  zone: 'brain' },
-      { event: 'memory:store',            agent: 'archivist',  zone: 'memory' },
-      { event: 'memory:recall',           agent: 'archivist',  zone: 'memory' },
-      { event: 'skills:train',            agent: 'instructor', zone: 'skills' },
-      { event: 'skills:level-up',         agent: 'instructor', zone: 'skills' },
-      { event: 'docks:connect',           agent: 'dockmaster', zone: 'docks' },
-      { event: 'docks:transfer',          agent: 'dockmaster', zone: 'docks' },
+      { event: "dispatch:task-assigned", agent: "commander", zone: "dispatch" },
+      { event: "dispatch:task-complete", agent: "commander", zone: "dispatch" },
+      { event: "dispatch:task-failed", agent: "commander", zone: "dispatch" },
+      { event: "brain:query", agent: "librarian", zone: "brain" },
+      { event: "brain:index-complete", agent: "librarian", zone: "brain" },
+      { event: "memory:store", agent: "archivist", zone: "memory" },
+      { event: "memory:recall", agent: "archivist", zone: "memory" },
+      { event: "skills:train", agent: "instructor", zone: "skills" },
+      { event: "skills:level-up", agent: "instructor", zone: "skills" },
+      { event: "docks:connect", agent: "dockmaster", zone: "docks" },
+      { event: "docks:transfer", agent: "dockmaster", zone: "docks" },
     ];
 
     for (const { event, agent, zone } of eventMap) {
       const handler = () => {
         this.moveAgentToZone(agent, zone);
-        this.setAgentStatus(agent, 'active');
+        this.setAgentStatus(agent, "active");
         // Revert to idle after a few seconds
-        setTimeout(() => this.setAgentStatus(agent, 'idle'), 5000);
+        setTimeout(() => this.setAgentStatus(agent, "idle"), 5000);
       };
       document.addEventListener(event, handler);
       this._boundEventHandlers.push({ event, handler });
@@ -591,8 +590,11 @@ export class AgentSpriteSystem {
       if (!detail || !detail.id) return;
       this._sendNearestAgentToZone(detail.id);
     };
-    document.addEventListener('zone-click', zoneClickHandler);
-    this._boundEventHandlers.push({ event: 'zone-click', handler: zoneClickHandler });
+    document.addEventListener("zone-click", zoneClickHandler);
+    this._boundEventHandlers.push({
+      event: "zone-click",
+      handler: zoneClickHandler,
+    });
   }
 
   /**
@@ -600,7 +602,7 @@ export class AgentSpriteSystem {
    * @param {string} zoneId
    */
   _sendNearestAgentToZone(zoneId) {
-    const zoneDef = ZONE_DEFS.find(z => z.id === zoneId);
+    const zoneDef = ZONE_DEFS.find((z) => z.id === zoneId);
     if (!zoneDef) return;
 
     const target = tileToScreen(
@@ -615,10 +617,10 @@ export class AgentSpriteSystem {
       if (agent.moving) continue; // prefer idle agents
       const dx = agent.x - target.x;
       const dy = agent.y - target.y;
-      const d  = dx * dx + dy * dy;
+      const d = dx * dx + dy * dy;
       if (d < bestDist) {
         bestDist = d;
-        nearest  = agent;
+        nearest = agent;
       }
     }
 
@@ -639,22 +641,24 @@ export class AgentSpriteSystem {
    */
   _wireAgentClicks() {
     for (const [id, agent] of this._agents) {
-      agent.container.removeAllListeners?.('pointertap');
-      agent.container.on('pointertap', (e) => {
+      agent.container.removeAllListeners?.("pointertap");
+      agent.container.on("pointertap", (e) => {
         e.stopPropagation?.();
         const personality = AGENT_PERSONALITIES[id];
-        document.dispatchEvent(new CustomEvent('agent-click', {
-          detail: {
-            agentId:  id,
-            name:     personality?.name || id,
-            role:     personality?.role || '',
-            color:    personality?.color || '#ffffff',
-            status:   agent.status,
-            zone:     agent.currentZone,
-            x:        agent.x,
-            y:        agent.y,
-          },
-        }));
+        document.dispatchEvent(
+          new CustomEvent("agent-click", {
+            detail: {
+              agentId: id,
+              name: personality?.name || id,
+              role: personality?.role || "",
+              color: personality?.color || "#ffffff",
+              status: agent.status,
+              zone: agent.currentZone,
+              x: agent.x,
+              y: agent.y,
+            },
+          }),
+        );
       });
     }
   }

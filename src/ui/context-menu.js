@@ -9,28 +9,42 @@
 // ── Constants ──────────────────────────────────────────────────────
 
 const AGENT_LIST = [
-  { id: 'commander',  icon: '\u{1F451}', name: 'Commander' },
-  { id: 'librarian',  icon: '\u{1F4DA}', name: 'Librarian' },
-  { id: 'archivist',  icon: '\u{1F4DC}', name: 'Archivist' },
-  { id: 'instructor', icon: '\u{1F393}', name: 'Instructor' },
-  { id: 'dockmaster', icon: '\u{2693}',  name: 'Dockmaster' },
+  { id: "commander", icon: "\u{1F451}", name: "Commander" },
+  { id: "librarian", icon: "\u{1F4DA}", name: "Librarian" },
+  { id: "archivist", icon: "\u{1F4DC}", name: "Archivist" },
+  { id: "instructor", icon: "\u{1F393}", name: "Instructor" },
+  { id: "dockmaster", icon: "\u{2693}", name: "Dockmaster" },
 ];
 
 const PRIORITY_OPTIONS = [
-  { id: 'high',   label: 'High',   cssClass: 'ctx-menu__dot--high' },
-  { id: 'medium', label: 'Medium', cssClass: 'ctx-menu__dot--medium' },
-  { id: 'low',    label: 'Low',    cssClass: 'ctx-menu__dot--low' },
+  { id: "high", label: "High", cssClass: "ctx-menu__dot--high" },
+  { id: "medium", label: "Medium", cssClass: "ctx-menu__dot--medium" },
+  { id: "low", label: "Low", cssClass: "ctx-menu__dot--low" },
 ];
 
 const ZONE_ICONS = {
-  dispatch: '\u{1F3F0}', brain: '\u{1F4DA}', chat: '\u{1F4AC}',
-  memory: '\u{1F5C4}', skills: '\u{1F3AF}', minions: '\u{26CF}',
-  treasury: '\u{1F4B0}', sales: '\u{1F4C8}', marketing: '\u{1F4E3}',
-  exchange: '\u{1F504}', market: '\u{1F6D2}', council: '\u{1F3DB}',
-  rnd: '\u{1F52C}', legal: '\u{2696}', archive: '\u{1F4DC}',
-  docks: '\u{2693}', airport: '\u{2708}', globe: '\u{1F310}',
-  broadcast: '\u{1F4E1}', 'mission-control': '\u{1F6F0}',
-  analytics: '\u{1F4CA}', settings: '\u{2699}',
+  dispatch: "\u{1F3F0}",
+  brain: "\u{1F4DA}",
+  chat: "\u{1F4AC}",
+  memory: "\u{1F5C4}",
+  skills: "\u{1F3AF}",
+  minions: "\u{26CF}",
+  treasury: "\u{1F4B0}",
+  sales: "\u{1F4C8}",
+  marketing: "\u{1F4E3}",
+  exchange: "\u{1F504}",
+  market: "\u{1F6D2}",
+  council: "\u{1F3DB}",
+  rnd: "\u{1F52C}",
+  legal: "\u{2696}",
+  archive: "\u{1F4DC}",
+  docks: "\u{2693}",
+  airport: "\u{2708}",
+  globe: "\u{1F310}",
+  broadcast: "\u{1F4E1}",
+  "mission-control": "\u{1F6F0}",
+  analytics: "\u{1F4CA}",
+  settings: "\u{2699}",
 };
 
 // ── Helpers ────────────────────────────────────────────────────────
@@ -40,9 +54,9 @@ let _cssLoaded = false;
 function ensureCSS() {
   if (_cssLoaded) return;
   _cssLoaded = true;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = new URL('./context-menu.css', import.meta.url).href;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = new URL("./context-menu.css", import.meta.url).href;
   document.head.appendChild(link);
 }
 
@@ -101,12 +115,12 @@ export class ContextMenu {
 
   /** Enable right-click listening on the canvas. */
   enable() {
-    this._canvas.addEventListener('contextmenu', this._onContextMenu);
+    this._canvas.addEventListener("contextmenu", this._onContextMenu);
   }
 
   /** Disable right-click listening (does not remove existing menu). */
   disable() {
-    this._canvas.removeEventListener('contextmenu', this._onContextMenu);
+    this._canvas.removeEventListener("contextmenu", this._onContextMenu);
     this._close();
   }
 
@@ -160,7 +174,7 @@ export class ContextMenu {
     if (!items.length) return;
 
     switch (e.key) {
-      case 'Escape':
+      case "Escape":
         e.preventDefault();
         if (this._activeSubmenu) {
           this._closeSubmenu();
@@ -171,22 +185,22 @@ export class ContextMenu {
         }
         break;
 
-      case 'ArrowDown':
+      case "ArrowDown":
         e.preventDefault();
         this._moveFocus(1, items);
         break;
 
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
         this._moveFocus(-1, items);
         break;
 
-      case 'ArrowRight':
+      case "ArrowRight":
         e.preventDefault();
         this._tryOpenSubmenu(items);
         break;
 
-      case 'ArrowLeft':
+      case "ArrowLeft":
         e.preventDefault();
         if (this._activeSubmenu) {
           this._closeSubmenu();
@@ -194,8 +208,8 @@ export class ContextMenu {
         }
         break;
 
-      case 'Enter':
-      case ' ':
+      case "Enter":
+      case " ":
         e.preventDefault();
         if (this._focusIdx >= 0 && this._focusIdx < items.length) {
           items[this._focusIdx].click();
@@ -215,79 +229,89 @@ export class ContextMenu {
     const zone = this._zone;
     if (!zone) return;
 
-    const menu = el('div', 'ctx-menu');
-    menu.setAttribute('role', 'menu');
-    menu.setAttribute('aria-label', `Context menu for ${zone.name}`);
+    const menu = el("div", "ctx-menu");
+    menu.setAttribute("role", "menu");
+    menu.setAttribute("aria-label", `Context menu for ${zone.name}`);
 
     const isLocked = this._lockedZones.has(zone.id);
-    const icon = ZONE_ICONS[zone.id] || '\u{1F3D7}';
+    const icon = ZONE_ICONS[zone.id] || "\u{1F3D7}";
 
     // 1. Open zone
     this._addItem(menu, icon, `Open ${zone.name}`, () => {
-      this._dispatch('open', { zoneId: zone.id });
-      document.dispatchEvent(new CustomEvent('zone-click', { detail: zone }));
+      this._dispatch("open", { zoneId: zone.id });
+      document.dispatchEvent(new CustomEvent("zone-click", { detail: zone }));
     });
 
     // 2. View Analytics
-    this._addItem(menu, '\u{1F4CA}', 'View Analytics', () => {
-      this._dispatch('view-analytics', { zoneId: zone.id });
-      document.dispatchEvent(new CustomEvent('zone-click', {
-        detail: { ...zone, id: 'analytics', name: 'Analytics', _filterZone: zone.id },
-      }));
+    this._addItem(menu, "\u{1F4CA}", "View Analytics", () => {
+      this._dispatch("view-analytics", { zoneId: zone.id });
+      document.dispatchEvent(
+        new CustomEvent("zone-click", {
+          detail: {
+            ...zone,
+            id: "analytics",
+            name: "Analytics",
+            _filterZone: zone.id,
+          },
+        }),
+      );
     });
 
     // 3. Assign Agent (submenu)
-    this._addSubmenuTrigger(menu, '\u{1F916}', 'Assign Agent', (container) => {
+    this._addSubmenuTrigger(menu, "\u{1F916}", "Assign Agent", (container) => {
       for (const agent of AGENT_LIST) {
         this._addItem(container, agent.icon, agent.name, () => {
-          this._dispatch('assign-agent', { zoneId: zone.id, agentId: agent.id });
+          this._dispatch("assign-agent", {
+            zoneId: zone.id,
+            agentId: agent.id,
+          });
         });
       }
     });
 
     // 4. Set Priority (submenu)
     const currentPriority = this._priorities.get(zone.id) || null;
-    this._addSubmenuTrigger(menu, '\u{2B50}', 'Set Priority', (container) => {
+    this._addSubmenuTrigger(menu, "\u{2B50}", "Set Priority", (container) => {
       for (const p of PRIORITY_OPTIONS) {
         const item = this._addItem(container, null, p.label, () => {
           this._priorities.set(zone.id, p.id);
-          this._dispatch('set-priority', { zoneId: zone.id, priority: p.id });
+          this._dispatch("set-priority", { zoneId: zone.id, priority: p.id });
         });
         // Insert colored dot before label
-        const dot = el('span', `ctx-menu__dot ${p.cssClass}`);
-        const iconSlot = item.querySelector('.ctx-menu__icon');
+        const dot = el("span", `ctx-menu__dot ${p.cssClass}`);
+        const iconSlot = item.querySelector(".ctx-menu__icon");
         if (iconSlot) {
-          iconSlot.textContent = '';
+          iconSlot.textContent = "";
           iconSlot.appendChild(dot);
         }
         // Mark current priority
         if (currentPriority === p.id) {
-          const check = el('span', null, '\u{2713}');
-          check.style.marginLeft = 'auto';
-          check.style.opacity = '0.6';
-          check.style.fontSize = '12px';
+          const check = el("span", null, "\u{2713}");
+          check.style.marginLeft = "auto";
+          check.style.opacity = "0.6";
+          check.style.fontSize = "12px";
           item.appendChild(check);
         }
       }
     });
 
     // 5. Toggle Lock
-    const lockLabel = isLocked ? 'Unlock Zone' : 'Lock Zone';
-    const lockIcon = isLocked ? '\u{1F513}' : '\u{1F512}';
+    const lockLabel = isLocked ? "Unlock Zone" : "Lock Zone";
+    const lockIcon = isLocked ? "\u{1F513}" : "\u{1F512}";
     this._addItem(menu, lockIcon, lockLabel, () => {
       if (isLocked) {
         this._lockedZones.delete(zone.id);
       } else {
         this._lockedZones.add(zone.id);
       }
-      this._dispatch('toggle-lock', { zoneId: zone.id, locked: !isLocked });
+      this._dispatch("toggle-lock", { zoneId: zone.id, locked: !isLocked });
     });
 
     // 6. Separator
-    menu.appendChild(el('div', 'ctx-menu__separator'));
+    menu.appendChild(el("div", "ctx-menu__separator"));
 
     // 7. Zone Info (mini card)
-    this._addItem(menu, '\u{2139}\u{FE0F}', 'Zone Info', () => {
+    this._addItem(menu, "\u{2139}\u{FE0F}", "Zone Info", () => {
       this._showInfoCard(menu, zone);
     });
 
@@ -300,8 +324,8 @@ export class ContextMenu {
 
     // Bind dismiss listeners
     requestAnimationFrame(() => {
-      document.addEventListener('mousedown', this._onDismiss, true);
-      document.addEventListener('keydown', this._onKeyDown, true);
+      document.addEventListener("mousedown", this._onDismiss, true);
+      document.addEventListener("keydown", this._onKeyDown, true);
     });
   }
 
@@ -314,17 +338,17 @@ export class ContextMenu {
    * @returns {HTMLElement}
    */
   _addItem(container, icon, label, onClick) {
-    const item = el('button', 'ctx-menu__item');
-    item.setAttribute('role', 'menuitem');
+    const item = el("button", "ctx-menu__item");
+    item.setAttribute("role", "menuitem");
     item.tabIndex = -1;
 
-    const iconEl = el('span', 'ctx-menu__icon', icon || '');
-    const labelEl = el('span', 'ctx-menu__label', label);
+    const iconEl = el("span", "ctx-menu__icon", icon || "");
+    const labelEl = el("span", "ctx-menu__label", label);
 
     item.appendChild(iconEl);
     item.appendChild(labelEl);
 
-    item.addEventListener('click', (e) => {
+    item.addEventListener("click", (e) => {
       e.stopPropagation();
       onClick();
       this._close();
@@ -342,14 +366,14 @@ export class ContextMenu {
    * @param {(submenu: HTMLElement) => void} buildSubmenu
    */
   _addSubmenuTrigger(container, icon, label, buildSubmenu) {
-    const item = el('button', 'ctx-menu__item');
-    item.setAttribute('role', 'menuitem');
-    item.setAttribute('aria-haspopup', 'true');
+    const item = el("button", "ctx-menu__item");
+    item.setAttribute("role", "menuitem");
+    item.setAttribute("aria-haspopup", "true");
     item.tabIndex = -1;
 
-    const iconEl = el('span', 'ctx-menu__icon', icon);
-    const labelEl = el('span', 'ctx-menu__label', label);
-    const chevron = el('span', 'ctx-menu__chevron', '\u{25B6}');
+    const iconEl = el("span", "ctx-menu__icon", icon);
+    const labelEl = el("span", "ctx-menu__label", label);
+    const chevron = el("span", "ctx-menu__chevron", "\u{25B6}");
 
     item.appendChild(iconEl);
     item.appendChild(labelEl);
@@ -361,28 +385,28 @@ export class ContextMenu {
 
     const showSub = () => {
       this._closeSubmenu();
-      const sub = el('div', 'ctx-menu__submenu');
-      sub.setAttribute('role', 'menu');
+      const sub = el("div", "ctx-menu__submenu");
+      sub.setAttribute("role", "menu");
       buildSubmenu(sub);
 
-      item.style.position = 'relative';
+      item.style.position = "relative";
       item.appendChild(sub);
       this._activeSubmenu = sub;
 
       // Flip if near right edge
       const rect = sub.getBoundingClientRect();
       if (rect.right > window.innerWidth - 8) {
-        sub.classList.add('ctx-menu__submenu--flip');
+        sub.classList.add("ctx-menu__submenu--flip");
       }
       // Flip vertical if near bottom
       if (rect.bottom > window.innerHeight - 8) {
-        sub.style.top = 'auto';
-        sub.style.bottom = '-6px';
+        sub.style.top = "auto";
+        sub.style.bottom = "-6px";
       }
     };
 
-    item.addEventListener('mouseenter', showSub);
-    item.addEventListener('click', (e) => {
+    item.addEventListener("mouseenter", showSub);
+    item.addEventListener("click", (e) => {
       e.stopPropagation();
       showSub();
     });
@@ -399,38 +423,51 @@ export class ContextMenu {
   _showInfoCard(menu, zone) {
     // Don't close the menu; replace its content with an info card
     // Actually, just show the info as a temporary tooltip-like thing
-    const card = el('div', 'ctx-menu__info-card');
+    const card = el("div", "ctx-menu__info-card");
 
-    const name = el('div', 'ctx-menu__info-name', `${ZONE_ICONS[zone.id] || ''} ${zone.name}`);
+    const name = el(
+      "div",
+      "ctx-menu__info-name",
+      `${ZONE_ICONS[zone.id] || ""} ${zone.name}`,
+    );
     card.appendChild(name);
 
-    const district = el('div', 'ctx-menu__info-district', `${zone.district} district \u2022 Ring ${zone.ring}`);
+    const district = el(
+      "div",
+      "ctx-menu__info-district",
+      `${zone.district} district \u2022 Ring ${zone.ring}`,
+    );
     card.appendChild(district);
 
-    const status = el('div', 'ctx-menu__info-status');
-    const badge = el('span',
-      `ctx-menu__info-badge ${zone.active ? 'ctx-menu__info-badge--active' : 'ctx-menu__info-badge--locked'}`,
-      zone.active ? 'Active' : 'Locked'
+    const status = el("div", "ctx-menu__info-status");
+    const badge = el(
+      "span",
+      `ctx-menu__info-badge ${zone.active ? "ctx-menu__info-badge--active" : "ctx-menu__info-badge--locked"}`,
+      zone.active ? "Active" : "Locked",
     );
     status.appendChild(badge);
 
     const priority = this._priorities.get(zone.id);
     if (priority) {
-      const pLabel = el('span', null, `Priority: ${priority}`);
-      pLabel.style.fontSize = '11px';
+      const pLabel = el("span", null, `Priority: ${priority}`);
+      pLabel.style.fontSize = "11px";
       status.appendChild(pLabel);
     }
     card.appendChild(status);
 
-    const sizeInfo = el('div', 'ctx-menu__info-status', `${zone.w}\u00D7${zone.h} tiles \u2022 Height ${zone.height}`);
+    const sizeInfo = el(
+      "div",
+      "ctx-menu__info-status",
+      `${zone.w}\u00D7${zone.h} tiles \u2022 Height ${zone.height}`,
+    );
     card.appendChild(sizeInfo);
 
     // Replace menu items with info card
-    menu.innerHTML = '';
+    menu.innerHTML = "";
     menu.appendChild(card);
 
     // Dispatch event
-    this._dispatch('zone-info', { zoneId: zone.id });
+    this._dispatch("zone-info", { zoneId: zone.id });
   }
 
   // ── Positioning ─────────────────────────────────────────────────
@@ -482,7 +519,7 @@ export class ContextMenu {
 
     // If a submenu is open, navigate within it
     const container = this._activeSubmenu || this._menuEl;
-    return Array.from(container.querySelectorAll(':scope > .ctx-menu__item'));
+    return Array.from(container.querySelectorAll(":scope > .ctx-menu__item"));
   }
 
   /**
@@ -509,12 +546,12 @@ export class ContextMenu {
 
     // Clear previous
     for (const item of items) {
-      item.classList.remove('ctx-menu__item--focused');
+      item.classList.remove("ctx-menu__item--focused");
     }
 
     if (idx >= 0 && idx < items.length) {
       this._focusIdx = idx;
-      items[idx].classList.add('ctx-menu__item--focused');
+      items[idx].classList.add("ctx-menu__item--focused");
       items[idx].focus();
     }
   }
@@ -528,7 +565,7 @@ export class ContextMenu {
     const item = items[this._focusIdx];
     if (item._isSubmenuTrigger) {
       // Trigger mouseenter to open submenu
-      item.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      item.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
       // Focus first item in submenu
       requestAnimationFrame(() => {
         this._focusIdx = -1;
@@ -561,8 +598,8 @@ export class ContextMenu {
     this._zone = null;
     this._focusIdx = -1;
 
-    document.removeEventListener('mousedown', this._onDismiss, true);
-    document.removeEventListener('keydown', this._onKeyDown, true);
+    document.removeEventListener("mousedown", this._onDismiss, true);
+    document.removeEventListener("keydown", this._onKeyDown, true);
   }
 
   /**
@@ -572,9 +609,11 @@ export class ContextMenu {
    */
   _dispatch(action, data = {}) {
     const detail = { action, zoneId: data.zoneId || this._zone?.id, data };
-    document.dispatchEvent(new CustomEvent('context-menu:action', {
-      detail,
-      bubbles: true,
-    }));
+    document.dispatchEvent(
+      new CustomEvent("context-menu:action", {
+        detail,
+        bubbles: true,
+      }),
+    );
   }
 }

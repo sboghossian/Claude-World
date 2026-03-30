@@ -4,19 +4,19 @@
 // No audio files required — everything is generated in real-time.
 // ============================================================
 
-const STORAGE_KEY_SFX_VOLUME = 'claude-world:sfx-volume';
-const STORAGE_KEY_SFX_MUTED  = 'claude-world:sfx-muted';
+const STORAGE_KEY_SFX_VOLUME = "claude-world:sfx-volume";
+const STORAGE_KEY_SFX_MUTED = "claude-world:sfx-muted";
 
 // ─── Note frequencies (Hz) ──────────────────────────────────
 
 const NOTE = {
-  A3: 220.00,
+  A3: 220.0,
   E3: 164.81,
   F4: 349.23,
-  A4: 440.00,
+  A4: 440.0,
   C4: 261.63,
   E4: 329.63,
-  G4: 392.00,
+  G4: 392.0,
   C5: 523.25,
   E5: 659.25,
   G5: 783.99,
@@ -25,18 +25,18 @@ const NOTE = {
 // ─── Sound IDs ──────────────────────────────────────────────
 
 export const SoundId = Object.freeze({
-  TASK_COMPLETE:     'task-complete',
-  TASK_FAILED:       'task-failed',
-  ZONE_UNLOCKED:     'zone-unlocked',
-  ACHIEVEMENT:       'achievement',
-  QUEST_COMPLETE:    'quest-complete',
-  LEVEL_UP:          'level-up',
-  NEW_NOTIFICATION:  'new-notification',
-  XP_EARNED:         'xp-earned',
-  AGENT_CHAT:        'agent-chat',
-  ERROR_WARNING:     'error-warning',
-  TIMER_TICK:        'timer-tick',
-  AMBIENT_SUCCESS:   'ambient-success',
+  TASK_COMPLETE: "task-complete",
+  TASK_FAILED: "task-failed",
+  ZONE_UNLOCKED: "zone-unlocked",
+  ACHIEVEMENT: "achievement",
+  QUEST_COMPLETE: "quest-complete",
+  LEVEL_UP: "level-up",
+  NEW_NOTIFICATION: "new-notification",
+  XP_EARNED: "xp-earned",
+  AGENT_CHAT: "agent-chat",
+  ERROR_WARNING: "error-warning",
+  TIMER_TICK: "timer-tick",
+  AMBIENT_SUCCESS: "ambient-success",
 });
 
 // ─── Helpers ────────────────────────────────────────────────
@@ -127,7 +127,7 @@ export class SoundEffects {
       this._ownsCtx = true;
     }
 
-    if (this._ctx.state === 'suspended') {
+    if (this._ctx.state === "suspended") {
       this._ctx.resume().catch(() => {});
     }
 
@@ -152,7 +152,7 @@ export class SoundEffects {
       const v = localStorage.getItem(STORAGE_KEY_SFX_VOLUME);
       if (v !== null) this._volume = parseFloat(v);
       const m = localStorage.getItem(STORAGE_KEY_SFX_MUTED);
-      if (m !== null) this._muted = m === 'true';
+      if (m !== null) this._muted = m === "true";
     } catch (_) {}
   }
 
@@ -204,7 +204,11 @@ export class SoundEffects {
     this._volume = Math.max(0, Math.min(1, v));
     this._savePreferences();
     if (this._master) {
-      this._master.gain.setTargetAtTime(this._volume, this._ctx.currentTime, 0.05);
+      this._master.gain.setTargetAtTime(
+        this._volume,
+        this._ctx.currentTime,
+        0.05,
+      );
     }
   }
 
@@ -227,7 +231,11 @@ export class SoundEffects {
     this._muted = false;
     this._savePreferences();
     if (this._master) {
-      this._master.gain.setTargetAtTime(this._volume, this._ctx.currentTime, 0.05);
+      this._master.gain.setTargetAtTime(
+        this._volume,
+        this._ctx.currentTime,
+        0.05,
+      );
     }
   }
 
@@ -261,65 +269,65 @@ export class SoundEffects {
     };
 
     // Task complete — success chime
-    on(window, 'dispatch:task-complete', () => {
+    on(window, "dispatch:task-complete", () => {
       this.play(SoundId.TASK_COMPLETE);
     });
 
     // Task failed
-    on(window, 'dispatch:task-failed', () => {
+    on(window, "dispatch:task-failed", () => {
       this.play(SoundId.TASK_FAILED);
     });
 
     // Zone unlocked
-    on(window, 'zone:unlocked', () => {
+    on(window, "zone:unlocked", () => {
       this.play(SoundId.ZONE_UNLOCKED);
     });
 
     // Achievement unlocked
-    on(window, 'achievement:unlocked', () => {
+    on(window, "achievement:unlocked", () => {
       this.play(SoundId.ACHIEVEMENT);
     });
 
     // Quest complete
-    on(window, 'quest:complete', () => {
+    on(window, "quest:complete", () => {
       this.play(SoundId.QUEST_COMPLETE);
     });
 
     // Level up
-    on(window, 'world:level-up', () => {
+    on(window, "world:level-up", () => {
       this.play(SoundId.LEVEL_UP);
     });
 
     // New notification
-    on(document, 'notification:push', () => {
+    on(document, "notification:push", () => {
       this.play(SoundId.NEW_NOTIFICATION);
     });
 
     // XP earned
-    on(window, 'xp:earned', () => {
+    on(window, "xp:earned", () => {
       this.play(SoundId.XP_EARNED);
     });
 
     // Agent chat message
-    on(window, 'agent:chat-message', () => {
+    on(window, "agent:chat-message", () => {
       this.play(SoundId.AGENT_CHAT);
     });
 
     // Error / warning toast
-    on(window, 'toast:show', (e) => {
+    on(window, "toast:show", (e) => {
       const type = e.detail?.type;
-      if (type === 'error' || type === 'warning') {
+      if (type === "error" || type === "warning") {
         this.play(SoundId.ERROR_WARNING);
       }
     });
 
     // Timer tick
-    on(window, 'timer:tick', () => {
+    on(window, "timer:tick", () => {
       this.play(SoundId.TIMER_TICK);
     });
 
     // Ambient success (long pad swell on onboarding complete, etc.)
-    on(window, 'onboarding:complete', () => {
+    on(window, "onboarding:complete", () => {
       this.play(SoundId.AMBIENT_SUCCESS);
     });
   }
@@ -331,18 +339,18 @@ export class SoundEffects {
 
   get _sounds() {
     return {
-      [SoundId.TASK_COMPLETE]:    this._playTaskComplete,
-      [SoundId.TASK_FAILED]:      this._playTaskFailed,
-      [SoundId.ZONE_UNLOCKED]:    this._playZoneUnlocked,
-      [SoundId.ACHIEVEMENT]:      this._playAchievement,
-      [SoundId.QUEST_COMPLETE]:   this._playQuestComplete,
-      [SoundId.LEVEL_UP]:         this._playLevelUp,
+      [SoundId.TASK_COMPLETE]: this._playTaskComplete,
+      [SoundId.TASK_FAILED]: this._playTaskFailed,
+      [SoundId.ZONE_UNLOCKED]: this._playZoneUnlocked,
+      [SoundId.ACHIEVEMENT]: this._playAchievement,
+      [SoundId.QUEST_COMPLETE]: this._playQuestComplete,
+      [SoundId.LEVEL_UP]: this._playLevelUp,
       [SoundId.NEW_NOTIFICATION]: this._playNewNotification,
-      [SoundId.XP_EARNED]:        this._playXPEarned,
-      [SoundId.AGENT_CHAT]:       this._playAgentChat,
-      [SoundId.ERROR_WARNING]:    this._playErrorWarning,
-      [SoundId.TIMER_TICK]:       this._playTimerTick,
-      [SoundId.AMBIENT_SUCCESS]:  this._playAmbientSuccess,
+      [SoundId.XP_EARNED]: this._playXPEarned,
+      [SoundId.AGENT_CHAT]: this._playAgentChat,
+      [SoundId.ERROR_WARNING]: this._playErrorWarning,
+      [SoundId.TIMER_TICK]: this._playTimerTick,
+      [SoundId.AMBIENT_SUCCESS]: this._playAmbientSuccess,
     };
   }
 
@@ -359,7 +367,7 @@ export class SoundEffects {
     const playNote = (freq, t) => {
       const osc = ctx.createOscillator();
       const g = ctx.createGain();
-      osc.type = 'sine';
+      osc.type = "sine";
       osc.frequency.value = freq;
       g.gain.setValueAtTime(0.25, t);
       g.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
@@ -383,7 +391,7 @@ export class SoundEffects {
 
     const osc = ctx.createOscillator();
     const g = ctx.createGain();
-    osc.type = 'square';
+    osc.type = "square";
     osc.frequency.setValueAtTime(NOTE.A3, now);
     osc.frequency.exponentialRampToValueAtTime(NOTE.E3, now + dur);
     g.gain.setValueAtTime(0.2, now);
@@ -409,7 +417,7 @@ export class SoundEffects {
       const t = now + i * 0.15;
       const osc = ctx.createOscillator();
       const g = ctx.createGain();
-      osc.type = 'triangle';
+      osc.type = "triangle";
       osc.frequency.value = freq;
       g.gain.setValueAtTime(0.28, t);
       g.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
@@ -441,7 +449,7 @@ export class SoundEffects {
       // Fundamental
       const osc = ctx.createOscillator();
       const g = ctx.createGain();
-      osc.type = 'sine';
+      osc.type = "sine";
       osc.frequency.value = freq;
       g.gain.setValueAtTime(0.28, t);
       g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
@@ -454,7 +462,7 @@ export class SoundEffects {
       // 2nd harmonic for brightness
       const osc2 = ctx.createOscillator();
       const g2 = ctx.createGain();
-      osc2.type = 'sine';
+      osc2.type = "sine";
       osc2.frequency.value = freq * 2;
       g2.gain.setValueAtTime(0.08, t);
       g2.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.7);
@@ -466,7 +474,7 @@ export class SoundEffects {
       // 3rd harmonic (faint)
       const osc3 = ctx.createOscillator();
       const g3 = ctx.createGain();
-      osc3.type = 'sine';
+      osc3.type = "sine";
       osc3.frequency.value = freq * 3;
       g3.gain.setValueAtTime(0.03, t);
       g3.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.5);
@@ -492,7 +500,7 @@ export class SoundEffects {
     chord.forEach((freq) => {
       const osc = ctx.createOscillator();
       const g = ctx.createGain();
-      osc.type = 'sine';
+      osc.type = "sine";
       osc.frequency.value = freq;
 
       // Soft attack, sustained, gentle fade
@@ -511,7 +519,7 @@ export class SoundEffects {
     // Add a 5th (G4) reinforcement for fullness
     const osc5 = ctx.createOscillator();
     const g5 = ctx.createGain();
-    osc5.type = 'triangle';
+    osc5.type = "triangle";
     osc5.frequency.value = NOTE.G4;
     g5.gain.setValueAtTime(0.0001, now);
     g5.gain.linearRampToValueAtTime(0.08, now + 0.05);
@@ -533,12 +541,12 @@ export class SoundEffects {
     const filter = ctx.createBiquadFilter();
     const g = ctx.createGain();
 
-    osc.type = 'sawtooth';
+    osc.type = "sawtooth";
     osc.frequency.setValueAtTime(100, now);
     osc.frequency.exponentialRampToValueAtTime(2000, now + dur);
 
     // Lowpass filter sweeps up with the frequency
-    filter.type = 'lowpass';
+    filter.type = "lowpass";
     filter.frequency.setValueAtTime(200, now);
     filter.frequency.exponentialRampToValueAtTime(4000, now + dur);
     filter.Q.value = 2;
@@ -570,7 +578,7 @@ export class SoundEffects {
 
     const osc = ctx.createOscillator();
     const g = ctx.createGain();
-    osc.type = 'sine';
+    osc.type = "sine";
     osc.frequency.value = NOTE.G5;
 
     g.gain.setValueAtTime(0.2, now);
@@ -598,13 +606,13 @@ export class SoundEffects {
     // Carrier
     const carrier = ctx.createOscillator();
     const carrierGain = ctx.createGain();
-    carrier.type = 'sine';
+    carrier.type = "sine";
     carrier.frequency.value = 1800;
 
     // Modulator for metallic FM timbre
     const mod = ctx.createOscillator();
     const modGain = ctx.createGain();
-    mod.type = 'sine';
+    mod.type = "sine";
     mod.frequency.value = 3400;
     modGain.gain.setValueAtTime(600, now);
     modGain.gain.exponentialRampToValueAtTime(1, now + dur);
@@ -636,7 +644,7 @@ export class SoundEffects {
     src.buffer = buf;
 
     const bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
+    bp.type = "bandpass";
     bp.frequency.value = 1200;
     bp.Q.value = 3;
 
@@ -665,7 +673,7 @@ export class SoundEffects {
         const t = now + (rep * 2 + j) * noteDur;
         const osc = ctx.createOscillator();
         const g = ctx.createGain();
-        osc.type = 'square';
+        osc.type = "square";
         osc.frequency.value = freq;
         g.gain.setValueAtTime(0.15, t);
         g.gain.exponentialRampToValueAtTime(0.0001, t + noteDur);
@@ -689,7 +697,7 @@ export class SoundEffects {
     src.buffer = buf;
 
     const hp = ctx.createBiquadFilter();
-    hp.type = 'highpass';
+    hp.type = "highpass";
     hp.frequency.value = 4000;
 
     const g = ctx.createGain();
@@ -721,7 +729,7 @@ export class SoundEffects {
       // Fundamental
       const osc = ctx.createOscillator();
       const g = ctx.createGain();
-      osc.type = 'sine';
+      osc.type = "sine";
       osc.frequency.value = freq;
 
       g.gain.setValueAtTime(0.0001, now);
@@ -737,7 +745,7 @@ export class SoundEffects {
       // Octave-up layer for shimmer
       const osc2 = ctx.createOscillator();
       const g2 = ctx.createGain();
-      osc2.type = 'sine';
+      osc2.type = "sine";
       osc2.frequency.value = freq * 2;
 
       g2.gain.setValueAtTime(0.0001, now);

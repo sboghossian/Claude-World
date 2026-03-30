@@ -14,26 +14,26 @@
  *   REPORTING -> IDLE (after 2s)
  */
 
-import { Container, Graphics, Text } from 'pixi.js';
-import { tileToScreen } from './tiles.js';
-import { ZONE_DEFS } from './zones.js';
-import { TILE_WIDTH, TILE_HEIGHT } from './constants.js';
+import { Container, Graphics, Text } from "pixi.js";
+import { tileToScreen } from "./tiles.js";
+import { ZONE_DEFS } from "./zones.js";
+import { TILE_WIDTH, TILE_HEIGHT } from "./constants.js";
 
 // ── Agent states ─────────────────────────────────────────────────────
 export const AgentState = Object.freeze({
-  IDLE:      'IDLE',
-  WALKING:   'WALKING',
-  WORKING:   'WORKING',
-  REPORTING: 'REPORTING',
+  IDLE: "IDLE",
+  WALKING: "WALKING",
+  WORKING: "WORKING",
+  REPORTING: "REPORTING",
 });
 
 // ── Role → color mapping ─────────────────────────────────────────────
 const ROLE_COLORS = {
-  dispatcher:    0x4a90d9, // blue
-  researcher:    0x4caf50, // green
-  trainer:       0xe8893c, // orange
+  dispatcher: 0x4a90d9, // blue
+  researcher: 0x4caf50, // green
+  trainer: 0xe8893c, // orange
   memory_keeper: 0x9c5ec7, // purple
-  integrator:    0x00bcd4, // cyan
+  integrator: 0x00bcd4, // cyan
 };
 
 /** Fallback color when role is unknown */
@@ -56,7 +56,7 @@ const REPORT_DURATION = 2; // seconds
 const BODY_W = 10;
 const BODY_H = 10;
 const HEAD_R = 5;
-const LEG_H  = 4;
+const LEG_H = 4;
 const SPRITE_W = 16;
 const SPRITE_H = 24;
 
@@ -72,7 +72,7 @@ function clamp(v, lo, hi) {
 
 // ── Helper: find zone def by id ──────────────────────────────────────
 function findZone(zoneId) {
-  return ZONE_DEFS.find(z => z.id === zoneId) || null;
+  return ZONE_DEFS.find((z) => z.id === zoneId) || null;
 }
 
 /**
@@ -109,11 +109,7 @@ function createSpeechBubble(message) {
   bg.roundRect(-bw / 2, -bh - 8, bw, bh, 4);
   bg.fill({ color: 0xffffff, alpha: 0.92 });
   // Small triangle pointer
-  bg.poly([
-    -4, -8,
-     4, -8,
-     0, -3,
-  ]);
+  bg.poly([-4, -8, 4, -8, 0, -3]);
   bg.fill({ color: 0xffffff, alpha: 0.92 });
   bubble.addChild(bg);
 
@@ -121,10 +117,10 @@ function createSpeechBubble(message) {
   const label = new Text({
     text: message,
     style: {
-      fontFamily: 'monospace',
+      fontFamily: "monospace",
       fontSize: 9,
       fill: 0x333333,
-      align: 'center',
+      align: "center",
     },
   });
   label.anchor.set(0.5, 0.5);
@@ -148,7 +144,11 @@ function createSpeechBubble(message) {
  * @param {boolean} opts.handRaised - whether to draw the raised-hand line
  * @param {number} opts.glowAlpha   - 0-1 pulse glow intensity (working)
  */
-function drawAgentBody(gfx, color, { legPhase = 0, handRaised = false, glowAlpha = 0 } = {}) {
+function drawAgentBody(
+  gfx,
+  color,
+  { legPhase = 0, handRaised = false, glowAlpha = 0 } = {},
+) {
   gfx.clear();
 
   // ── Glow circle (behind body, for WORKING state) ───────────────
@@ -208,11 +208,11 @@ class Agent {
    * @param {string} data.zoneId    - home zone id
    */
   constructor(data) {
-    this.id       = data.id;
-    this.name     = data.name;
-    this.role     = data.role;
-    this.zoneId   = data.zoneId;
-    this.color    = ROLE_COLORS[data.role] || DEFAULT_COLOR;
+    this.id = data.id;
+    this.name = data.name;
+    this.role = data.role;
+    this.zoneId = data.zoneId;
+    this.color = ROLE_COLORS[data.role] || DEFAULT_COLOR;
 
     // Zone reference
     this.zone = findZone(data.zoneId);
@@ -233,15 +233,15 @@ class Agent {
     this._walkToWork = false;
 
     // Timers
-    this._idleTimer     = randRange(WANDER_INTERVAL_MIN, WANDER_INTERVAL_MAX);
-    this._reportTimer   = 0;
-    this._stateTime     = 0; // total time in current state
+    this._idleTimer = randRange(WANDER_INTERVAL_MIN, WANDER_INTERVAL_MAX);
+    this._reportTimer = 0;
+    this._stateTime = 0; // total time in current state
 
     // Animation phase counters
-    this._bobPhase      = Math.random() * Math.PI * 2; // randomize start
-    this._legPhase      = 0;
+    this._bobPhase = Math.random() * Math.PI * 2; // randomize start
+    this._legPhase = 0;
     this._legToggleTime = 0;
-    this._glowPhase     = 0;
+    this._glowPhase = 0;
 
     // ── PixiJS visual objects ────────────────────────────────────
     /** Root container positioned at agent's screen location */
@@ -290,7 +290,7 @@ class Agent {
         break;
       case AgentState.REPORTING:
         this._reportTimer = REPORT_DURATION;
-        this._showBubble('\u2713'); // checkmark
+        this._showBubble("\u2713"); // checkmark
         break;
       default:
         break;
@@ -329,8 +329,16 @@ class Agent {
     const center = zoneCenter(this.zone);
     const dx = Math.round(randRange(-WANDER_RADIUS, WANDER_RADIUS));
     const dy = Math.round(randRange(-WANDER_RADIUS, WANDER_RADIUS));
-    this.targetTileX = clamp(center.x + dx, this.zone.tileX, this.zone.tileX + this.zone.w - 1);
-    this.targetTileY = clamp(center.y + dy, this.zone.tileY, this.zone.tileY + this.zone.h - 1);
+    this.targetTileX = clamp(
+      center.x + dx,
+      this.zone.tileX,
+      this.zone.tileX + this.zone.w - 1,
+    );
+    this.targetTileY = clamp(
+      center.y + dy,
+      this.zone.tileY,
+      this.zone.tileY + this.zone.h - 1,
+    );
   }
 
   // ── Per-frame update ───────────────────────────────────────────
@@ -509,7 +517,9 @@ export class AgentManager {
    */
   addAgent(agentData) {
     if (this._agents.has(agentData.id)) {
-      console.warn(`[AgentManager] Agent "${agentData.id}" already exists, skipping.`);
+      console.warn(
+        `[AgentManager] Agent "${agentData.id}" already exists, skipping.`,
+      );
       return this._agents.get(agentData.id);
     }
 
@@ -518,7 +528,7 @@ export class AgentManager {
     this.container.addChild(agent.container);
 
     console.log(
-      `[AgentManager] Added agent "${agent.name}" (${agent.role}) in zone "${agent.zoneId}"`
+      `[AgentManager] Added agent "${agent.name}" (${agent.role}) in zone "${agent.zoneId}"`,
     );
     return agent;
   }

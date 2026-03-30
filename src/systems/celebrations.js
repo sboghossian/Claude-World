@@ -4,7 +4,7 @@
 // Uses a dedicated 2D canvas (NOT PixiJS).
 // ============================================================
 
-const PALETTE = ['#a855f7', '#3b82f6', '#eab308', '#ffffff', '#ec4899'];
+const PALETTE = ["#a855f7", "#3b82f6", "#eab308", "#ffffff", "#ec4899"];
 
 // ─── Helpers ────────────────────────────────────────────────
 
@@ -59,7 +59,10 @@ class ConfettiParticle {
 
   update(dt, canvasH) {
     this.life -= dt;
-    if (this.life <= 0) { this.alive = false; return; }
+    if (this.life <= 0) {
+      this.alive = false;
+      return;
+    }
 
     this.vy += this.gravity * (dt / 16.67);
     this.vx += this.drift * (dt / 16.67);
@@ -103,22 +106,25 @@ class XPFloater {
 
   update(dt) {
     this.life -= dt;
-    if (this.life <= 0) { this.alive = false; return; }
-    const t = 1 - (this.life / this.maxLife);
+    if (this.life <= 0) {
+      this.alive = false;
+      return;
+    }
+    const t = 1 - this.life / this.maxLife;
     this.y = this.startY - easeOutCubic(t) * 60;
   }
 
   draw(ctx) {
-    const t = 1 - (this.life / this.maxLife);
-    const alpha = t < 0.7 ? 1 : 1 - ((t - 0.7) / 0.3);
+    const t = 1 - this.life / this.maxLife;
+    const alpha = t < 0.7 ? 1 : 1 - (t - 0.7) / 0.3;
 
     ctx.save();
     ctx.globalAlpha = Math.max(0, alpha);
-    ctx.font = 'bold 20px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.shadowColor = '#eab308';
+    ctx.font = "bold 20px system-ui, -apple-system, sans-serif";
+    ctx.textAlign = "center";
+    ctx.shadowColor = "#eab308";
     ctx.shadowBlur = 12;
-    ctx.fillStyle = '#eab308';
+    ctx.fillStyle = "#eab308";
     ctx.fillText(`+${this.amount} XP`, this.x, this.y);
     ctx.restore();
   }
@@ -139,7 +145,10 @@ class StarOrbiter {
 
   update(dt) {
     this.life -= dt;
-    if (this.life <= 0) { this.alive = false; return; }
+    if (this.life <= 0) {
+      this.alive = false;
+      return;
+    }
     this.angle += this.speed * (dt / 16.67);
   }
 
@@ -150,8 +159,8 @@ class StarOrbiter {
 
     ctx.save();
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = '#eab308';
-    ctx.shadowColor = '#eab308';
+    ctx.fillStyle = "#eab308";
+    ctx.shadowColor = "#eab308";
     ctx.shadowBlur = 8;
     ctx.beginPath();
     this._drawStar(ctx, x, y, this.size, this.size / 2, 5);
@@ -178,8 +187,8 @@ class SparkleParticle {
     const speed = rand(80, 200);
     this.x = cx;
     this.y = cy;
-    this.vx = Math.cos(angle) * speed / 60;
-    this.vy = Math.sin(angle) * speed / 60;
+    this.vx = (Math.cos(angle) * speed) / 60;
+    this.vy = (Math.sin(angle) * speed) / 60;
     this.life = rand(400, 800);
     this.maxLife = this.life;
     this.size = rand(2, 6);
@@ -189,7 +198,10 @@ class SparkleParticle {
 
   update(dt) {
     this.life -= dt;
-    if (this.life <= 0) { this.alive = false; return; }
+    if (this.life <= 0) {
+      this.alive = false;
+      return;
+    }
     this.vx *= 0.97;
     this.vy *= 0.97;
     this.x += this.vx * (dt / 16.67);
@@ -226,15 +238,13 @@ class ScreenFlash {
   }
 
   draw(ctx, w, h) {
-    const t = 1 - (this.life / this.maxLife);
+    const t = 1 - this.life / this.maxLife;
     // alpha: 0 → 0.8 → 0
-    const alpha = t < 0.3
-      ? (t / 0.3) * 0.8
-      : 0.8 * (1 - (t - 0.3) / 0.7);
+    const alpha = t < 0.3 ? (t / 0.3) * 0.8 : 0.8 * (1 - (t - 0.3) / 0.7);
 
     ctx.save();
     ctx.globalAlpha = Math.max(0, alpha);
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, w, h);
     ctx.restore();
   }
@@ -256,7 +266,7 @@ class LevelUpText {
   }
 
   draw(ctx) {
-    const t = 1 - (this.life / this.maxLife);
+    const t = 1 - this.life / this.maxLife;
     // scale: 0.5 → 1.5 → 1.0
     let scale;
     if (t < 0.5) {
@@ -265,20 +275,20 @@ class LevelUpText {
       scale = lerp(1.5, 1.0, easeInOutQuad((t - 0.5) / 0.5));
     }
 
-    const alpha = t < 0.15 ? t / 0.15 : (t > 0.8 ? 1 - (t - 0.8) / 0.2 : 1);
+    const alpha = t < 0.15 ? t / 0.15 : t > 0.8 ? 1 - (t - 0.8) / 0.2 : 1;
 
     ctx.save();
     ctx.globalAlpha = Math.max(0, alpha);
     ctx.translate(this.cx, this.cy);
     ctx.scale(scale, scale);
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
 
     // Glow
-    ctx.shadowColor = '#a855f7';
+    ctx.shadowColor = "#a855f7";
     ctx.shadowBlur = 30;
-    ctx.font = 'bold 72px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = '#ffffff';
+    ctx.font = "bold 72px system-ui, -apple-system, sans-serif";
+    ctx.fillStyle = "#ffffff";
     ctx.fillText(`LEVEL ${this.level}`, 0, 0);
 
     ctx.restore();
@@ -305,7 +315,10 @@ class TrophyDrop {
 
   update(dt, canvasH) {
     this.life -= dt;
-    if (this.life <= 0) { this.alive = false; return; }
+    if (this.life <= 0) {
+      this.alive = false;
+      return;
+    }
 
     const center = canvasH * 0.38;
     this.targetY = center;
@@ -335,24 +348,24 @@ class TrophyDrop {
   }
 
   draw(ctx, canvasW) {
-    const t = 1 - (this.life / this.maxLife);
+    const t = 1 - this.life / this.maxLife;
     const fadeOut = t > 0.75 ? 1 - (t - 0.75) / 0.25 : 1;
 
     ctx.save();
     ctx.globalAlpha = Math.max(0, fadeOut);
 
     // Trophy emoji
-    ctx.font = '64px system-ui';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.shadowColor = '#eab308';
+    ctx.font = "64px system-ui";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.shadowColor = "#eab308";
     ctx.shadowBlur = 20;
-    ctx.fillText('🏆', canvasW / 2, this.y);
+    ctx.fillText("🏆", canvasW / 2, this.y);
 
     // Quest title with typewriter
     const displayed = this.questTitle.slice(0, this.typewriterIndex);
-    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = '#eab308';
+    ctx.font = "bold 24px system-ui, -apple-system, sans-serif";
+    ctx.fillStyle = "#eab308";
     ctx.shadowBlur = 14;
     ctx.fillText(displayed, canvasW / 2, this.y + 58);
 
@@ -397,7 +410,9 @@ class BuildingToast {
       return baseY;
     } else {
       // Slide out
-      const t = (this.elapsed - this.slideInDuration - this.stayDuration) / this.slideOutDuration;
+      const t =
+        (this.elapsed - this.slideInDuration - this.stayDuration) /
+        this.slideOutDuration;
       return baseY + slideTotal * Math.min(1, t);
     }
   }
@@ -412,14 +427,14 @@ class BuildingToast {
     ctx.globalAlpha = 1;
 
     // Background
-    ctx.fillStyle = 'rgba(15,10,30,0.92)';
+    ctx.fillStyle = "rgba(15,10,30,0.92)";
     this._roundRect(ctx, x, y, this.w, this.h, r);
     ctx.fill();
 
     // Golden border with pulse
     ctx.strokeStyle = `rgba(234,179,8,${pulseAlpha})`;
     ctx.lineWidth = 2.5;
-    ctx.shadowColor = '#eab308';
+    ctx.shadowColor = "#eab308";
     ctx.shadowBlur = 12 * pulseAlpha;
     this._roundRect(ctx, x, y, this.w, this.h, r);
     ctx.stroke();
@@ -427,11 +442,15 @@ class BuildingToast {
     ctx.shadowBlur = 0;
 
     // Text
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = 'bold 18px system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = '#eab308';
-    ctx.fillText(`🏗️ → ✨  ${this.buildingName} Complete!`, x + this.w / 2, y + this.h / 2);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = "bold 18px system-ui, -apple-system, sans-serif";
+    ctx.fillStyle = "#eab308";
+    ctx.fillText(
+      `🏗️ → ✨  ${this.buildingName} Complete!`,
+      x + this.w / 2,
+      y + this.h / 2,
+    );
 
     ctx.restore();
   }
@@ -470,9 +489,12 @@ class StreakBanner {
   }
 
   draw(ctx, canvasW) {
-    const t = 1 - (this.life / this.maxLife);
+    const t = 1 - this.life / this.maxLife;
     const fadeOut = t > 0.75 ? 1 - (t - 0.75) / 0.25 : 1;
-    const shake = this.shakeAmp * Math.exp(-this.shakeDecay * this.elapsed) * Math.sin(this.elapsed * 0.05);
+    const shake =
+      this.shakeAmp *
+      Math.exp(-this.shakeDecay * this.elapsed) *
+      Math.sin(this.elapsed * 0.05);
 
     const x = canvasW - 220 + shake;
     const y = 32;
@@ -482,14 +504,14 @@ class StreakBanner {
 
     // Gradient fire text
     const grad = ctx.createLinearGradient(x, y, x, y + 48);
-    grad.addColorStop(0, '#ff4500');
-    grad.addColorStop(0.5, '#ff8c00');
-    grad.addColorStop(1, '#ffcc00');
+    grad.addColorStop(0, "#ff4500");
+    grad.addColorStop(0.5, "#ff8c00");
+    grad.addColorStop(1, "#ffcc00");
 
-    ctx.font = 'bold 32px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.shadowColor = '#ff4500';
+    ctx.font = "bold 32px system-ui, -apple-system, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.shadowColor = "#ff4500";
     ctx.shadowBlur = 18;
     ctx.fillStyle = grad;
     ctx.fillText(`🔥 ${this.count}x STREAK!`, x, y);
@@ -503,17 +525,17 @@ class StreakBanner {
 export class CelebrationSystem {
   constructor() {
     // Full-screen overlay canvas
-    this._canvas = document.createElement('canvas');
+    this._canvas = document.createElement("canvas");
     this._canvas.style.cssText =
-      'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9000;';
+      "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9000;";
     document.body.appendChild(this._canvas);
-    this._ctx = this._canvas.getContext('2d');
+    this._ctx = this._canvas.getContext("2d");
     this._resize();
-    window.addEventListener('resize', () => this._resize());
+    window.addEventListener("resize", () => this._resize());
 
     // Particle & effect pools
-    this._particles = [];   // ConfettiParticle, SparkleParticle, StarOrbiter, XPFloater
-    this._effects = [];     // ScreenFlash, LevelUpText, TrophyDrop, BuildingToast, StreakBanner
+    this._particles = []; // ConfettiParticle, SparkleParticle, StarOrbiter, XPFloater
+    this._effects = []; // ScreenFlash, LevelUpText, TrophyDrop, BuildingToast, StreakBanner
 
     this._running = false;
     this._raf = null;
@@ -534,8 +556,12 @@ export class CelebrationSystem {
     this._canvas.height = window.innerHeight;
   }
 
-  get _w() { return this._canvas.width; }
-  get _h() { return this._canvas.height; }
+  get _w() {
+    return this._canvas.width;
+  }
+  get _h() {
+    return this._canvas.height;
+  }
 
   // ── Animation loop ───────────────────────────────────────
 
@@ -561,7 +587,10 @@ export class CelebrationSystem {
     for (let i = this._effects.length - 1; i >= 0; i--) {
       const e = this._effects[i];
       e.update(dt, this._h);
-      if (!e.alive) { this._effects.splice(i, 1); continue; }
+      if (!e.alive) {
+        this._effects.splice(i, 1);
+        continue;
+      }
 
       if (e instanceof ScreenFlash) {
         e.draw(ctx, this._w, this._h);
@@ -585,7 +614,10 @@ export class CelebrationSystem {
         p.update(dt);
       }
 
-      if (!p.alive) { this._particles.splice(i, 1); continue; }
+      if (!p.alive) {
+        this._particles.splice(i, 1);
+        continue;
+      }
       p.draw(ctx);
     }
   }
@@ -593,31 +625,31 @@ export class CelebrationSystem {
   // ── Event bindings ───────────────────────────────────────
 
   _bindEvents() {
-    window.addEventListener('quest:complete', (e) => {
-      const title = e.detail?.title ?? 'Quest Complete';
+    window.addEventListener("quest:complete", (e) => {
+      const title = e.detail?.title ?? "Quest Complete";
       this.triggerQuestComplete(title);
     });
 
-    window.addEventListener('world:level-up', (e) => {
-      const level = e.detail?.level ?? '?';
+    window.addEventListener("world:level-up", (e) => {
+      const level = e.detail?.level ?? "?";
       this.triggerLevelUp(level);
     });
 
-    window.addEventListener('dispatch:task-complete', (e) => {
+    window.addEventListener("dispatch:task-complete", (e) => {
       // XP float at HUD XP bar position (default bottom-center if not provided)
       const x = e.detail?.screenX ?? this._w / 2;
-      const y = e.detail?.screenY ?? (this._h - 80);
+      const y = e.detail?.screenY ?? this._h - 80;
       const amount = e.detail?.xp ?? e.detail?.amount ?? 10;
       this.triggerXPFloat(x, y, amount);
       this._trackStreak();
     });
 
-    window.addEventListener('zone:building-complete', (e) => {
-      const name = e.detail?.buildingName ?? e.detail?.name ?? 'Building';
+    window.addEventListener("zone:building-complete", (e) => {
+      const name = e.detail?.buildingName ?? e.detail?.name ?? "Building";
       this.triggerBuildingComplete(name);
     });
 
-    window.addEventListener('onboarding:complete', () => {
+    window.addEventListener("onboarding:complete", () => {
       this.triggerConfetti(3);
       setTimeout(() => this.triggerLevelUp(1), 600);
     });
@@ -630,7 +662,7 @@ export class CelebrationSystem {
     this._taskTimestamps.push(now);
     // Prune old timestamps
     this._taskTimestamps = this._taskTimestamps.filter(
-      (t) => now - t <= this._streakWindow
+      (t) => now - t <= this._streakWindow,
     );
     const count = this._taskTimestamps.length;
     if (count >= 3) {
@@ -689,7 +721,7 @@ export class CelebrationSystem {
           cy,
           120,
           0.05 + Math.random() * 0.03,
-          (i / starCount) * Math.PI * 2
+          (i / starCount) * Math.PI * 2,
         );
         orbiter.life = 1000;
         orbiter.maxLife = 1000;
@@ -716,9 +748,12 @@ export class CelebrationSystem {
 
     // Sparkle burst around trophy (spread over 300ms)
     for (let i = 0; i < 40; i++) {
-      setTimeout(() => {
-        this._particles.push(new SparkleParticle(cx, cy * 0.75));
-      }, rand(0, 300));
+      setTimeout(
+        () => {
+          this._particles.push(new SparkleParticle(cx, cy * 0.75));
+        },
+        rand(0, 300),
+      );
     }
   }
 

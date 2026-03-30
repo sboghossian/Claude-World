@@ -64,7 +64,9 @@
   font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 500;
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
   border-bottom: 3px solid transparent;
   position: relative;
 }
@@ -130,8 +132,17 @@
 }
 
 @keyframes ap-glow-pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(var(--agent-color-rgb, 74, 158, 255), 0.3), 0 0 40px rgba(var(--agent-color-rgb, 74, 158, 255), 0.1); }
-  50% { box-shadow: 0 0 28px rgba(var(--agent-color-rgb, 74, 158, 255), 0.45), 0 0 56px rgba(var(--agent-color-rgb, 74, 158, 255), 0.15); }
+  0%,
+  100% {
+    box-shadow:
+      0 0 20px rgba(var(--agent-color-rgb, 74, 158, 255), 0.3),
+      0 0 40px rgba(var(--agent-color-rgb, 74, 158, 255), 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 28px rgba(var(--agent-color-rgb, 74, 158, 255), 0.45),
+      0 0 56px rgba(var(--agent-color-rgb, 74, 158, 255), 0.15);
+  }
 }
 
 .ap-name {
@@ -298,7 +309,11 @@
 .ap-trait__bar-inner {
   height: 100%;
   border-radius: var(--radius-full);
-  background: linear-gradient(90deg, var(--agent-color, var(--accent-blue)), var(--agent-color-light, var(--accent-cyan)));
+  background: linear-gradient(
+    90deg,
+    var(--agent-color, var(--accent-blue)),
+    var(--agent-color-light, var(--accent-cyan))
+  );
   transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   width: 0;
   box-shadow: 0 0 8px rgba(var(--agent-color-rgb, 74, 158, 255), 0.3);
@@ -560,8 +575,28 @@
 }
 
 /* ── Agent color overrides (set as CSS custom properties) ────────  */
-.ap-agent--commander   { --agent-color: #7c3aed; --agent-color-rgb: 124, 58, 237; --agent-color-light: #a78bfa; }
-.ap-agent--librarian   { --agent-color: #2563eb; --agent-color-rgb: 37, 99, 235;  --agent-color-light: #60a5fa; }
-.ap-agent--archivist   { --agent-color: #0891b2; --agent-color-rgb: 8, 145, 178;  --agent-color-light: #22d3ee; }
-.ap-agent--instructor  { --agent-color: #16a34a; --agent-color-rgb: 22, 163, 74;  --agent-color-light: #4ade80; }
-.ap-agent--dockmaster  { --agent-color: #d97706; --agent-color-rgb: 217, 119, 6;  --agent-color-light: #fbbf24; }
+.ap-agent--commander {
+  --agent-color: #7c3aed;
+  --agent-color-rgb: 124, 58, 237;
+  --agent-color-light: #a78bfa;
+}
+.ap-agent--librarian {
+  --agent-color: #2563eb;
+  --agent-color-rgb: 37, 99, 235;
+  --agent-color-light: #60a5fa;
+}
+.ap-agent--archivist {
+  --agent-color: #0891b2;
+  --agent-color-rgb: 8, 145, 178;
+  --agent-color-light: #22d3ee;
+}
+.ap-agent--instructor {
+  --agent-color: #16a34a;
+  --agent-color-rgb: 22, 163, 74;
+  --agent-color-light: #4ade80;
+}
+.ap-agent--dockmaster {
+  --agent-color: #d97706;
+  --agent-color-rgb: 217, 119, 6;
+  --agent-color-light: #fbbf24;
+}

@@ -1,27 +1,27 @@
-'use strict';
+"use strict";
 
-const Anthropic = require('@anthropic-ai/sdk');
+const Anthropic = require("@anthropic-ai/sdk");
 const {
   ProviderAdapter,
   ProviderError,
   RateLimitError,
   AuthenticationError,
-} = require('./base');
+} = require("./base");
 
 // ── Pricing (USD per 1 M tokens) ─────────────────────────────────────
 const PRICING = {
-  'claude-sonnet-4-20250514': { input: 3, output: 15 },
-  'claude-haiku-4-5-20251001': { input: 1, output: 5 },
+  "claude-sonnet-4-20250514": { input: 3, output: 15 },
+  "claude-haiku-4-5-20251001": { input: 1, output: 5 },
 };
 
-const DEFAULT_MODEL = 'claude-sonnet-4-20250514';
+const DEFAULT_MODEL = "claude-sonnet-4-20250514";
 
 class AnthropicAdapter extends ProviderAdapter {
   /**
    * @param {import('../../../electron/key-store')} keyStore
    */
   constructor(keyStore) {
-    super('anthropic', keyStore);
+    super("anthropic", keyStore);
   }
 
   /** Lazily create / return the SDK client. */
@@ -77,9 +77,9 @@ class AnthropicAdapter extends ProviderAdapter {
       const response = await client.messages.create(params);
 
       const text = response.content
-        .filter((block) => block.type === 'text')
+        .filter((block) => block.type === "text")
         .map((block) => block.text)
-        .join('');
+        .join("");
 
       return {
         text,
@@ -117,23 +117,23 @@ class AnthropicAdapter extends ProviderAdapter {
       const stream = client.messages.stream(params);
 
       for await (const event of stream) {
-        if (event.type === 'message_start' && event.message) {
+        if (event.type === "message_start" && event.message) {
           responseModel = event.message.model || model;
           if (event.message.usage) {
             inputTokens = event.message.usage.input_tokens || 0;
           }
         }
-        if (event.type === 'content_block_delta' && event.delta?.text) {
-          yield { type: 'text', text: event.delta.text };
+        if (event.type === "content_block_delta" && event.delta?.text) {
+          yield { type: "text", text: event.delta.text };
         }
-        if (event.type === 'message_delta' && event.usage) {
+        if (event.type === "message_delta" && event.usage) {
           outputTokens = event.usage.output_tokens || 0;
         }
       }
 
       // Final metadata chunk
       yield {
-        type: 'done',
+        type: "done",
         model: responseModel,
         inputTokens,
         outputTokens,
@@ -153,7 +153,7 @@ class AnthropicAdapter extends ProviderAdapter {
       await client.messages.create({
         model: DEFAULT_MODEL,
         max_tokens: 1,
-        messages: [{ role: 'user', content: 'ping' }],
+        messages: [{ role: "user", content: "ping" }],
       });
       return { ok: true, latencyMs: Date.now() - start };
     } catch (err) {
@@ -176,30 +176,30 @@ class AnthropicAdapter extends ProviderAdapter {
     const status = err.status || err.statusCode || null;
 
     if (status === 429) {
-      const retryAfter = err.headers?.['retry-after'];
+      const retryAfter = err.headers?.["retry-after"];
       throw new RateLimitError(
-        'anthropic',
-        retryAfter ? parseInt(retryAfter, 10) * 1000 : undefined
+        "anthropic",
+        retryAfter ? parseInt(retryAfter, 10) * 1000 : undefined,
       );
     }
     if (status === 401) {
-      throw new AuthenticationError('anthropic');
+      throw new AuthenticationError("anthropic");
     }
     if (status === 400) {
-      throw new ProviderError('anthropic', `Bad request: ${err.message}`, {
+      throw new ProviderError("anthropic", `Bad request: ${err.message}`, {
         status: 400,
         retryable: false,
       });
     }
     if (status === 500 || status === 502 || status === 503) {
-      throw new ProviderError('anthropic', `Server error: ${err.message}`, {
+      throw new ProviderError("anthropic", `Server error: ${err.message}`, {
         status,
         retryable: true,
       });
     }
 
     // Unknown / network errors
-    throw new ProviderError('anthropic', err.message || 'Unknown error', {
+    throw new ProviderError("anthropic", err.message || "Unknown error", {
       status,
       retryable: false,
     });

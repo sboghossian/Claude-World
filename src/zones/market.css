@@ -126,9 +126,10 @@
   font-family: var(--font-sans);
   font-weight: 500;
   cursor: pointer;
-  transition: background var(--transition-fast),
-              color var(--transition-fast),
-              border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
   white-space: nowrap;
 }
 
@@ -159,7 +160,7 @@
 }
 
 .market-zone__section-title::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--border);
@@ -188,9 +189,10 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: border-color var(--transition-fast),
-              box-shadow var(--transition-fast),
-              transform var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
   cursor: default;
 }
 
@@ -203,12 +205,13 @@
 /* Featured card variant */
 .market-zone__card--featured {
   border-color: rgba(249, 115, 22, 0.4);
-  box-shadow: 0 0 16px rgba(249, 115, 22, 0.12),
-              inset 0 0 24px rgba(249, 115, 22, 0.04);
+  box-shadow:
+    0 0 16px rgba(249, 115, 22, 0.12),
+    inset 0 0 24px rgba(249, 115, 22, 0.04);
 }
 
 .market-zone__card--featured::before {
-  content: '⭐ Featured';
+  content: "⭐ Featured";
   position: absolute;
   top: -1px;
   right: 10px;
@@ -338,9 +341,10 @@
   font-weight: 600;
   font-family: var(--font-sans);
   cursor: pointer;
-  transition: background var(--transition-fast),
-              border-color var(--transition-fast),
-              opacity var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    opacity var(--transition-fast);
   text-align: center;
 }
 
@@ -366,8 +370,13 @@
 }
 
 @keyframes market-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.55; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
 }
 
 /* ── My Installs tab ──────────────────────────────────────────── */
@@ -466,7 +475,8 @@
 
 .market-zone__skeleton-row {
   height: 90px;
-  background: linear-gradient(90deg,
+  background: linear-gradient(
+    90deg,
     var(--bg-secondary) 25%,
     rgba(249, 115, 22, 0.05) 50%,
     var(--bg-secondary) 75%
@@ -477,8 +487,12 @@
 }
 
 @keyframes market-shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ── Toast ────────────────────────────────────────────────────── */
@@ -494,7 +508,7 @@
   color: var(--text-primary);
   font-size: 12px;
   font-family: var(--font-sans);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -503,9 +517,19 @@
 }
 
 @keyframes market-toast-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.market-zone__toast--success { border-color: #22c55e; }
-.market-zone__toast--error   { border-color: #ef4444; }
+.market-zone__toast--success {
+  border-color: #22c55e;
+}
+.market-zone__toast--error {
+  border-color: #ef4444;
+}

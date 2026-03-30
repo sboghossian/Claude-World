@@ -5,33 +5,33 @@
 
 /* ── Root variables ── */
 .legal-tower {
-  --lt-bg:           #0f1117;
-  --lt-surface:      #171c26;
-  --lt-surface-2:    #1e2535;
-  --lt-border:       #2a3347;
+  --lt-bg: #0f1117;
+  --lt-surface: #171c26;
+  --lt-surface-2: #1e2535;
+  --lt-border: #2a3347;
   --lt-border-focus: #f59e0b;
 
-  --lt-gold:         #f59e0b;
-  --lt-gold-dark:    #d97706;
-  --lt-gold-glow:    rgba(245, 158, 11, 0.18);
+  --lt-gold: #f59e0b;
+  --lt-gold-dark: #d97706;
+  --lt-gold-glow: rgba(245, 158, 11, 0.18);
 
-  --lt-text-primary:   #e8eaf0;
+  --lt-text-primary: #e8eaf0;
   --lt-text-secondary: #8a9ab8;
-  --lt-text-muted:     #4a5568;
+  --lt-text-muted: #4a5568;
 
-  --lt-risk-low-bg:    rgba(16, 185, 129, 0.15);
+  --lt-risk-low-bg: rgba(16, 185, 129, 0.15);
   --lt-risk-low-color: #10b981;
-  --lt-risk-low-border:#10b981;
+  --lt-risk-low-border: #10b981;
 
-  --lt-risk-med-bg:    rgba(245, 158, 11, 0.15);
+  --lt-risk-med-bg: rgba(245, 158, 11, 0.15);
   --lt-risk-med-color: #f59e0b;
-  --lt-risk-med-border:#f59e0b;
+  --lt-risk-med-border: #f59e0b;
 
-  --lt-risk-high-bg:   rgba(239, 68, 68, 0.15);
-  --lt-risk-high-color:#ef4444;
-  --lt-risk-high-border:#ef4444;
+  --lt-risk-high-bg: rgba(239, 68, 68, 0.15);
+  --lt-risk-high-color: #ef4444;
+  --lt-risk-high-border: #ef4444;
 
-  --lt-radius:    8px;
+  --lt-radius: 8px;
   --lt-radius-lg: 12px;
   --lt-transition: 0.18s ease;
 
@@ -190,7 +190,9 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--lt-transition), box-shadow var(--lt-transition);
+  transition:
+    background var(--lt-transition),
+    box-shadow var(--lt-transition);
   letter-spacing: 0.01em;
 }
 
@@ -309,11 +311,25 @@
   border: 1px solid var(--lt-border);
 }
 
-.lt-type-badge--contract { color: #60a5fa; border-color: rgba(96, 165, 250, 0.4); }
-.lt-type-badge--nda      { color: #a78bfa; border-color: rgba(167, 139, 250, 0.4); }
-.lt-type-badge--terms    { color: #34d399; border-color: rgba(52, 211, 153, 0.4); }
-.lt-type-badge--policy   { color: #fb923c; border-color: rgba(251, 146, 60, 0.4); }
-.lt-type-badge--other    { color: var(--lt-text-secondary); }
+.lt-type-badge--contract {
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.4);
+}
+.lt-type-badge--nda {
+  color: #a78bfa;
+  border-color: rgba(167, 139, 250, 0.4);
+}
+.lt-type-badge--terms {
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.4);
+}
+.lt-type-badge--policy {
+  color: #fb923c;
+  border-color: rgba(251, 146, 60, 0.4);
+}
+.lt-type-badge--other {
+  color: var(--lt-text-secondary);
+}
 
 /* ── Risk badges ── */
 .lt-risk-badge {
@@ -458,7 +474,9 @@
   color: var(--lt-text-primary);
   font-size: 0.9rem;
   font-family: inherit;
-  transition: border-color var(--lt-transition), box-shadow var(--lt-transition);
+  transition:
+    border-color var(--lt-transition),
+    box-shadow var(--lt-transition);
   outline: none;
 }
 
@@ -643,7 +661,7 @@
 }
 
 .lt-analysis-item::before {
-  content: '\2022';
+  content: "\2022";
   position: absolute;
   left: 0;
   color: var(--lt-gold);
@@ -676,7 +694,9 @@
 }
 
 @keyframes lt-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Error state */

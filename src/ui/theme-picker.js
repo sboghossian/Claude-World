@@ -347,10 +347,10 @@ export class ThemePicker {
     this._open = true;
     // Trigger entrance animation next frame
     requestAnimationFrame(() => {
-      this._overlay.classList.add('cw-tp-visible');
+      this._overlay.classList.add("cw-tp-visible");
     });
 
-    document.addEventListener('keydown', this._boundKeydown);
+    document.addEventListener("keydown", this._boundKeydown);
     this._focusedIndex = this._getThemeIds().indexOf(this._engine.getCurrent());
     if (this._focusedIndex < 0) this._focusedIndex = 0;
     this._updateFocusHighlight();
@@ -367,8 +367,8 @@ export class ThemePicker {
       this._hoverTheme = null;
     }
 
-    this._overlay.classList.remove('cw-tp-visible');
-    document.removeEventListener('keydown', this._boundKeydown);
+    this._overlay.classList.remove("cw-tp-visible");
+    document.removeEventListener("keydown", this._boundKeydown);
   }
 
   /** Toggle open/closed. */
@@ -382,8 +382,8 @@ export class ThemePicker {
 
   _ensureStyles() {
     if (this._styleInjected) return;
-    const el = document.createElement('style');
-    el.id = 'theme-picker-styles';
+    const el = document.createElement("style");
+    el.id = "theme-picker-styles";
     el.textContent = PICKER_CSS;
     document.head.appendChild(el);
     this._styleInjected = true;
@@ -393,25 +393,25 @@ export class ThemePicker {
     if (this._overlay) return;
 
     // Overlay
-    const overlay = document.createElement('div');
-    overlay.id = 'cw-theme-picker-overlay';
-    overlay.setAttribute('role', 'dialog');
-    overlay.setAttribute('aria-modal', 'true');
-    overlay.setAttribute('aria-label', 'Choose Your World Theme');
-    overlay.addEventListener('click', this._boundOverlayClick);
+    const overlay = document.createElement("div");
+    overlay.id = "cw-theme-picker-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", "Choose Your World Theme");
+    overlay.addEventListener("click", this._boundOverlayClick);
 
     // Modal container
-    const container = document.createElement('div');
-    container.id = 'cw-theme-picker';
+    const container = document.createElement("div");
+    container.id = "cw-theme-picker";
 
     // Header
     container.appendChild(this._buildHeader());
 
     // Theme list
-    const list = document.createElement('div');
-    list.className = 'cw-tp-list';
-    list.setAttribute('role', 'listbox');
-    list.setAttribute('aria-label', 'Themes');
+    const list = document.createElement("div");
+    list.className = "cw-tp-list";
+    list.setAttribute("role", "listbox");
+    list.setAttribute("aria-label", "Themes");
 
     const themes = this._engine.list();
     themes.forEach((theme, idx) => {
@@ -429,32 +429,32 @@ export class ThemePicker {
   }
 
   _buildHeader() {
-    const header = document.createElement('div');
-    header.className = 'cw-tp-header';
+    const header = document.createElement("div");
+    header.className = "cw-tp-header";
 
-    const icon = document.createElement('span');
-    icon.className = 'cw-tp-header-icon';
-    icon.textContent = '🎨';
+    const icon = document.createElement("span");
+    icon.className = "cw-tp-header-icon";
+    icon.textContent = "🎨";
 
-    const text = document.createElement('div');
-    text.className = 'cw-tp-header-text';
+    const text = document.createElement("div");
+    text.className = "cw-tp-header-text";
 
-    const title = document.createElement('div');
-    title.className = 'cw-tp-header-title';
-    title.textContent = 'Choose Your World Theme';
+    const title = document.createElement("div");
+    title.className = "cw-tp-header-title";
+    title.textContent = "Choose Your World Theme";
 
-    const subtitle = document.createElement('div');
-    subtitle.className = 'cw-tp-header-subtitle';
-    subtitle.textContent = 'Live preview on hover — click to apply';
+    const subtitle = document.createElement("div");
+    subtitle.className = "cw-tp-header-subtitle";
+    subtitle.textContent = "Live preview on hover — click to apply";
 
     text.appendChild(title);
     text.appendChild(subtitle);
 
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'cw-tp-close-btn';
-    closeBtn.setAttribute('aria-label', 'Close theme picker');
-    closeBtn.textContent = '×';
-    closeBtn.addEventListener('click', () => this.close());
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "cw-tp-close-btn";
+    closeBtn.setAttribute("aria-label", "Close theme picker");
+    closeBtn.textContent = "×";
+    closeBtn.addEventListener("click", () => this.close());
 
     header.appendChild(icon);
     header.appendChild(text);
@@ -464,46 +464,49 @@ export class ThemePicker {
   }
 
   _buildCard(theme, idx) {
-    const card = document.createElement('div');
-    card.className = 'cw-tp-card';
-    card.setAttribute('role', 'option');
-    card.setAttribute('tabindex', '-1');
-    card.setAttribute('aria-selected', this._engine.getCurrent() === theme.id ? 'true' : 'false');
+    const card = document.createElement("div");
+    card.className = "cw-tp-card";
+    card.setAttribute("role", "option");
+    card.setAttribute("tabindex", "-1");
+    card.setAttribute(
+      "aria-selected",
+      this._engine.getCurrent() === theme.id ? "true" : "false",
+    );
     card.dataset.themeId = theme.id;
     card.dataset.idx = idx;
 
     if (this._engine.getCurrent() === theme.id) {
-      card.classList.add('cw-tp-active');
+      card.classList.add("cw-tp-active");
     }
 
     // Emoji
-    const emoji = document.createElement('span');
-    emoji.className = 'cw-tp-card-emoji';
+    const emoji = document.createElement("span");
+    emoji.className = "cw-tp-card-emoji";
     emoji.textContent = theme.emoji;
 
     // Body
-    const body = document.createElement('div');
-    body.className = 'cw-tp-card-body';
+    const body = document.createElement("div");
+    body.className = "cw-tp-card-body";
 
-    const name = document.createElement('div');
-    name.className = 'cw-tp-card-name';
+    const name = document.createElement("div");
+    name.className = "cw-tp-card-name";
     name.textContent = theme.name;
 
-    const desc = document.createElement('div');
-    desc.className = 'cw-tp-card-desc';
+    const desc = document.createElement("div");
+    desc.className = "cw-tp-card-desc";
     desc.textContent = theme.description;
 
     // Swatches
-    const swatchRow = document.createElement('div');
-    swatchRow.className = 'cw-tp-swatches';
+    const swatchRow = document.createElement("div");
+    swatchRow.className = "cw-tp-swatches";
 
     const swatchColors = this._getSwatchColors(theme);
-    swatchColors.forEach(color => {
-      const swatch = document.createElement('span');
-      swatch.className = 'cw-tp-swatch';
+    swatchColors.forEach((color) => {
+      const swatch = document.createElement("span");
+      swatch.className = "cw-tp-swatch";
       swatch.style.background = color;
       if (this._isLight(color)) {
-        swatch.style.borderColor = 'rgba(0,0,0,0.15)';
+        swatch.style.borderColor = "rgba(0,0,0,0.15)";
       }
       swatchRow.appendChild(swatch);
     });
@@ -521,10 +524,10 @@ export class ThemePicker {
     }
 
     // Events
-    card.addEventListener('mouseenter', () => this._onCardHover(theme.id));
-    card.addEventListener('mouseleave', () => this._onCardUnhover());
-    card.addEventListener('click', () => this._applyTheme(theme.id));
-    card.addEventListener('focus', () => {
+    card.addEventListener("mouseenter", () => this._onCardHover(theme.id));
+    card.addEventListener("mouseleave", () => this._onCardUnhover());
+    card.addEventListener("click", () => this._applyTheme(theme.id));
+    card.addEventListener("focus", () => {
       this._focusedIndex = idx;
       this._updateFocusHighlight();
     });
@@ -533,39 +536,39 @@ export class ThemePicker {
   }
 
   _buildBadge() {
-    const badge = document.createElement('div');
-    badge.className = 'cw-tp-badge';
+    const badge = document.createElement("div");
+    badge.className = "cw-tp-badge";
 
-    const dot = document.createElement('span');
-    dot.className = 'cw-tp-badge-dot';
+    const dot = document.createElement("span");
+    dot.className = "cw-tp-badge-dot";
 
     badge.appendChild(dot);
-    badge.appendChild(document.createTextNode('Active'));
+    badge.appendChild(document.createTextNode("Active"));
     return badge;
   }
 
   _buildFooter() {
-    const footer = document.createElement('div');
-    footer.className = 'cw-tp-footer';
+    const footer = document.createElement("div");
+    footer.className = "cw-tp-footer";
 
     const hints = [
-      { keys: ['↑', '↓'], label: 'navigate' },
-      { keys: ['↵'], label: 'apply' },
-      { keys: ['Esc'], label: 'close' },
+      { keys: ["↑", "↓"], label: "navigate" },
+      { keys: ["↵"], label: "apply" },
+      { keys: ["Esc"], label: "close" },
     ];
 
     hints.forEach(({ keys, label }) => {
-      const hint = document.createElement('span');
-      hint.className = 'cw-tp-hint';
+      const hint = document.createElement("span");
+      hint.className = "cw-tp-hint";
 
-      keys.forEach(k => {
-        const key = document.createElement('kbd');
-        key.className = 'cw-tp-key';
+      keys.forEach((k) => {
+        const key = document.createElement("kbd");
+        key.className = "cw-tp-key";
         key.textContent = k;
         hint.appendChild(key);
       });
 
-      const labelNode = document.createTextNode(' ' + label);
+      const labelNode = document.createTextNode(" " + label);
       hint.appendChild(labelNode);
       footer.appendChild(hint);
     });
@@ -606,22 +609,22 @@ export class ThemePicker {
     if (!this._open) return;
 
     switch (e.key) {
-      case 'Escape':
+      case "Escape":
         e.preventDefault();
         this.close();
         break;
 
-      case 'ArrowDown':
+      case "ArrowDown":
         e.preventDefault();
         this._moveFocus(1);
         break;
 
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
         this._moveFocus(-1);
         break;
 
-      case 'Enter': {
+      case "Enter": {
         e.preventDefault();
         const ids = this._getThemeIds();
         if (ids[this._focusedIndex]) {
@@ -657,15 +660,15 @@ export class ThemePicker {
 
   _updateFocusHighlight() {
     if (!this._container) return;
-    const cards = this._container.querySelectorAll('.cw-tp-card');
+    const cards = this._container.querySelectorAll(".cw-tp-card");
     cards.forEach((card, idx) => {
-      card.classList.toggle('cw-tp-focused', idx === this._focusedIndex);
+      card.classList.toggle("cw-tp-focused", idx === this._focusedIndex);
     });
 
     // Scroll focused card into view smoothly
     const focusedCard = cards[this._focusedIndex];
     if (focusedCard) {
-      focusedCard.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      focusedCard.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   }
 
@@ -677,17 +680,17 @@ export class ThemePicker {
   _syncCards() {
     if (!this._container) return;
     const current = this._engine.getCurrent();
-    const cards = this._container.querySelectorAll('.cw-tp-card');
+    const cards = this._container.querySelectorAll(".cw-tp-card");
 
-    cards.forEach(card => {
+    cards.forEach((card) => {
       const id = card.dataset.themeId;
       const isActive = id === current;
 
-      card.classList.toggle('cw-tp-active', isActive);
-      card.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      card.classList.toggle("cw-tp-active", isActive);
+      card.setAttribute("aria-selected", isActive ? "true" : "false");
 
       // Remove existing badge
-      const existingBadge = card.querySelector('.cw-tp-badge');
+      const existingBadge = card.querySelector(".cw-tp-badge");
       if (existingBadge) existingBadge.remove();
 
       // Add badge if active
@@ -698,7 +701,7 @@ export class ThemePicker {
   }
 
   _getThemeIds() {
-    return this._engine.list().map(t => t.id);
+    return this._engine.list().map((t) => t.id);
   }
 
   /**
@@ -709,11 +712,11 @@ export class ThemePicker {
   _getSwatchColors(theme) {
     const c = theme.colors;
     return [
-      c['--cw-bg'],
-      c['--cw-panel'] || c['--cw-card'],
-      c['--cw-accent'],
-      c['--cw-accent-2'],
-      c['--cw-text'],
+      c["--cw-bg"],
+      c["--cw-panel"] || c["--cw-card"],
+      c["--cw-accent"],
+      c["--cw-accent-2"],
+      c["--cw-text"],
     ].filter(Boolean);
   }
 
@@ -723,14 +726,14 @@ export class ThemePicker {
    * @returns {boolean}
    */
   _isLight(hex) {
-    if (!hex || !hex.startsWith('#')) return false;
-    const h = hex.replace('#', '');
+    if (!hex || !hex.startsWith("#")) return false;
+    const h = hex.replace("#", "");
     if (h.length < 6) return false;
     const r = parseInt(h.slice(0, 2), 16);
     const g = parseInt(h.slice(2, 4), 16);
     const b = parseInt(h.slice(4, 6), 16);
     // Perceived luminance
-    return (r * 0.299 + g * 0.587 + b * 0.114) > 180;
+    return r * 0.299 + g * 0.587 + b * 0.114 > 180;
   }
 }
 
@@ -747,21 +750,21 @@ export function initThemePicker(engine) {
   const picker = new ThemePicker(engine);
 
   // Cmd+Shift+T (macOS) / Ctrl+Shift+T (other)
-  document.addEventListener('keydown', e => {
-    const isMac = navigator.platform.toUpperCase().includes('MAC');
+  document.addEventListener("keydown", (e) => {
+    const isMac = navigator.platform.toUpperCase().includes("MAC");
     const mod = isMac ? e.metaKey : e.ctrlKey;
-    if (mod && e.shiftKey && e.key === 'T') {
+    if (mod && e.shiftKey && e.key === "T") {
       e.preventDefault();
       picker.toggle();
     }
   });
 
   // Command palette integration: listen for '/theme' command event
-  document.addEventListener('command:theme', () => picker.open());
+  document.addEventListener("command:theme", () => picker.open());
 
   // Also support a generic palette dispatch format
-  document.addEventListener('palette:command', e => {
-    if (e.detail && e.detail.command === '/theme') {
+  document.addEventListener("palette:command", (e) => {
+    if (e.detail && e.detail.command === "/theme") {
       picker.open();
     }
   });

@@ -11,15 +11,15 @@
 // ── Helpers ──────────────────────────────────────────────────────────
 
 function escapeHTML(str) {
-  if (!str) return '';
-  const div = document.createElement('div');
+  if (!str) return "";
+  const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
 }
 
 function formatBytes(bytes) {
-  if (!bytes || bytes <= 0) return '0 B';
-  const units = ['B', 'KB', 'MB', 'GB'];
+  if (!bytes || bytes <= 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
   let i = 0;
   let val = bytes;
   while (val >= 1024 && i < units.length - 1) {
@@ -30,25 +30,32 @@ function formatBytes(bytes) {
 }
 
 function formatDateTime(iso) {
-  if (!iso) return 'Unknown';
+  if (!iso) return "Unknown";
   return new Date(iso).toLocaleString(undefined, {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
 function relativeTime(iso) {
-  if (!iso) return 'Unknown';
+  if (!iso) return "Unknown";
   const ms = Date.now() - new Date(iso).getTime();
   const secs = Math.floor(ms / 1000);
-  if (secs < 60) return 'Just now';
+  if (secs < 60) return "Just now";
   const mins = Math.floor(secs / 60);
   if (mins < 60) return `${mins}m ago`;
   const hours = Math.floor(mins / 60);
   if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
   if (days < 30) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  return new Date(iso).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 // ── Backups class ────────────────────────────────────────────────────
@@ -80,10 +87,10 @@ export class Backups {
   render() {
     this._injectCSS();
 
-    const el = document.createElement('div');
-    el.className = 'backups';
-    el.setAttribute('role', 'region');
-    el.setAttribute('aria-label', 'Backup Management');
+    const el = document.createElement("div");
+    el.className = "backups";
+    el.setAttribute("role", "region");
+    el.setAttribute("aria-label", "Backup Management");
 
     el.innerHTML = `
       <!-- Header -->
@@ -202,18 +209,18 @@ export class Backups {
 
   _cacheElements() {
     this._els = {};
-    this._root.querySelectorAll('[data-el]').forEach(el => {
+    this._root.querySelectorAll("[data-el]").forEach((el) => {
       this._els[el.dataset.el] = el;
     });
   }
 
   _injectCSS() {
-    const id = 'backups-styles';
+    const id = "backups-styles";
     if (document.getElementById(id)) return;
-    const link = document.createElement('link');
+    const link = document.createElement("link");
     link.id = id;
-    link.rel = 'stylesheet';
-    link.href = 'src/zones/backups.css';
+    link.rel = "stylesheet";
+    link.href = "src/zones/backups.css";
     document.head.appendChild(link);
   }
 
@@ -221,43 +228,59 @@ export class Backups {
 
   _bindEvents() {
     // Delegate clicks
-    this._root.addEventListener('click', (e) => {
-      const action = e.target.closest('[data-action]')?.dataset.action;
+    this._root.addEventListener("click", (e) => {
+      const action = e.target.closest("[data-action]")?.dataset.action;
       if (!action) return;
 
       switch (action) {
-        case 'create':     this._handleCreate(); break;
-        case 'import':     this._handleImport(); break;
-        case 'cleanup':    this._handleCleanup(); break;
-        case 'modal-close': this._closeModal(); break;
-        case 'confirm-restore': this._handleConfirmRestore(); break;
+        case "create":
+          this._handleCreate();
+          break;
+        case "import":
+          this._handleImport();
+          break;
+        case "cleanup":
+          this._handleCleanup();
+          break;
+        case "modal-close":
+          this._closeModal();
+          break;
+        case "confirm-restore":
+          this._handleConfirmRestore();
+          break;
       }
 
       // Per-backup actions
-      const card = e.target.closest('[data-backup]');
+      const card = e.target.closest("[data-backup]");
       if (!card) return;
       const filename = card.dataset.backup;
 
       switch (action) {
-        case 'restore': this._openRestoreModal(filename); break;
-        case 'delete':  this._handleDelete(filename); break;
-        case 'export':  this._handleExport(filename); break;
+        case "restore":
+          this._openRestoreModal(filename);
+          break;
+        case "delete":
+          this._handleDelete(filename);
+          break;
+        case "export":
+          this._handleExport(filename);
+          break;
       }
     });
 
     // Auto-backup toggle
-    const toggle = this._els['auto-toggle'];
+    const toggle = this._els["auto-toggle"];
     if (toggle) {
-      toggle.addEventListener('change', () => {
+      toggle.addEventListener("change", () => {
         this._autoEnabled = toggle.checked;
         this._applyAutoBackupSettings();
       });
     }
 
     // Interval selector
-    const select = this._els['interval-select'];
+    const select = this._els["interval-select"];
     if (select) {
-      select.addEventListener('change', () => {
+      select.addEventListener("change", () => {
         this._intervalMinutes = parseInt(select.value, 10);
         this._applyAutoBackupSettings();
       });
@@ -271,7 +294,7 @@ export class Backups {
     try {
       this._backups = await window.api.backup.list();
     } catch (err) {
-      console.error('[backups] Failed to load backups:', err);
+      console.error("[backups] Failed to load backups:", err);
       this._backups = [];
     }
     this._loading = false;
@@ -282,7 +305,7 @@ export class Backups {
     try {
       this._storage = await window.api.backup.getStorageUsage();
     } catch (err) {
-      console.error('[backups] Failed to load storage:', err);
+      console.error("[backups] Failed to load storage:", err);
       this._storage = { totalSize: 0, count: 0 };
     }
     this._renderStorage();
@@ -291,21 +314,23 @@ export class Backups {
   // ── Rendering ───────────────────────────────────────────────────
 
   _renderList() {
-    const list = this._els['backup-list'];
-    const count = this._els['list-count'];
+    const list = this._els["backup-list"];
+    const count = this._els["list-count"];
     if (!list) return;
 
     if (count) count.textContent = `(${this._backups.length})`;
 
     if (this._backups.length === 0) {
-      list.innerHTML = '<div class="backups__empty">No backups found. Create your first backup above.</div>';
+      list.innerHTML =
+        '<div class="backups__empty">No backups found. Create your first backup above.</div>';
       return;
     }
 
-    list.innerHTML = this._backups.map(bk => {
-      const isAuto = !bk.filename.includes('manual');
-      const badge = `<span class="backups__badge backups__badge--${isAuto ? 'auto' : 'manual'}">${isAuto ? 'Auto' : 'Manual'}</span>`;
-      return `
+    list.innerHTML = this._backups
+      .map((bk) => {
+        const isAuto = !bk.filename.includes("manual");
+        const badge = `<span class="backups__badge backups__badge--${isAuto ? "auto" : "manual"}">${isAuto ? "Auto" : "Manual"}</span>`;
+        return `
         <div class="backups__card" data-backup="${escapeHTML(bk.filename)}">
           <div class="backups__card-main">
             <div class="backups__card-info">
@@ -323,23 +348,28 @@ export class Backups {
           </div>
         </div>
       `;
-    }).join('');
+      })
+      .join("");
   }
 
   _renderStorage() {
-    const text = this._els['storage-text'];
-    const bar = this._els['storage-bar'];
-    const countEl = this._els['backup-count'];
+    const text = this._els["storage-text"];
+    const bar = this._els["storage-bar"];
+    const countEl = this._els["backup-count"];
 
     if (text) text.textContent = formatBytes(this._storage.totalSize);
-    if (countEl) countEl.textContent = `${this._storage.count} backup${this._storage.count !== 1 ? 's' : ''}`;
+    if (countEl)
+      countEl.textContent = `${this._storage.count} backup${this._storage.count !== 1 ? "s" : ""}`;
 
     // Bar fill: assume 500 MB max for visual scale
     if (bar) {
-      const pct = Math.min(100, (this._storage.totalSize / (500 * 1024 * 1024)) * 100);
+      const pct = Math.min(
+        100,
+        (this._storage.totalSize / (500 * 1024 * 1024)) * 100,
+      );
       bar.style.width = `${pct}%`;
-      bar.classList.toggle('backups__storage-bar-fill--warning', pct > 70);
-      bar.classList.toggle('backups__storage-bar-fill--danger', pct > 90);
+      bar.classList.toggle("backups__storage-bar-fill--warning", pct > 70);
+      bar.classList.toggle("backups__storage-bar-fill--danger", pct > 90);
     }
   }
 
@@ -347,20 +377,26 @@ export class Backups {
 
   async _handleCreate() {
     const btn = this._root.querySelector('[data-action="create"]');
-    if (btn) { btn.disabled = true; btn.textContent = 'Creating...'; }
-
-    try {
-      const result = await window.api.backup.create('manual');
-      if (result.success) {
-        this._showToast('Backup created successfully');
-      } else {
-        this._showToast(`Backup failed: ${result.error}`, 'error');
-      }
-    } catch (err) {
-      this._showToast(`Backup failed: ${err.message}`, 'error');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Creating...";
     }
 
-    if (btn) { btn.disabled = false; btn.innerHTML = '<span class="backups__btn-icon">+</span> Create Backup'; }
+    try {
+      const result = await window.api.backup.create("manual");
+      if (result.success) {
+        this._showToast("Backup created successfully");
+      } else {
+        this._showToast(`Backup failed: ${result.error}`, "error");
+      }
+    } catch (err) {
+      this._showToast(`Backup failed: ${err.message}`, "error");
+    }
+
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="backups__btn-icon">+</span> Create Backup';
+    }
     await this._loadBackups();
     await this._loadStorage();
   }
@@ -370,12 +406,12 @@ export class Backups {
     try {
       const result = await window.api.backup.delete(filename);
       if (result.success) {
-        this._showToast('Backup deleted');
+        this._showToast("Backup deleted");
       } else {
-        this._showToast(`Delete failed: ${result.error}`, 'error');
+        this._showToast(`Delete failed: ${result.error}`, "error");
       }
     } catch (err) {
-      this._showToast(`Delete failed: ${err.message}`, 'error');
+      this._showToast(`Delete failed: ${err.message}`, "error");
     }
     await this._loadBackups();
     await this._loadStorage();
@@ -386,14 +422,14 @@ export class Backups {
     try {
       const result = await window.api.backup.export(filename);
       if (result.success) {
-        this._showToast('Backup exported');
+        this._showToast("Backup exported");
       } else if (result.cancelled) {
         // User cancelled save dialog — no message needed
       } else {
-        this._showToast(`Export failed: ${result.error}`, 'error');
+        this._showToast(`Export failed: ${result.error}`, "error");
       }
     } catch (err) {
-      this._showToast(`Export failed: ${err.message}`, 'error');
+      this._showToast(`Export failed: ${err.message}`, "error");
     }
   }
 
@@ -401,16 +437,16 @@ export class Backups {
     try {
       const result = await window.api.backup.import();
       if (result.success) {
-        this._showToast('Backup imported');
+        this._showToast("Backup imported");
         await this._loadBackups();
         await this._loadStorage();
       } else if (result.cancelled) {
         // User cancelled open dialog
       } else {
-        this._showToast(`Import failed: ${result.error}`, 'error');
+        this._showToast(`Import failed: ${result.error}`, "error");
       }
     } catch (err) {
-      this._showToast(`Import failed: ${err.message}`, 'error');
+      this._showToast(`Import failed: ${err.message}`, "error");
     }
   }
 
@@ -421,32 +457,35 @@ export class Backups {
       await this._loadBackups();
       await this._loadStorage();
     } catch (err) {
-      this._showToast(`Cleanup failed: ${err.message}`, 'error');
+      this._showToast(`Cleanup failed: ${err.message}`, "error");
     }
   }
 
   async _applyAutoBackupSettings() {
     try {
-      await window.api.backup.setAutoBackup(this._autoEnabled, this._intervalMinutes);
+      await window.api.backup.setAutoBackup(
+        this._autoEnabled,
+        this._intervalMinutes,
+      );
     } catch (err) {
-      console.error('[backups] Failed to apply settings:', err);
+      console.error("[backups] Failed to apply settings:", err);
     }
   }
 
   // ── Modal ───────────────────────────────────────────────────────
 
   _openRestoreModal(filename) {
-    const bk = this._backups.find(b => b.filename === filename);
+    const bk = this._backups.find((b) => b.filename === filename);
     if (!bk) return;
 
     this._restoreTarget = bk;
 
-    const overlay = this._els['modal-overlay'];
-    if (overlay) overlay.style.display = 'flex';
+    const overlay = this._els["modal-overlay"];
+    if (overlay) overlay.style.display = "flex";
 
-    const fnEl = this._els['modal-filename'];
-    const dateEl = this._els['modal-date'];
-    const sizeEl = this._els['modal-size'];
+    const fnEl = this._els["modal-filename"];
+    const dateEl = this._els["modal-date"];
+    const sizeEl = this._els["modal-size"];
 
     if (fnEl) fnEl.textContent = bk.filename;
     if (dateEl) dateEl.textContent = formatDateTime(bk.created_at);
@@ -454,8 +493,8 @@ export class Backups {
   }
 
   _closeModal() {
-    const overlay = this._els['modal-overlay'];
-    if (overlay) overlay.style.display = 'none';
+    const overlay = this._els["modal-overlay"];
+    if (overlay) overlay.style.display = "none";
     this._restoreTarget = null;
   }
 
@@ -463,42 +502,48 @@ export class Backups {
     if (!this._restoreTarget) return;
 
     const btn = this._root.querySelector('[data-action="confirm-restore"]');
-    if (btn) { btn.disabled = true; btn.textContent = 'Restoring...'; }
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Restoring...";
+    }
 
     try {
       const result = await window.api.backup.restore(this._restoreTarget.path);
       if (result.success) {
-        this._showToast('Database restored. Restarting app...');
+        this._showToast("Database restored. Restarting app...");
         // The app should restart for the restored DB to take effect
         setTimeout(() => {
           window.api.backup.restartApp();
         }, 1500);
       } else {
-        this._showToast(`Restore failed: ${result.error}`, 'error');
+        this._showToast(`Restore failed: ${result.error}`, "error");
       }
     } catch (err) {
-      this._showToast(`Restore failed: ${err.message}`, 'error');
+      this._showToast(`Restore failed: ${err.message}`, "error");
     }
 
-    if (btn) { btn.disabled = false; btn.textContent = 'Restore'; }
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Restore";
+    }
     this._closeModal();
   }
 
   // ── Toast ───────────────────────────────────────────────────────
 
-  _showToast(message, type = 'success') {
+  _showToast(message, type = "success") {
     // Remove existing toast
-    const old = this._root.querySelector('.backups__toast');
+    const old = this._root.querySelector(".backups__toast");
     if (old) old.remove();
 
-    const toast = document.createElement('div');
+    const toast = document.createElement("div");
     toast.className = `backups__toast backups__toast--${type}`;
     toast.textContent = message;
     this._root.appendChild(toast);
 
-    setTimeout(() => toast.classList.add('backups__toast--visible'), 10);
+    setTimeout(() => toast.classList.add("backups__toast--visible"), 10);
     setTimeout(() => {
-      toast.classList.remove('backups__toast--visible');
+      toast.classList.remove("backups__toast--visible");
       setTimeout(() => toast.remove(), 300);
     }, 3000);
   }

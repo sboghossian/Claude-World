@@ -17,7 +17,11 @@
   gap: 0;
   padding: 0 0 2rem;
   color: #e2e8f0;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   font-size: 0.875rem;
   background: transparent;
 }
@@ -80,7 +84,9 @@
     0 4px 24px rgba(124, 58, 237, 0.45),
     0 1px 4px rgba(0, 0, 0, 0.5);
   cursor: default;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   flex-shrink: 0;
 }
 
@@ -242,7 +248,10 @@
   padding: 0.25rem;
   cursor: pointer;
   line-height: 1;
-  transition: background 0.12s, border-color 0.12s, transform 0.1s;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    transform 0.1s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -272,7 +281,9 @@
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: transform 0.12s, border-color 0.12s;
+  transition:
+    transform 0.12s,
+    border-color 0.12s;
 }
 
 .ip-color-swatch:hover {
@@ -377,7 +388,9 @@
   font-size: 0.75rem;
   color: #c4b5fd;
   font-weight: 500;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
   animation: ip-fade-in 0.2s ease;
 }
 
@@ -470,7 +483,10 @@
   cursor: pointer;
   font-family: inherit;
   font-weight: 500;
-  transition: background 0.15s, opacity 0.15s, transform 0.1s;
+  transition:
+    background 0.15s,
+    opacity 0.15s,
+    transform 0.1s;
   padding: 0.4rem 0.875rem;
   font-size: 0.8rem;
   line-height: 1;

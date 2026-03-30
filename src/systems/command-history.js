@@ -13,67 +13,67 @@
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = 'claude-world:command-history';
+const STORAGE_KEY = "claude-world:command-history";
 const MAX_HISTORY = 100;
 const MAX_UNDO_STACK = 50;
 
 /** Action types that can be undone */
 const REVERSIBLE_TYPES = new Set([
-  'setting-change',
-  'theme-change',
-  'zone-close',
-  'tab-close',
-  'panel-open',
-  'zone-open',
+  "setting-change",
+  "theme-change",
+  "zone-close",
+  "tab-close",
+  "panel-open",
+  "zone-open",
 ]);
 
 /** Action types recorded but never undoable */
 const NON_REVERSIBLE_TYPES = new Set([
-  'task-dispatch',
-  'snapshot-create',
-  'data-delete',
-  'achievement-unlock',
-  'zone-unlock',
+  "task-dispatch",
+  "snapshot-create",
+  "data-delete",
+  "achievement-unlock",
+  "zone-unlock",
 ]);
 
 /** Human-readable labels for each action type */
 const ACTION_LABELS = {
-  'zone-open':          'Opened zone',
-  'zone-close':         'Closed zone',
-  'task-dispatch':      'Dispatched task',
-  'setting-change':     'Changed setting',
-  'theme-change':       'Changed theme',
-  'zone-unlock':        'Unlocked zone',
-  'snapshot-create':    'Created snapshot',
-  'achievement-unlock': 'Unlocked achievement',
-  'tab-switch':         'Switched tab',
-  'tab-close':          'Closed tab',
-  'panel-open':         'Opened panel',
-  'panel-close':        'Closed panel',
-  'search':             'Searched',
-  'command-palette':    'Used command palette',
-  'focus-toggle':       'Toggled focus mode',
-  'audio-toggle':       'Toggled audio',
+  "zone-open": "Opened zone",
+  "zone-close": "Closed zone",
+  "task-dispatch": "Dispatched task",
+  "setting-change": "Changed setting",
+  "theme-change": "Changed theme",
+  "zone-unlock": "Unlocked zone",
+  "snapshot-create": "Created snapshot",
+  "achievement-unlock": "Unlocked achievement",
+  "tab-switch": "Switched tab",
+  "tab-close": "Closed tab",
+  "panel-open": "Opened panel",
+  "panel-close": "Closed panel",
+  search: "Searched",
+  "command-palette": "Used command palette",
+  "focus-toggle": "Toggled focus mode",
+  "audio-toggle": "Toggled audio",
 };
 
 /** Icons per action type (emoji shorthand) */
 const ACTION_ICONS = {
-  'zone-open':          '🏠',
-  'zone-close':         '🚪',
-  'task-dispatch':      '🚀',
-  'setting-change':     '⚙️',
-  'theme-change':       '🎨',
-  'zone-unlock':        '🔓',
-  'snapshot-create':    '📸',
-  'achievement-unlock': '🏆',
-  'tab-switch':         '📑',
-  'tab-close':          '✖️',
-  'panel-open':         '📋',
-  'panel-close':        '📋',
-  'search':             '🔍',
-  'command-palette':    '⌘',
-  'focus-toggle':       '🎯',
-  'audio-toggle':       '🔊',
+  "zone-open": "🏠",
+  "zone-close": "🚪",
+  "task-dispatch": "🚀",
+  "setting-change": "⚙️",
+  "theme-change": "🎨",
+  "zone-unlock": "🔓",
+  "snapshot-create": "📸",
+  "achievement-unlock": "🏆",
+  "tab-switch": "📑",
+  "tab-close": "✖️",
+  "panel-open": "📋",
+  "panel-close": "📋",
+  search: "🔍",
+  "command-palette": "⌘",
+  "focus-toggle": "🎯",
+  "audio-toggle": "🔊",
 };
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -97,23 +97,23 @@ function describeCommand(cmd) {
   const d = cmd.data || {};
 
   switch (cmd.type) {
-    case 'zone-open':
-    case 'zone-close':
-      return `${base}: ${d.zoneName || d.zoneId || ''}`;
-    case 'theme-change':
-      return `${base}: ${d.from || '?'} → ${d.to || '?'}`;
-    case 'setting-change':
-      return `${base}: ${d.key || '?'} → ${d.value ?? '?'}`;
-    case 'task-dispatch':
-      return `${base}: ${d.title || d.taskId || ''}`;
-    case 'achievement-unlock':
-      return `${base}: ${d.name || d.id || ''}`;
-    case 'tab-switch':
-    case 'tab-close':
-      return `${base}: ${d.tabName || d.tabId || ''}`;
-    case 'panel-open':
-    case 'panel-close':
-      return `${base}: ${d.panelName || d.panelId || ''}`;
+    case "zone-open":
+    case "zone-close":
+      return `${base}: ${d.zoneName || d.zoneId || ""}`;
+    case "theme-change":
+      return `${base}: ${d.from || "?"} → ${d.to || "?"}`;
+    case "setting-change":
+      return `${base}: ${d.key || "?"} → ${d.value ?? "?"}`;
+    case "task-dispatch":
+      return `${base}: ${d.title || d.taskId || ""}`;
+    case "achievement-unlock":
+      return `${base}: ${d.name || d.id || ""}`;
+    case "tab-switch":
+    case "tab-close":
+      return `${base}: ${d.tabName || d.tabId || ""}`;
+    case "panel-open":
+    case "panel-close":
+      return `${base}: ${d.panelName || d.panelId || ""}`;
     default:
       return base;
   }
@@ -125,7 +125,7 @@ function describeCommand(cmd) {
  * @returns {string}
  */
 function iconForType(type) {
-  return ACTION_ICONS[type] || '▸';
+  return ACTION_ICONS[type] || "▸";
 }
 
 // ── CommandHistory class ─────────────────────────────────────────────────────
@@ -161,7 +161,9 @@ export class CommandHistory {
    */
   record(command) {
     const entry = {
-      id: crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      id:
+        crypto.randomUUID?.() ||
+        `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       type: command.type,
       data: command.data || {},
       timestamp: Date.now(),
@@ -192,7 +194,7 @@ export class CommandHistory {
     }
 
     this._save();
-    emit('command:executed', { command: entry });
+    emit("command:executed", { command: entry });
   }
 
   /**
@@ -208,7 +210,7 @@ export class CommandHistory {
       try {
         entry._undoFn();
       } catch (err) {
-        console.warn('[CommandHistory] undo failed:', err);
+        console.warn("[CommandHistory] undo failed:", err);
       }
     } else {
       this._performDefaultUndo(entry);
@@ -216,10 +218,10 @@ export class CommandHistory {
 
     this._redoStack.push(entry);
     this._save();
-    emit('command:undone', { command: entry });
-    emit('toast:show', {
-      type: 'info',
-      title: 'Undone',
+    emit("command:undone", { command: entry });
+    emit("toast:show", {
+      type: "info",
+      title: "Undone",
       body: entry.description,
       duration: 2000,
     });
@@ -240,7 +242,7 @@ export class CommandHistory {
       try {
         entry._redoFn();
       } catch (err) {
-        console.warn('[CommandHistory] redo failed:', err);
+        console.warn("[CommandHistory] redo failed:", err);
       }
     } else {
       this._performDefaultRedo(entry);
@@ -248,10 +250,10 @@ export class CommandHistory {
 
     this._undoStack.push(entry);
     this._save();
-    emit('command:redone', { command: entry });
-    emit('toast:show', {
-      type: 'info',
-      title: 'Redone',
+    emit("command:redone", { command: entry });
+    emit("toast:show", {
+      type: "info",
+      title: "Redone",
       body: entry.description,
       duration: 2000,
     });
@@ -283,7 +285,7 @@ export class CommandHistory {
    * @returns {string[]}
    */
   getActionTypes() {
-    const types = new Set(this._history.map(e => e.type));
+    const types = new Set(this._history.map((e) => e.type));
     return [...types].sort();
   }
 
@@ -295,7 +297,7 @@ export class CommandHistory {
     this._undoStack = [];
     this._redoStack = [];
     this._save();
-    emit('command:history-cleared');
+    emit("command:history-cleared");
   }
 
   /**
@@ -303,7 +305,7 @@ export class CommandHistory {
    */
   destroy() {
     if (this._keyHandler) {
-      document.removeEventListener('keydown', this._keyHandler);
+      document.removeEventListener("keydown", this._keyHandler);
       this._keyHandler = null;
     }
     this._removeEventListeners();
@@ -315,7 +317,7 @@ export class CommandHistory {
   _save() {
     try {
       // Serialize only serializable fields
-      const serializable = this._history.map(e => ({
+      const serializable = this._history.map((e) => ({
         id: e.id,
         type: e.type,
         data: e.data,
@@ -348,33 +350,34 @@ export class CommandHistory {
     this._keyHandler = (e) => {
       // Don't capture when typing in inputs
       const tag = e.target?.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target?.isContentEditable) return;
+      if (tag === "INPUT" || tag === "TEXTAREA" || e.target?.isContentEditable)
+        return;
 
       const isMeta = e.metaKey || e.ctrlKey;
 
       // Cmd+Z — undo
-      if (isMeta && !e.shiftKey && e.key === 'z') {
+      if (isMeta && !e.shiftKey && e.key === "z") {
         e.preventDefault();
         this.undo();
         return;
       }
 
       // Cmd+Shift+Z — redo
-      if (isMeta && e.shiftKey && e.key === 'z') {
+      if (isMeta && e.shiftKey && e.key === "z") {
         e.preventDefault();
         this.redo();
         return;
       }
 
       // Cmd+Shift+H — open history panel
-      if (isMeta && e.shiftKey && e.key.toLowerCase() === 'h') {
+      if (isMeta && e.shiftKey && e.key.toLowerCase() === "h") {
         e.preventDefault();
-        emit('command-history:toggle-panel');
+        emit("command-history:toggle-panel");
         return;
       }
     };
 
-    document.addEventListener('keydown', this._keyHandler);
+    document.addEventListener("keydown", this._keyHandler);
   }
 
   // ── Private: auto-record from system events ──────────────────────
@@ -389,98 +392,104 @@ export class CommandHistory {
     };
 
     // Zone navigation
-    listen('command-palette:navigate', (detail) => {
+    listen("command-palette:navigate", (detail) => {
       this.record({
-        type: 'zone-open',
+        type: "zone-open",
         data: { zoneId: detail.zoneId, zoneName: detail.zoneName },
-        undoFn: () => emit('shortcut:escape'),
+        undoFn: () => emit("shortcut:escape"),
       });
     });
 
     // Theme changes
-    listen('theme:changed', (detail) => {
+    listen("theme:changed", (detail) => {
       const prevTheme = detail.from;
       const newTheme = detail.to;
       this.record({
-        type: 'theme-change',
+        type: "theme-change",
         data: { from: prevTheme, to: newTheme },
-        undoFn: () => emit('theme:apply', { themeId: prevTheme }),
-        redoFn: () => emit('theme:apply', { themeId: newTheme }),
+        undoFn: () => emit("theme:apply", { themeId: prevTheme }),
+        redoFn: () => emit("theme:apply", { themeId: newTheme }),
       });
     });
 
     // Settings
-    listen('setting:changed', (detail) => {
+    listen("setting:changed", (detail) => {
       this.record({
-        type: 'setting-change',
-        data: { key: detail.key, value: detail.value, previous: detail.previous },
-        undoFn: () => emit('setting:apply', { key: detail.key, value: detail.previous }),
-        redoFn: () => emit('setting:apply', { key: detail.key, value: detail.value }),
+        type: "setting-change",
+        data: {
+          key: detail.key,
+          value: detail.value,
+          previous: detail.previous,
+        },
+        undoFn: () =>
+          emit("setting:apply", { key: detail.key, value: detail.previous }),
+        redoFn: () =>
+          emit("setting:apply", { key: detail.key, value: detail.value }),
       });
     });
 
     // Task dispatch
-    listen('task:dispatched', (detail) => {
+    listen("task:dispatched", (detail) => {
       this.record({
-        type: 'task-dispatch',
+        type: "task-dispatch",
         data: { taskId: detail.taskId, title: detail.title },
       });
     });
 
     // Snapshot create
-    listen('snapshot:created', (detail) => {
+    listen("snapshot:created", (detail) => {
       this.record({
-        type: 'snapshot-create',
+        type: "snapshot-create",
         data: { snapshotId: detail.id },
       });
     });
 
     // Achievement unlock
-    listen('achievement:unlocked', (detail) => {
+    listen("achievement:unlocked", (detail) => {
       this.record({
-        type: 'achievement-unlock',
+        type: "achievement-unlock",
         data: { id: detail.id, name: detail.name },
       });
     });
 
     // Zone unlock
-    listen('zone:unlocked', (detail) => {
+    listen("zone:unlocked", (detail) => {
       this.record({
-        type: 'zone-unlock',
+        type: "zone-unlock",
         data: { zoneId: detail.zoneId, zoneName: detail.zoneName },
       });
     });
 
     // Tab switch
-    listen('tab:switched', (detail) => {
+    listen("tab:switched", (detail) => {
       this.record({
-        type: 'tab-switch',
+        type: "tab-switch",
         data: { tabId: detail.tabId, tabName: detail.tabName },
       });
     });
 
     // Panel open/close
-    listen('panel:opened', (detail) => {
+    listen("panel:opened", (detail) => {
       this.record({
-        type: 'panel-open',
+        type: "panel-open",
         data: { panelId: detail.panelId, panelName: detail.panelName },
       });
     });
 
-    listen('panel:closed', (detail) => {
+    listen("panel:closed", (detail) => {
       this.record({
-        type: 'panel-close',
+        type: "panel-close",
         data: { panelId: detail.panelId, panelName: detail.panelName },
       });
     });
 
     // Focus mode
-    listen('focus:toggled', (detail) => {
+    listen("focus:toggled", (detail) => {
       this.record({
-        type: 'focus-toggle',
+        type: "focus-toggle",
         data: { active: detail.active },
-        undoFn: () => emit('focus:toggle'),
-        redoFn: () => emit('focus:toggle'),
+        undoFn: () => emit("focus:toggle"),
+        redoFn: () => emit("focus:toggle"),
       });
     });
   }
@@ -498,54 +507,67 @@ export class CommandHistory {
 
   _performDefaultUndo(entry) {
     switch (entry.type) {
-      case 'zone-open':
-        emit('shortcut:escape');
+      case "zone-open":
+        emit("shortcut:escape");
         break;
-      case 'zone-close':
-        emit('command-palette:navigate', {
+      case "zone-close":
+        emit("command-palette:navigate", {
           zoneId: entry.data.zoneId,
           zoneName: entry.data.zoneName,
         });
         break;
-      case 'theme-change':
-        emit('theme:apply', { themeId: entry.data.from });
+      case "theme-change":
+        emit("theme:apply", { themeId: entry.data.from });
         break;
-      case 'setting-change':
-        emit('setting:apply', { key: entry.data.key, value: entry.data.previous });
+      case "setting-change":
+        emit("setting:apply", {
+          key: entry.data.key,
+          value: entry.data.previous,
+        });
         break;
-      case 'tab-close':
-        emit('tab:reopen', { tabId: entry.data.tabId, tabName: entry.data.tabName });
+      case "tab-close":
+        emit("tab:reopen", {
+          tabId: entry.data.tabId,
+          tabName: entry.data.tabName,
+        });
         break;
-      case 'panel-open':
-        emit('shortcut:escape');
+      case "panel-open":
+        emit("shortcut:escape");
         break;
       default:
-        console.warn(`[CommandHistory] No default undo for type: ${entry.type}`);
+        console.warn(
+          `[CommandHistory] No default undo for type: ${entry.type}`,
+        );
     }
   }
 
   _performDefaultRedo(entry) {
     switch (entry.type) {
-      case 'zone-open':
-        emit('command-palette:navigate', {
+      case "zone-open":
+        emit("command-palette:navigate", {
           zoneId: entry.data.zoneId,
           zoneName: entry.data.zoneName,
         });
         break;
-      case 'zone-close':
-        emit('shortcut:escape');
+      case "zone-close":
+        emit("shortcut:escape");
         break;
-      case 'theme-change':
-        emit('theme:apply', { themeId: entry.data.to });
+      case "theme-change":
+        emit("theme:apply", { themeId: entry.data.to });
         break;
-      case 'setting-change':
-        emit('setting:apply', { key: entry.data.key, value: entry.data.value });
+      case "setting-change":
+        emit("setting:apply", { key: entry.data.key, value: entry.data.value });
         break;
-      case 'panel-open':
-        emit('panel:opened', { panelId: entry.data.panelId, panelName: entry.data.panelName });
+      case "panel-open":
+        emit("panel:opened", {
+          panelId: entry.data.panelId,
+          panelName: entry.data.panelName,
+        });
         break;
       default:
-        console.warn(`[CommandHistory] No default redo for type: ${entry.type}`);
+        console.warn(
+          `[CommandHistory] No default redo for type: ${entry.type}`,
+        );
     }
   }
 }
@@ -567,4 +589,10 @@ export function getCommandHistory() {
 }
 
 // Re-export helpers for the panel
-export { describeCommand, iconForType, ACTION_LABELS, ACTION_ICONS, REVERSIBLE_TYPES };
+export {
+  describeCommand,
+  iconForType,
+  ACTION_LABELS,
+  ACTION_ICONS,
+  REVERSIBLE_TYPES,
+};

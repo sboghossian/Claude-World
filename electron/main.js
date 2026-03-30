@@ -1,7 +1,7 @@
-const { app, BrowserWindow, session, ipcMain, dialog } = require('electron');
-const path = require('path');
-const { initAutoUpdater } = require('./auto-updater');
-const backup = require('./backup');
+const { app, BrowserWindow, session, ipcMain, dialog } = require("electron");
+const path = require("path");
+const { initAutoUpdater } = require("./auto-updater");
+const backup = require("./backup");
 
 let mainWindow = null;
 let db = null;
@@ -9,13 +9,16 @@ let db = null;
 // ── Database initialization ────────────────────────────────────────────
 function initDatabase() {
   try {
-    const { Database } = require('../src/db/database');
-    const dbPath = path.join(app.getPath('userData'), 'claude-world.db');
+    const { Database } = require("../src/db/database");
+    const dbPath = path.join(app.getPath("userData"), "claude-world.db");
     db = new Database(dbPath);
-    console.log('[main] Database initialized at', dbPath);
+    console.log("[main] Database initialized at", dbPath);
     return db;
   } catch (err) {
-    console.warn('[main] Database module not ready, using null db:', err.message);
+    console.warn(
+      "[main] Database module not ready, using null db:",
+      err.message,
+    );
     return null;
   }
 }
@@ -27,13 +30,13 @@ function createWindow() {
     height: 900,
     minWidth: 1024,
     minHeight: 768,
-    title: 'Claude World',
-    backgroundColor: '#0a0a14',
-    titleBarStyle: 'hiddenInset',
+    title: "Claude World",
+    backgroundColor: "#0a0a14",
+    titleBarStyle: "hiddenInset",
     trafficLightPosition: { x: 16, y: 16 },
     show: false, // show when ready to prevent flicker
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
@@ -41,8 +44,18 @@ function createWindow() {
     },
   });
 
+  // Capture renderer console output in main process terminal
+  mainWindow.webContents.on(
+    "console-message",
+    (_event, level, message, line, sourceId) => {
+      const prefix = ["LOG", "WARN", "ERR", "DBG"][level] || "LOG";
+      const src = sourceId ? sourceId.split("/").pop() : "";
+      console.log(`[renderer:${prefix}] ${message}  (${src}:${line})`);
+    },
+  );
+
   // Show window once content is ready (prevents white flash)
-  mainWindow.once('ready-to-show', () => {
+  mainWindow.once("ready-to-show", () => {
     mainWindow.show();
     initAutoUpdater(mainWindow);
   });
@@ -52,29 +65,34 @@ function createWindow() {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        'Content-Security-Policy': [
+        "Content-Security-Policy": [
           [
             "default-src 'self'",
-            "script-src 'self' https://cdn.jsdelivr.net",
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
             "style-src 'self' 'unsafe-inline'",
             "img-src 'self' data: blob:",
             "connect-src 'self' https://cdn.jsdelivr.net https://api.anthropic.com https://api.openai.com https://generativelanguage.googleapis.com http://localhost:*",
             "font-src 'self'",
-          ].join('; '),
+          ].join("; "),
         ],
       },
     });
   });
 
-  mainWindow.loadFile(path.join(__dirname, '..', 'src', 'renderer', 'index.html'));
+  mainWindow.loadFile(
+    path.join(__dirname, "..", "src", "renderer", "index.html"),
+  );
 
-  mainWindow.on('closed', () => {
+  mainWindow.on("closed", () => {
     mainWindow = null;
   });
 
   // Open DevTools in development
-  if (process.env.NODE_ENV === 'development' || process.argv.includes('--devtools')) {
-    mainWindow.webContents.openDevTools({ mode: 'detach' });
+  if (
+    process.env.NODE_ENV === "development" ||
+    process.argv.includes("--devtools")
+  ) {
+    mainWindow.webContents.openDevTools({ mode: "detach" });
   }
 }
 
@@ -84,16 +102,16 @@ app.whenReady().then(() => {
   db = initDatabase();
 
   // Initialize backup system (creates startup backup before any writes)
-  const dbPath = path.join(app.getPath('userData'), 'claude-world.db');
+  const dbPath = path.join(app.getPath("userData"), "claude-world.db");
   backup.initBackup(dbPath);
 
   createWindow();
 
   // Register IPC handlers (pass db so handlers can use it)
-  const { registerHandlers } = require('./ipc-handlers');
+  const { registerHandlers } = require("./ipc-handlers");
   registerHandlers(ipcMain, db);
 
-  app.on('activate', () => {
+  app.on("activate", () => {
     // macOS: re-create window when dock icon is clicked
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
@@ -101,12 +119,12 @@ app.whenReady().then(() => {
   });
 });
 
-app.on('window-all-closed', () => {
+app.on("window-all-closed", () => {
   // On macOS apps typically stay open; but for this app we quit
   app.quit();
 });
 
-app.on('before-quit', () => {
+app.on("before-quit", () => {
   // Graceful backup on quit (before DB close)
   backup.cleanup();
 
@@ -114,9 +132,9 @@ app.on('before-quit', () => {
   if (db) {
     try {
       db.close();
-      console.log('[main] Database closed');
+      console.log("[main] Database closed");
     } catch (err) {
-      console.error('[main] Error closing database:', err.message);
+      console.error("[main] Error closing database:", err.message);
     }
   }
 });
@@ -126,7 +144,7 @@ const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
 } else {
-  app.on('second-instance', () => {
+  app.on("second-instance", () => {
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
@@ -135,14 +153,14 @@ if (!gotLock) {
 }
 
 // Handle uncaught errors gracefully
-process.on('uncaughtException', (error) => {
-  console.error('[main] Uncaught exception:', error);
+process.on("uncaughtException", (error) => {
+  console.error("[main] Uncaught exception:", error);
   dialog.showErrorBox(
-    'Claude World — Unexpected Error',
-    `An unexpected error occurred:\n\n${error.message}\n\nThe app will continue running but may be unstable.`
+    "Claude World — Unexpected Error",
+    `An unexpected error occurred:\n\n${error.message}\n\nThe app will continue running but may be unstable.`,
   );
 });
 
-process.on('unhandledRejection', (reason) => {
-  console.error('[main] Unhandled rejection:', reason);
+process.on("unhandledRejection", (reason) => {
+  console.error("[main] Unhandled rejection:", reason);
 });

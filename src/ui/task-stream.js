@@ -26,24 +26,55 @@ const TOKEN_ANIM_MS = 200;
 
 /** Basic keyword sets for syntax highlighting */
 const JS_KEYWORDS = new Set([
-  'const', 'let', 'var', 'function', 'return', 'if', 'else', 'for',
-  'while', 'do', 'switch', 'case', 'break', 'continue', 'class',
-  'extends', 'new', 'this', 'import', 'export', 'from', 'default',
-  'async', 'await', 'try', 'catch', 'throw', 'typeof', 'instanceof',
-  'true', 'false', 'null', 'undefined', 'yield', 'of', 'in',
+  "const",
+  "let",
+  "var",
+  "function",
+  "return",
+  "if",
+  "else",
+  "for",
+  "while",
+  "do",
+  "switch",
+  "case",
+  "break",
+  "continue",
+  "class",
+  "extends",
+  "new",
+  "this",
+  "import",
+  "export",
+  "from",
+  "default",
+  "async",
+  "await",
+  "try",
+  "catch",
+  "throw",
+  "typeof",
+  "instanceof",
+  "true",
+  "false",
+  "null",
+  "undefined",
+  "yield",
+  "of",
+  "in",
 ]);
 
 const PROVIDER_ABBREV = {
-  anthropic: 'A',
-  openai:    'O',
-  google:    'G',
+  anthropic: "A",
+  openai: "O",
+  google: "G",
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
 function esc(str) {
-  if (!str) return '';
-  const d = document.createElement('div');
+  if (!str) return "";
+  const d = document.createElement("div");
   d.textContent = str;
   return d.innerHTML;
 }
@@ -56,7 +87,7 @@ function fmtElapsed(ms) {
 }
 
 function fmtCost(usd) {
-  if (usd == null || usd === 0) return '$0.000';
+  if (usd == null || usd === 0) return "$0.000";
   if (usd < 0.001) return `$${usd.toFixed(5)}`;
   if (usd < 0.01) return `$${usd.toFixed(4)}`;
   return `$${usd.toFixed(3)}`;
@@ -76,16 +107,16 @@ function highlightCode(code) {
   html = html.replace(/(\/\/.*)/g, '<span class="ts-comment">$1</span>');
 
   // Strings (double and single quoted — simple, non-nested)
-  html = html.replace(/(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;|`[^`]*?`)/g,
-    '<span class="ts-string">$1</span>');
+  html = html.replace(
+    /(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;|`[^`]*?`)/g,
+    '<span class="ts-string">$1</span>',
+  );
 
   // Numbers
   html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="ts-number">$1</span>');
 
   // Keywords
-  const kwPat = new RegExp(
-    '\\b(' + [...JS_KEYWORDS].join('|') + ')\\b', 'g'
-  );
+  const kwPat = new RegExp("\\b(" + [...JS_KEYWORDS].join("|") + ")\\b", "g");
   html = html.replace(kwPat, '<span class="ts-keyword">$1</span>');
 
   return html;
@@ -97,18 +128,18 @@ function highlightCode(code) {
  */
 function renderStreamedText(raw) {
   const parts = raw.split(/(```[\s\S]*?```)/g);
-  let html = '';
+  let html = "";
   for (const part of parts) {
-    if (part.startsWith('```')) {
-      const lines = part.slice(3, -3).split('\n');
+    if (part.startsWith("```")) {
+      const lines = part.slice(3, -3).split("\n");
       const lang = lines[0].trim();
-      const code = lines.slice(lang ? 1 : 0).join('\n');
+      const code = lines.slice(lang ? 1 : 0).join("\n");
       html += '<span class="ts-code-block">';
       if (lang) {
         html += `<span class="ts-code-lang">${esc(lang)}</span>`;
       }
       html += highlightCode(code);
-      html += '</span>';
+      html += "</span>";
     } else {
       html += esc(part);
     }
@@ -121,11 +152,11 @@ function renderStreamedText(raw) {
 class StreamTab {
   constructor(id, model, provider) {
     this.id = id;
-    this.model = model || 'unknown';
-    this.provider = provider || 'default';
-    this.chunks = [];         // raw text chunks received
-    this.displayedLen = 0;    // chars already rendered
-    this.status = 'streaming'; // streaming | done | error
+    this.model = model || "unknown";
+    this.provider = provider || "default";
+    this.chunks = []; // raw text chunks received
+    this.displayedLen = 0; // chars already rendered
+    this.status = "streaming"; // streaming | done | error
     this.inputTokens = 0;
     this.outputTokens = 0;
     this.costUsd = 0;
@@ -136,7 +167,7 @@ class StreamTab {
   }
 
   get fullText() {
-    return this.chunks.join('');
+    return this.chunks.join("");
   }
 
   get elapsedMs() {
@@ -178,9 +209,9 @@ export class TaskStream {
     document.body.appendChild(this._root);
 
     // Listen to task events on the window
-    window.addEventListener('task:stream-start', this._onStreamStart);
-    window.addEventListener('task:stream-chunk', this._onStreamChunk);
-    window.addEventListener('task:stream-end', this._onStreamEnd);
+    window.addEventListener("task:stream-start", this._onStreamStart);
+    window.addEventListener("task:stream-chunk", this._onStreamChunk);
+    window.addEventListener("task:stream-end", this._onStreamEnd);
 
     // Elapsed timer — update every second
     this._elapsedTimer = setInterval(() => this._tickElapsed(), 1000);
@@ -190,9 +221,9 @@ export class TaskStream {
     if (!this._mounted) return;
     this._mounted = false;
 
-    window.removeEventListener('task:stream-start', this._onStreamStart);
-    window.removeEventListener('task:stream-chunk', this._onStreamChunk);
-    window.removeEventListener('task:stream-end', this._onStreamEnd);
+    window.removeEventListener("task:stream-start", this._onStreamStart);
+    window.removeEventListener("task:stream-chunk", this._onStreamChunk);
+    window.removeEventListener("task:stream-end", this._onStreamEnd);
 
     if (this._typewriterTimer) {
       clearInterval(this._typewriterTimer);
@@ -218,41 +249,41 @@ export class TaskStream {
   // ── DOM construction ───────────────────────────────────────────────
 
   _buildDOM() {
-    const root = document.createElement('div');
-    root.className = 'task-stream';
-    root.setAttribute('role', 'region');
-    root.setAttribute('aria-label', 'AI Task Stream');
+    const root = document.createElement("div");
+    root.className = "task-stream";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-label", "AI Task Stream");
 
     // Tab bar
-    const tabs = document.createElement('div');
-    tabs.className = 'task-stream__tabs';
+    const tabs = document.createElement("div");
+    tabs.className = "task-stream__tabs";
     root.appendChild(tabs);
 
     // Body (sidebar + output)
-    const body = document.createElement('div');
-    body.className = 'task-stream__body';
+    const body = document.createElement("div");
+    body.className = "task-stream__body";
 
     // Sidebar
-    const sidebar = document.createElement('div');
-    sidebar.className = 'task-stream__sidebar';
+    const sidebar = document.createElement("div");
+    sidebar.className = "task-stream__sidebar";
     body.appendChild(sidebar);
 
     // Output wrap
-    const outputWrap = document.createElement('div');
-    outputWrap.className = 'task-stream__output-wrap';
+    const outputWrap = document.createElement("div");
+    outputWrap.className = "task-stream__output-wrap";
 
-    const output = document.createElement('div');
-    output.className = 'task-stream__output';
-    output.setAttribute('role', 'log');
-    output.setAttribute('aria-live', 'polite');
+    const output = document.createElement("div");
+    output.className = "task-stream__output";
+    output.setAttribute("role", "log");
+    output.setAttribute("aria-live", "polite");
     outputWrap.appendChild(output);
     body.appendChild(outputWrap);
 
     root.appendChild(body);
 
     // Toolbar
-    const toolbar = document.createElement('div');
-    toolbar.className = 'task-stream__toolbar';
+    const toolbar = document.createElement("div");
+    toolbar.className = "task-stream__toolbar";
     root.appendChild(toolbar);
 
     this._root = root;
@@ -287,7 +318,7 @@ export class TaskStream {
     const { id, text } = evt.detail || {};
     if (!id || !text) return;
     const tab = this._tabs.get(id);
-    if (!tab || tab.status !== 'streaming') return;
+    if (!tab || tab.status !== "streaming") return;
 
     tab.chunks.push(text);
     tab.outputTokens += Math.ceil(text.length / 4); // rough token estimate
@@ -299,12 +330,13 @@ export class TaskStream {
   }
 
   _handleStreamEnd(evt) {
-    const { id, inputTokens, outputTokens, costUsd, latencyMs, error } = evt.detail || {};
+    const { id, inputTokens, outputTokens, costUsd, latencyMs, error } =
+      evt.detail || {};
     if (!id) return;
     const tab = this._tabs.get(id);
     if (!tab) return;
 
-    tab.status = error ? 'error' : 'done';
+    tab.status = error ? "error" : "done";
     tab.endTime = Date.now();
     if (inputTokens != null) tab.inputTokens = inputTokens;
     if (outputTokens != null) tab.outputTokens = outputTokens;
@@ -322,8 +354,10 @@ export class TaskStream {
     if (!tab.pinned) {
       tab.collapseTimer = setTimeout(() => {
         // Only collapse if this is still the only/active stream and all are done
-        const allDone = [...this._tabs.values()].every(t => t.status !== 'streaming');
-        const anyPinned = [...this._tabs.values()].some(t => t.pinned);
+        const allDone = [...this._tabs.values()].every(
+          (t) => t.status !== "streaming",
+        );
+        const anyPinned = [...this._tabs.values()].some((t) => t.pinned);
         if (allDone && !anyPinned) {
           this._close();
         }
@@ -335,23 +369,23 @@ export class TaskStream {
 
   _open() {
     if (!this._root) return;
-    this._root.classList.remove('task-stream--collapsing');
+    this._root.classList.remove("task-stream--collapsing");
     // Force reflow before adding open class for animation
     void this._root.offsetHeight;
-    this._root.classList.add('task-stream--open');
+    this._root.classList.add("task-stream--open");
   }
 
   _close() {
     if (!this._root) return;
-    this._root.classList.remove('task-stream--open');
-    this._root.classList.add('task-stream--collapsing');
+    this._root.classList.remove("task-stream--open");
+    this._root.classList.add("task-stream--collapsing");
     // After animation, clean up finished tabs
     setTimeout(() => {
       if (!this._root) return;
-      this._root.classList.remove('task-stream--collapsing');
+      this._root.classList.remove("task-stream--collapsing");
       // Remove done/error tabs that aren't pinned
       for (const [id, tab] of this._tabs) {
-        if (tab.status !== 'streaming' && !tab.pinned) {
+        if (tab.status !== "streaming" && !tab.pinned) {
           this._tabs.delete(id);
         }
       }
@@ -365,7 +399,10 @@ export class TaskStream {
 
   _startTypewriter() {
     if (this._typewriterTimer) return;
-    this._typewriterTimer = setInterval(() => this._typewriterTick(), TYPEWRITER_INTERVAL_MS);
+    this._typewriterTimer = setInterval(
+      () => this._typewriterTick(),
+      TYPEWRITER_INTERVAL_MS,
+    );
   }
 
   _typewriterTick() {
@@ -375,7 +412,7 @@ export class TaskStream {
     const full = tab.fullText;
     if (tab.displayedLen >= full.length) {
       // Nothing new to render
-      if (tab.status !== 'streaming') {
+      if (tab.status !== "streaming") {
         clearInterval(this._typewriterTimer);
         this._typewriterTimer = null;
       }
@@ -383,7 +420,10 @@ export class TaskStream {
     }
 
     // Advance by a few chars per tick for speed
-    const charsPerTick = Math.max(1, Math.floor((full.length - tab.displayedLen) / 8));
+    const charsPerTick = Math.max(
+      1,
+      Math.floor((full.length - tab.displayedLen) / 8),
+    );
     const advance = Math.min(charsPerTick, 3);
     tab.displayedLen = Math.min(tab.displayedLen + advance, full.length);
 
@@ -401,7 +441,7 @@ export class TaskStream {
     let html = renderStreamedText(displayed);
 
     // Add cursor if still streaming
-    if (tab.status === 'streaming') {
+    if (tab.status === "streaming") {
       html += '<span class="task-stream__cursor"></span>';
     }
 
@@ -416,38 +456,40 @@ export class TaskStream {
   _renderTabs() {
     if (!this._els) return;
     const container = this._els.tabs;
-    container.innerHTML = '';
+    container.innerHTML = "";
 
     for (const [id, tab] of this._tabs) {
-      const btn = document.createElement('button');
-      btn.className = 'task-stream__tab';
-      if (id === this._activeId) btn.classList.add('task-stream__tab--active');
+      const btn = document.createElement("button");
+      btn.className = "task-stream__tab";
+      if (id === this._activeId) btn.classList.add("task-stream__tab--active");
 
       // Status indicator
-      const dot = document.createElement('span');
-      dot.className = 'task-stream__tab-indicator';
-      if (tab.status === 'streaming') dot.classList.add('task-stream__tab-indicator--streaming');
-      else if (tab.status === 'done') dot.classList.add('task-stream__tab-indicator--done');
-      else dot.classList.add('task-stream__tab-indicator--error');
+      const dot = document.createElement("span");
+      dot.className = "task-stream__tab-indicator";
+      if (tab.status === "streaming")
+        dot.classList.add("task-stream__tab-indicator--streaming");
+      else if (tab.status === "done")
+        dot.classList.add("task-stream__tab-indicator--done");
+      else dot.classList.add("task-stream__tab-indicator--error");
       btn.appendChild(dot);
 
       // Label
-      const label = document.createElement('span');
+      const label = document.createElement("span");
       label.textContent = tab.model;
       btn.appendChild(label);
 
       // Close button
-      const close = document.createElement('button');
-      close.className = 'task-stream__tab-close';
-      close.textContent = '\u2715';
-      close.title = 'Close tab';
-      close.addEventListener('click', (e) => {
+      const close = document.createElement("button");
+      close.className = "task-stream__tab-close";
+      close.textContent = "\u2715";
+      close.title = "Close tab";
+      close.addEventListener("click", (e) => {
         e.stopPropagation();
         this._closeTab(id);
       });
       btn.appendChild(close);
 
-      btn.addEventListener('click', () => this._switchTab(id));
+      btn.addEventListener("click", () => this._switchTab(id));
       container.appendChild(btn);
     }
   }
@@ -470,7 +512,8 @@ export class TaskStream {
 
     if (this._activeId === id) {
       const remaining = [...this._tabs.keys()];
-      this._activeId = remaining.length > 0 ? remaining[remaining.length - 1] : null;
+      this._activeId =
+        remaining.length > 0 ? remaining[remaining.length - 1] : null;
     }
 
     if (this._tabs.size === 0) {
@@ -489,13 +532,13 @@ export class TaskStream {
     if (!this._els) return;
     const tab = this._tabs.get(this._activeId);
     if (!tab) {
-      this._els.sidebar.innerHTML = '';
+      this._els.sidebar.innerHTML = "";
       return;
     }
 
-    const providerKey = (tab.provider || 'default').toLowerCase();
-    const abbrev = PROVIDER_ABBREV[providerKey] || '?';
-    const iconClass = `task-stream__provider-icon--${providerKey in PROVIDER_ABBREV ? providerKey : 'default'}`;
+    const providerKey = (tab.provider || "default").toLowerCase();
+    const abbrev = PROVIDER_ABBREV[providerKey] || "?";
+    const iconClass = `task-stream__provider-icon--${providerKey in PROVIDER_ABBREV ? providerKey : "default"}`;
 
     this._els.sidebar.innerHTML = `
       <div class="task-stream__stat">
@@ -539,16 +582,16 @@ export class TaskStream {
     if (!el || !tab) return;
 
     el.textContent = fmtTokens(tab.outputTokens);
-    el.classList.remove('ts-animating');
+    el.classList.remove("ts-animating");
     void el.offsetHeight; // trigger reflow
-    el.classList.add('ts-animating');
-    setTimeout(() => el.classList.remove('ts-animating'), TOKEN_ANIM_MS);
+    el.classList.add("ts-animating");
+    setTimeout(() => el.classList.remove("ts-animating"), TOKEN_ANIM_MS);
   }
 
   _tickElapsed() {
     if (!this._els) return;
     const tab = this._tabs.get(this._activeId);
-    if (!tab || tab.status !== 'streaming') return;
+    if (!tab || tab.status !== "streaming") return;
     const el = this._els.sidebar.querySelector('[data-role="elapsed"]');
     if (el) {
       el.textContent = fmtElapsed(tab.elapsedMs);
@@ -560,7 +603,7 @@ export class TaskStream {
   _renderOutput() {
     const tab = this._tabs.get(this._activeId);
     if (!tab) {
-      if (this._els) this._els.output.innerHTML = '';
+      if (this._els) this._els.output.innerHTML = "";
       return;
     }
     this._renderOutputContent(tab);
@@ -572,88 +615,96 @@ export class TaskStream {
     if (!this._els) return;
     const tab = this._tabs.get(this._activeId);
     const toolbar = this._els.toolbar;
-    toolbar.innerHTML = '';
+    toolbar.innerHTML = "";
 
     if (!tab) return;
 
     // Status indicator
-    const status = document.createElement('div');
-    status.className = 'task-stream__status';
+    const status = document.createElement("div");
+    status.className = "task-stream__status";
 
-    if (tab.status === 'streaming') {
-      const dot = document.createElement('span');
-      dot.className = 'task-stream__status-dot task-stream__status-dot--streaming';
+    if (tab.status === "streaming") {
+      const dot = document.createElement("span");
+      dot.className =
+        "task-stream__status-dot task-stream__status-dot--streaming";
       status.appendChild(dot);
-      const label = document.createElement('span');
-      label.textContent = 'Streaming\u2026';
+      const label = document.createElement("span");
+      label.textContent = "Streaming\u2026";
       status.appendChild(label);
-    } else if (tab.status === 'done') {
-      const check = document.createElement('span');
-      check.className = 'task-stream__status-check';
-      check.textContent = '\u2713';
+    } else if (tab.status === "done") {
+      const check = document.createElement("span");
+      check.className = "task-stream__status-check";
+      check.textContent = "\u2713";
       status.appendChild(check);
-      const label = document.createElement('span');
-      label.textContent = 'Complete';
+      const label = document.createElement("span");
+      label.textContent = "Complete";
       status.appendChild(label);
     } else {
-      const dot = document.createElement('span');
-      dot.className = 'task-stream__status-dot task-stream__status-dot--error';
+      const dot = document.createElement("span");
+      dot.className = "task-stream__status-dot task-stream__status-dot--error";
       status.appendChild(dot);
-      const label = document.createElement('span');
-      label.textContent = 'Error';
+      const label = document.createElement("span");
+      label.textContent = "Error";
       status.appendChild(label);
     }
     toolbar.appendChild(status);
 
     // Spacer
-    const spacer = document.createElement('div');
-    spacer.className = 'task-stream__spacer';
+    const spacer = document.createElement("div");
+    spacer.className = "task-stream__spacer";
     toolbar.appendChild(spacer);
 
     // Stop button (only while streaming)
-    if (tab.status === 'streaming') {
-      const stopBtn = document.createElement('button');
-      stopBtn.className = 'task-stream__btn task-stream__btn--stop';
-      stopBtn.innerHTML = '\u25A0 Stop';
-      stopBtn.title = 'Cancel this stream';
-      stopBtn.addEventListener('click', () => {
-        window.dispatchEvent(new CustomEvent('task:cancel', { detail: { id: tab.id } }));
+    if (tab.status === "streaming") {
+      const stopBtn = document.createElement("button");
+      stopBtn.className = "task-stream__btn task-stream__btn--stop";
+      stopBtn.innerHTML = "\u25A0 Stop";
+      stopBtn.title = "Cancel this stream";
+      stopBtn.addEventListener("click", () => {
+        window.dispatchEvent(
+          new CustomEvent("task:cancel", { detail: { id: tab.id } }),
+        );
       });
       toolbar.appendChild(stopBtn);
     }
 
     // Copy button
-    const copyBtn = document.createElement('button');
-    copyBtn.className = 'task-stream__btn task-stream__btn--copy';
-    copyBtn.innerHTML = '\u2398 Copy';
-    copyBtn.title = 'Copy response to clipboard';
-    copyBtn.addEventListener('click', () => {
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "task-stream__btn task-stream__btn--copy";
+    copyBtn.innerHTML = "\u2398 Copy";
+    copyBtn.title = "Copy response to clipboard";
+    copyBtn.addEventListener("click", () => {
       const text = tab.fullText;
-      navigator.clipboard.writeText(text).then(() => {
-        copyBtn.classList.add('copied');
-        copyBtn.innerHTML = '\u2713 Copied';
-        setTimeout(() => {
-          copyBtn.classList.remove('copied');
-          copyBtn.innerHTML = '\u2398 Copy';
-        }, 1500);
-      }).catch(() => {
-        // Fallback: select text
-        const range = document.createRange();
-        range.selectNodeContents(this._els.output);
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
-      });
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          copyBtn.classList.add("copied");
+          copyBtn.innerHTML = "\u2713 Copied";
+          setTimeout(() => {
+            copyBtn.classList.remove("copied");
+            copyBtn.innerHTML = "\u2398 Copy";
+          }, 1500);
+        })
+        .catch(() => {
+          // Fallback: select text
+          const range = document.createRange();
+          range.selectNodeContents(this._els.output);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        });
     });
     toolbar.appendChild(copyBtn);
 
     // Pin button
-    const pinBtn = document.createElement('button');
-    pinBtn.className = 'task-stream__btn task-stream__btn--pin';
-    if (tab.pinned) pinBtn.classList.add('active');
-    pinBtn.innerHTML = '\u{1F4CC} Pin';
-    pinBtn.title = tab.pinned ? 'Unpin (auto-collapse when done)' : 'Pin drawer open';
-    pinBtn.addEventListener('click', () => {
+    const pinBtn = document.createElement("button");
+    pinBtn.className = "task-stream__btn task-stream__btn--pin";
+    if (tab.pinned) pinBtn.classList.add("active");
+    pinBtn.innerHTML = "\u{1F4CC} Pin";
+    pinBtn.title = tab.pinned
+      ? "Unpin (auto-collapse when done)"
+      : "Pin drawer open";
+    pinBtn.addEventListener("click", () => {
       tab.pinned = !tab.pinned;
       if (tab.pinned && tab.collapseTimer) {
         clearTimeout(tab.collapseTimer);
@@ -664,11 +715,11 @@ export class TaskStream {
     toolbar.appendChild(pinBtn);
 
     // Close / minimize button
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'task-stream__btn';
-    closeBtn.innerHTML = '\u2715 Close';
-    closeBtn.title = 'Close drawer';
-    closeBtn.addEventListener('click', () => this._close());
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "task-stream__btn";
+    closeBtn.innerHTML = "\u2715 Close";
+    closeBtn.title = "Close drawer";
+    closeBtn.addEventListener("click", () => this._close());
     toolbar.appendChild(closeBtn);
   }
 }

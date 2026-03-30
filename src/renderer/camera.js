@@ -7,11 +7,17 @@
  */
 
 import {
-  ZOOM_MIN, ZOOM_MAX, ZOOM_SPEED, PAN_SPEED,
-  FOLLOW_EASING, CAMERA_LERP_SPEED,
-  TILE_WIDTH, TILE_HEIGHT, GRID_SIZE,
-} from './constants.js';
-import { tileToScreen } from './tiles.js';
+  ZOOM_MIN,
+  ZOOM_MAX,
+  ZOOM_SPEED,
+  PAN_SPEED,
+  FOLLOW_EASING,
+  CAMERA_LERP_SPEED,
+  TILE_WIDTH,
+  TILE_HEIGHT,
+  GRID_SIZE,
+} from "./constants.js";
+import { tileToScreen } from "./tiles.js";
 
 export class Camera {
   /**
@@ -91,10 +97,14 @@ export class Camera {
   update(_dt) {
     // ── Keyboard panning ──────────────────────────────────────────
     const speed = PAN_SPEED / this.zoom;
-    if (this._keys.has('ArrowLeft') || this._keys.has('KeyA'))  this.targetX += speed;
-    if (this._keys.has('ArrowRight') || this._keys.has('KeyD')) this.targetX -= speed;
-    if (this._keys.has('ArrowUp') || this._keys.has('KeyW'))    this.targetY += speed;
-    if (this._keys.has('ArrowDown') || this._keys.has('KeyS'))  this.targetY -= speed;
+    if (this._keys.has("ArrowLeft") || this._keys.has("KeyA"))
+      this.targetX += speed;
+    if (this._keys.has("ArrowRight") || this._keys.has("KeyD"))
+      this.targetX -= speed;
+    if (this._keys.has("ArrowUp") || this._keys.has("KeyW"))
+      this.targetY += speed;
+    if (this._keys.has("ArrowDown") || this._keys.has("KeyS"))
+      this.targetY -= speed;
 
     // ── Follow mode ───────────────────────────────────────────────
     if (this._followTarget) {
@@ -106,8 +116,14 @@ export class Camera {
     const hw = this.canvas.width / (2 * this.targetZoom);
     const hh = this.canvas.height / (2 * this.targetZoom);
 
-    this.targetX = Math.max(-this._worldMaxX + hw, Math.min(-this._worldMinX - hw, this.targetX));
-    this.targetY = Math.max(-this._worldMaxY + hh, Math.min(-this._worldMinY - hh, this.targetY));
+    this.targetX = Math.max(
+      -this._worldMaxX + hw,
+      Math.min(-this._worldMinX - hw, this.targetX),
+    );
+    this.targetY = Math.max(
+      -this._worldMaxY + hh,
+      Math.min(-this._worldMinY - hh, this.targetY),
+    );
 
     // ── Smooth lerp to target ─────────────────────────────────────
     const lerp = this._followTarget ? FOLLOW_EASING : CAMERA_LERP_SPEED;
@@ -142,7 +158,7 @@ export class Camera {
     const c = this.canvas;
 
     // ── Mouse drag ────────────────────────────────────────────────
-    c.addEventListener('pointerdown', (e) => {
+    c.addEventListener("pointerdown", (e) => {
       // Only start drag on primary button on empty space
       if (e.button !== 0) return;
       if (this._dragDisabledByDragDrop) return;
@@ -154,7 +170,7 @@ export class Camera {
       this._followTarget = null; // Break follow on manual pan
     });
 
-    window.addEventListener('pointermove', (e) => {
+    window.addEventListener("pointermove", (e) => {
       if (!this._dragging) return;
       const dx = e.clientX - this._dragStartX;
       const dy = e.clientY - this._dragStartY;
@@ -162,27 +178,31 @@ export class Camera {
       this.targetY = this._camStartY + dy / this.zoom;
     });
 
-    window.addEventListener('pointerup', () => {
+    window.addEventListener("pointerup", () => {
       this._dragging = false;
     });
 
     // ── Scroll zoom ───────────────────────────────────────────────
-    c.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      const direction = e.deltaY > 0 ? -1 : 1;
-      this.targetZoom = Math.max(
-        ZOOM_MIN,
-        Math.min(ZOOM_MAX, this.targetZoom + direction * ZOOM_SPEED),
-      );
-    }, { passive: false });
+    c.addEventListener(
+      "wheel",
+      (e) => {
+        e.preventDefault();
+        const direction = e.deltaY > 0 ? -1 : 1;
+        this.targetZoom = Math.max(
+          ZOOM_MIN,
+          Math.min(ZOOM_MAX, this.targetZoom + direction * ZOOM_SPEED),
+        );
+      },
+      { passive: false },
+    );
 
     // ── Keyboard ──────────────────────────────────────────────────
-    window.addEventListener('keydown', (e) => {
+    window.addEventListener("keydown", (e) => {
       this._keys.add(e.code);
       // Home key shortcut
-      if (e.code === 'KeyH') this.goHome();
+      if (e.code === "KeyH") this.goHome();
     });
-    window.addEventListener('keyup', (e) => {
+    window.addEventListener("keyup", (e) => {
       this._keys.delete(e.code);
     });
   }

@@ -10,19 +10,19 @@
  * BuildingManager (reads/writes building positions).
  */
 
-import { Graphics } from 'pixi.js';
-import { TILE_WIDTH, TILE_HEIGHT, COLORS } from './constants.js';
-import { tileToScreen, screenToTile } from './tiles.js';
-import { ZONE_DEFS } from './zones.js';
+import { Graphics } from "pixi.js";
+import { TILE_WIDTH, TILE_HEIGHT, COLORS } from "./constants.js";
+import { tileToScreen, screenToTile } from "./tiles.js";
+import { ZONE_DEFS } from "./zones.js";
 
 // ── Configuration ───────────────────────────────────────────────────
-const LONG_PRESS_MS      = 500;
-const DRAG_ALPHA         = 0.6;
-const GHOST_VALID_COLOR  = 0x44cc66;
+const LONG_PRESS_MS = 500;
+const DRAG_ALPHA = 0.6;
+const GHOST_VALID_COLOR = 0x44cc66;
 const GHOST_INVALID_COLOR = 0xcc4444;
-const GHOST_ALPHA        = 0.35;
-const SHIFT_ANIM_MS      = 250;
-const DRAG_THRESHOLD_PX  = 4;   // pixels moved before long-press cancels
+const GHOST_ALPHA = 0.35;
+const SHIFT_ANIM_MS = 250;
+const DRAG_THRESHOLD_PX = 4; // pixels moved before long-press cancels
 
 /**
  * DragDropSystem provides long-press drag-and-drop reordering of zone
@@ -75,13 +75,13 @@ export class DragDropSystem {
     this._shiftAnims = new Map();
 
     // Bound handlers (so we can remove them)
-    this._onPointerDown  = this._handlePointerDown.bind(this);
-    this._onPointerMove  = this._handlePointerMove.bind(this);
-    this._onPointerUp    = this._handlePointerUp.bind(this);
-    this._onKeyDown      = this._handleKeyDown.bind(this);
-    this._onAnimFrame    = this._animateShifts.bind(this);
-    this._animRAF        = null;
-    this._lastAnimTime   = 0;
+    this._onPointerDown = this._handlePointerDown.bind(this);
+    this._onPointerMove = this._handlePointerMove.bind(this);
+    this._onPointerUp = this._handlePointerUp.bind(this);
+    this._onKeyDown = this._handleKeyDown.bind(this);
+    this._onAnimFrame = this._animateShifts.bind(this);
+    this._animRAF = null;
+    this._lastAnimTime = 0;
   }
 
   // ── Public API ──────────────────────────────────────────────────
@@ -92,10 +92,10 @@ export class DragDropSystem {
     this._enabled = true;
 
     const canvas = this._camera.canvas;
-    canvas.addEventListener('pointerdown', this._onPointerDown);
-    window.addEventListener('pointermove', this._onPointerMove);
-    window.addEventListener('pointerup', this._onPointerUp);
-    window.addEventListener('keydown', this._onKeyDown);
+    canvas.addEventListener("pointerdown", this._onPointerDown);
+    window.addEventListener("pointermove", this._onPointerMove);
+    window.addEventListener("pointerup", this._onPointerUp);
+    window.addEventListener("keydown", this._onKeyDown);
 
     // Add the ghost overlay to the building container so it transforms with the world
     this._bm.container.addChild(this._ghost);
@@ -108,10 +108,10 @@ export class DragDropSystem {
     this._enabled = false;
 
     const canvas = this._camera.canvas;
-    canvas.removeEventListener('pointerdown', this._onPointerDown);
-    window.removeEventListener('pointermove', this._onPointerMove);
-    window.removeEventListener('pointerup', this._onPointerUp);
-    window.removeEventListener('keydown', this._onKeyDown);
+    canvas.removeEventListener("pointerdown", this._onPointerDown);
+    window.removeEventListener("pointermove", this._onPointerMove);
+    window.removeEventListener("pointerup", this._onPointerUp);
+    window.removeEventListener("keydown", this._onKeyDown);
 
     if (this._ghost.parent) {
       this._ghost.parent.removeChild(this._ghost);
@@ -140,7 +140,7 @@ export class DragDropSystem {
     const hitZone = this._bm.hitTest(worldPos.x, worldPos.y);
     if (!hitZone) return;
 
-    const entry = this._bm.buildings.find(b => b.zoneId === hitZone.id);
+    const entry = this._bm.buildings.find((b) => b.zoneId === hitZone.id);
     if (!entry) return;
 
     // Start long-press timer
@@ -190,7 +190,11 @@ export class DragDropSystem {
 
     if (!this._dragging || !this._dragEntry) return;
 
-    if (this._hoverValid && (this._hoverTileX !== this._originTileX || this._hoverTileY !== this._originTileY)) {
+    if (
+      this._hoverValid &&
+      (this._hoverTileX !== this._originTileX ||
+        this._hoverTileY !== this._originTileY)
+    ) {
       this._executeDrop(this._hoverTileX, this._hoverTileY);
     } else {
       this._cancelDrag();
@@ -199,7 +203,7 @@ export class DragDropSystem {
 
   /** @param {KeyboardEvent} e */
   _handleKeyDown(e) {
-    if (e.code === 'Escape' && this._dragging) {
+    if (e.code === "Escape" && this._dragging) {
       e.preventDefault();
       this._cancelDrag();
     }
@@ -235,7 +239,7 @@ export class DragDropSystem {
     this._ghost.visible = true;
 
     // Change cursor
-    this._camera.canvas.style.cursor = 'grabbing';
+    this._camera.canvas.style.cursor = "grabbing";
 
     console.log(`[DragDrop] Started dragging: ${zone.name}`);
   }
@@ -262,12 +266,12 @@ export class DragDropSystem {
 
     // Re-enable camera panning
     this._camera._dragDisabledByDragDrop = false;
-    this._camera.canvas.style.cursor = 'default';
+    this._camera.canvas.style.cursor = "default";
 
     this._dragging = false;
     this._dragEntry = null;
 
-    console.log('[DragDrop] Drag cancelled');
+    console.log("[DragDrop] Drag cancelled");
   }
 
   /**
@@ -278,13 +282,17 @@ export class DragDropSystem {
    */
   _executeDrop(tileX, tileY) {
     const draggedEntry = this._dragEntry;
-    const draggedZone  = draggedEntry.zone;
+    const draggedZone = draggedEntry.zone;
 
     // Find if another building occupies the target area
     const occupant = this._findOccupant(tileX, tileY, draggedZone);
 
     // Record old positions for the event and for animation
-    const oldPositions = ZONE_DEFS.map(z => ({ id: z.id, tileX: z.tileX, tileY: z.tileY }));
+    const oldPositions = ZONE_DEFS.map((z) => ({
+      id: z.id,
+      tileX: z.tileX,
+      tileY: z.tileY,
+    }));
 
     if (occupant && occupant.zoneId !== draggedZone.id) {
       // Swap: move occupant to dragged building's original position
@@ -298,11 +306,14 @@ export class DragDropSystem {
 
       // Animate the occupant sliding to its new position
       const occupantStart = tileToScreen(oldOccX, oldOccY);
-      const occupantEnd   = tileToScreen(occupantZone.tileX, occupantZone.tileY);
+      const occupantEnd = tileToScreen(occupantZone.tileX, occupantZone.tileY);
       this._shiftAnims.set(occupant.zoneId, {
-        startX: occupantStart.x, startY: occupantStart.y,
-        endX: occupantEnd.x, endY: occupantEnd.y,
-        elapsed: 0, duration: SHIFT_ANIM_MS,
+        startX: occupantStart.x,
+        startY: occupantStart.y,
+        endX: occupantEnd.x,
+        endY: occupantEnd.y,
+        elapsed: 0,
+        duration: SHIFT_ANIM_MS,
       });
       this._startAnimLoop();
     }
@@ -324,18 +335,24 @@ export class DragDropSystem {
 
     // Re-enable camera
     this._camera._dragDisabledByDragDrop = false;
-    this._camera.canvas.style.cursor = 'default';
+    this._camera.canvas.style.cursor = "default";
 
     this._dragging = false;
     this._dragEntry = null;
 
     // Build new positions map
-    const newPositions = ZONE_DEFS.map(z => ({ id: z.id, tileX: z.tileX, tileY: z.tileY }));
+    const newPositions = ZONE_DEFS.map((z) => ({
+      id: z.id,
+      tileX: z.tileX,
+      tileY: z.tileY,
+    }));
 
     // Dispatch rearranged event
-    document.dispatchEvent(new CustomEvent('zone:rearranged', {
-      detail: { oldPositions, newPositions },
-    }));
+    document.dispatchEvent(
+      new CustomEvent("zone:rearranged", {
+        detail: { oldPositions, newPositions },
+      }),
+    );
 
     // Persist via DB API
     this._persistPositions(newPositions);
@@ -343,7 +360,9 @@ export class DragDropSystem {
     // Re-sort buildings by depth for correct painter's algorithm
     this._resortBuildings();
 
-    console.log(`[DragDrop] Dropped ${draggedZone.name} at tile (${tileX}, ${tileY})`);
+    console.log(
+      `[DragDrop] Dropped ${draggedZone.name} at tile (${tileX}, ${tileY})`,
+    );
   }
 
   // ── Ghost outline ───────────────────────────────────────────────
@@ -362,22 +381,22 @@ export class DragDropSystem {
     const pos = tileToScreen(tileX, tileY);
     gfx.position.set(pos.x, pos.y);
 
-    const hw = TILE_WIDTH  / 2;
+    const hw = TILE_WIDTH / 2;
     const hh = TILE_HEIGHT / 4;
-    const w  = zone.w;
-    const h  = zone.h;
+    const w = zone.w;
+    const h = zone.h;
 
     const color = valid ? GHOST_VALID_COLOR : GHOST_INVALID_COLOR;
 
     // Footprint diamond (filled)
-    const topX   = 0;
-    const topY   = 0;
+    const topX = 0;
+    const topY = 0;
     const rightX = w * hw;
     const rightY = w * hh;
-    const botX   = (w - h) * hw;
-    const botY   = (w + h) * hh;
-    const leftX  = -h * hw;
-    const leftY  = h * hh;
+    const botX = (w - h) * hw;
+    const botY = (w + h) * hh;
+    const leftX = -h * hw;
+    const leftY = h * hh;
 
     gfx.poly([topX, topY, rightX, rightY, botX, botY, leftX, leftY]);
     gfx.fill({ color, alpha: GHOST_ALPHA });
@@ -409,7 +428,18 @@ export class DragDropSystem {
     for (const entry of this._bm.buildings) {
       if (entry.zoneId === zone.id) continue;
       const oz = entry.zone;
-      if (this._rectsOverlap(tileX, tileY, zone.w, zone.h, oz.tileX, oz.tileY, oz.w, oz.h)) {
+      if (
+        this._rectsOverlap(
+          tileX,
+          tileY,
+          zone.w,
+          zone.h,
+          oz.tileX,
+          oz.tileY,
+          oz.w,
+          oz.h,
+        )
+      ) {
         overlapCount++;
       }
     }
@@ -429,7 +459,18 @@ export class DragDropSystem {
     for (const entry of this._bm.buildings) {
       if (entry.zoneId === draggedZone.id) continue;
       const oz = entry.zone;
-      if (this._rectsOverlap(tileX, tileY, draggedZone.w, draggedZone.h, oz.tileX, oz.tileY, oz.w, oz.h)) {
+      if (
+        this._rectsOverlap(
+          tileX,
+          tileY,
+          draggedZone.w,
+          draggedZone.h,
+          oz.tileX,
+          oz.tileY,
+          oz.w,
+          oz.h,
+        )
+      ) {
         return entry;
       }
     }
@@ -468,7 +509,7 @@ export class DragDropSystem {
       const x = anim.startX + (anim.endX - anim.startX) * eased;
       const y = anim.startY + (anim.endY - anim.startY) * eased;
 
-      const entry = this._bm.buildings.find(b => b.zoneId === zoneId);
+      const entry = this._bm.buildings.find((b) => b.zoneId === zoneId);
       if (entry) {
         entry.gfx.position.set(x, y);
       }
@@ -495,17 +536,21 @@ export class DragDropSystem {
    */
   async _persistPositions(positions) {
     try {
-      if (window.api && window.api.db && typeof window.api.db.updateZoneProgress === 'function') {
+      if (
+        window.api &&
+        window.api.db &&
+        typeof window.api.db.updateZoneProgress === "function"
+      ) {
         for (const pos of positions) {
           await window.api.db.updateZoneProgress(pos.id, {
             tileX: pos.tileX,
             tileY: pos.tileY,
           });
         }
-        console.log('[DragDrop] Positions persisted to DB');
+        console.log("[DragDrop] Positions persisted to DB");
       }
     } catch (err) {
-      console.warn('[DragDrop] Failed to persist positions:', err);
+      console.warn("[DragDrop] Failed to persist positions:", err);
     }
   }
 
@@ -524,7 +569,9 @@ export class DragDropSystem {
    * painter's algorithm renders correctly after a position swap.
    */
   _resortBuildings() {
-    this._bm.buildings.sort((a, b) => (a.zone.tileX + a.zone.tileY) - (b.zone.tileX + b.zone.tileY));
+    this._bm.buildings.sort(
+      (a, b) => a.zone.tileX + a.zone.tileY - (b.zone.tileX + b.zone.tileY),
+    );
 
     // Re-order the children in the container to match
     for (let i = 0; i < this._bm.buildings.length; i++) {

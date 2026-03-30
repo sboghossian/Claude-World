@@ -21,8 +21,13 @@
 }
 
 @keyframes treasury-pulse {
-  0%, 100% { box-shadow: inset 0 0 0 1px transparent; }
-  50% { box-shadow: inset 0 0 12px rgba(255, 74, 106, 0.25); }
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 1px transparent;
+  }
+  50% {
+    box-shadow: inset 0 0 12px rgba(255, 74, 106, 0.25);
+  }
 }
 
 /* ── Stats bar ────────────────────────────────────────────────── */
@@ -73,8 +78,13 @@
 }
 
 @keyframes dot-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 /* ── Section scaffolding ──────────────────────────────────────── */
@@ -107,7 +117,7 @@
 }
 
 .treasury__section-header::after {
-  content: '\25BC';
+  content: "\25BC";
   font-size: 8px;
   transition: transform var(--transition-fast);
 }
@@ -118,7 +128,9 @@
 
 .treasury__section-body {
   padding: 12px;
-  transition: max-height var(--transition-normal), opacity var(--transition-normal);
+  transition:
+    max-height var(--transition-normal),
+    opacity var(--transition-normal);
   max-height: 2000px;
   opacity: 1;
 }
@@ -191,12 +203,14 @@
   border: 1px solid var(--border-light);
   border-radius: 10px;
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
   flex-shrink: 0;
 }
 
 .treasury__toggle::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 2px;
   left: 2px;
@@ -204,7 +218,9 @@
   height: 14px;
   background: var(--text-secondary);
   border-radius: 50%;
-  transition: transform var(--transition-fast), background var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .treasury__toggle.active {
@@ -277,7 +293,9 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
   margin-top: 4px;
 }
 
@@ -386,16 +404,32 @@
 }
 
 /* Provider colors */
-.treasury__bar-fill--anthropic { background: var(--accent-purple); }
-.treasury__bar-fill--openai { background: var(--accent-green); }
-.treasury__bar-fill--google { background: var(--accent-blue); }
-.treasury__bar-fill--default { background: var(--accent-amber); }
+.treasury__bar-fill--anthropic {
+  background: var(--accent-purple);
+}
+.treasury__bar-fill--openai {
+  background: var(--accent-green);
+}
+.treasury__bar-fill--google {
+  background: var(--accent-blue);
+}
+.treasury__bar-fill--default {
+  background: var(--accent-amber);
+}
 
 /* Zone colors */
-.treasury__bar-fill--core { background: var(--accent-blue); }
-.treasury__bar-fill--business { background: var(--accent-green); }
-.treasury__bar-fill--advanced { background: var(--accent-purple); }
-.treasury__bar-fill--edge { background: var(--accent-amber); }
+.treasury__bar-fill--core {
+  background: var(--accent-blue);
+}
+.treasury__bar-fill--business {
+  background: var(--accent-green);
+}
+.treasury__bar-fill--advanced {
+  background: var(--accent-purple);
+}
+.treasury__bar-fill--edge {
+  background: var(--accent-amber);
+}
 
 /* ── Daily spend chart ────────────────────────────────────────── */
 
@@ -420,7 +454,9 @@
   width: 100%;
   background: var(--accent-blue);
   border-radius: 2px 2px 0 0;
-  transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity var(--transition-fast);
+  transition:
+    height 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity var(--transition-fast);
   opacity: 0.7;
   min-height: 1px;
   cursor: crosshair;
@@ -570,7 +606,9 @@
   font-family: var(--font-sans);
   font-size: 11px;
   cursor: pointer;
-  transition: color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
   margin-top: 8px;
 }
 
@@ -650,7 +688,9 @@
 /* ── Animations ───────────────────────────────────────────────── */
 
 @keyframes treasury-bar-grow {
-  from { width: 0; }
+  from {
+    width: 0;
+  }
 }
 
 .treasury__bar-fill {

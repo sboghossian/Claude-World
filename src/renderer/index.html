@@ -1,718 +1,1025 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claude World</title>
-  <script type="importmap">
-  {
-    "imports": {
-      "pixi.js": "../../node_modules/pixi.js/dist/pixi.min.mjs"
-    }
-  }
-  </script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a14; }
-    #world-canvas { display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
-    #ui-root { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
-    #ui-root * { pointer-events: auto; }
-    #ui-root .hud-bar { pointer-events: none; }
-    #ui-root .hud-bar > * { pointer-events: auto; }
-
-    /* ── Inline splash (shows immediately, before any JS modules load) ── */
-    #splash {
-      position: fixed; inset: 0; z-index: 9999;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      background: #0a0a14; overflow: hidden;
-    }
-    .splash__glow {
-      position: absolute; width: 600px; height: 400px; top: 30%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(ellipse at center, rgba(168,85,247,0.18) 0%, rgba(124,58,237,0.08) 40%, transparent 70%);
-      border-radius: 50%; pointer-events: none;
-    }
-    .splash__city {
-      position: relative; width: 420px; height: 200px; margin-bottom: 32px;
-      display: flex; align-items: flex-end; justify-content: center;
-    }
-    .splash__building-body { border-radius: 3px 3px 0 0; }
-    .splash__building { display: flex; flex-direction: column; align-items: center; }
-    .splash__ground {
-      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 380px; height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(124,58,237,0.4), transparent);
-    }
-    .splash__title {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 42px; font-weight: 700; color: #e8e8f0;
-      letter-spacing: 2px; margin-bottom: 10px;
-    }
-    .splash__subtitle {
-      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-      font-size: 14px; color: #8888a0; margin-bottom: 36px;
-    }
-    .splash__progress-wrap {
-      width: 320px; height: 4px; background: rgba(255,255,255,0.06);
-      border-radius: 4px; overflow: hidden;
-    }
-    .splash__progress-bar {
-      height: 100%; width: 0%; border-radius: 4px;
-      background: linear-gradient(90deg, #7c3aed, #a855f7, #4a9eff);
-    }
-    .splash__progress-label {
-      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-      font-size: 11px; color: #555570; margin-top: 12px; height: 16px;
-    }
-    .splash__particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-  </style>
-</head>
-<body>
-  <!-- Splash screen — visible immediately before any JS modules load -->
-  <div id="splash">
-    <div class="splash__glow"></div>
-    <div class="splash__particles"></div>
-    <div class="splash__city">
-      <div class="splash__building"><div class="splash__building-body" style="width:32px;height:70px;background:linear-gradient(180deg,#3b82f6,#1d4ed8)"></div></div>
-      <div class="splash__building"><div class="splash__building-body" style="width:28px;height:90px;background:linear-gradient(180deg,#8b5cf6,#5b21b6)"></div></div>
-      <div class="splash__building"><div class="splash__building-body" style="width:38px;height:110px;background:linear-gradient(180deg,#6d28d9,#4c1d95)"></div></div>
-      <div class="splash__building"><div class="splash__building-body" style="width:50px;height:160px;background:linear-gradient(180deg,#a855f7,#7c3aed)"></div></div>
-      <div class="splash__building"><div class="splash__building-body" style="width:36px;height:100px;background:linear-gradient(180deg,#7c3aed,#5b21b6)"></div></div>
-      <div class="splash__building"><div class="splash__building-body" style="width:30px;height:80px;background:linear-gradient(180deg,#4a9eff,#2563eb)"></div></div>
-      <div class="splash__building"><div class="splash__building-body" style="width:26px;height:55px;background:linear-gradient(180deg,#6366f1,#4338ca)"></div></div>
-      <div class="splash__ground"></div>
-    </div>
-    <div class="splash__title">Claude World</div>
-    <div class="splash__subtitle">Building your city...<span class="splash__cursor"></span></div>
-    <div class="splash__progress-wrap"><div class="splash__progress-bar"></div></div>
-    <div class="splash__progress-label">Loading modules...</div>
-  </div>
-
-  <canvas id="world-canvas"></canvas>
-  <div id="ui-root"></div>
-  <script>
-    // Global error catcher for module load failures
-    window.addEventListener('error', (e) => {
-      console.error('[BOOT ERROR]', e.message, e.filename, e.lineno);
-      const label = document.querySelector('.splash__progress-label');
-      if (label) label.textContent = 'Error: ' + e.message;
-      const sub = document.querySelector('.splash__subtitle');
-      if (sub) sub.textContent = (e.filename || '') + ':' + (e.lineno || '');
-    });
-    window.addEventListener('unhandledrejection', (e) => {
-      console.error('[BOOT REJECTION]', e.reason);
-      const label = document.querySelector('.splash__progress-label');
-      if (label) label.textContent = 'Error: ' + (e.reason?.message || e.reason);
-    });
-  </script>
-  <script type="module">
-    // ── Dynamic imports (with progress logging on splash) ─────────
-    const _log = (m) => { const el = document.querySelector('.splash__progress-label'); if (el) el.textContent = m; console.log('[boot]', m); };
-
-    let SplashScreen, initWorld, getWorldState, getBuildingManager, getApp, getCamera, getDayNight;
-    let initUI, MorningBriefing, OnboardingSystem, initOnboarding;
-    let AgentRelationshipSystem, IncidentPanel;
-    let initThemes, initThemePicker, initCelebrations, initAudio, ZoneAmbience, initSoundEffects;
-    let initPersonalityEngine, ThoughtBubbles, getQualityManager;
-    let initVFX, initParticles, initCityLife, initDataFlows;
-    let OnboardingCinema, NotificationCenter, Minimap, ActivityFeed;
-    let initAgentSprites, DragDropSystem, ContextMenu;
-    let getAchievementEngine, TutorialEngine, FocusMode;
-    let TaskStream, AgentChat, StatusBar, PerfMonitor;
-
-    try {
-      _log('Loading core renderer...');
-      ({ SplashScreen } = await import('../ui/splash-screen.js'));
-      ({ initWorld, getWorldState, getBuildingManager, getApp, getCamera, getDayNight } = await import('./app.js'));
-      _log('Loading UI framework...');
-      ({ initUI } = await import('../ui/index.js'));
-      _log('Loading systems...');
-      ({ MorningBriefing } = await import('../systems/morning-briefing.js'));
-      ({ OnboardingSystem } = await import('../systems/onboarding.js'));
-      ({ initOnboarding } = await import('../ui/onboarding.js'));
-      ({ AgentRelationshipSystem } = await import('../systems/agent-relationships.js'));
-      ({ IncidentPanel } = await import('../ui/incident-panel.js'));
-      ({ initThemes } = await import('../systems/themes.js'));
-      ({ initThemePicker } = await import('../ui/theme-picker.js'));
-      ({ initCelebrations } = await import('../systems/celebrations.js'));
-      ({ initAudio } = await import('../systems/audio.js'));
-      ({ ZoneAmbience } = await import('../systems/zone-ambience.js'));
-      ({ initSoundEffects } = await import('../systems/sound-effects.js'));
-      ({ initPersonalityEngine } = await import('../systems/agent-personalities.js'));
-      ({ ThoughtBubbles } = await import('../ui/thought-bubbles.js'));
-      ({ getQualityManager } = await import('../systems/quality.js'));
-      _log('Loading visual effects...');
-      ({ initVFX } = await import('./vfx.js'));
-      ({ initParticles } = await import('./particles.js'));
-      ({ initCityLife } = await import('./city-life.js'));
-      ({ initDataFlows } = await import('./data-flows.js'));
-      _log('Loading UI components...');
-      ({ OnboardingCinema } = await import('../systems/onboarding-cinema.js'));
-      ({ NotificationCenter } = await import('../ui/notification-center.js'));
-      ({ Minimap } = await import('../ui/minimap.js'));
-      ({ ActivityFeed } = await import('../ui/activity-feed.js'));
-      ({ initAgentSprites } = await import('./agent-sprites.js'));
-      ({ DragDropSystem } = await import('./drag-drop.js'));
-      ({ ContextMenu } = await import('../ui/context-menu.js'));
-      _log('Loading game systems...');
-      ({ getAchievementEngine } = await import('../systems/achievements.js'));
-      ({ TutorialEngine } = await import('../systems/tutorial.js'));
-      ({ FocusMode } = await import('../systems/focus-mode.js'));
-      ({ TaskStream } = await import('../ui/task-stream.js'));
-      ({ AgentChat } = await import('../ui/agent-chat.js'));
-      ({ StatusBar } = await import('../ui/status-bar.js'));
-      ({ PerfMonitor } = await import('../ui/perf-monitor.js'));
-      _log('All modules loaded!');
-    } catch (err) {
-      console.error('[boot] Module import failed:', err);
-      _log('ERROR: ' + err.message);
-      const sub = document.querySelector('.splash__subtitle');
-      if (sub) sub.textContent = String(err.stack || '').split('\n')[0];
-      throw err;
-    }
-
-    // ── Reputation listener ───────────────────────────────────────
-    function initReputationListener(worldId) {
-      const POINTS = {
-        'dispatch:task-complete':   { key: 'task_complete',   pts: 5,  desc: (d) => d.description || 'Task completed' },
-        'skills-academy:create':    { key: 'skill_create',    pts: 20, desc: (d) => d.name ? `Skill "${d.name}" created` : 'Skill created' },
-        'quest:complete':           { key: 'quest_complete',  pts: 50, desc: (d) => d.title ? `Quest "${d.title}" completed` : 'Quest completed' },
-        'zone:unlock':              { key: 'zone_unlock',     pts: 30, desc: (d) => d.zoneType ? `Zone "${d.zoneType}" unlocked` : 'Zone unlocked' },
-        'minion:run-complete':      { key: 'minion_run',      pts: 3,  desc: () => 'Minion run completed' },
-        'connector-docks:api-save': { key: 'api_connect',     pts: 25, desc: (d) => d.provider ? `${d.provider} API connected` : 'API connected' },
-      };
-      for (const [eventType, cfg] of Object.entries(POINTS)) {
-        document.addEventListener(eventType, (e) => {
-          const wid = (e.detail && e.detail.worldId) || worldId;
-          if (!wid) return;
-          window.api.db.awardReputation(wid, cfg.key, cfg.pts, cfg.desc(e.detail || {})).catch(() => {});
-        });
-      }
-    }
-
-    // ── Main boot sequence ────────────────────────────────────────
-    async function boot() {
-      const splash = new SplashScreen();
-      const TOTAL_STEPS = 32;
-      try {
-        // ── 1. Start the isometric world ──────────────────────────────
-        splash.setProgress(1, TOTAL_STEPS, 'Initializing world renderer...');
-        await initWorld();
-        console.log('[boot] World renderer initialized');
-
-        // ── 2. Start the UI overlay ───────────────────────────────────
-        splash.setProgress(2, TOTAL_STEPS, 'Building UI overlay...');
-        const ui = initUI({ cssBasePath: '../ui/' });
-        console.log('[boot] UI layer initialized');
-
-        // ── 3. Wire world state → HUD ────────────────────────────────
-        splash.setProgress(3, TOTAL_STEPS, 'Connecting world state...');
-        const worldState = getWorldState();
-        worldState.onChange((snapshot) => {
-          ui.hud.setWorldState(snapshot.state);
-        });
-
-        // ── 4. Wire zone clicks → UI panels ──────────────────────────
-        splash.setProgress(4, TOTAL_STEPS, 'Wiring zone interactions...');
-        document.addEventListener('zone-click', (e) => {
-          const { zoneId, zoneName } = e.detail;
-          ui.panels.openZone(zoneId, zoneName);
-          ui.toasts.show({ type: 'info', title: zoneName, description: 'Zone selected' });
-        });
-
-        // ── 5. Load zone build progress from DB → buildings ──────────
-        splash.setProgress(5, TOTAL_STEPS, 'Loading build progress...');
-        async function syncBuildProgress(worldId) {
-          try {
-            const zones = await window.api.db.getZoneProgress(worldId);
-            const bm = getBuildingManager();
-            if (bm && zones && zones.length) {
-              bm.updateAllFromDB(zones);
-              console.log('[boot] Build progress synced for', zones.length, 'zones');
-            }
-          } catch (err) {
-            console.warn('[boot] Could not sync build progress:', err.message);
-          }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Claude World</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "pixi.js": "../../node_modules/pixi.js/dist/pixi.min.mjs"
         }
+      }
+    </script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #0a0a14;
+      }
+      #world-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      #ui-root {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 10;
+      }
+      #ui-root * {
+        pointer-events: auto;
+      }
+      #ui-root .hud-bar {
+        pointer-events: none;
+      }
+      #ui-root .hud-bar > * {
+        pointer-events: auto;
+      }
 
-        // ── 6. Onboarding ─────────────────────────────────────────────
-        splash.setProgress(6, TOTAL_STEPS, 'Preparing onboarding...');
-        const onboarding = new OnboardingSystem();
-        initOnboarding(onboarding);
+      /* ── Inline splash (shows immediately, before any JS modules load) ── */
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #0a0a14;
+        overflow: hidden;
+      }
+      .splash__glow {
+        position: absolute;
+        width: 600px;
+        height: 400px;
+        top: 30%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+          ellipse at center,
+          rgba(168, 85, 247, 0.18) 0%,
+          rgba(124, 58, 237, 0.08) 40%,
+          transparent 70%
+        );
+        border-radius: 50%;
+        pointer-events: none;
+      }
+      .splash__city {
+        position: relative;
+        width: 420px;
+        height: 200px;
+        margin-bottom: 32px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      .splash__building-body {
+        border-radius: 3px 3px 0 0;
+      }
+      .splash__building {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .splash__ground {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 380px;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(124, 58, 237, 0.4),
+          transparent
+        );
+      }
+      .splash__title {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        font-size: 42px;
+        font-weight: 700;
+        color: #e8e8f0;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+      }
+      .splash__subtitle {
+        font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+        font-size: 14px;
+        color: #8888a0;
+        margin-bottom: 36px;
+      }
+      .splash__progress-wrap {
+        width: 320px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .splash__progress-bar {
+        height: 100%;
+        width: 0%;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #7c3aed, #a855f7, #4a9eff);
+      }
+      .splash__progress-label {
+        font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+        font-size: 11px;
+        color: #555570;
+        margin-top: 12px;
+        height: 16px;
+      }
+      .splash__particles {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Splash screen — visible immediately before any JS modules load -->
+    <div id="splash">
+      <div class="splash__glow"></div>
+      <div class="splash__particles"></div>
+      <div class="splash__city">
+        <div class="splash__building">
+          <div
+            class="splash__building-body"
+            style="
+              width: 32px;
+              height: 70px;
+              background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+            "
+          ></div>
+        </div>
+        <div class="splash__building">
+          <div
+            class="splash__building-body"
+            style="
+              width: 28px;
+              height: 90px;
+              background: linear-gradient(180deg, #8b5cf6, #5b21b6);
+            "
+          ></div>
+        </div>
+        <div class="splash__building">
+          <div
+            class="splash__building-body"
+            style="
+              width: 38px;
+              height: 110px;
+              background: linear-gradient(180deg, #6d28d9, #4c1d95);
+            "
+          ></div>
+        </div>
+        <div class="splash__building">
+          <div
+            class="splash__building-body"
+            style="
+              width: 50px;
+              height: 160px;
+              background: linear-gradient(180deg, #a855f7, #7c3aed);
+            "
+          ></div>
+        </div>
+        <div class="splash__building">
+          <div
+            class="splash__building-body"
+            style="
+              width: 36px;
+              height: 100px;
+              background: linear-gradient(180deg, #7c3aed, #5b21b6);
+            "
+          ></div>
+        </div>
+        <div class="splash__building">
+          <div
+            class="splash__building-body"
+            style="
+              width: 30px;
+              height: 80px;
+              background: linear-gradient(180deg, #4a9eff, #2563eb);
+            "
+          ></div>
+        </div>
+        <div class="splash__building">
+          <div
+            class="splash__building-body"
+            style="
+              width: 26px;
+              height: 55px;
+              background: linear-gradient(180deg, #6366f1, #4338ca);
+            "
+          ></div>
+        </div>
+        <div class="splash__ground"></div>
+      </div>
+      <div class="splash__title">Claude World</div>
+      <div class="splash__subtitle">
+        Building your city...<span class="splash__cursor"></span>
+      </div>
+      <div class="splash__progress-wrap">
+        <div class="splash__progress-bar"></div>
+      </div>
+      <div class="splash__progress-label">Loading modules...</div>
+    </div>
 
-        // After onboarding creates a world, unlock starting zones + sync
-        document.addEventListener('onboarding:world-created', async (e) => {
-          const { worldId, template } = e.detail;
-          // Unlock the 3 template starting zones
-          const startingZones = {
-            'startup_founder': ['dispatch', 'brain', 'legal'],
-            'startup':         ['dispatch', 'brain', 'legal'],
-            'developer':       ['dispatch', 'brain', 'docks'],
-            'freelancer':      ['dispatch', 'brain', 'skills'],
-          };
-          const zones = startingZones[template] || ['dispatch', 'brain'];
-          for (const zoneType of zones) {
-            await window.api.db.unlockZone(worldId, zoneType).catch(() => {});
+    <canvas id="world-canvas"></canvas>
+    <div id="ui-root"></div>
+    <script>
+      // Global error catcher for module load failures
+      window.addEventListener("error", (e) => {
+        console.error("[BOOT ERROR]", e.message, e.filename, e.lineno);
+        const label = document.querySelector(".splash__progress-label");
+        if (label) label.textContent = "Error: " + e.message;
+        const sub = document.querySelector(".splash__subtitle");
+        if (sub) sub.textContent = (e.filename || "") + ":" + (e.lineno || "");
+      });
+      window.addEventListener("unhandledrejection", (e) => {
+        console.error("[BOOT REJECTION]", e.reason);
+        const label = document.querySelector(".splash__progress-label");
+        if (label)
+          label.textContent = "Error: " + (e.reason?.message || e.reason);
+      });
+    </script>
+    <script type="module">
+      // ── Dynamic imports (with progress logging on splash) ─────────
+      const _log = (m) => {
+        const el = document.querySelector(".splash__progress-label");
+        if (el) el.textContent = m;
+        console.log("[boot]", m);
+      };
+
+      let SplashScreen,
+        initWorld,
+        getWorldState,
+        getBuildingManager,
+        getApp,
+        getCamera,
+        getDayNight;
+      let initUI, MorningBriefing, OnboardingSystem, initOnboarding;
+      let AgentRelationshipSystem, IncidentPanel;
+      let initThemes,
+        initThemePicker,
+        initCelebrations,
+        initAudio,
+        ZoneAmbience,
+        initSoundEffects;
+      let initPersonalityEngine, ThoughtBubbles, getQualityManager;
+      let initVFX, initParticles, initCityLife, initDataFlows;
+      let OnboardingCinema, NotificationCenter, Minimap, ActivityFeed;
+      let initAgentSprites, DragDropSystem, ContextMenu;
+      let getAchievementEngine, TutorialEngine, FocusMode;
+      let TaskStream, AgentChat, StatusBar, PerfMonitor;
+
+      try {
+        _log("Loading core renderer...");
+        ({ SplashScreen } = await import("../ui/splash-screen.js"));
+        ({
+          initWorld,
+          getWorldState,
+          getBuildingManager,
+          getApp,
+          getCamera,
+          getDayNight,
+        } = await import("./app.js"));
+        _log("Loading UI framework...");
+        ({ initUI } = await import("../ui/index.js"));
+        _log("Loading systems...");
+        ({ MorningBriefing } = await import("../systems/morning-briefing.js"));
+        ({ OnboardingSystem } = await import("../systems/onboarding.js"));
+        ({ initOnboarding } = await import("../ui/onboarding.js"));
+        ({ AgentRelationshipSystem } =
+          await import("../systems/agent-relationships.js"));
+        ({ IncidentPanel } = await import("../ui/incident-panel.js"));
+        ({ initThemes } = await import("../systems/themes.js"));
+        ({ initThemePicker } = await import("../ui/theme-picker.js"));
+        ({ initCelebrations } = await import("../systems/celebrations.js"));
+        ({ initAudio } = await import("../systems/audio.js"));
+        ({ ZoneAmbience } = await import("../systems/zone-ambience.js"));
+        ({ initSoundEffects } = await import("../systems/sound-effects.js"));
+        ({ initPersonalityEngine } =
+          await import("../systems/agent-personalities.js"));
+        ({ ThoughtBubbles } = await import("../ui/thought-bubbles.js"));
+        ({ getQualityManager } = await import("../systems/quality.js"));
+        _log("Loading visual effects...");
+        ({ initVFX } = await import("./vfx.js"));
+        ({ initParticles } = await import("./particles.js"));
+        ({ initCityLife } = await import("./city-life.js"));
+        ({ initDataFlows } = await import("./data-flows.js"));
+        _log("Loading UI components...");
+        ({ OnboardingCinema } =
+          await import("../systems/onboarding-cinema.js"));
+        ({ NotificationCenter } = await import("../ui/notification-center.js"));
+        ({ Minimap } = await import("../ui/minimap.js"));
+        ({ ActivityFeed } = await import("../ui/activity-feed.js"));
+        ({ initAgentSprites } = await import("./agent-sprites.js"));
+        ({ DragDropSystem } = await import("./drag-drop.js"));
+        ({ ContextMenu } = await import("../ui/context-menu.js"));
+        _log("Loading game systems...");
+        ({ getAchievementEngine } = await import("../systems/achievements.js"));
+        ({ TutorialEngine } = await import("../systems/tutorial.js"));
+        ({ FocusMode } = await import("../systems/focus-mode.js"));
+        ({ TaskStream } = await import("../ui/task-stream.js"));
+        ({ AgentChat } = await import("../ui/agent-chat.js"));
+        ({ StatusBar } = await import("../ui/status-bar.js"));
+        ({ PerfMonitor } = await import("../ui/perf-monitor.js"));
+        _log("All modules loaded!");
+      } catch (err) {
+        console.error("[boot] Module import failed:", err);
+        _log("ERROR: " + err.message);
+        const sub = document.querySelector(".splash__subtitle");
+        if (sub) sub.textContent = String(err.stack || "").split("\n")[0];
+        throw err;
+      }
+
+      // ── Reputation listener ───────────────────────────────────────
+      function initReputationListener(worldId) {
+        const POINTS = {
+          "dispatch:task-complete": {
+            key: "task_complete",
+            pts: 5,
+            desc: (d) => d.description || "Task completed",
+          },
+          "skills-academy:create": {
+            key: "skill_create",
+            pts: 20,
+            desc: (d) =>
+              d.name ? `Skill "${d.name}" created` : "Skill created",
+          },
+          "quest:complete": {
+            key: "quest_complete",
+            pts: 50,
+            desc: (d) =>
+              d.title ? `Quest "${d.title}" completed` : "Quest completed",
+          },
+          "zone:unlock": {
+            key: "zone_unlock",
+            pts: 30,
+            desc: (d) =>
+              d.zoneType ? `Zone "${d.zoneType}" unlocked` : "Zone unlocked",
+          },
+          "minion:run-complete": {
+            key: "minion_run",
+            pts: 3,
+            desc: () => "Minion run completed",
+          },
+          "connector-docks:api-save": {
+            key: "api_connect",
+            pts: 25,
+            desc: (d) =>
+              d.provider ? `${d.provider} API connected` : "API connected",
+          },
+        };
+        for (const [eventType, cfg] of Object.entries(POINTS)) {
+          document.addEventListener(eventType, (e) => {
+            const wid = (e.detail && e.detail.worldId) || worldId;
+            if (!wid) return;
+            window.api.db
+              .awardReputation(wid, cfg.key, cfg.pts, cfg.desc(e.detail || {}))
+              .catch(() => {});
+          });
+        }
+      }
+
+      // ── Main boot sequence ────────────────────────────────────────
+      async function boot() {
+        const splash = new SplashScreen();
+        const TOTAL_STEPS = 32;
+        try {
+          // ── 1. Start the isometric world ──────────────────────────────
+          splash.setProgress(1, TOTAL_STEPS, "Initializing world renderer...");
+          await initWorld();
+          console.log("[boot] World renderer initialized");
+
+          // ── 2. Start the UI overlay ───────────────────────────────────
+          splash.setProgress(2, TOTAL_STEPS, "Building UI overlay...");
+          const ui = initUI({ cssBasePath: "../ui/" });
+          console.log("[boot] UI layer initialized");
+
+          // ── 3. Wire world state → HUD ────────────────────────────────
+          splash.setProgress(3, TOTAL_STEPS, "Connecting world state...");
+          const worldState = getWorldState();
+          worldState.onChange((snapshot) => {
+            ui.hud.setWorldState(snapshot.state);
+          });
+
+          // ── 4. Wire zone clicks → UI panels ──────────────────────────
+          splash.setProgress(4, TOTAL_STEPS, "Wiring zone interactions...");
+          document.addEventListener("zone-click", (e) => {
+            const { zoneId, zoneName } = e.detail;
+            ui.panels.openZone(zoneId, zoneName);
+            ui.toasts.show({
+              type: "info",
+              title: zoneName,
+              description: "Zone selected",
+            });
+          });
+
+          // ── 5. Load zone build progress from DB → buildings ──────────
+          splash.setProgress(5, TOTAL_STEPS, "Loading build progress...");
+          async function syncBuildProgress(worldId) {
+            try {
+              const zones = await window.api.db.getZoneProgress(worldId);
+              const bm = getBuildingManager();
+              if (bm && zones && zones.length) {
+                bm.updateAllFromDB(zones);
+                console.log(
+                  "[boot] Build progress synced for",
+                  zones.length,
+                  "zones",
+                );
+              }
+            } catch (err) {
+              console.warn(
+                "[boot] Could not sync build progress:",
+                err.message,
+              );
+            }
           }
-          await syncBuildProgress(worldId);
-        });
 
-        // When onboarding completes, sync progress + show morning briefing
-        document.addEventListener('onboarding:complete', async (e) => {
-          const worldId = e.detail?.worldId || 1;
-          await syncBuildProgress(worldId);
-        });
+          // ── 6. Onboarding ─────────────────────────────────────────────
+          splash.setProgress(6, TOTAL_STEPS, "Preparing onboarding...");
+          const onboarding = new OnboardingSystem();
+          initOnboarding(onboarding);
 
-        // ── 7. Check if onboarding is needed ─────────────────────────
-        splash.setProgress(7, TOTAL_STEPS, 'Checking onboarding status...');
-        if (!onboarding.isComplete()) {
-          await onboarding.check();
-        } else {
-          // Returning user — sync existing world's build progress
+          // After onboarding creates a world, unlock starting zones + sync
+          document.addEventListener("onboarding:world-created", async (e) => {
+            const { worldId, template } = e.detail;
+            // Unlock the 3 template starting zones
+            const startingZones = {
+              startup_founder: ["dispatch", "brain", "legal"],
+              startup: ["dispatch", "brain", "legal"],
+              developer: ["dispatch", "brain", "docks"],
+              freelancer: ["dispatch", "brain", "skills"],
+            };
+            const zones = startingZones[template] || ["dispatch", "brain"];
+            for (const zoneType of zones) {
+              await window.api.db.unlockZone(worldId, zoneType).catch(() => {});
+            }
+            await syncBuildProgress(worldId);
+          });
+
+          // When onboarding completes, sync progress + show morning briefing
+          document.addEventListener("onboarding:complete", async (e) => {
+            const worldId = e.detail?.worldId || 1;
+            await syncBuildProgress(worldId);
+          });
+
+          // ── 7. Check if onboarding is needed ─────────────────────────
+          splash.setProgress(7, TOTAL_STEPS, "Checking onboarding status...");
+          if (!onboarding.isComplete()) {
+            await onboarding.check();
+          } else {
+            // Returning user — sync existing world's build progress
+            try {
+              const world = await window.api.db.getWorld(1);
+              if (world?.id) await syncBuildProgress(world.id);
+            } catch (_) {}
+          }
+
+          // ── 8. Wire zone progress on dispatch task complete ───────────
+          splash.setProgress(8, TOTAL_STEPS, "Wiring dispatch events...");
+          document.addEventListener("dispatch:task-complete", async (e) => {
+            const { worldId, zoneType, success } = e.detail || {};
+            if (!worldId || !zoneType) return;
+            try {
+              // Get current progress and advance it
+              const zones = await window.api.db.getZoneProgress(worldId);
+              const zone = zones?.find((z) => z.zone_type === zoneType);
+              const current = zone?.build_progress ?? 0;
+              // Each successful task adds 0.08–0.15 progress
+              const delta = success ? 0.08 + Math.random() * 0.07 : 0.02;
+              const next = Math.min(1.0, current + delta);
+              await window.api.db.updateZoneProgress(worldId, zoneType, next);
+              const bm = getBuildingManager();
+              if (bm) bm.setZoneProgress(zoneType, next);
+            } catch (err) {
+              console.warn(
+                "[boot] Could not update zone progress:",
+                err.message,
+              );
+            }
+          });
+
+          // ── 9. Agent relationships + incident panel ───────────────
+          splash.setProgress(9, TOTAL_STEPS, "Loading agent relationships...");
+          const incidentPanel = new IncidentPanel();
+          incidentPanel.mount();
+
+          const relationships = new AgentRelationshipSystem();
           try {
             const world = await window.api.db.getWorld(1);
-            if (world?.id) await syncBuildProgress(world.id);
-          } catch (_) {}
-        }
-
-        // ── 8. Wire zone progress on dispatch task complete ───────────
-        splash.setProgress(8, TOTAL_STEPS, 'Wiring dispatch events...');
-        document.addEventListener('dispatch:task-complete', async (e) => {
-          const { worldId, zoneType, success } = e.detail || {};
-          if (!worldId || !zoneType) return;
-          try {
-            // Get current progress and advance it
-            const zones = await window.api.db.getZoneProgress(worldId);
-            const zone = zones?.find(z => z.zone_type === zoneType);
-            const current = zone?.build_progress ?? 0;
-            // Each successful task adds 0.08–0.15 progress
-            const delta = success ? (0.08 + Math.random() * 0.07) : 0.02;
-            const next = Math.min(1.0, current + delta);
-            await window.api.db.updateZoneProgress(worldId, zoneType, next);
-            const bm = getBuildingManager();
-            if (bm) bm.setZoneProgress(zoneType, next);
-          } catch (err) {
-            console.warn('[boot] Could not update zone progress:', err.message);
-          }
-        });
-
-        // ── 9. Agent relationships + incident panel ───────────────
-        splash.setProgress(9, TOTAL_STEPS, 'Loading agent relationships...');
-        const incidentPanel = new IncidentPanel();
-        incidentPanel.mount();
-
-        const relationships = new AgentRelationshipSystem();
-        try {
-          const world = await window.api.db.getWorld(1);
-          if (world?.id) {
-            await relationships.init(world.id);
-            window.__claudeWorldId = world.id;
-            console.log('[boot] Agent relationships loaded');
-          }
-        } catch (err) {
-          console.warn('[boot] Could not init relationships:', err.message);
-        }
-
-        // ── 10. Morning briefing (once per day) ───────────────────────
-        splash.setProgress(10, TOTAL_STEPS, 'Checking morning briefing...');
-        try {
-          const briefing = new MorningBriefing();
-          if (briefing.tryShow()) {
-            console.log('[boot] Morning briefing shown');
-          }
-        } catch (err) {
-          console.warn('[boot] Morning briefing failed (non-critical):', err.message);
-        }
-
-        // ── 11. Reputation listener ────────────────────────────────────
-        splash.setProgress(11, TOTAL_STEPS, 'Starting reputation system...');
-        try {
-          const worldIdForRep = window.__claudeWorldId || 1;
-          initReputationListener(worldIdForRep);
-          console.log('[boot] Reputation listener started');
-        } catch (err) {
-          console.warn('[boot] Reputation listener failed (non-critical):', err.message);
-        }
-
-        // ── 12. Identity panel — open on avatar-click ──────────────────
-        splash.setProgress(12, TOTAL_STEPS, 'Wiring identity panel...');
-        try {
-          document.addEventListener('hud:avatar-click', () => {
-            if (typeof ui !== 'undefined' && ui?.panels) {
-              ui.panels.openZone('identity', 'Identity');
-            }
-          });
-        } catch (err) {
-          console.warn('[boot] Identity panel wiring failed (non-critical):', err.message);
-        }
-
-        // ── 13. Theme engine (apply saved theme immediately) ───────────
-        splash.setProgress(13, TOTAL_STEPS, 'Applying theme...');
-        let themeEngine = null;
-        try {
-          themeEngine = initThemes();
-          const themePicker = initThemePicker(themeEngine);
-          window.__themeEngine = themeEngine;
-          // Update PixiJS renderer colors when theme changes
-          document.addEventListener('theme:changed', (e) => {
-            const bm = getBuildingManager();
-            if (bm) bm.setThemeTint?.(e.detail.theme.buildingTint);
-          });
-          console.log('[boot] Theme engine started:', themeEngine.getCurrent());
-        } catch (err) {
-          console.warn('[boot] Theme engine failed (non-critical):', err.message);
-        }
-
-        // ── 14. Celebrations & Audio ───────────────────────────────────
-        splash.setProgress(14, TOTAL_STEPS, 'Initializing audio...');
-        let audio = null;
-        try {
-          const celebrations = initCelebrations();
-          audio = initAudio();
-          window.__audio = audio;
-          const sfx = initSoundEffects(audio?._ctx);
-          window.__soundEffects = sfx;
-
-          // Zone-specific ambient soundscapes (shares AudioContext with main audio)
-          // Lazy-init: ZoneAmbience needs a running AudioContext, which is created
-          // on first user gesture inside AudioSystem. We listen for the first
-          // zone-click to bootstrap it if the context exists by then.
-          let zoneAmbience = null;
-          function ensureZoneAmbience() {
-            if (zoneAmbience) return;
-            const ctx = audio?._ctx;
-            if (!ctx) return;
-            zoneAmbience = new ZoneAmbience(ctx);
-            window.__zoneAmbience = zoneAmbience;
-            console.log('[boot] ZoneAmbience initialized');
-          }
-          document.addEventListener('zone-click', () => ensureZoneAmbience());
-
-          console.log('[boot] Celebrations + Audio initialized');
-        } catch (err) {
-          console.warn('[boot] Audio/Celebrations init failed (non-critical):', err.message);
-        }
-
-        // ── 15. Agent personalities + thought bubbles ─────────────────
-        splash.setProgress(15, TOTAL_STEPS, 'Loading agent personalities...');
-        try {
-          const personalities = initPersonalityEngine();
-          const canvas = document.getElementById('world-canvas');
-          const thoughtBubbles = new ThoughtBubbles(canvas, personalities);
-          window.__personalities = personalities;
-          console.log('[boot] Agent personalities loaded');
-        } catch (err) {
-          console.warn('[boot] Agent personalities failed (non-critical):', err.message);
-        }
-
-        // ── 15b. Quality manager (before VFX so systems read settings) ─
-        splash.setProgress(16, TOTAL_STEPS, 'Detecting quality settings...');
-        try {
-          const quality = getQualityManager({ firstRun: true });
-          window.__quality = quality;
-          console.log('[boot] Quality manager initialized — preset:', quality.getPreset());
-        } catch (err) {
-          console.warn('[boot] Quality manager failed (non-critical):', err.message);
-        }
-
-        // ── 16. VFX system + City Life ────────────────────────────────
-        splash.setProgress(16, TOTAL_STEPS, 'Starting VFX engine...');
-        try {
-          const pixiApp = getApp();
-          if (pixiApp) {
-            const vfx = initVFX(pixiApp);
-            window.__vfx = vfx;
-            const particles = initParticles(pixiApp);
-            window.__particles = particles;
-            console.log('[boot] ParticleSystem started');
-            const cityLife = initCityLife(pixiApp, pixiApp.stage);
-            window.__cityLife = cityLife;
-            console.log('[boot] VFX + CityLife started');
-
-            // Data flow visualization (after buildings are initialized)
-            const bm = getBuildingManager();
-            if (bm) {
-              const dataFlows = initDataFlows(pixiApp, bm);
-              pixiApp.stage.addChild(dataFlows.container);
-              window.__dataFlows = dataFlows;
-              console.log('[boot] DataFlowSystem started');
-            }
-          }
-        } catch (err) {
-          console.warn('[boot] VFX init failed (non-critical):', err.message);
-        }
-
-        // ── 17. Cinematic onboarding cinema hook ──────────────────────
-        splash.setProgress(17, TOTAL_STEPS, 'Preparing cinematic engine...');
-        document.addEventListener('onboarding:complete', async (e) => {
-          const wId = e.detail?.worldId || 1;
-          try {
-            const w = await window.api.db.getWorld(wId);
-            if (w?.name) {
-              const cinema = new OnboardingCinema({
-                getCamera,
-                getBuildingManager,
-              });
-              await cinema.play(wId, w.name);
+            if (world?.id) {
+              await relationships.init(world.id);
+              window.__claudeWorldId = world.id;
+              console.log("[boot] Agent relationships loaded");
             }
           } catch (err) {
-            console.warn('[boot] Cinema failed (non-critical):', err.message);
+            console.warn("[boot] Could not init relationships:", err.message);
           }
 
-          // After cinema, check if any API key is configured.
-          // If not, show a gentle nudge to connect a provider.
+          // ── 10. Morning briefing (once per day) ───────────────────────
+          splash.setProgress(10, TOTAL_STEPS, "Checking morning briefing...");
           try {
-            const keys = (window.api?.keys?.list) ? await window.api.keys.list() : [];
-            const hasActiveKey = keys.some(k => k.is_active);
-            if (!hasActiveKey) {
-              setTimeout(() => {
-                if (window.__notifications) {
-                  window.__notifications.show({
-                    title: 'Connect an AI provider',
-                    body: 'Add an API key in Connector Docks to unlock your agents.',
-                    type: 'info',
-                    duration: 8000,
-                    action: () => {
-                      document.dispatchEvent(new CustomEvent('zone:open', {
-                        detail: { zone: 'docks' }, bubbles: true,
-                      }));
-                    },
-                  });
-                }
-              }, 2500);
+            const briefing = new MorningBriefing();
+            if (briefing.tryShow()) {
+              console.log("[boot] Morning briefing shown");
             }
           } catch (err) {
-            // Non-critical — don't block boot
-            console.warn('[boot] API key check failed (non-critical):', err.message);
+            console.warn(
+              "[boot] Morning briefing failed (non-critical):",
+              err.message,
+            );
           }
-        });
 
-        // ── 18. Wire mission-control quick-open ───────────────────────
-        splash.setProgress(18, TOTAL_STEPS, 'Connecting mission control...');
-        document.addEventListener('command:mission-control', () => {
-          ui?.panels?.openZone('mission-control', 'Mission Control');
-        });
-
-        // ── 19. Notification center ──────────────────────────────────
-        splash.setProgress(19, TOTAL_STEPS, 'Mounting notifications...');
-        const notifications = new NotificationCenter();
-        notifications.mount();
-        window.__notifications = notifications;
-        console.log('[boot] Notification center mounted');
-
-        // ── 20. Standalone minimap ───────────────────────────────────
-        splash.setProgress(20, TOTAL_STEPS, 'Mounting minimap...');
-        try {
-          const cam = getCamera();
-          const bm = getBuildingManager();
-          const worldCanvas = document.getElementById('world-canvas');
-          if (cam && bm && worldCanvas) {
-            const minimap = new Minimap(worldCanvas, cam, bm);
-            minimap.mount();
-            window.__minimap = minimap;
-            console.log('[boot] Minimap mounted');
-          }
-        } catch (err) {
-          console.warn('[boot] Minimap init failed (non-critical):', err.message);
-        }
-
-        // ── 21. Activity feed ─────────────────────────────────────────
-        splash.setProgress(21, TOTAL_STEPS, 'Starting activity feed...');
-        try {
-          const activityFeed = new ActivityFeed();
-          activityFeed.mount();
-          window.__activityFeed = activityFeed;
-          console.log('[boot] Activity feed mounted');
-        } catch (err) {
-          console.warn('[boot] Activity feed init failed (non-critical):', err.message);
-        }
-
-        // ── 22. Agent sprites on the isometric map ───────────────────
-        splash.setProgress(22, TOTAL_STEPS, 'Spawning agents...');
-        try {
-          const pixiApp = getApp();
-          if (pixiApp) {
-            const agentSprites = initAgentSprites(pixiApp, pixiApp.stage);
-            window.__agentSprites = agentSprites;
-            console.log('[boot] Agent sprites spawned');
-          }
-        } catch (err) {
-          console.warn('[boot] Agent sprites init failed (non-critical):', err.message);
-        }
-
-        // ── 23. Zone tooltips ────────────────────────────────────────
-        splash.setProgress(23, TOTAL_STEPS, 'Enabling tooltips...');
-        try {
-          const cam = getCamera();
-          const bm = getBuildingManager();
-          const worldCanvas = document.getElementById('world-canvas');
-          if (ui.mountTooltips) {
-            ui.mountTooltips(worldCanvas, cam, bm);
-            console.log('[boot] Zone tooltips enabled');
-          }
-        } catch (err) {
-          console.warn('[boot] Tooltips init failed (non-critical):', err.message);
-        }
-
-        // ── 24. Drag-drop zone rearranging ─────────────────────────
-        splash.setProgress(24, TOTAL_STEPS, 'Enabling drag & drop...');
-        try {
-          const cam = getCamera();
-          const bm = getBuildingManager();
-          const pixiApp = getApp();
-          if (pixiApp && cam && bm) {
-            const dragDrop = new DragDropSystem(pixiApp, cam, bm);
-            dragDrop.enable();
-            window.__dragDrop = dragDrop;
-            console.log('[boot] Drag-drop enabled');
-          }
-        } catch (err) {
-          console.warn('[boot] Drag-drop init failed (non-critical):', err.message);
-        }
-
-        // ── 25. Context menu ─────────────────────────────────────────
-        splash.setProgress(25, TOTAL_STEPS, 'Enabling context menu...');
-        try {
-          const cam = getCamera();
-          const bm = getBuildingManager();
-          const worldCanvas = document.getElementById('world-canvas');
-          if (worldCanvas && cam && bm) {
-            const ctxMenu = new ContextMenu(worldCanvas, cam, bm);
-            ctxMenu.enable();
-            window.__contextMenu = ctxMenu;
-            console.log('[boot] Context menu enabled');
-          }
-        } catch (err) {
-          console.warn('[boot] Context menu init failed (non-critical):', err.message);
-        }
-
-        // ── 26. Achievements engine ──────────────────────────────────
-        splash.setProgress(26, TOTAL_STEPS, 'Loading achievements...');
-        try {
-          const achieveEngine = getAchievementEngine();
-          const wid = window.__claudeWorldId || 1;
-          await achieveEngine.init(wid);
-          window.__achievements = achieveEngine;
-          console.log('[boot] Achievements loaded');
-        } catch (err) {
-          console.warn('[boot] Achievements init failed (non-critical):', err.message);
-        }
-
-        // ── 27. Tutorial system ──────────────────────────────────────
-        splash.setProgress(27, TOTAL_STEPS, 'Preparing tutorials...');
-        try {
-          const tutorials = new TutorialEngine();
-          window.__tutorials = tutorials;
-          // Auto-start "Getting Started" for first-time users
-          if (!tutorials.isComplete('getting-started') && onboarding.isComplete()) {
-            setTimeout(() => tutorials.start('getting-started'), 2000);
-          }
-          console.log('[boot] Tutorial system ready');
-        } catch (err) {
-          console.warn('[boot] Tutorial init failed (non-critical):', err.message);
-        }
-
-        // ── 28. Focus / Zen mode ────────────────────────────────────
-        splash.setProgress(28, TOTAL_STEPS, 'Enabling focus mode...');
-        try {
-          const focusMode = new FocusMode({
-            getCamera,
-            getDayNight: () => window.__dayNight,
-          });
-          window.__focusMode = focusMode;
-          console.log('[boot] Focus mode ready (Cmd+Shift+F or F11)');
-        } catch (err) {
-          console.warn('[boot] Focus mode init failed (non-critical):', err.message);
-        }
-
-        // ── 29. Task streaming visualizer ────────────────────────────
-        splash.setProgress(29, TOTAL_STEPS, 'Mounting task stream...');
-        try {
-          const taskStream = new TaskStream();
-          taskStream.mount();
-          window.__taskStream = taskStream;
-          console.log('[boot] Task stream mounted');
-        } catch (err) {
-          console.warn('[boot] Task stream init failed (non-critical):', err.message);
-        }
-
-        // ── 30. Agent chat ──────────────────────────────────────────
-        splash.setProgress(30, TOTAL_STEPS, 'Enabling agent chat...');
-        try {
-          const agentChat = new AgentChat();
-          window.__agentChat = agentChat;
-          // Wire agent-click events to open chat
-          document.addEventListener('agent-click', (e) => {
-            agentChat.open(e.detail);
-          });
-          console.log('[boot] Agent chat ready');
-        } catch (err) {
-          console.warn('[boot] Agent chat init failed (non-critical):', err.message);
-        }
-
-        // Wire agent-click to open Agent Profile zone
-        document.addEventListener('agent-click', (e) => {
+          // ── 11. Reputation listener ────────────────────────────────────
+          splash.setProgress(11, TOTAL_STEPS, "Starting reputation system...");
           try {
-            const agentKey = e.detail?.agentKey || e.detail?.agentId || 'commander';
-            window.__agentProfileTarget = agentKey;
-            ui.panels.openZone('agent-profile', 'Agent Profile');
-          } catch (err) { console.warn('[boot] AgentProfile open:', err.message); }
-        });
-
-        // ── 31. Status bar ────────────────────────────────────────────
-        splash.setProgress(31, TOTAL_STEPS, 'Mounting status bar...');
-        try {
-          const statusBar = new StatusBar();
-          statusBar.mount();
-          window.__statusBar = statusBar;
-          // Set initial values from world state
-          try {
-            const world = await window.api.db.getWorld(window.__claudeWorldId || 1);
-            statusBar.setWorldName(world?.name || 'Claude World');
-          } catch (_) {
-            statusBar.setWorldName('Claude World');
+            const worldIdForRep = window.__claudeWorldId || 1;
+            initReputationListener(worldIdForRep);
+            console.log("[boot] Reputation listener started");
+          } catch (err) {
+            console.warn(
+              "[boot] Reputation listener failed (non-critical):",
+              err.message,
+            );
           }
-          statusBar.setZone('home');
-          console.log('[boot] Status bar mounted');
+
+          // ── 12. Identity panel — open on avatar-click ──────────────────
+          splash.setProgress(12, TOTAL_STEPS, "Wiring identity panel...");
+          try {
+            document.addEventListener("hud:avatar-click", () => {
+              if (typeof ui !== "undefined" && ui?.panels) {
+                ui.panels.openZone("identity", "Identity");
+              }
+            });
+          } catch (err) {
+            console.warn(
+              "[boot] Identity panel wiring failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 13. Theme engine (apply saved theme immediately) ───────────
+          splash.setProgress(13, TOTAL_STEPS, "Applying theme...");
+          let themeEngine = null;
+          try {
+            themeEngine = initThemes();
+            const themePicker = initThemePicker(themeEngine);
+            window.__themeEngine = themeEngine;
+            // Update PixiJS renderer colors when theme changes
+            document.addEventListener("theme:changed", (e) => {
+              const bm = getBuildingManager();
+              if (bm) bm.setThemeTint?.(e.detail.theme.buildingTint);
+            });
+            console.log(
+              "[boot] Theme engine started:",
+              themeEngine.getCurrent(),
+            );
+          } catch (err) {
+            console.warn(
+              "[boot] Theme engine failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 14. Celebrations & Audio ───────────────────────────────────
+          splash.setProgress(14, TOTAL_STEPS, "Initializing audio...");
+          let audio = null;
+          try {
+            const celebrations = initCelebrations();
+            audio = initAudio();
+            window.__audio = audio;
+            const sfx = initSoundEffects(audio?._ctx);
+            window.__soundEffects = sfx;
+
+            // Zone-specific ambient soundscapes (shares AudioContext with main audio)
+            // Lazy-init: ZoneAmbience needs a running AudioContext, which is created
+            // on first user gesture inside AudioSystem. We listen for the first
+            // zone-click to bootstrap it if the context exists by then.
+            let zoneAmbience = null;
+            function ensureZoneAmbience() {
+              if (zoneAmbience) return;
+              const ctx = audio?._ctx;
+              if (!ctx) return;
+              zoneAmbience = new ZoneAmbience(ctx);
+              window.__zoneAmbience = zoneAmbience;
+              console.log("[boot] ZoneAmbience initialized");
+            }
+            document.addEventListener("zone-click", () => ensureZoneAmbience());
+
+            console.log("[boot] Celebrations + Audio initialized");
+          } catch (err) {
+            console.warn(
+              "[boot] Audio/Celebrations init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 15. Agent personalities + thought bubbles ─────────────────
+          splash.setProgress(15, TOTAL_STEPS, "Loading agent personalities...");
+          try {
+            const personalities = initPersonalityEngine();
+            const canvas = document.getElementById("world-canvas");
+            const thoughtBubbles = new ThoughtBubbles(canvas, personalities);
+            window.__personalities = personalities;
+            console.log("[boot] Agent personalities loaded");
+          } catch (err) {
+            console.warn(
+              "[boot] Agent personalities failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 15b. Quality manager (before VFX so systems read settings) ─
+          splash.setProgress(16, TOTAL_STEPS, "Detecting quality settings...");
+          try {
+            const quality = getQualityManager({ firstRun: true });
+            window.__quality = quality;
+            console.log(
+              "[boot] Quality manager initialized — preset:",
+              quality.getPreset(),
+            );
+          } catch (err) {
+            console.warn(
+              "[boot] Quality manager failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 16. VFX system + City Life ────────────────────────────────
+          splash.setProgress(16, TOTAL_STEPS, "Starting VFX engine...");
+          try {
+            const pixiApp = getApp();
+            if (pixiApp) {
+              const vfx = initVFX(pixiApp);
+              window.__vfx = vfx;
+              const particles = initParticles(pixiApp);
+              window.__particles = particles;
+              console.log("[boot] ParticleSystem started");
+              const cityLife = initCityLife(pixiApp, pixiApp.stage);
+              window.__cityLife = cityLife;
+              console.log("[boot] VFX + CityLife started");
+
+              // Data flow visualization (after buildings are initialized)
+              const bm = getBuildingManager();
+              if (bm) {
+                const dataFlows = initDataFlows(pixiApp, bm);
+                pixiApp.stage.addChild(dataFlows.container);
+                window.__dataFlows = dataFlows;
+                console.log("[boot] DataFlowSystem started");
+              }
+            }
+          } catch (err) {
+            console.warn("[boot] VFX init failed (non-critical):", err.message);
+          }
+
+          // ── 17. Cinematic onboarding cinema hook ──────────────────────
+          splash.setProgress(17, TOTAL_STEPS, "Preparing cinematic engine...");
+          document.addEventListener("onboarding:complete", async (e) => {
+            const wId = e.detail?.worldId || 1;
+            try {
+              const w = await window.api.db.getWorld(wId);
+              if (w?.name) {
+                const cinema = new OnboardingCinema({
+                  getCamera,
+                  getBuildingManager,
+                });
+                await cinema.play(wId, w.name);
+              }
+            } catch (err) {
+              console.warn("[boot] Cinema failed (non-critical):", err.message);
+            }
+
+            // After cinema, check if any API key is configured.
+            // If not, show a gentle nudge to connect a provider.
+            try {
+              const keys = window.api?.keys?.list
+                ? await window.api.keys.list()
+                : [];
+              const hasActiveKey = keys.some((k) => k.is_active);
+              if (!hasActiveKey) {
+                setTimeout(() => {
+                  if (window.__notifications) {
+                    window.__notifications.show({
+                      title: "Connect an AI provider",
+                      body: "Add an API key in Connector Docks to unlock your agents.",
+                      type: "info",
+                      duration: 8000,
+                      action: () => {
+                        document.dispatchEvent(
+                          new CustomEvent("zone:open", {
+                            detail: { zone: "docks" },
+                            bubbles: true,
+                          }),
+                        );
+                      },
+                    });
+                  }
+                }, 2500);
+              }
+            } catch (err) {
+              // Non-critical — don't block boot
+              console.warn(
+                "[boot] API key check failed (non-critical):",
+                err.message,
+              );
+            }
+          });
+
+          // ── 18. Wire mission-control quick-open ───────────────────────
+          splash.setProgress(18, TOTAL_STEPS, "Connecting mission control...");
+          document.addEventListener("command:mission-control", () => {
+            ui?.panels?.openZone("mission-control", "Mission Control");
+          });
+
+          // ── 19. Notification center ──────────────────────────────────
+          splash.setProgress(19, TOTAL_STEPS, "Mounting notifications...");
+          const notifications = new NotificationCenter();
+          notifications.mount();
+          window.__notifications = notifications;
+          console.log("[boot] Notification center mounted");
+
+          // ── 20. Standalone minimap ───────────────────────────────────
+          splash.setProgress(20, TOTAL_STEPS, "Mounting minimap...");
+          try {
+            const cam = getCamera();
+            const bm = getBuildingManager();
+            const worldCanvas = document.getElementById("world-canvas");
+            if (cam && bm && worldCanvas) {
+              const minimap = new Minimap(worldCanvas, cam, bm);
+              minimap.mount();
+              window.__minimap = minimap;
+              console.log("[boot] Minimap mounted");
+            }
+          } catch (err) {
+            console.warn(
+              "[boot] Minimap init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 21. Activity feed ─────────────────────────────────────────
+          splash.setProgress(21, TOTAL_STEPS, "Starting activity feed...");
+          try {
+            const activityFeed = new ActivityFeed();
+            activityFeed.mount();
+            window.__activityFeed = activityFeed;
+            console.log("[boot] Activity feed mounted");
+          } catch (err) {
+            console.warn(
+              "[boot] Activity feed init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 22. Agent sprites on the isometric map ───────────────────
+          splash.setProgress(22, TOTAL_STEPS, "Spawning agents...");
+          try {
+            const pixiApp = getApp();
+            if (pixiApp) {
+              const agentSprites = initAgentSprites(pixiApp, pixiApp.stage);
+              window.__agentSprites = agentSprites;
+              console.log("[boot] Agent sprites spawned");
+            }
+          } catch (err) {
+            console.warn(
+              "[boot] Agent sprites init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 23. Zone tooltips ────────────────────────────────────────
+          splash.setProgress(23, TOTAL_STEPS, "Enabling tooltips...");
+          try {
+            const cam = getCamera();
+            const bm = getBuildingManager();
+            const worldCanvas = document.getElementById("world-canvas");
+            if (ui.mountTooltips) {
+              ui.mountTooltips(worldCanvas, cam, bm);
+              console.log("[boot] Zone tooltips enabled");
+            }
+          } catch (err) {
+            console.warn(
+              "[boot] Tooltips init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 24. Drag-drop zone rearranging ─────────────────────────
+          splash.setProgress(24, TOTAL_STEPS, "Enabling drag & drop...");
+          try {
+            const cam = getCamera();
+            const bm = getBuildingManager();
+            const pixiApp = getApp();
+            if (pixiApp && cam && bm) {
+              const dragDrop = new DragDropSystem(pixiApp, cam, bm);
+              dragDrop.enable();
+              window.__dragDrop = dragDrop;
+              console.log("[boot] Drag-drop enabled");
+            }
+          } catch (err) {
+            console.warn(
+              "[boot] Drag-drop init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 25. Context menu ─────────────────────────────────────────
+          splash.setProgress(25, TOTAL_STEPS, "Enabling context menu...");
+          try {
+            const cam = getCamera();
+            const bm = getBuildingManager();
+            const worldCanvas = document.getElementById("world-canvas");
+            if (worldCanvas && cam && bm) {
+              const ctxMenu = new ContextMenu(worldCanvas, cam, bm);
+              ctxMenu.enable();
+              window.__contextMenu = ctxMenu;
+              console.log("[boot] Context menu enabled");
+            }
+          } catch (err) {
+            console.warn(
+              "[boot] Context menu init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 26. Achievements engine ──────────────────────────────────
+          splash.setProgress(26, TOTAL_STEPS, "Loading achievements...");
+          try {
+            const achieveEngine = getAchievementEngine();
+            const wid = window.__claudeWorldId || 1;
+            await achieveEngine.init(wid);
+            window.__achievements = achieveEngine;
+            console.log("[boot] Achievements loaded");
+          } catch (err) {
+            console.warn(
+              "[boot] Achievements init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 27. Tutorial system ──────────────────────────────────────
+          splash.setProgress(27, TOTAL_STEPS, "Preparing tutorials...");
+          try {
+            const tutorials = new TutorialEngine();
+            window.__tutorials = tutorials;
+            // Auto-start "Getting Started" for first-time users
+            if (
+              !tutorials.isComplete("getting-started") &&
+              onboarding.isComplete()
+            ) {
+              setTimeout(() => tutorials.start("getting-started"), 2000);
+            }
+            console.log("[boot] Tutorial system ready");
+          } catch (err) {
+            console.warn(
+              "[boot] Tutorial init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 28. Focus / Zen mode ────────────────────────────────────
+          splash.setProgress(28, TOTAL_STEPS, "Enabling focus mode...");
+          try {
+            const focusMode = new FocusMode({
+              getCamera,
+              getDayNight: () => window.__dayNight,
+            });
+            window.__focusMode = focusMode;
+            console.log("[boot] Focus mode ready (Cmd+Shift+F or F11)");
+          } catch (err) {
+            console.warn(
+              "[boot] Focus mode init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 29. Task streaming visualizer ────────────────────────────
+          splash.setProgress(29, TOTAL_STEPS, "Mounting task stream...");
+          try {
+            const taskStream = new TaskStream();
+            taskStream.mount();
+            window.__taskStream = taskStream;
+            console.log("[boot] Task stream mounted");
+          } catch (err) {
+            console.warn(
+              "[boot] Task stream init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 30. Agent chat ──────────────────────────────────────────
+          splash.setProgress(30, TOTAL_STEPS, "Enabling agent chat...");
+          try {
+            const agentChat = new AgentChat();
+            window.__agentChat = agentChat;
+            // Wire agent-click events to open chat
+            document.addEventListener("agent-click", (e) => {
+              agentChat.open(e.detail);
+            });
+            console.log("[boot] Agent chat ready");
+          } catch (err) {
+            console.warn(
+              "[boot] Agent chat init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // Wire agent-click to open Agent Profile zone
+          document.addEventListener("agent-click", (e) => {
+            try {
+              const agentKey =
+                e.detail?.agentKey || e.detail?.agentId || "commander";
+              window.__agentProfileTarget = agentKey;
+              ui.panels.openZone("agent-profile", "Agent Profile");
+            } catch (err) {
+              console.warn("[boot] AgentProfile open:", err.message);
+            }
+          });
+
+          // ── 31. Status bar ────────────────────────────────────────────
+          splash.setProgress(31, TOTAL_STEPS, "Mounting status bar...");
+          try {
+            const statusBar = new StatusBar();
+            statusBar.mount();
+            window.__statusBar = statusBar;
+            // Set initial values from world state
+            try {
+              const world = await window.api.db.getWorld(
+                window.__claudeWorldId || 1,
+              );
+              statusBar.setWorldName(world?.name || "Claude World");
+            } catch (_) {
+              statusBar.setWorldName("Claude World");
+            }
+            statusBar.setZone("home");
+            console.log("[boot] Status bar mounted");
+          } catch (err) {
+            console.warn(
+              "[boot] Status bar init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── 32. Performance monitor (dev only) ───────────────────────
+          splash.setProgress(32, TOTAL_STEPS, "Ready!");
+          try {
+            const perfMonitor = new PerfMonitor();
+            window.__perfMonitor = perfMonitor;
+            console.log("[boot] Perf monitor ready (Cmd+Shift+P to toggle)");
+          } catch (err) {
+            console.warn(
+              "[boot] Perf monitor init failed (non-critical):",
+              err.message,
+            );
+          }
+
+          // ── Done — fade out the splash screen ────────────────────────
+          await splash.fadeOut();
+          console.log("[boot] Splash screen dismissed");
+
+          // Open home dashboard as the default zone
+          if (onboarding.isComplete()) {
+            ui.panels.openZone("home", "Home");
+            console.log("[boot] Home dashboard opened");
+          }
         } catch (err) {
-          console.warn('[boot] Status bar init failed (non-critical):', err.message);
-        }
-
-        // ── 32. Performance monitor (dev only) ───────────────────────
-        splash.setProgress(32, TOTAL_STEPS, 'Ready!');
-        try {
-          const perfMonitor = new PerfMonitor();
-          window.__perfMonitor = perfMonitor;
-          console.log('[boot] Perf monitor ready (Cmd+Shift+P to toggle)');
-        } catch (err) {
-          console.warn('[boot] Perf monitor init failed (non-critical):', err.message);
-        }
-
-        // ── Done — fade out the splash screen ────────────────────────
-        await splash.fadeOut();
-        console.log('[boot] Splash screen dismissed');
-
-        // Open home dashboard as the default zone
-        if (onboarding.isComplete()) {
-          ui.panels.openZone('home', 'Home');
-          console.log('[boot] Home dashboard opened');
-        }
-
-      } catch (err) {
-        console.error('[boot] Initialization failed:', err);
-        // Remove splash on error too
-        const splashEl = document.getElementById('splash');
-        if (splashEl) splashEl.remove();
-        document.body.innerHTML = `
+          console.error("[boot] Initialization failed:", err);
+          // Remove splash on error too
+          const splashEl = document.getElementById("splash");
+          if (splashEl) splashEl.remove();
+          document.body.innerHTML = `
           <div style="color: #ff4a6a; padding: 40px; font-family: monospace;">
             <h1>Claude World — Boot Error</h1>
             <pre>${err.message}\n${err.stack}</pre>
           </div>
         `;
+        }
       }
-    }
 
-    boot();
-  </script>
-</body>
+      boot();
+    </script>
+  </body>
 </html>

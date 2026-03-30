@@ -16,7 +16,7 @@
  *   tooltips.destroy();
  */
 
-import worldState from '../systems/world-state.js';
+import worldState from "../systems/world-state.js";
 
 // ── Config ──────────────────────────────────────────────────────────────
 
@@ -36,25 +36,31 @@ const THROTTLE_MS = 60;
 
 /** @type {Record<string, { icon: string, desc: string }>} */
 const ZONE_META = {
-  dispatch:   { icon: '\u{1F3E2}', desc: 'Central task dispatcher & orchestrator' },
-  brain:      { icon: '\u{1F4DA}', desc: 'Knowledge base & reasoning engine' },
-  chat:       { icon: '\u{1F4AC}', desc: 'Conversational interface rooms' },
-  memory:     { icon: '\u{1F5C4}\uFE0F', desc: 'Persistent memory & context vault' },
-  skills:     { icon: '\u{1F393}', desc: 'Agent skill training academy' },
-  minions:    { icon: '\u{26CF}\uFE0F', desc: 'Sub-agent tunnel network' },
-  treasury:   { icon: '\u{1F4B0}', desc: 'Budget & resource management' },
-  sales:      { icon: '\u{1F4C8}', desc: 'Revenue & outreach district' },
-  marketing:  { icon: '\u{1F4E3}', desc: 'Campaign & brand plaza' },
-  exchange:   { icon: '\u{1F504}', desc: 'API & data exchange hub' },
-  market:     { icon: '\u{1F6D2}', desc: 'Marketplace for tools & plugins' },
-  council:    { icon: '\u{1F3DB}\uFE0F', desc: 'Governance & decision council' },
-  rnd:        { icon: '\u{1F52C}', desc: 'Research & development lab' },
-  legal:      { icon: '\u{2696}\uFE0F', desc: 'Compliance & policy tower' },
-  archive:    { icon: '\u{1F4DC}', desc: 'Historical data archive' },
-  docks:      { icon: '\u{2693}', desc: 'External connector docks' },
-  airport:    { icon: '\u{2708}\uFE0F', desc: 'Cross-platform transit hub' },
-  globe:      { icon: '\u{1F310}', desc: 'Global communications room' },
-  broadcast:  { icon: '\u{1F4E1}', desc: 'Broadcast & notification tower' },
+  dispatch: {
+    icon: "\u{1F3E2}",
+    desc: "Central task dispatcher & orchestrator",
+  },
+  brain: { icon: "\u{1F4DA}", desc: "Knowledge base & reasoning engine" },
+  chat: { icon: "\u{1F4AC}", desc: "Conversational interface rooms" },
+  memory: {
+    icon: "\u{1F5C4}\uFE0F",
+    desc: "Persistent memory & context vault",
+  },
+  skills: { icon: "\u{1F393}", desc: "Agent skill training academy" },
+  minions: { icon: "\u{26CF}\uFE0F", desc: "Sub-agent tunnel network" },
+  treasury: { icon: "\u{1F4B0}", desc: "Budget & resource management" },
+  sales: { icon: "\u{1F4C8}", desc: "Revenue & outreach district" },
+  marketing: { icon: "\u{1F4E3}", desc: "Campaign & brand plaza" },
+  exchange: { icon: "\u{1F504}", desc: "API & data exchange hub" },
+  market: { icon: "\u{1F6D2}", desc: "Marketplace for tools & plugins" },
+  council: { icon: "\u{1F3DB}\uFE0F", desc: "Governance & decision council" },
+  rnd: { icon: "\u{1F52C}", desc: "Research & development lab" },
+  legal: { icon: "\u{2696}\uFE0F", desc: "Compliance & policy tower" },
+  archive: { icon: "\u{1F4DC}", desc: "Historical data archive" },
+  docks: { icon: "\u{2693}", desc: "External connector docks" },
+  airport: { icon: "\u{2708}\uFE0F", desc: "Cross-platform transit hub" },
+  globe: { icon: "\u{1F310}", desc: "Global communications room" },
+  broadcast: { icon: "\u{1F4E1}", desc: "Broadcast & notification tower" },
 };
 
 // ── Helpers ─────────────────────────────────────────────────────────────
@@ -64,66 +70,66 @@ const ZONE_META = {
  * references to the dynamic inner nodes.
  */
 function createTooltipDOM() {
-  const root = document.createElement('div');
-  root.className = 'zone-tooltip';
-  root.setAttribute('role', 'tooltip');
+  const root = document.createElement("div");
+  root.className = "zone-tooltip";
+  root.setAttribute("role", "tooltip");
 
-  const caret = document.createElement('div');
-  caret.className = 'zone-tooltip__caret';
+  const caret = document.createElement("div");
+  caret.className = "zone-tooltip__caret";
 
-  const card = document.createElement('div');
-  card.className = 'zone-tooltip__card';
+  const card = document.createElement("div");
+  card.className = "zone-tooltip__card";
 
   // Header
-  const header = document.createElement('div');
-  header.className = 'zone-tooltip__header';
+  const header = document.createElement("div");
+  header.className = "zone-tooltip__header";
 
-  const icon = document.createElement('span');
-  icon.className = 'zone-tooltip__icon';
+  const icon = document.createElement("span");
+  icon.className = "zone-tooltip__icon";
 
-  const name = document.createElement('span');
-  name.className = 'zone-tooltip__name';
+  const name = document.createElement("span");
+  name.className = "zone-tooltip__name";
 
-  const lockedTag = document.createElement('span');
-  lockedTag.className = 'zone-tooltip__locked-tag';
+  const lockedTag = document.createElement("span");
+  lockedTag.className = "zone-tooltip__locked-tag";
 
   header.append(icon, name, lockedTag);
 
   // Description
-  const desc = document.createElement('div');
-  desc.className = 'zone-tooltip__desc';
+  const desc = document.createElement("div");
+  desc.className = "zone-tooltip__desc";
 
   // Progress row
-  const progressRow = document.createElement('div');
-  progressRow.className = 'zone-tooltip__progress';
+  const progressRow = document.createElement("div");
+  progressRow.className = "zone-tooltip__progress";
 
-  const progressTrack = document.createElement('div');
-  progressTrack.className = 'zone-tooltip__progress-track';
+  const progressTrack = document.createElement("div");
+  progressTrack.className = "zone-tooltip__progress-track";
 
-  const progressFill = document.createElement('div');
-  progressFill.className = 'zone-tooltip__progress-fill';
+  const progressFill = document.createElement("div");
+  progressFill.className = "zone-tooltip__progress-fill";
 
   progressTrack.appendChild(progressFill);
 
-  const progressLabel = document.createElement('span');
-  progressLabel.className = 'zone-tooltip__progress-label';
+  const progressLabel = document.createElement("span");
+  progressLabel.className = "zone-tooltip__progress-label";
 
   progressRow.append(progressTrack, progressLabel);
 
   // Footer
-  const footer = document.createElement('div');
-  footer.className = 'zone-tooltip__footer';
+  const footer = document.createElement("div");
+  footer.className = "zone-tooltip__footer";
 
-  const agents = document.createElement('span');
-  agents.className = 'zone-tooltip__agents';
+  const agents = document.createElement("span");
+  agents.className = "zone-tooltip__agents";
 
-  const status = document.createElement('span');
-  status.className = 'zone-tooltip__status';
+  const status = document.createElement("span");
+  status.className = "zone-tooltip__status";
 
-  const statusDot = document.createElement('span');
-  statusDot.className = 'zone-tooltip__status-dot';
+  const statusDot = document.createElement("span");
+  statusDot.className = "zone-tooltip__status-dot";
 
-  const statusLabel = document.createElement('span');
+  const statusLabel = document.createElement("span");
 
   status.append(statusDot, statusLabel);
   footer.append(agents, status);
@@ -193,8 +199,8 @@ export class ZoneTooltips {
       this._mounted = true;
     }
 
-    this._canvas.addEventListener('mousemove', this._onMouseMove);
-    this._canvas.addEventListener('mouseleave', this._onMouseLeave);
+    this._canvas.addEventListener("mousemove", this._onMouseMove);
+    this._canvas.addEventListener("mouseleave", this._onMouseLeave);
   }
 
   /** Deactivate the tooltip — removes listeners, hides tooltip. */
@@ -202,8 +208,8 @@ export class ZoneTooltips {
     if (!this._enabled) return;
     this._enabled = false;
 
-    this._canvas.removeEventListener('mousemove', this._onMouseMove);
-    this._canvas.removeEventListener('mouseleave', this._onMouseLeave);
+    this._canvas.removeEventListener("mousemove", this._onMouseMove);
+    this._canvas.removeEventListener("mouseleave", this._onMouseLeave);
     this._hide();
   }
 
@@ -275,7 +281,10 @@ export class ZoneTooltips {
   _show(zone, cx, cy) {
     this._currentZoneId = zone.id;
 
-    const meta = ZONE_META[zone.id] || { icon: '\u{1F3D7}\uFE0F', desc: 'Zone' };
+    const meta = ZONE_META[zone.id] || {
+      icon: "\u{1F3D7}\uFE0F",
+      desc: "Zone",
+    };
     const progress = this._bm.getZoneProgress(zone.id);
     const pct = Math.max(0, Math.min(100, Math.round(progress * 100)));
     const isLocked = !zone.active && progress === 0;
@@ -288,10 +297,10 @@ export class ZoneTooltips {
 
     // Locked tag
     if (isLocked) {
-      this._dom.lockedTag.textContent = '\u{1F512} Locked';
-      this._dom.lockedTag.style.display = '';
+      this._dom.lockedTag.textContent = "\u{1F512} Locked";
+      this._dom.lockedTag.style.display = "";
     } else {
-      this._dom.lockedTag.style.display = 'none';
+      this._dom.lockedTag.style.display = "none";
     }
 
     // Description
@@ -300,30 +309,35 @@ export class ZoneTooltips {
     // Progress bar
     const isComplete = pct >= 100;
     this._dom.progressFill.style.width = `${pct}%`;
-    this._dom.progressFill.classList.toggle('zone-tooltip__progress-fill--complete', isComplete);
+    this._dom.progressFill.classList.toggle(
+      "zone-tooltip__progress-fill--complete",
+      isComplete,
+    );
     this._dom.progressLabel.textContent = `${pct}%`;
 
     // Agent count
-    this._dom.agents.textContent = agentCount > 0
-      ? `${agentCount} agent${agentCount !== 1 ? 's' : ''}`
-      : 'No agents';
+    this._dom.agents.textContent =
+      agentCount > 0
+        ? `${agentCount} agent${agentCount !== 1 ? "s" : ""}`
+        : "No agents";
 
     // Status indicator
     let statusState;
     if (isLocked) {
-      statusState = 'locked';
+      statusState = "locked";
     } else if (isActive) {
-      statusState = 'active';
+      statusState = "active";
     } else {
-      statusState = 'idle';
+      statusState = "idle";
     }
 
     this._dom.statusDot.className = `zone-tooltip__status-dot zone-tooltip__status-dot--${statusState}`;
-    this._dom.statusLabel.textContent = statusState.charAt(0).toUpperCase() + statusState.slice(1);
+    this._dom.statusLabel.textContent =
+      statusState.charAt(0).toUpperCase() + statusState.slice(1);
 
     // Position and reveal
     this._position(cx, cy);
-    this._dom.root.classList.add('visible');
+    this._dom.root.classList.add("visible");
   }
 
   /**
@@ -334,7 +348,7 @@ export class ZoneTooltips {
     this._clearShowTimer();
     this._currentZoneId = null;
     this._pendingZone = null;
-    this._dom.root.classList.remove('visible');
+    this._dom.root.classList.remove("visible");
   }
 
   /**
@@ -379,9 +393,9 @@ export class ZoneTooltips {
     el.style.top = `${y}px`;
 
     // Update caret direction classes
-    el.classList.toggle('zone-tooltip--above', flipY);
-    el.classList.toggle('zone-tooltip--below', !flipY);
-    el.classList.toggle('zone-tooltip--flip-x', flipX);
+    el.classList.toggle("zone-tooltip--above", flipY);
+    el.classList.toggle("zone-tooltip--below", !flipY);
+    el.classList.toggle("zone-tooltip--flip-x", flipX);
   }
 
   /**

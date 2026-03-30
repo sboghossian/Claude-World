@@ -23,7 +23,9 @@
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   gap: 2px;
-  transition: opacity var(--transition-fast), height var(--transition-fast);
+  transition:
+    opacity var(--transition-fast),
+    height var(--transition-fast);
 }
 
 .workspace__tab-bar--hidden {
@@ -82,7 +84,7 @@
 }
 
 .workspace__tab--active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 4px;
@@ -94,7 +96,7 @@
 
 /* Split pane tab indicator */
 .workspace__tab--split::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 4px;

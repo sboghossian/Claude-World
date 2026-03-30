@@ -19,14 +19,14 @@ export class SplashScreen {
    * Loads the full CSS file and spawns floating particles.
    */
   constructor() {
-    this.el = document.getElementById('splash');
-    this.progressBar = this.el?.querySelector('.splash__progress-bar');
-    this.progressLabel = this.el?.querySelector('.splash__progress-label');
-    this.particlesContainer = this.el?.querySelector('.splash__particles');
+    this.el = document.getElementById("splash");
+    this.progressBar = this.el?.querySelector(".splash__progress-bar");
+    this.progressLabel = this.el?.querySelector(".splash__progress-label");
+    this.particlesContainer = this.el?.querySelector(".splash__particles");
     this._destroyed = false;
 
     if (!this.el) {
-      console.warn('[SplashScreen] No #splash element found — skipping.');
+      console.warn("[SplashScreen] No #splash element found — skipping.");
       return;
     }
 
@@ -39,8 +39,8 @@ export class SplashScreen {
     // After the typewriter finishes (~2s), mark the title as done
     // so the caret stops blinking
     this._titleTimer = setTimeout(() => {
-      const title = this.el.querySelector('.splash__title');
-      if (title) title.classList.add('splash__title--done');
+      const title = this.el.querySelector(".splash__title");
+      if (title) title.classList.add("splash__title--done");
     }, 2800);
   }
 
@@ -80,22 +80,22 @@ export class SplashScreen {
 
       // Fill progress bar to 100%
       if (this.progressBar) {
-        this.progressBar.style.width = '100%';
+        this.progressBar.style.width = "100%";
       }
       if (this.progressLabel) {
-        this.progressLabel.textContent = 'Ready';
+        this.progressLabel.textContent = "Ready";
       }
 
       // Short pause at 100% before fading
       setTimeout(() => {
-        this.el.classList.add('splash--hidden');
+        this.el.classList.add("splash--hidden");
 
         const onDone = () => {
-          this.el.removeEventListener('transitionend', onDone);
+          this.el.removeEventListener("transitionend", onDone);
           this._destroy();
           resolve();
         };
-        this.el.addEventListener('transitionend', onDone);
+        this.el.addEventListener("transitionend", onDone);
 
         // Safety timeout in case transitionend doesn't fire
         setTimeout(() => {
@@ -114,11 +114,11 @@ export class SplashScreen {
    * Load the full splash-screen.css stylesheet.
    */
   _loadCSS() {
-    if (document.getElementById('splash-screen-css')) return;
-    const link = document.createElement('link');
-    link.id = 'splash-screen-css';
-    link.rel = 'stylesheet';
-    link.href = '../ui/splash-screen.css';
+    if (document.getElementById("splash-screen-css")) return;
+    const link = document.createElement("link");
+    link.id = "splash-screen-css";
+    link.rel = "stylesheet";
+    link.href = "../ui/splash-screen.css";
     document.head.appendChild(link);
   }
 
@@ -130,18 +130,18 @@ export class SplashScreen {
     if (!this.particlesContainer) return;
 
     const colors = [
-      '#a855f7', // purple
-      '#7c3aed', // deeper purple
-      '#4a9eff', // blue
-      '#60a5fa', // light blue
-      '#f59e0b', // amber
-      '#fcd34d', // gold
-      '#c084fc', // lavender
+      "#a855f7", // purple
+      "#7c3aed", // deeper purple
+      "#4a9eff", // blue
+      "#60a5fa", // light blue
+      "#f59e0b", // amber
+      "#fcd34d", // gold
+      "#c084fc", // lavender
     ];
 
     for (let i = 0; i < count; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'splash__particle';
+      const dot = document.createElement("div");
+      dot.className = "splash__particle";
 
       const color = colors[Math.floor(Math.random() * colors.length)];
       const left = Math.random() * 100;
@@ -176,7 +176,7 @@ export class SplashScreen {
       this.el.parentNode.removeChild(this.el);
     }
     // Also remove the CSS link
-    const link = document.getElementById('splash-screen-css');
+    const link = document.getElementById("splash-screen-css");
     if (link) link.remove();
   }
 }

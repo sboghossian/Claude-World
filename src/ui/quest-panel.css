@@ -12,7 +12,9 @@
   justify-content: center;
   background: rgba(0, 0, 0, 0);
   backdrop-filter: blur(0px);
-  transition: background 250ms ease, backdrop-filter 250ms ease;
+  transition:
+    background 250ms ease,
+    backdrop-filter 250ms ease;
   pointer-events: auto;
 }
 
@@ -39,8 +41,9 @@
   overflow: hidden;
   transform: translateY(20px) scale(0.96);
   opacity: 0;
-  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1),
-              opacity 250ms ease;
+  transition:
+    transform 250ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 250ms ease;
 }
 
 .quest-panel-overlay--visible .quest-panel {
@@ -83,7 +86,9 @@
   font-size: 20px;
   cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .quest-panel__close:hover {
@@ -194,8 +199,13 @@
 }
 
 @keyframes quest-dot-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 158, 255, 0); }
-  50% { box-shadow: 0 0 10px 3px rgba(74, 158, 255, 0.3); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(74, 158, 255, 0);
+  }
+  50% {
+    box-shadow: 0 0 10px 3px rgba(74, 158, 255, 0.3);
+  }
 }
 
 .quest-panel__dot--locked {
@@ -219,7 +229,11 @@
 }
 
 .quest-panel__line--active {
-  background: linear-gradient(to bottom, var(--accent-blue), rgba(85, 85, 112, 0.3));
+  background: linear-gradient(
+    to bottom,
+    var(--accent-blue),
+    rgba(85, 85, 112, 0.3)
+  );
 }
 
 .quest-panel__line--locked {

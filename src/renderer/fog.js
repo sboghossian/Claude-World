@@ -5,12 +5,16 @@
  * toward the edges. Active zones punch through the fog.
  */
 
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics } from "pixi.js";
 import {
-  TILE_WIDTH, TILE_HEIGHT, GRID_SIZE, COLORS, FOG_OPACITY,
-} from './constants.js';
-import { tileToScreen } from './tiles.js';
-import { ZONE_DEFS } from './zones.js';
+  TILE_WIDTH,
+  TILE_HEIGHT,
+  GRID_SIZE,
+  COLORS,
+  FOG_OPACITY,
+} from "./constants.js";
+import { tileToScreen } from "./tiles.js";
+import { ZONE_DEFS } from "./zones.js";
 
 /**
  * Ring boundary definitions.
@@ -18,8 +22,8 @@ import { ZONE_DEFS } from './zones.js';
  * We approximate rings as distance-from-center bands.
  */
 const RING_BOUNDS = [
-  { ring: 0, minDist: 0,  maxDist: 5  },
-  { ring: 1, minDist: 5,  maxDist: 10 },
+  { ring: 0, minDist: 0, maxDist: 5 },
+  { ring: 1, minDist: 5, maxDist: 10 },
   { ring: 2, minDist: 10, maxDist: 15 },
   { ring: 3, minDist: 15, maxDist: 20 },
   { ring: 4, minDist: 20, maxDist: 40 },
@@ -48,11 +52,16 @@ function tileRing(tx, ty) {
  */
 function fogOpacityForRing(ring) {
   switch (ring) {
-    case 0: return FOG_OPACITY.ring0;
-    case 1: return FOG_OPACITY.ring1;
-    case 2: return FOG_OPACITY.ring2;
-    case 3: return FOG_OPACITY.ring3;
-    default: return FOG_OPACITY.edge;
+    case 0:
+      return FOG_OPACITY.ring0;
+    case 1:
+      return FOG_OPACITY.ring1;
+    case 2:
+      return FOG_OPACITY.ring2;
+    case 3:
+      return FOG_OPACITY.ring3;
+    default:
+      return FOG_OPACITY.edge;
   }
 }
 
@@ -97,10 +106,14 @@ export class FogOfWar {
 
           const { x: sx, y: sy } = tileToScreen(tx, ty);
           gfx.poly([
-            sx,      sy,
-            sx + hw, sy + hh / 2,
-            sx,      sy + hh,
-            sx - hw, sy + hh / 2,
+            sx,
+            sy,
+            sx + hw,
+            sy + hh / 2,
+            sx,
+            sy + hh,
+            sx - hw,
+            sy + hh / 2,
           ]);
           gfx.fill({ color: COLORS.fogColor, alpha: opacity });
         }

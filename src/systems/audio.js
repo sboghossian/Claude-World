@@ -4,8 +4,8 @@
 // No audio files required — everything is synthesized in-browser.
 // ============================================================
 
-const STORAGE_KEY_ENABLED = 'claude-world:audio-enabled';
-const STORAGE_KEY_VOLUME  = 'claude-world:audio-volume';
+const STORAGE_KEY_ENABLED = "claude-world:audio-enabled";
+const STORAGE_KEY_VOLUME = "claude-world:audio-volume";
 
 // ─── Helpers ─────────────────────────────────────────────────
 
@@ -34,7 +34,7 @@ function expRamp(gainNode, target, endTime, ctx) {
 function playTone(ctx, masterGain, opts) {
   const {
     freq,
-    type = 'sine',
+    type = "sine",
     duration,
     gain = 0.3,
     endGain = 0.0001,
@@ -133,7 +133,7 @@ export class AudioSystem {
     try {
       const storedEnabled = localStorage.getItem(STORAGE_KEY_ENABLED);
       if (storedEnabled !== null) {
-        this._enabled = storedEnabled !== 'false';
+        this._enabled = storedEnabled !== "false";
       }
       const storedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
       if (storedVolume !== null) {
@@ -161,7 +161,7 @@ export class AudioSystem {
 
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) {
-      console.warn('[AudioSystem] Web Audio API not supported.');
+      console.warn("[AudioSystem] Web Audio API not supported.");
       return;
     }
 
@@ -194,18 +194,18 @@ export class AudioSystem {
 
     // Lowpass filter to keep it sub-bass only
     const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
+    filter.type = "lowpass";
     filter.frequency.value = 200;
     filter.Q.value = 0.8;
 
     // Drone 1: 55 Hz sine
     const drone1 = ctx.createOscillator();
-    drone1.type = 'sine';
+    drone1.type = "sine";
     drone1.frequency.value = 55;
 
     // Drone 2: 110 Hz sine, slight detune for beat frequency
     const drone2 = ctx.createOscillator();
-    drone2.type = 'sine';
+    drone2.type = "sine";
     drone2.frequency.value = 110;
     drone2.detune.value = 5; // +5 cents
 
@@ -239,7 +239,10 @@ export class AudioSystem {
 
     osc.detune.linearRampToValueAtTime(nextDetune, ctx.currentTime + nextTime);
 
-    this._ambient.droneEvolveTimer = setTimeout(() => this._evolveDrone(), nextTime * 1000);
+    this._ambient.droneEvolveTimer = setTimeout(
+      () => this._evolveDrone(),
+      nextTime * 1000,
+    );
   }
 
   _scheduleNextBlip() {
@@ -258,7 +261,7 @@ export class AudioSystem {
 
     playTone(ctx, this._master, {
       freq,
-      type: 'sine',
+      type: "sine",
       duration: 0.05,
       gain: 0.05,
       endGain: 0.0001,
@@ -280,7 +283,7 @@ export class AudioSystem {
 
   _ready() {
     if (!this._ctx || !this._enabled) return false;
-    if (this._ctx.state === 'suspended') {
+    if (this._ctx.state === "suspended") {
       this._ctx.resume().catch(() => {});
     }
     return true;
@@ -306,7 +309,7 @@ export class AudioSystem {
     const playNote = (freq, startTime) => {
       const osc = ctx.createOscillator();
       const g = ctx.createGain();
-      osc.type = 'sine';
+      osc.type = "sine";
       osc.frequency.value = freq;
       g.gain.setValueAtTime(0.28, startTime);
       g.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.15);
@@ -337,11 +340,11 @@ export class AudioSystem {
     const curve = new Float32Array(256);
     for (let i = 0; i < 256; i++) {
       const x = (i * 2) / 256 - 1;
-      curve[i] = (Math.PI + 200) * x / (Math.PI + 200 * Math.abs(x));
+      curve[i] = ((Math.PI + 200) * x) / (Math.PI + 200 * Math.abs(x));
     }
     dist.curve = curve;
 
-    osc.type = 'sawtooth';
+    osc.type = "sawtooth";
     osc.frequency.setValueAtTime(80, now);
     osc.frequency.exponentialRampToValueAtTime(40, now + 0.15);
 
@@ -367,7 +370,7 @@ export class AudioSystem {
     const osc = ctx.createOscillator();
     const g = ctx.createGain();
 
-    osc.type = 'triangle';
+    osc.type = "triangle";
     osc.frequency.setValueAtTime(400, now);
     osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
 
@@ -390,7 +393,7 @@ export class AudioSystem {
     const ctx = this._ctx;
     const now = ctx.currentTime;
 
-    const notes = [261.63, 329.63, 392.00, 523.25]; // C4 E4 G4 C5
+    const notes = [261.63, 329.63, 392.0, 523.25]; // C4 E4 G4 C5
     const sendGain = ctx.createGain();
     sendGain.gain.value = 0.35;
     sendGain.connect(this._reverb);
@@ -403,7 +406,7 @@ export class AudioSystem {
       // Add a subtle harmonic
       const osc2 = ctx.createOscillator();
       const g2 = ctx.createGain();
-      osc2.type = 'sine';
+      osc2.type = "sine";
       osc2.frequency.value = freq * 2;
       g2.gain.setValueAtTime(0.06, startTime);
       g2.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.25);
@@ -412,7 +415,7 @@ export class AudioSystem {
       osc2.start(startTime);
       osc2.stop(startTime + 0.26);
 
-      osc.type = 'sine';
+      osc.type = "sine";
       osc.frequency.value = freq;
       const noteDuration = i === notes.length - 1 ? 0.5 : 0.2;
       g.gain.setValueAtTime(0.3, startTime);
@@ -442,7 +445,7 @@ export class AudioSystem {
 
     // Bandpass sweep for whoosh character
     const bandpass = ctx.createBiquadFilter();
-    bandpass.type = 'bandpass';
+    bandpass.type = "bandpass";
     bandpass.frequency.setValueAtTime(200, now);
     bandpass.frequency.exponentialRampToValueAtTime(2000, now + duration);
     bandpass.Q.value = 0.8;
@@ -476,7 +479,7 @@ export class AudioSystem {
     // Bell fundamental
     const osc = ctx.createOscillator();
     const g = ctx.createGain();
-    osc.type = 'sine';
+    osc.type = "sine";
     osc.frequency.value = 880;
     g.gain.setValueAtTime(0.22, now);
     g.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
@@ -489,7 +492,7 @@ export class AudioSystem {
     // Bell harmonic (inharmonic partial for bell character)
     const osc2 = ctx.createOscillator();
     const g2 = ctx.createGain();
-    osc2.type = 'sine';
+    osc2.type = "sine";
     osc2.frequency.value = 880 * 2.756; // inharmonic partial
     g2.gain.setValueAtTime(0.08, now);
     g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
@@ -509,7 +512,7 @@ export class AudioSystem {
     const now = ctx.currentTime;
 
     const fanfare = [
-      { freq: 392.00, start: 0,    dur: 0.18 }, // G4
+      { freq: 392.0, start: 0, dur: 0.18 }, // G4
       { freq: 523.25, start: 0.12, dur: 0.18 }, // C5
       { freq: 659.25, start: 0.24, dur: 0.18 }, // E5
       { freq: 783.99, start: 0.36, dur: 0.55 }, // G5 — long final
@@ -525,7 +528,7 @@ export class AudioSystem {
       // Fundamental
       const osc = ctx.createOscillator();
       const g = ctx.createGain();
-      osc.type = 'sine';
+      osc.type = "sine";
       osc.frequency.value = freq;
       g.gain.setValueAtTime(0.0001, startTime);
       g.gain.linearRampToValueAtTime(0.32, startTime + 0.02);
@@ -539,7 +542,7 @@ export class AudioSystem {
       // 5th harmonic for richness
       const osc3 = ctx.createOscillator();
       const g3 = ctx.createGain();
-      osc3.type = 'sine';
+      osc3.type = "sine";
       osc3.frequency.value = freq * 1.5;
       g3.gain.setValueAtTime(0.0001, startTime);
       g3.gain.linearRampToValueAtTime(0.09, startTime + 0.02);
@@ -567,7 +570,7 @@ export class AudioSystem {
       rampGain(this._master, enabled ? this._volume : 0, 0.3, this._ctx);
     }
 
-    if (enabled && this._ctx.state === 'suspended') {
+    if (enabled && this._ctx.state === "suspended") {
       this._ctx.resume().catch(() => {});
     }
   }
@@ -586,10 +589,14 @@ export class AudioSystem {
   }
 
   /** @returns {boolean} */
-  get enabled() { return this._enabled; }
+  get enabled() {
+    return this._enabled;
+  }
 
   /** @returns {number} */
-  get volume() { return this._volume; }
+  get volume() {
+    return this._volume;
+  }
 
   // ── Event bindings ───────────────────────────────────────
 
@@ -597,33 +604,33 @@ export class AudioSystem {
     // Lazy init on first user gesture
     const initOnce = () => {
       this.init();
-      window.removeEventListener('click', initOnce);
-      window.removeEventListener('keydown', initOnce);
+      window.removeEventListener("click", initOnce);
+      window.removeEventListener("keydown", initOnce);
     };
-    window.addEventListener('click', initOnce);
-    window.addEventListener('keydown', initOnce);
+    window.addEventListener("click", initOnce);
+    window.addEventListener("keydown", initOnce);
 
-    window.addEventListener('dispatch:task-complete', () => {
+    window.addEventListener("dispatch:task-complete", () => {
       this.playTaskComplete();
       // Small offset so the XP chirp hits just after the task sound
       setTimeout(() => this.playXPGain(), 120);
     });
 
-    window.addEventListener('quest:complete', () => {
+    window.addEventListener("quest:complete", () => {
       this.playQuestComplete();
     });
 
-    window.addEventListener('world:level-up', () => {
+    window.addEventListener("world:level-up", () => {
       this.playLevelUp();
     });
 
-    window.addEventListener('zone-click', () => {
+    window.addEventListener("zone-click", () => {
       this.playZoneOpen();
     });
 
-    window.addEventListener('toast:show', (e) => {
+    window.addEventListener("toast:show", (e) => {
       const type = e.detail?.type;
-      if (type === 'error') {
+      if (type === "error") {
         this.playError();
       } else {
         // success, info, default
@@ -631,7 +638,7 @@ export class AudioSystem {
       }
     });
 
-    window.addEventListener('onboarding:complete', () => {
+    window.addEventListener("onboarding:complete", () => {
       this.playLevelUp();
     });
   }

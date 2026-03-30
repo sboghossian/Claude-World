@@ -9,38 +9,50 @@
 // ── Constants ─────────────────────────────────────────────────────
 
 const SECTIONS = [
-  { id: 'export',  label: 'Export',  icon: '\u{1F4E4}' },
-  { id: 'import',  label: 'Import',  icon: '\u{1F4E5}' },
-  { id: 'share',   label: 'Share',   icon: '\u{1F517}' },
-  { id: 'stats',   label: 'Stats',   icon: '\u{1F4CA}' },
+  { id: "export", label: "Export", icon: "\u{1F4E4}" },
+  { id: "import", label: "Import", icon: "\u{1F4E5}" },
+  { id: "share", label: "Share", icon: "\u{1F517}" },
+  { id: "stats", label: "Stats", icon: "\u{1F4CA}" },
 ];
 
 const CONFLICT_MODES = [
-  { id: 'skip',      label: 'Skip existing',       desc: 'Keep current data, ignore conflicts' },
-  { id: 'overwrite', label: 'Overwrite',            desc: 'Replace current data with imported data' },
-  { id: 'merge',     label: 'Merge',                desc: 'Combine data, newer entries win' },
+  {
+    id: "skip",
+    label: "Skip existing",
+    desc: "Keep current data, ignore conflicts",
+  },
+  {
+    id: "overwrite",
+    label: "Overwrite",
+    desc: "Replace current data with imported data",
+  },
+  { id: "merge", label: "Merge", desc: "Combine data, newer entries win" },
 ];
 
-const FILE_EXTENSION = '.claude-world';
-const FILE_MIME = 'application/json';
+const FILE_EXTENSION = ".claude-world";
+const FILE_MIME = "application/json";
 
 // ── Helpers ───────────────────────────────────────────────────────
 
 function escapeHtml(str) {
-  const d = document.createElement('div');
+  const d = document.createElement("div");
   d.textContent = str;
   return d.innerHTML;
 }
 
 function formatDate(iso) {
-  if (!iso) return '\u2014';
+  if (!iso) return "\u2014";
   const d = new Date(iso);
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 function formatBytes(bytes) {
-  if (bytes === 0) return '0 B';
-  const units = ['B', 'KB', 'MB', 'GB'];
+  if (bytes === 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
   return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
@@ -55,7 +67,7 @@ function estimateJsonSize(obj) {
 
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);
@@ -76,7 +88,7 @@ function readFileAsText(file) {
 }
 
 function sanitizeFilename(name) {
-  return name.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 60);
+  return name.replace(/[^a-zA-Z0-9_-]/g, "_").substring(0, 60);
 }
 
 // ── Sharing class ─────────────────────────────────────────────────
@@ -88,7 +100,7 @@ export class Sharing {
   constructor(container) {
     /** @type {HTMLElement} */
     this._container = container;
-    this._container.classList.add('shr-root');
+    this._container.classList.add("shr-root");
 
     /** @type {string|null} */
     this._worldId = null;
@@ -97,7 +109,7 @@ export class Sharing {
     this._world = null;
 
     /** @type {string} */
-    this._activeSection = 'export';
+    this._activeSection = "export";
 
     /** @type {object|null} */
     this._exportData = null;
@@ -106,7 +118,7 @@ export class Sharing {
     this._importPreview = null;
 
     /** @type {string} */
-    this._conflictMode = 'skip';
+    this._conflictMode = "skip";
 
     /** @type {boolean} */
     this._isExporting = false;
@@ -118,7 +130,14 @@ export class Sharing {
     this._progress = 0;
 
     /** @type {object} */
-    this._stats = { zones: 0, tasks: 0, agents: 0, xp: 0, playTime: 0, health: 0 };
+    this._stats = {
+      zones: 0,
+      tasks: 0,
+      agents: 0,
+      xp: 0,
+      playTime: 0,
+      health: 0,
+    };
 
     /** @type {Array} */
     this._zones = [];
@@ -146,7 +165,7 @@ export class Sharing {
     }
 
     try {
-      this._zones = await window.api.db.getZones(worldId) || [];
+      this._zones = (await window.api.db.getZones(worldId)) || [];
     } catch (_) {
       this._zones = [];
     }
@@ -165,7 +184,7 @@ export class Sharing {
 
   /** Tear down. */
   destroy() {
-    this._container.innerHTML = '';
+    this._container.innerHTML = "";
   }
 
   // ── Stats loading ───────────────────────────────────────────────
@@ -178,22 +197,31 @@ export class Sharing {
     let agents = [];
     let achievements = [];
 
-    try { tasks = await window.api.db.getTasks(this._worldId, {}) || []; } catch (_) {}
-    try { agents = await window.api.db.getAgents(this._worldId) || []; } catch (_) {}
-    try { achievements = await window.api.db.getAchievements(this._worldId) || []; } catch (_) {}
+    try {
+      tasks = (await window.api.db.getTasks(this._worldId, {})) || [];
+    } catch (_) {}
+    try {
+      agents = (await window.api.db.getAgents(this._worldId)) || [];
+    } catch (_) {}
+    try {
+      achievements = (await window.api.db.getAchievements(this._worldId)) || [];
+    } catch (_) {}
 
-    const completedTasks = tasks.filter(t => t.status === 'done' || t.status === 'completed');
+    const completedTasks = tasks.filter(
+      (t) => t.status === "done" || t.status === "completed",
+    );
     const totalTasks = tasks.length;
-    const healthScore = totalTasks > 0
-      ? Math.round((completedTasks.length / totalTasks) * 100)
-      : 100;
+    const healthScore =
+      totalTasks > 0
+        ? Math.round((completedTasks.length / totalTasks) * 100)
+        : 100;
 
     this._stats = {
       zones: zones.length,
       tasks: totalTasks,
       agents: agents.length,
       xp: this._world?.xp || 0,
-      achievements: achievements.filter(a => a.unlocked_at).length,
+      achievements: achievements.filter((a) => a.unlocked_at).length,
       health: healthScore,
     };
   }
@@ -201,20 +229,28 @@ export class Sharing {
   // ── Rendering ───────────────────────────────────────────────────
 
   _render() {
-    this._container.innerHTML = '';
+    this._container.innerHTML = "";
 
     // Section nav
     this._container.appendChild(this._buildNav());
 
     // Content
-    const content = document.createElement('div');
-    content.className = 'shr-content';
+    const content = document.createElement("div");
+    content.className = "shr-content";
 
     switch (this._activeSection) {
-      case 'export': this._buildExport(content); break;
-      case 'import': this._buildImport(content); break;
-      case 'share':  this._buildShare(content); break;
-      case 'stats':  this._buildStats(content); break;
+      case "export":
+        this._buildExport(content);
+        break;
+      case "import":
+        this._buildImport(content);
+        break;
+      case "share":
+        this._buildShare(content);
+        break;
+      case "stats":
+        this._buildStats(content);
+        break;
     }
 
     this._container.appendChild(content);
@@ -223,14 +259,16 @@ export class Sharing {
   // ── Section nav ─────────────────────────────────────────────────
 
   _buildNav() {
-    const nav = document.createElement('div');
-    nav.className = 'shr-nav';
+    const nav = document.createElement("div");
+    nav.className = "shr-nav";
 
     for (const section of SECTIONS) {
-      const btn = document.createElement('button');
-      btn.className = 'shr-nav-btn' + (section.id === this._activeSection ? ' shr-nav-btn--active' : '');
+      const btn = document.createElement("button");
+      btn.className =
+        "shr-nav-btn" +
+        (section.id === this._activeSection ? " shr-nav-btn--active" : "");
       btn.innerHTML = `<span class="shr-nav-icon">${section.icon}</span><span>${section.label}</span>`;
-      btn.addEventListener('click', () => {
+      btn.addEventListener("click", () => {
         this._activeSection = section.id;
         this._render();
       });
@@ -244,29 +282,42 @@ export class Sharing {
 
   _buildExport(parent) {
     // Full world export
-    const fullCard = this._createCard('Export World', 'Download your entire world as a .claude-world file');
-    fullCard.appendChild(this._createBadge('JSON', 'blue'));
+    const fullCard = this._createCard(
+      "Export World",
+      "Download your entire world as a .claude-world file",
+    );
+    fullCard.appendChild(this._createBadge("JSON", "blue"));
 
-    const fullDesc = document.createElement('p');
-    fullDesc.className = 'shr-card-detail';
-    fullDesc.textContent = 'Includes all zones, tasks, agents, settings, achievements, and quest data.';
+    const fullDesc = document.createElement("p");
+    fullDesc.className = "shr-card-detail";
+    fullDesc.textContent =
+      "Includes all zones, tasks, agents, settings, achievements, and quest data.";
     fullCard.appendChild(fullDesc);
 
-    const fullActions = document.createElement('div');
-    fullActions.className = 'shr-card-actions';
+    const fullActions = document.createElement("div");
+    fullActions.className = "shr-card-actions";
 
-    const estimateBtn = this._createButton('Estimate Size', 'secondary', async () => {
-      const data = await this._fetchExportData();
-      if (data) {
-        const size = estimateJsonSize(data);
-        estimateBtn.textContent = `~${formatBytes(size)}`;
-        estimateBtn.classList.add('shr-btn--faded');
-      }
-    });
+    const estimateBtn = this._createButton(
+      "Estimate Size",
+      "secondary",
+      async () => {
+        const data = await this._fetchExportData();
+        if (data) {
+          const size = estimateJsonSize(data);
+          estimateBtn.textContent = `~${formatBytes(size)}`;
+          estimateBtn.classList.add("shr-btn--faded");
+        }
+      },
+    );
 
-    const exportBtn = this._createButton('Export World', 'primary', () => this._exportWorld());
-    exportBtn.classList.add('shr-btn--icon');
-    exportBtn.insertAdjacentHTML('afterbegin', '<span class="shr-btn-badge">\u{1F4E4}</span>');
+    const exportBtn = this._createButton("Export World", "primary", () =>
+      this._exportWorld(),
+    );
+    exportBtn.classList.add("shr-btn--icon");
+    exportBtn.insertAdjacentHTML(
+      "afterbegin",
+      '<span class="shr-btn-badge">\u{1F4E4}</span>',
+    );
 
     fullActions.appendChild(estimateBtn);
     fullActions.appendChild(exportBtn);
@@ -274,18 +325,21 @@ export class Sharing {
     parent.appendChild(fullCard);
 
     // Zone export
-    const zoneCard = this._createCard('Export Zone', 'Export a single zone\'s data');
-    zoneCard.appendChild(this._createBadge('Zone', 'green'));
+    const zoneCard = this._createCard(
+      "Export Zone",
+      "Export a single zone's data",
+    );
+    zoneCard.appendChild(this._createBadge("Zone", "green"));
 
-    const zoneSelect = document.createElement('select');
-    zoneSelect.className = 'shr-select';
-    const defaultOpt = document.createElement('option');
-    defaultOpt.value = '';
-    defaultOpt.textContent = 'Select a zone...';
+    const zoneSelect = document.createElement("select");
+    zoneSelect.className = "shr-select";
+    const defaultOpt = document.createElement("option");
+    defaultOpt.value = "";
+    defaultOpt.textContent = "Select a zone...";
     zoneSelect.appendChild(defaultOpt);
 
     for (const zone of this._zones) {
-      const opt = document.createElement('option');
+      const opt = document.createElement("option");
       opt.value = zone.slug || zone.id;
       opt.textContent = zone.name || zone.slug;
       zoneSelect.appendChild(opt);
@@ -293,32 +347,45 @@ export class Sharing {
 
     zoneCard.appendChild(zoneSelect);
 
-    const zoneExportBtn = this._createButton('Export Zone', 'primary', async () => {
-      const slug = zoneSelect.value;
-      if (!slug) return;
-      await this._exportZone(slug);
-    });
+    const zoneExportBtn = this._createButton(
+      "Export Zone",
+      "primary",
+      async () => {
+        const slug = zoneSelect.value;
+        if (!slug) return;
+        await this._exportZone(slug);
+      },
+    );
     zoneCard.appendChild(zoneExportBtn);
     parent.appendChild(zoneCard);
 
     // Template export
-    const templateCard = this._createCard('Export as Template', 'Create a reusable world template');
-    templateCard.appendChild(this._createBadge('Template', 'purple'));
+    const templateCard = this._createCard(
+      "Export as Template",
+      "Create a reusable world template",
+    );
+    templateCard.appendChild(this._createBadge("Template", "purple"));
 
-    const templateDesc = document.createElement('p');
-    templateDesc.className = 'shr-card-detail';
-    templateDesc.textContent = 'Strips personal data (identity, API keys, messages) and exports a clean template others can use.';
+    const templateDesc = document.createElement("p");
+    templateDesc.className = "shr-card-detail";
+    templateDesc.textContent =
+      "Strips personal data (identity, API keys, messages) and exports a clean template others can use.";
     templateCard.appendChild(templateDesc);
 
-    const templateBtn = this._createButton('Export Template', 'primary', () => this._exportTemplate());
-    templateBtn.classList.add('shr-btn--icon');
-    templateBtn.insertAdjacentHTML('afterbegin', '<span class="shr-btn-badge">\u{1F4CB}</span>');
+    const templateBtn = this._createButton("Export Template", "primary", () =>
+      this._exportTemplate(),
+    );
+    templateBtn.classList.add("shr-btn--icon");
+    templateBtn.insertAdjacentHTML(
+      "afterbegin",
+      '<span class="shr-btn-badge">\u{1F4CB}</span>',
+    );
     templateCard.appendChild(templateBtn);
     parent.appendChild(templateCard);
 
     // Progress bar (shown during export)
     if (this._isExporting) {
-      parent.appendChild(this._buildProgressBar('Exporting...'));
+      parent.appendChild(this._buildProgressBar("Exporting..."));
     }
   }
 
@@ -326,39 +393,39 @@ export class Sharing {
 
   _buildImport(parent) {
     // Drag-and-drop area
-    const dropZone = document.createElement('div');
-    dropZone.className = 'shr-dropzone';
+    const dropZone = document.createElement("div");
+    dropZone.className = "shr-dropzone";
     dropZone.innerHTML = `
       <div class="shr-dropzone-icon">\u{1F4C2}</div>
       <div class="shr-dropzone-text">Drop a <strong>.claude-world</strong> file here</div>
       <div class="shr-dropzone-sub">or click to browse</div>
     `;
 
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = FILE_EXTENSION + ',.json';
-    fileInput.style.display = 'none';
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = FILE_EXTENSION + ",.json";
+    fileInput.style.display = "none";
 
-    fileInput.addEventListener('change', async () => {
+    fileInput.addEventListener("change", async () => {
       if (fileInput.files && fileInput.files[0]) {
         await this._handleImportFile(fileInput.files[0]);
       }
     });
 
-    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener("click", () => fileInput.click());
 
-    dropZone.addEventListener('dragover', (e) => {
+    dropZone.addEventListener("dragover", (e) => {
       e.preventDefault();
-      dropZone.classList.add('shr-dropzone--active');
+      dropZone.classList.add("shr-dropzone--active");
     });
 
-    dropZone.addEventListener('dragleave', () => {
-      dropZone.classList.remove('shr-dropzone--active');
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.classList.remove("shr-dropzone--active");
     });
 
-    dropZone.addEventListener('drop', async (e) => {
+    dropZone.addEventListener("drop", async (e) => {
       e.preventDefault();
-      dropZone.classList.remove('shr-dropzone--active');
+      dropZone.classList.remove("shr-dropzone--active");
       if (e.dataTransfer.files && e.dataTransfer.files[0]) {
         await this._handleImportFile(e.dataTransfer.files[0]);
       }
@@ -368,26 +435,44 @@ export class Sharing {
     parent.appendChild(dropZone);
 
     // Import type buttons
-    const typeCard = this._createCard('Import Options', 'Choose what to import');
+    const typeCard = this._createCard(
+      "Import Options",
+      "Choose what to import",
+    );
 
-    const typeRow = document.createElement('div');
-    typeRow.className = 'shr-import-types';
+    const typeRow = document.createElement("div");
+    typeRow.className = "shr-import-types";
 
     const types = [
-      { id: 'world',    icon: '\u{1F30D}', label: 'Full World',     desc: 'Replace current world data' },
-      { id: 'zone',     icon: '\u{1F3D7}', label: 'Single Zone',    desc: 'Add zone data to current world' },
-      { id: 'template', icon: '\u{1F4D0}', label: 'From Template',  desc: 'Create new world from template' },
+      {
+        id: "world",
+        icon: "\u{1F30D}",
+        label: "Full World",
+        desc: "Replace current world data",
+      },
+      {
+        id: "zone",
+        icon: "\u{1F3D7}",
+        label: "Single Zone",
+        desc: "Add zone data to current world",
+      },
+      {
+        id: "template",
+        icon: "\u{1F4D0}",
+        label: "From Template",
+        desc: "Create new world from template",
+      },
     ];
 
     for (const type of types) {
-      const typeBtn = document.createElement('button');
-      typeBtn.className = 'shr-import-type';
+      const typeBtn = document.createElement("button");
+      typeBtn.className = "shr-import-type";
       typeBtn.innerHTML = `
         <span class="shr-import-type-icon">${type.icon}</span>
         <span class="shr-import-type-label">${type.label}</span>
         <span class="shr-import-type-desc">${type.desc}</span>
       `;
-      typeBtn.addEventListener('click', () => {
+      typeBtn.addEventListener("click", () => {
         fileInput.dataset.importType = type.id;
         fileInput.click();
       });
@@ -398,23 +483,26 @@ export class Sharing {
     parent.appendChild(typeCard);
 
     // Conflict resolution
-    const conflictCard = this._createCard('Conflict Resolution', 'How to handle duplicate data during import');
+    const conflictCard = this._createCard(
+      "Conflict Resolution",
+      "How to handle duplicate data during import",
+    );
 
     for (const mode of CONFLICT_MODES) {
-      const row = document.createElement('label');
-      row.className = 'shr-conflict-row';
+      const row = document.createElement("label");
+      row.className = "shr-conflict-row";
 
-      const radio = document.createElement('input');
-      radio.type = 'radio';
-      radio.name = 'shr-conflict';
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = "shr-conflict";
       radio.value = mode.id;
       radio.checked = this._conflictMode === mode.id;
-      radio.addEventListener('change', () => {
+      radio.addEventListener("change", () => {
         this._conflictMode = mode.id;
       });
 
-      const info = document.createElement('div');
-      info.className = 'shr-conflict-info';
+      const info = document.createElement("div");
+      info.className = "shr-conflict-info";
       info.innerHTML = `<span class="shr-conflict-label">${mode.label}</span><span class="shr-conflict-desc">${mode.desc}</span>`;
 
       row.appendChild(radio);
@@ -431,7 +519,7 @@ export class Sharing {
 
     // Progress bar (shown during import)
     if (this._isImporting) {
-      parent.appendChild(this._buildProgressBar('Importing...'));
+      parent.appendChild(this._buildProgressBar("Importing..."));
     }
   }
 
@@ -439,27 +527,36 @@ export class Sharing {
 
   _buildShare(parent) {
     // World summary
-    const summaryCard = this._createCard('World Summary', 'Generate a shareable summary of your world');
+    const summaryCard = this._createCard(
+      "World Summary",
+      "Generate a shareable summary of your world",
+    );
 
-    const summaryPreview = document.createElement('div');
-    summaryPreview.className = 'shr-summary-preview';
-    summaryPreview.textContent = 'Click generate to create a summary...';
+    const summaryPreview = document.createElement("div");
+    summaryPreview.className = "shr-summary-preview";
+    summaryPreview.textContent = "Click generate to create a summary...";
 
-    const summaryActions = document.createElement('div');
-    summaryActions.className = 'shr-card-actions';
+    const summaryActions = document.createElement("div");
+    summaryActions.className = "shr-card-actions";
 
-    const generateBtn = this._createButton('Generate Summary', 'primary', () => {
-      const summary = this._generateWorldSummary();
-      summaryPreview.textContent = summary;
-      summaryPreview.classList.add('shr-summary-preview--filled');
-    });
+    const generateBtn = this._createButton(
+      "Generate Summary",
+      "primary",
+      () => {
+        const summary = this._generateWorldSummary();
+        summaryPreview.textContent = summary;
+        summaryPreview.classList.add("shr-summary-preview--filled");
+      },
+    );
 
-    const copySummaryBtn = this._createButton('Copy', 'secondary', () => {
+    const copySummaryBtn = this._createButton("Copy", "secondary", () => {
       const text = summaryPreview.textContent;
-      if (text && text !== 'Click generate to create a summary...') {
+      if (text && text !== "Click generate to create a summary...") {
         navigator.clipboard.writeText(text);
-        copySummaryBtn.textContent = 'Copied!';
-        setTimeout(() => { copySummaryBtn.textContent = 'Copy'; }, 2000);
+        copySummaryBtn.textContent = "Copied!";
+        setTimeout(() => {
+          copySummaryBtn.textContent = "Copy";
+        }, 2000);
       }
     });
 
@@ -470,16 +567,21 @@ export class Sharing {
     parent.appendChild(summaryCard);
 
     // Copy stats as Markdown
-    const mdCard = this._createCard('Copy Stats', 'Copy world statistics as formatted Markdown');
+    const mdCard = this._createCard(
+      "Copy Stats",
+      "Copy world statistics as formatted Markdown",
+    );
 
-    const mdPreview = document.createElement('pre');
-    mdPreview.className = 'shr-md-preview';
+    const mdPreview = document.createElement("pre");
+    mdPreview.className = "shr-md-preview";
     mdPreview.textContent = this._generateMarkdownStats();
 
-    const mdCopyBtn = this._createButton('Copy to Clipboard', 'primary', () => {
+    const mdCopyBtn = this._createButton("Copy to Clipboard", "primary", () => {
       navigator.clipboard.writeText(this._generateMarkdownStats());
-      mdCopyBtn.textContent = 'Copied!';
-      setTimeout(() => { mdCopyBtn.textContent = 'Copy to Clipboard'; }, 2000);
+      mdCopyBtn.textContent = "Copied!";
+      setTimeout(() => {
+        mdCopyBtn.textContent = "Copy to Clipboard";
+      }, 2000);
     });
 
     mdCard.appendChild(mdPreview);
@@ -487,17 +589,28 @@ export class Sharing {
     parent.appendChild(mdCard);
 
     // Screenshot capture
-    const screenshotCard = this._createCard('Generate Screenshot', 'Capture the city canvas as a PNG image');
-    screenshotCard.appendChild(this._createBadge('PNG', 'amber'));
+    const screenshotCard = this._createCard(
+      "Generate Screenshot",
+      "Capture the city canvas as a PNG image",
+    );
+    screenshotCard.appendChild(this._createBadge("PNG", "amber"));
 
-    const screenshotDesc = document.createElement('p');
-    screenshotDesc.className = 'shr-card-detail';
-    screenshotDesc.textContent = 'Captures the current isometric city view as a high-resolution PNG.';
+    const screenshotDesc = document.createElement("p");
+    screenshotDesc.className = "shr-card-detail";
+    screenshotDesc.textContent =
+      "Captures the current isometric city view as a high-resolution PNG.";
     screenshotCard.appendChild(screenshotDesc);
 
-    const screenshotBtn = this._createButton('Capture Screenshot', 'primary', () => this._captureScreenshot());
-    screenshotBtn.classList.add('shr-btn--icon');
-    screenshotBtn.insertAdjacentHTML('afterbegin', '<span class="shr-btn-badge">\u{1F4F8}</span>');
+    const screenshotBtn = this._createButton(
+      "Capture Screenshot",
+      "primary",
+      () => this._captureScreenshot(),
+    );
+    screenshotBtn.classList.add("shr-btn--icon");
+    screenshotBtn.insertAdjacentHTML(
+      "afterbegin",
+      '<span class="shr-btn-badge">\u{1F4F8}</span>',
+    );
     screenshotCard.appendChild(screenshotBtn);
     parent.appendChild(screenshotCard);
   }
@@ -505,32 +618,57 @@ export class Sharing {
   // ── Stats section ───────────────────────────────────────────────
 
   _buildStats(parent) {
-    const card = document.createElement('div');
-    card.className = 'shr-stats-card';
+    const card = document.createElement("div");
+    card.className = "shr-stats-card";
 
-    const title = document.createElement('h3');
-    title.className = 'shr-card-title';
-    title.textContent = 'World Statistics';
+    const title = document.createElement("h3");
+    title.className = "shr-card-title";
+    title.textContent = "World Statistics";
     card.appendChild(title);
 
-    const grid = document.createElement('div');
-    grid.className = 'shr-stats-grid';
+    const grid = document.createElement("div");
+    grid.className = "shr-stats-grid";
 
     const statItems = [
-      { label: 'Zones',        value: this._stats.zones,        icon: '\u{1F3D7}',  color: 'blue' },
-      { label: 'Tasks',        value: this._stats.tasks,        icon: '\u{1F4CB}',  color: 'green' },
-      { label: 'Agents',       value: this._stats.agents,       icon: '\u{1F916}',  color: 'purple' },
-      { label: 'XP',           value: this._stats.xp,           icon: '\u2B50',      color: 'gold' },
-      { label: 'Achievements', value: this._stats.achievements, icon: '\u{1F3C6}',  color: 'amber' },
-      { label: 'Health',       value: `${this._stats.health}%`, icon: '\u{1F49A}',  color: 'green' },
+      {
+        label: "Zones",
+        value: this._stats.zones,
+        icon: "\u{1F3D7}",
+        color: "blue",
+      },
+      {
+        label: "Tasks",
+        value: this._stats.tasks,
+        icon: "\u{1F4CB}",
+        color: "green",
+      },
+      {
+        label: "Agents",
+        value: this._stats.agents,
+        icon: "\u{1F916}",
+        color: "purple",
+      },
+      { label: "XP", value: this._stats.xp, icon: "\u2B50", color: "gold" },
+      {
+        label: "Achievements",
+        value: this._stats.achievements,
+        icon: "\u{1F3C6}",
+        color: "amber",
+      },
+      {
+        label: "Health",
+        value: `${this._stats.health}%`,
+        icon: "\u{1F49A}",
+        color: "green",
+      },
     ];
 
     for (const item of statItems) {
-      const cell = document.createElement('div');
+      const cell = document.createElement("div");
       cell.className = `shr-stat-cell shr-stat-cell--${item.color}`;
       cell.innerHTML = `
         <span class="shr-stat-icon">${item.icon}</span>
-        <span class="shr-stat-value" data-target="${typeof item.value === 'number' ? item.value : ''}">${item.value}</span>
+        <span class="shr-stat-value" data-target="${typeof item.value === "number" ? item.value : ""}">${item.value}</span>
         <span class="shr-stat-label">${item.label}</span>
       `;
       grid.appendChild(cell);
@@ -539,19 +677,24 @@ export class Sharing {
     card.appendChild(grid);
 
     // World info
-    const infoSection = document.createElement('div');
-    infoSection.className = 'shr-stats-info';
+    const infoSection = document.createElement("div");
+    infoSection.className = "shr-stats-info";
 
     const infoItems = [
-      { label: 'World Name',  value: this._world?.name || 'My World' },
-      { label: 'Template',    value: (this._world?.template || 'starter').charAt(0).toUpperCase() + (this._world?.template || 'starter').slice(1) },
-      { label: 'Level',       value: this._world?.level || 1 },
-      { label: 'Created',     value: formatDate(this._world?.created_at) },
+      { label: "World Name", value: this._world?.name || "My World" },
+      {
+        label: "Template",
+        value:
+          (this._world?.template || "starter").charAt(0).toUpperCase() +
+          (this._world?.template || "starter").slice(1),
+      },
+      { label: "Level", value: this._world?.level || 1 },
+      { label: "Created", value: formatDate(this._world?.created_at) },
     ];
 
     for (const info of infoItems) {
-      const row = document.createElement('div');
-      row.className = 'shr-stats-row';
+      const row = document.createElement("div");
+      row.className = "shr-stats-row";
       row.innerHTML = `<span class="shr-stats-row-label">${info.label}</span><span class="shr-stats-row-value">${escapeHtml(String(info.value))}</span>`;
       infoSection.appendChild(row);
     }
@@ -571,7 +714,7 @@ export class Sharing {
       this._exportData = await window.api.db.exportWorld(this._worldId);
       return this._exportData;
     } catch (err) {
-      console.error('[sharing] Export fetch failed:', err);
+      console.error("[sharing] Export fetch failed:", err);
       return null;
     }
   }
@@ -586,23 +729,23 @@ export class Sharing {
       this._updateProgress();
 
       const data = await this._fetchExportData();
-      if (!data) throw new Error('No export data');
+      if (!data) throw new Error("No export data");
 
       this._progress = 70;
       this._updateProgress();
 
       const json = JSON.stringify(data, null, 2);
       const blob = new Blob([json], { type: FILE_MIME });
-      const worldName = sanitizeFilename(this._world?.name || 'claude-world');
-      const date = new Date().toISOString().split('T')[0];
+      const worldName = sanitizeFilename(this._world?.name || "claude-world");
+      const date = new Date().toISOString().split("T")[0];
       downloadBlob(blob, `${worldName}_${date}${FILE_EXTENSION}`);
 
       this._progress = 100;
       this._updateProgress();
-      this._showToast('World exported successfully');
+      this._showToast("World exported successfully");
     } catch (err) {
-      console.error('[sharing] Export failed:', err);
-      this._showToast('Export failed: ' + err.message);
+      console.error("[sharing] Export failed:", err);
+      this._showToast("Export failed: " + err.message);
     }
 
     setTimeout(() => {
@@ -619,18 +762,22 @@ export class Sharing {
       const data = await this._fetchExportData();
       if (!data) return;
 
-      const zone = data.zones?.find(z => z.slug === slug || String(z.id) === String(slug));
+      const zone = data.zones?.find(
+        (z) => z.slug === slug || String(z.id) === String(slug),
+      );
       if (!zone) {
-        this._showToast('Zone not found');
+        this._showToast("Zone not found");
         return;
       }
 
       const zoneData = {
         exportedAt: new Date().toISOString(),
-        version: '1.0',
-        type: 'zone',
+        version: "1.0",
+        type: "zone",
         zone,
-        tasks: (data.tasks || []).filter(t => t.zone_slug === slug || t.zone_id === zone.id),
+        tasks: (data.tasks || []).filter(
+          (t) => t.zone_slug === slug || t.zone_id === zone.id,
+        ),
       };
 
       const json = JSON.stringify(zoneData, null, 2);
@@ -639,8 +786,8 @@ export class Sharing {
       downloadBlob(blob, `zone_${zoneName}${FILE_EXTENSION}`);
       this._showToast(`Zone "${zone.name}" exported`);
     } catch (err) {
-      console.error('[sharing] Zone export failed:', err);
-      this._showToast('Zone export failed');
+      console.error("[sharing] Zone export failed:", err);
+      this._showToast("Zone export failed");
     }
   }
 
@@ -654,16 +801,16 @@ export class Sharing {
       // Strip personal data for template
       const template = {
         exportedAt: new Date().toISOString(),
-        version: '1.0',
-        type: 'template',
+        version: "1.0",
+        type: "template",
         world: {
-          name: data.world?.name || 'Template',
-          template: data.world?.template || 'custom',
+          name: data.world?.name || "Template",
+          template: data.world?.template || "custom",
           level: 1,
           xp: 0,
           xp_to_next: data.world?.xp_to_next || 100,
         },
-        zones: (data.zones || []).map(z => ({
+        zones: (data.zones || []).map((z) => ({
           slug: z.slug,
           name: z.name,
           color: z.color,
@@ -673,12 +820,13 @@ export class Sharing {
           height: z.height,
           unlocked: z.unlocked,
         })),
-        settings: (data.settings || []).filter(s =>
-          !s.key.startsWith('api.') &&
-          !s.key.startsWith('privacy.') &&
-          !s.key.startsWith('identity.')
+        settings: (data.settings || []).filter(
+          (s) =>
+            !s.key.startsWith("api.") &&
+            !s.key.startsWith("privacy.") &&
+            !s.key.startsWith("identity."),
         ),
-        agents: (data.agents || []).map(a => ({
+        agents: (data.agents || []).map((a) => ({
           name: a.name,
           role: a.role,
           sprite_key: a.sprite_key,
@@ -689,12 +837,12 @@ export class Sharing {
 
       const json = JSON.stringify(template, null, 2);
       const blob = new Blob([json], { type: FILE_MIME });
-      const worldName = sanitizeFilename(this._world?.name || 'template');
+      const worldName = sanitizeFilename(this._world?.name || "template");
       downloadBlob(blob, `template_${worldName}${FILE_EXTENSION}`);
-      this._showToast('Template exported');
+      this._showToast("Template exported");
     } catch (err) {
-      console.error('[sharing] Template export failed:', err);
-      this._showToast('Template export failed');
+      console.error("[sharing] Template export failed:", err);
+      this._showToast("Template export failed");
     }
   }
 
@@ -706,7 +854,7 @@ export class Sharing {
       const data = JSON.parse(text);
 
       if (!data.version || !data.exportedAt) {
-        this._showToast('Invalid file: missing version or export date');
+        this._showToast("Invalid file: missing version or export date");
         return;
       }
 
@@ -714,8 +862,8 @@ export class Sharing {
         filename: file.name,
         size: file.size,
         data,
-        type: data.type || 'world',
-        worldName: data.world?.name || 'Unknown',
+        type: data.type || "world",
+        worldName: data.world?.name || "Unknown",
         zonesCount: data.zones?.length || (data.zone ? 1 : 0),
         tasksCount: data.tasks?.length || 0,
         agentsCount: data.agents?.length || 0,
@@ -724,61 +872,66 @@ export class Sharing {
 
       this._render();
     } catch (err) {
-      console.error('[sharing] Import parse failed:', err);
-      this._showToast('Could not read file: ' + err.message);
+      console.error("[sharing] Import parse failed:", err);
+      this._showToast("Could not read file: " + err.message);
     }
   }
 
   _buildImportPreview() {
     const p = this._importPreview;
-    if (!p) return document.createElement('div');
+    if (!p) return document.createElement("div");
 
-    const card = document.createElement('div');
-    card.className = 'shr-preview-card';
+    const card = document.createElement("div");
+    card.className = "shr-preview-card";
 
-    const header = document.createElement('div');
-    header.className = 'shr-preview-header';
+    const header = document.createElement("div");
+    header.className = "shr-preview-header";
     header.innerHTML = `
       <span class="shr-preview-icon">\u{1F4C4}</span>
       <div class="shr-preview-meta">
         <span class="shr-preview-filename">${escapeHtml(p.filename)}</span>
         <span class="shr-preview-size">${formatBytes(p.size)}</span>
       </div>
-      <span class="shr-preview-type-badge shr-badge--${p.type === 'template' ? 'purple' : p.type === 'zone' ? 'green' : 'blue'}">${p.type}</span>
+      <span class="shr-preview-type-badge shr-badge--${p.type === "template" ? "purple" : p.type === "zone" ? "green" : "blue"}">${p.type}</span>
     `;
     card.appendChild(header);
 
-    const details = document.createElement('div');
-    details.className = 'shr-preview-details';
+    const details = document.createElement("div");
+    details.className = "shr-preview-details";
 
     const rows = [
-      { label: 'World', value: p.worldName },
-      { label: 'Zones', value: p.zonesCount },
-      { label: 'Tasks', value: p.tasksCount },
-      { label: 'Agents', value: p.agentsCount },
-      { label: 'Exported', value: formatDate(p.exportedAt) },
+      { label: "World", value: p.worldName },
+      { label: "Zones", value: p.zonesCount },
+      { label: "Tasks", value: p.tasksCount },
+      { label: "Agents", value: p.agentsCount },
+      { label: "Exported", value: formatDate(p.exportedAt) },
     ];
 
     for (const row of rows) {
-      const el = document.createElement('div');
-      el.className = 'shr-preview-row';
+      const el = document.createElement("div");
+      el.className = "shr-preview-row";
       el.innerHTML = `<span>${row.label}</span><span>${escapeHtml(String(row.value))}</span>`;
       details.appendChild(el);
     }
 
     card.appendChild(details);
 
-    const actions = document.createElement('div');
-    actions.className = 'shr-card-actions';
+    const actions = document.createElement("div");
+    actions.className = "shr-card-actions";
 
-    const cancelBtn = this._createButton('Cancel', 'secondary', () => {
+    const cancelBtn = this._createButton("Cancel", "secondary", () => {
       this._importPreview = null;
       this._render();
     });
 
-    const confirmBtn = this._createButton('Import', 'primary', () => this._executeImport());
-    confirmBtn.classList.add('shr-btn--icon');
-    confirmBtn.insertAdjacentHTML('afterbegin', '<span class="shr-btn-badge">\u{1F4E5}</span>');
+    const confirmBtn = this._createButton("Import", "primary", () =>
+      this._executeImport(),
+    );
+    confirmBtn.classList.add("shr-btn--icon");
+    confirmBtn.insertAdjacentHTML(
+      "afterbegin",
+      '<span class="shr-btn-badge">\u{1F4E5}</span>',
+    );
 
     actions.appendChild(cancelBtn);
     actions.appendChild(confirmBtn);
@@ -801,20 +954,20 @@ export class Sharing {
       this._progress = 20;
       this._updateProgress();
 
-      if (type === 'world') {
+      if (type === "world") {
         await this._importWorld(data);
-      } else if (type === 'zone') {
+      } else if (type === "zone") {
         await this._importZone(data);
-      } else if (type === 'template') {
+      } else if (type === "template") {
         await this._importTemplate(data);
       }
 
       this._progress = 100;
       this._updateProgress();
-      this._showToast('Import completed successfully');
+      this._showToast("Import completed successfully");
     } catch (err) {
-      console.error('[sharing] Import failed:', err);
-      this._showToast('Import failed: ' + err.message);
+      console.error("[sharing] Import failed:", err);
+      this._showToast("Import failed: " + err.message);
     }
 
     setTimeout(() => {
@@ -833,10 +986,10 @@ export class Sharing {
       // Fallback: insert data manually via available APIs
       if (data.settings && Array.isArray(data.settings)) {
         for (const s of data.settings) {
-          if (this._conflictMode === 'skip') {
+          if (this._conflictMode === "skip") {
             try {
               const existing = await window.api.db.getSettings(this._worldId);
-              if (existing.find(e => e.key === s.key)) continue;
+              if (existing.find((e) => e.key === s.key)) continue;
             } catch (__) {}
           }
           try {
@@ -853,7 +1006,11 @@ export class Sharing {
     // Zone import: add zone data via settings
     if (data.zone) {
       try {
-        await window.api.db.updateSettings(this._worldId, `zone.import.${data.zone.slug}`, JSON.stringify(data.zone));
+        await window.api.db.updateSettings(
+          this._worldId,
+          `zone.import.${data.zone.slug}`,
+          JSON.stringify(data.zone),
+        );
       } catch (_) {}
     }
     this._progress = 80;
@@ -878,8 +1035,10 @@ export class Sharing {
   _generateWorldSummary() {
     const w = this._world;
     const s = this._stats;
-    const name = w?.name || 'My World';
-    const template = (w?.template || 'starter').charAt(0).toUpperCase() + (w?.template || 'starter').slice(1);
+    const name = w?.name || "My World";
+    const template =
+      (w?.template || "starter").charAt(0).toUpperCase() +
+      (w?.template || "starter").slice(1);
     const level = w?.level || 1;
 
     return [
@@ -888,17 +1047,17 @@ export class Sharing {
       `${s.zones} zones | ${s.tasks} tasks | ${s.agents} agents`,
       `Health Score: ${s.health}% | Achievements: ${s.achievements}`,
       `Created: ${formatDate(w?.created_at)}`,
-    ].join('\n');
+    ].join("\n");
   }
 
   _generateMarkdownStats() {
     const w = this._world;
     const s = this._stats;
-    const name = w?.name || 'My World';
+    const name = w?.name || "My World";
 
     return [
       `## ${name}`,
-      '',
+      "",
       `| Stat | Value |`,
       `|------|-------|`,
       `| Zones | ${s.zones} |`,
@@ -907,50 +1066,50 @@ export class Sharing {
       `| XP | ${s.xp} |`,
       `| Achievements | ${s.achievements} |`,
       `| Health Score | ${s.health}% |`,
-      '',
+      "",
       `*Exported from Claude World on ${new Date().toLocaleDateString()}*`,
-    ].join('\n');
+    ].join("\n");
   }
 
   _captureScreenshot() {
     // Find the city canvas element
-    const canvas = document.querySelector('canvas');
+    const canvas = document.querySelector("canvas");
     if (!canvas) {
-      this._showToast('No canvas found to capture');
+      this._showToast("No canvas found to capture");
       return;
     }
 
     try {
       canvas.toBlob((blob) => {
         if (!blob) {
-          this._showToast('Screenshot capture failed');
+          this._showToast("Screenshot capture failed");
           return;
         }
-        const worldName = sanitizeFilename(this._world?.name || 'claude-world');
-        const date = new Date().toISOString().split('T')[0];
+        const worldName = sanitizeFilename(this._world?.name || "claude-world");
+        const date = new Date().toISOString().split("T")[0];
         downloadBlob(blob, `${worldName}_${date}.png`);
-        this._showToast('Screenshot saved');
-      }, 'image/png');
+        this._showToast("Screenshot saved");
+      }, "image/png");
     } catch (err) {
-      console.error('[sharing] Screenshot failed:', err);
-      this._showToast('Screenshot capture failed');
+      console.error("[sharing] Screenshot failed:", err);
+      this._showToast("Screenshot capture failed");
     }
   }
 
   // ── UI helpers ──────────────────────────────────────────────────
 
   _createCard(title, description) {
-    const card = document.createElement('div');
-    card.className = 'shr-card';
+    const card = document.createElement("div");
+    card.className = "shr-card";
 
-    const h = document.createElement('h3');
-    h.className = 'shr-card-title';
+    const h = document.createElement("h3");
+    h.className = "shr-card-title";
     h.textContent = title;
     card.appendChild(h);
 
     if (description) {
-      const d = document.createElement('p');
-      d.className = 'shr-card-desc';
+      const d = document.createElement("p");
+      d.className = "shr-card-desc";
       d.textContent = description;
       card.appendChild(d);
     }
@@ -959,41 +1118,41 @@ export class Sharing {
   }
 
   _createButton(label, variant, onClick) {
-    const btn = document.createElement('button');
+    const btn = document.createElement("button");
     btn.className = `shr-btn shr-btn--${variant}`;
     btn.textContent = label;
-    btn.addEventListener('click', onClick);
+    btn.addEventListener("click", onClick);
     return btn;
   }
 
   _createBadge(text, color) {
-    const badge = document.createElement('span');
+    const badge = document.createElement("span");
     badge.className = `shr-badge shr-badge--${color}`;
     badge.textContent = text;
     return badge;
   }
 
   _buildProgressBar(label) {
-    const wrap = document.createElement('div');
-    wrap.className = 'shr-progress-wrap';
+    const wrap = document.createElement("div");
+    wrap.className = "shr-progress-wrap";
 
-    const labelEl = document.createElement('span');
-    labelEl.className = 'shr-progress-label';
+    const labelEl = document.createElement("span");
+    labelEl.className = "shr-progress-label";
     labelEl.textContent = label;
     wrap.appendChild(labelEl);
 
-    const bar = document.createElement('div');
-    bar.className = 'shr-progress-bar';
+    const bar = document.createElement("div");
+    bar.className = "shr-progress-bar";
 
-    const fill = document.createElement('div');
-    fill.className = 'shr-progress-fill';
+    const fill = document.createElement("div");
+    fill.className = "shr-progress-fill";
     fill.style.width = `${this._progress}%`;
 
     bar.appendChild(fill);
     wrap.appendChild(bar);
 
-    const pct = document.createElement('span');
-    pct.className = 'shr-progress-pct';
+    const pct = document.createElement("span");
+    pct.className = "shr-progress-pct";
     pct.textContent = `${Math.round(this._progress)}%`;
     wrap.appendChild(pct);
 
@@ -1001,14 +1160,16 @@ export class Sharing {
   }
 
   _updateProgress() {
-    const fill = this._container.querySelector('.shr-progress-fill');
-    const pct = this._container.querySelector('.shr-progress-pct');
+    const fill = this._container.querySelector(".shr-progress-fill");
+    const pct = this._container.querySelector(".shr-progress-pct");
     if (fill) fill.style.width = `${this._progress}%`;
     if (pct) pct.textContent = `${Math.round(this._progress)}%`;
   }
 
   _animateCounters() {
-    const cells = this._container.querySelectorAll('.shr-stat-value[data-target]');
+    const cells = this._container.querySelectorAll(
+      ".shr-stat-value[data-target]",
+    );
     for (const cell of cells) {
       const target = parseInt(cell.dataset.target, 10);
       if (isNaN(target) || target === 0) continue;
@@ -1024,22 +1185,24 @@ export class Sharing {
   }
 
   _showToast(message) {
-    document.dispatchEvent(new CustomEvent('toast', { detail: { message, type: 'info' } }));
+    document.dispatchEvent(
+      new CustomEvent("toast", { detail: { message, type: "info" } }),
+    );
   }
 
   // ── Styles injection ────────────────────────────────────────────
 
   _injectStyles() {
     if (this._styleInjected) return;
-    if (document.getElementById('sharing-panel-styles')) {
+    if (document.getElementById("sharing-panel-styles")) {
       this._styleInjected = true;
       return;
     }
 
-    const link = document.createElement('link');
-    link.id = 'sharing-panel-styles';
-    link.rel = 'stylesheet';
-    link.href = new URL('./sharing.css', import.meta.url).href;
+    const link = document.createElement("link");
+    link.id = "sharing-panel-styles";
+    link.rel = "stylesheet";
+    link.href = new URL("./sharing.css", import.meta.url).href;
     document.head.appendChild(link);
     this._styleInjected = true;
   }

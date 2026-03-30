@@ -267,10 +267,18 @@
   margin-top: 6px;
 }
 
-.conv-history__item-status--completed { background: var(--accent-green); }
-.conv-history__item-status--failed { background: var(--accent-red); }
-.conv-history__item-status--pending { background: var(--accent-amber); }
-.conv-history__item-status--running { background: var(--accent-cyan); }
+.conv-history__item-status--completed {
+  background: var(--accent-green);
+}
+.conv-history__item-status--failed {
+  background: var(--accent-red);
+}
+.conv-history__item-status--pending {
+  background: var(--accent-amber);
+}
+.conv-history__item-status--running {
+  background: var(--accent-cyan);
+}
 
 .conv-history__sentinel {
   height: 40px;
@@ -480,9 +488,15 @@
   color: var(--text-primary);
 }
 
-.conv-history__message-body h1 { font-size: var(--font-size-xl); }
-.conv-history__message-body h2 { font-size: var(--font-size-lg); }
-.conv-history__message-body h3 { font-size: var(--font-size-base); }
+.conv-history__message-body h1 {
+  font-size: var(--font-size-xl);
+}
+.conv-history__message-body h2 {
+  font-size: var(--font-size-lg);
+}
+.conv-history__message-body h3 {
+  font-size: var(--font-size-base);
+}
 
 .conv-history__message-body p {
   margin: var(--space-2) 0;

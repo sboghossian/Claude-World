@@ -147,7 +147,9 @@
 }
 
 @keyframes statusbar-bounce {
-  0%, 60%, 100% {
+  0%,
+  60%,
+  100% {
     transform: translateY(0);
     opacity: 0.4;
   }
@@ -166,7 +168,9 @@
   padding: 2px 5px;
   border-radius: 3px;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
   border: none;
   background: none;
   color: var(--text-dim);

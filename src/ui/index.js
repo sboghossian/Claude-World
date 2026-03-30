@@ -14,55 +14,55 @@
  *   ui.panels.openZone('dispatch', 'Dispatch Tower');
  */
 
-import { CommandPalette } from './command-palette.js';
-import { HUD } from './hud.js';
-import { ToastManager } from './toasts.js';
-import { PanelManager } from './panels.js';
-import { AgentDialogue } from './agent-dialogue.js';
-import { ShortcutManager } from './shortcuts.js';
-import { Workspace } from './workspace.js';
-import { QuestPanel } from './quest-panel.js';
-import { ZoneTooltips } from './zone-tooltips.js';
-import { SearchResults } from './search-results.js';
-import { QuickActions } from './quick-actions.js';
-import { CommandHistoryPanel } from './command-history-panel.js';
-import { getCommandHistory } from '../systems/command-history.js';
-import { initTreasuryEvents } from '../zones/treasury.js';
+import { CommandPalette } from "./command-palette.js";
+import { HUD } from "./hud.js";
+import { ToastManager } from "./toasts.js";
+import { PanelManager } from "./panels.js";
+import { AgentDialogue } from "./agent-dialogue.js";
+import { ShortcutManager } from "./shortcuts.js";
+import { Workspace } from "./workspace.js";
+import { QuestPanel } from "./quest-panel.js";
+import { ZoneTooltips } from "./zone-tooltips.js";
+import { SearchResults } from "./search-results.js";
+import { QuickActions } from "./quick-actions.js";
+import { CommandHistoryPanel } from "./command-history-panel.js";
+import { getCommandHistory } from "../systems/command-history.js";
+import { initTreasuryEvents } from "../zones/treasury.js";
 
 /**
  * Load all UI CSS files by injecting <link> elements.
  * @param {string} basePath - Path prefix to the ui directory (e.g., '../src/ui/')
  */
-function loadStyles(basePath = '') {
+function loadStyles(basePath = "") {
   const cssFiles = [
-    'variables.css',
-    'command-palette.css',
-    'hud.css',
-    'toasts.css',
-    'panels.css',
-    'agent-dialogue.css',
-    'shortcuts.css',
-    'shortcuts-overlay.css',
-    'quest-panel.css',
-    'incident-panel.css',
-    'zone-tooltips.css',
-    'minimap.css',
-    'search-results.css',
-    'quick-actions.css',
-    'status-bar.css',
-    'perf-monitor.css',
-    'thought-bubbles.css',
-    'task-stream.css',
-    'agent-chat.css',
-    'achievements-panel.css',
-    'tutorial-overlay.css',
-    'workspace.css',
-    'command-history-panel.css',
+    "variables.css",
+    "command-palette.css",
+    "hud.css",
+    "toasts.css",
+    "panels.css",
+    "agent-dialogue.css",
+    "shortcuts.css",
+    "shortcuts-overlay.css",
+    "quest-panel.css",
+    "incident-panel.css",
+    "zone-tooltips.css",
+    "minimap.css",
+    "search-results.css",
+    "quick-actions.css",
+    "status-bar.css",
+    "perf-monitor.css",
+    "thought-bubbles.css",
+    "task-stream.css",
+    "agent-chat.css",
+    "achievements-panel.css",
+    "tutorial-overlay.css",
+    "workspace.css",
+    "command-history-panel.css",
   ];
 
   for (const file of cssFiles) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
     link.href = `${basePath}${file}`;
     document.head.appendChild(link);
   }
@@ -74,7 +74,7 @@ function loadStyles(basePath = '') {
  * @param {string} [options.cssBasePath] - Base path to CSS files
  * @returns {{ palette: CommandPalette, hud: HUD, toasts: ToastManager, panels: PanelManager, shortcuts: ShortcutManager, destroy: () => void }}
  */
-export function initUI({ cssBasePath = '' } = {}) {
+export function initUI({ cssBasePath = "" } = {}) {
   // Load stylesheets
   loadStyles(cssBasePath);
 
@@ -99,18 +99,18 @@ export function initUI({ cssBasePath = '' } = {}) {
   // ── Wire up cross-component events ────────────────────────────
 
   // Toast forwarding — quest engine emits toast:show, we route to the manager
-  document.addEventListener('toast:show', (e) => {
+  document.addEventListener("toast:show", (e) => {
     toasts.show(e.detail);
   });
 
   // Quest chain updates → refresh HUD quest card
-  document.addEventListener('quest:chain-updated', () => {
+  document.addEventListener("quest:chain-updated", () => {
     // The quest engine exposes toHUDData() via its singleton
     // This is picked up by whatever initializes the quest engine
   });
 
   // Command palette navigation → camera pan + panel open
-  document.addEventListener('command-palette:navigate', (e) => {
+  document.addEventListener("command-palette:navigate", (e) => {
     const { zoneId, zoneName } = e.detail;
     panels.openZone(zoneId, zoneName);
     hud.setCurrentZone(zoneId);
@@ -119,30 +119,78 @@ export function initUI({ cssBasePath = '' } = {}) {
   // Command palette agent → open rich agent dialogue panel
   // Maps agent ids to dialogue-compatible data using known agent metadata.
   const AGENT_DIALOGUE_DATA = {
-    commander:  { id: 'commander',  name: 'Commander',  role: 'Dispatcher',  personality: 'Strategic',  level: 3, xp: 75, colorKey: 'dispatcher' },
-    librarian:  { id: 'librarian',  name: 'Librarian',  role: 'Researcher',  personality: 'Curious',    level: 2, xp: 40, colorKey: 'researcher' },
-    archivist:  { id: 'archivist',  name: 'Archivist',  role: 'Memory',      personality: 'Meticulous', level: 2, xp: 55, colorKey: 'memory' },
-    instructor: { id: 'instructor', name: 'Instructor', role: 'Trainer',     personality: 'Patient',    level: 1, xp: 20, colorKey: 'trainer' },
-    dockmaster: { id: 'dockmaster', name: 'Dockmaster', role: 'Integrator',  personality: 'Practical',  level: 1, xp: 10, colorKey: 'integrator' },
+    commander: {
+      id: "commander",
+      name: "Commander",
+      role: "Dispatcher",
+      personality: "Strategic",
+      level: 3,
+      xp: 75,
+      colorKey: "dispatcher",
+    },
+    librarian: {
+      id: "librarian",
+      name: "Librarian",
+      role: "Researcher",
+      personality: "Curious",
+      level: 2,
+      xp: 40,
+      colorKey: "researcher",
+    },
+    archivist: {
+      id: "archivist",
+      name: "Archivist",
+      role: "Memory",
+      personality: "Meticulous",
+      level: 2,
+      xp: 55,
+      colorKey: "memory",
+    },
+    instructor: {
+      id: "instructor",
+      name: "Instructor",
+      role: "Trainer",
+      personality: "Patient",
+      level: 1,
+      xp: 20,
+      colorKey: "trainer",
+    },
+    dockmaster: {
+      id: "dockmaster",
+      name: "Dockmaster",
+      role: "Integrator",
+      personality: "Practical",
+      level: 1,
+      xp: 10,
+      colorKey: "integrator",
+    },
   };
 
-  document.addEventListener('command-palette:agent', (e) => {
+  document.addEventListener("command-palette:agent", (e) => {
     const { agentId } = e.detail;
-    const data = AGENT_DIALOGUE_DATA[agentId] || { id: agentId, name: agentId, role: 'Agent', personality: 'Adaptive', level: 1, xp: 0, colorKey: 'dispatcher' };
+    const data = AGENT_DIALOGUE_DATA[agentId] || {
+      id: agentId,
+      name: agentId,
+      role: "Agent",
+      personality: "Adaptive",
+      level: 1,
+      xp: 0,
+      colorKey: "dispatcher",
+    };
     agentDialogue.open(data);
   });
 
   // Command palette action → route actions
-  document.addEventListener('command-palette:action', (e) => {
+  document.addEventListener("command-palette:action", (e) => {
     const { action } = e.detail;
-    if (action === 'settings') {
+    if (action === "settings") {
       panels.openSettings();
     }
     // Other actions emit their own events for game systems to handle
   });
 
   // Minimap navigation → update HUD + emit event
-  document.addEventListener('hud:navigate', (e) => {
+  document.addEventListener("hud:navigate", (e) => {
     const { zoneId } = e.detail;
     hud.setCurrentZone(zoneId);
   });
@@ -201,6 +249,8 @@ export function initUI({ cssBasePath = '' } = {}) {
 
 // ── Auto-init if loaded as a script tag ─────────────────────────
 // (For quick testing in Electron without a bundler)
-if (typeof window !== 'undefined' && window.__CLAUDE_WORLD_AUTO_INIT_UI) {
-  window.__claudeWorldUI = initUI({ cssBasePath: window.__CLAUDE_WORLD_CSS_PATH || '' });
+if (typeof window !== "undefined" && window.__CLAUDE_WORLD_AUTO_INIT_UI) {
+  window.__claudeWorldUI = initUI({
+    cssBasePath: window.__CLAUDE_WORLD_CSS_PATH || "",
+  });
 }

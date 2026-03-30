@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Boot Test</title>
+    <script type="importmap">
+      {
+        "imports": { "pixi.js": "../../node_modules/pixi.js/dist/pixi.min.mjs" }
+      }
+    </script>
+    <style>
+      body {
+        background: #0a0a14;
+        color: #e8e8f0;
+        font-family: monospace;
+        padding: 40px;
+      }
+      #log {
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Claude World Boot Test</h1>
+    <div id="log">Starting...\n</div>
+    <script>
+      window.addEventListener("error", (e) => {
+        document.getElementById("log").textContent +=
+          "ERROR: " + e.message + " @ " + e.filename + ":" + e.lineno + "\n";
+      });
+      window.addEventListener("unhandledrejection", (e) => {
+        document.getElementById("log").textContent +=
+          "REJECTION: " + (e.reason?.message || e.reason) + "\n";
+      });
+    </script>
+    <script type="module">
+      const log = document.getElementById("log");
+      const add = (m) => {
+        log.textContent += m + "\n";
+        console.log(m);
+      };
+
+      try {
+        add("1. Importing PixiJS...");
+        const pixi = await import("pixi.js");
+        add("2. PixiJS loaded! Version: " + (pixi.VERSION || "unknown"));
+
+        add("3. Importing app.js...");
+        const app = await import("./app.js");
+        add("4. app.js loaded! exports: " + Object.keys(app).join(", "));
+
+        add("5. Importing ui/index.js...");
+        const ui = await import("../ui/index.js");
+        add("6. UI loaded! exports: " + Object.keys(ui).join(", "));
+
+        add("7. Calling initWorld()...");
+        await app.initWorld();
+        add("8. World initialized!");
+
+        add("✓ BOOT TEST PASSED");
+      } catch (err) {
+        add("FAILED: " + err.message);
+        add(err.stack);
+      }
+    </script>
+  </body>
+</html>

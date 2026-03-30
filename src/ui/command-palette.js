@@ -17,206 +17,253 @@
 // ── Zone registry ────────────────────────────────────────────────────────────
 
 const ZONES = [
-  { id: 'home',             name: 'Home Dashboard',     emoji: '🏠', active: true  },
-  { id: 'dispatch',         name: 'Dispatch Tower',     emoji: '🗼', active: true  },
-  { id: 'brain',            name: 'Brain Library',      emoji: '🧠', active: true  },
-  { id: 'chat',             name: 'Chat Rooms',         emoji: '💬', active: true  },
-  { id: 'memory',           name: 'Memory Vault',       emoji: '🔒', active: true  },
-  { id: 'skills',           name: 'Skills Academy',     emoji: '🎓', active: true  },
-  { id: 'minions',          name: 'Minion Tunnels',     emoji: '🤖', active: true  },
-  { id: 'treasury',         name: 'Treasury',           emoji: '💰', active: true  },
-  { id: 'sales',            name: 'Sales District',     emoji: '📈', active: true  },
-  { id: 'marketing',        name: 'Marketing Plaza',    emoji: '📣', active: true  },
-  { id: 'exchange',         name: 'The Exchange',       emoji: '🔄', active: true  },
-  { id: 'market',           name: 'The Market',         emoji: '🏪', active: true  },
-  { id: 'council',          name: 'The Council',        emoji: '🏛️', active: true  },
-  { id: 'rnd',              name: 'R&D Lab',            emoji: '🔬', active: true  },
-  { id: 'legal',            name: 'Legal Tower',        emoji: '⚖️', active: true  },
-  { id: 'archive',          name: 'The Archive',        emoji: '📚', active: true  },
-  { id: 'docks',            name: 'Connector Docks',    emoji: '⚓', active: true  },
-  { id: 'airport',          name: 'Airport',            emoji: '✈️', active: true  },
-  { id: 'globe',            name: 'Globe Room',         emoji: '🌐', active: true  },
-  { id: 'broadcast',        name: 'Broadcast Tower',    emoji: '📡', active: true  },
-  { id: 'mission-control',  name: 'Mission Control',    emoji: '🎛️', active: true  },
-  { id: 'analytics',        name: 'Analytics',          emoji: '📊', active: true  },
-  { id: 'settings',         name: 'Settings',           emoji: '⚙️', active: true  },
-  { id: 'reports',          name: 'Reports',            emoji: '📋', active: true  },
-  { id: 'timeline',         name: 'Timeline',           emoji: '📅', active: true  },
-  { id: 'kanban',           name: 'Kanban Board',       emoji: '📋', active: true  },
-  { id: 'knowledge-graph',  name: 'Knowledge Graph',    emoji: '🕸️', active: true  },
-  { id: 'automations',      name: 'Automations',        emoji: '⚙️', active: true  },
-  { id: 'skill-tree',       name: 'Skill Tree',         emoji: '🌳', active: true  },
-  { id: 'calendar',         name: 'Calendar',           emoji: '📅', active: true  },
-  { id: 'sharing',          name: 'Sharing',            emoji: '📤', active: true  },
-  { id: 'achievements',     name: 'Achievements',       emoji: '🏆', active: true  },
+  { id: "home", name: "Home Dashboard", emoji: "🏠", active: true },
+  { id: "dispatch", name: "Dispatch Tower", emoji: "🗼", active: true },
+  { id: "brain", name: "Brain Library", emoji: "🧠", active: true },
+  { id: "chat", name: "Chat Rooms", emoji: "💬", active: true },
+  { id: "memory", name: "Memory Vault", emoji: "🔒", active: true },
+  { id: "skills", name: "Skills Academy", emoji: "🎓", active: true },
+  { id: "minions", name: "Minion Tunnels", emoji: "🤖", active: true },
+  { id: "treasury", name: "Treasury", emoji: "💰", active: true },
+  { id: "sales", name: "Sales District", emoji: "📈", active: true },
+  { id: "marketing", name: "Marketing Plaza", emoji: "📣", active: true },
+  { id: "exchange", name: "The Exchange", emoji: "🔄", active: true },
+  { id: "market", name: "The Market", emoji: "🏪", active: true },
+  { id: "council", name: "The Council", emoji: "🏛️", active: true },
+  { id: "rnd", name: "R&D Lab", emoji: "🔬", active: true },
+  { id: "legal", name: "Legal Tower", emoji: "⚖️", active: true },
+  { id: "archive", name: "The Archive", emoji: "📚", active: true },
+  { id: "docks", name: "Connector Docks", emoji: "⚓", active: true },
+  { id: "airport", name: "Airport", emoji: "✈️", active: true },
+  { id: "globe", name: "Globe Room", emoji: "🌐", active: true },
+  { id: "broadcast", name: "Broadcast Tower", emoji: "📡", active: true },
+  { id: "mission-control", name: "Mission Control", emoji: "🎛️", active: true },
+  { id: "analytics", name: "Analytics", emoji: "📊", active: true },
+  { id: "settings", name: "Settings", emoji: "⚙️", active: true },
+  { id: "reports", name: "Reports", emoji: "📋", active: true },
+  { id: "timeline", name: "Timeline", emoji: "📅", active: true },
+  { id: "kanban", name: "Kanban Board", emoji: "📋", active: true },
+  { id: "knowledge-graph", name: "Knowledge Graph", emoji: "🕸️", active: true },
+  { id: "automations", name: "Automations", emoji: "⚙️", active: true },
+  { id: "skill-tree", name: "Skill Tree", emoji: "🌳", active: true },
+  { id: "calendar", name: "Calendar", emoji: "📅", active: true },
+  { id: "sharing", name: "Sharing", emoji: "📤", active: true },
+  { id: "achievements", name: "Achievements", emoji: "🏆", active: true },
 ];
 
 // ── Quick Actions registry ────────────────────────────────────────────────────
 
 const QUICK_ACTIONS = [
   {
-    id: 'qa-new-task',
-    label: 'New Task',
-    subtitle: 'Open Dispatch Tower with input focused',
-    icon: '➕',
-    shortcut: '↵ Create',
+    id: "qa-new-task",
+    label: "New Task",
+    subtitle: "Open Dispatch Tower with input focused",
+    icon: "➕",
+    shortcut: "↵ Create",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-        detail: { zoneId: 'dispatch', zoneName: 'Dispatch Tower', focusInput: true }, bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:navigate", {
+          detail: {
+            zoneId: "dispatch",
+            zoneName: "Dispatch Tower",
+            focusInput: true,
+          },
+          bubbles: true,
+        }),
+      );
     },
   },
   {
-    id: 'qa-new-chat',
-    label: 'New Chat',
-    subtitle: 'Open Chat Rooms and start a conversation',
-    icon: '💬',
-    shortcut: '↵ Open',
+    id: "qa-new-chat",
+    label: "New Chat",
+    subtitle: "Open Chat Rooms and start a conversation",
+    icon: "💬",
+    shortcut: "↵ Open",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-        detail: { zoneId: 'chat', zoneName: 'Chat Rooms' }, bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:navigate", {
+          detail: { zoneId: "chat", zoneName: "Chat Rooms" },
+          bubbles: true,
+        }),
+      );
     },
   },
   {
-    id: 'qa-snapshot',
-    label: 'Take Snapshot',
-    subtitle: 'Save a timestamped snapshot of the current world',
-    icon: '📸',
-    shortcut: '↵ Save',
+    id: "qa-snapshot",
+    label: "Take Snapshot",
+    subtitle: "Save a timestamped snapshot of the current world",
+    icon: "📸",
+    shortcut: "↵ Save",
     action: () => {
-      const label = `snapshot-${new Date().toISOString().slice(0, 19).replace('T', '_')}`;
-      document.dispatchEvent(new CustomEvent('command-palette:action', {
-        detail: { action: 'snapshot', label }, bubbles: true,
-      }));
+      const label = `snapshot-${new Date().toISOString().slice(0, 19).replace("T", "_")}`;
+      document.dispatchEvent(
+        new CustomEvent("command-palette:action", {
+          detail: { action: "snapshot", label },
+          bubbles: true,
+        }),
+      );
     },
   },
   {
-    id: 'qa-toggle-theme',
-    label: 'Toggle Theme',
-    subtitle: 'Cycle through available themes',
-    icon: '🎨',
-    shortcut: '↵ Toggle',
+    id: "qa-toggle-theme",
+    label: "Toggle Theme",
+    subtitle: "Cycle through available themes",
+    icon: "🎨",
+    shortcut: "↵ Toggle",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:open-theme-picker', { bubbles: true }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:open-theme-picker", { bubbles: true }),
+      );
     },
   },
   {
-    id: 'qa-toggle-audio',
-    label: 'Toggle Audio',
-    subtitle: 'Mute or unmute all sounds',
-    icon: '🔊',
-    shortcut: '↵ Toggle',
+    id: "qa-toggle-audio",
+    label: "Toggle Audio",
+    subtitle: "Mute or unmute all sounds",
+    icon: "🔊",
+    shortcut: "↵ Toggle",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:action', {
-        detail: { action: 'toggle-audio' }, bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:action", {
+          detail: { action: "toggle-audio" },
+          bubbles: true,
+        }),
+      );
     },
   },
   {
-    id: 'qa-focus-mode',
-    label: 'Focus Mode',
-    subtitle: 'Enter distraction-free focus mode',
-    icon: '🎯',
-    shortcut: '↵ Enter',
+    id: "qa-focus-mode",
+    label: "Focus Mode",
+    subtitle: "Enter distraction-free focus mode",
+    icon: "🎯",
+    shortcut: "↵ Enter",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:action', {
-        detail: { action: 'focus-mode' }, bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:action", {
+          detail: { action: "focus-mode" },
+          bubbles: true,
+        }),
+      );
     },
   },
   {
-    id: 'qa-open-settings',
-    label: 'Open Settings',
-    subtitle: 'World settings, providers, appearance',
-    icon: '⚙️',
-    shortcut: '↵ Open',
+    id: "qa-open-settings",
+    label: "Open Settings",
+    subtitle: "World settings, providers, appearance",
+    icon: "⚙️",
+    shortcut: "↵ Open",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-        detail: { zoneId: 'settings', zoneName: 'Settings' }, bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:navigate", {
+          detail: { zoneId: "settings", zoneName: "Settings" },
+          bubbles: true,
+        }),
+      );
     },
   },
   {
-    id: 'qa-show-shortcuts',
-    label: 'Show Shortcuts',
-    subtitle: 'View all keyboard shortcuts',
-    icon: '⌨️',
-    shortcut: '↵ Show',
+    id: "qa-show-shortcuts",
+    label: "Show Shortcuts",
+    subtitle: "View all keyboard shortcuts",
+    icon: "⌨️",
+    shortcut: "↵ Show",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:show-help', { bubbles: true }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:show-help", { bubbles: true }),
+      );
     },
   },
   {
-    id: 'qa-perf-monitor',
-    label: 'Performance Monitor',
-    subtitle: 'Toggle the performance overlay',
-    icon: '📈',
-    shortcut: '↵ Toggle',
+    id: "qa-perf-monitor",
+    label: "Performance Monitor",
+    subtitle: "Toggle the performance overlay",
+    icon: "📈",
+    shortcut: "↵ Toggle",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:action', {
-        detail: { action: 'toggle-perf-monitor' }, bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:action", {
+          detail: { action: "toggle-perf-monitor" },
+          bubbles: true,
+        }),
+      );
     },
   },
   {
-    id: 'qa-cold-email',
-    label: 'Write Cold Email',
-    subtitle: 'Open Sales District in outreach mode',
-    icon: '✉️',
-    shortcut: '↵ Open',
+    id: "qa-cold-email",
+    label: "Write Cold Email",
+    subtitle: "Open Sales District in outreach mode",
+    icon: "✉️",
+    shortcut: "↵ Open",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-        detail: { zoneId: 'sales', zoneName: 'Sales District', mode: 'outreach' }, bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:navigate", {
+          detail: {
+            zoneId: "sales",
+            zoneName: "Sales District",
+            mode: "outreach",
+          },
+          bubbles: true,
+        }),
+      );
     },
   },
   {
-    id: 'qa-research',
-    label: 'Research Topic',
-    subtitle: 'Open Globe Room for deep research',
-    icon: '🔍',
-    shortcut: '↵ Open',
+    id: "qa-research",
+    label: "Research Topic",
+    subtitle: "Open Globe Room for deep research",
+    icon: "🔍",
+    shortcut: "↵ Open",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-        detail: { zoneId: 'globe', zoneName: 'Globe Room' }, bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:navigate", {
+          detail: { zoneId: "globe", zoneName: "Globe Room" },
+          bubbles: true,
+        }),
+      );
     },
   },
   {
-    id: 'qa-run-minions',
-    label: 'Run All Minions',
-    subtitle: 'Trigger all currently enabled minions',
-    icon: '⚡',
-    shortcut: '↵ Run',
+    id: "qa-run-minions",
+    label: "Run All Minions",
+    subtitle: "Trigger all currently enabled minions",
+    icon: "⚡",
+    shortcut: "↵ Run",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:action', {
-        detail: { action: 'run-all-minions' }, bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:action", {
+          detail: { action: "run-all-minions" },
+          bubbles: true,
+        }),
+      );
     },
   },
   {
-    id: 'qa-morning-brief',
-    label: 'Generate Morning Brief',
-    subtitle: 'Trigger the morning briefing agent',
-    icon: '☀️',
-    shortcut: '↵ Run',
+    id: "qa-morning-brief",
+    label: "Generate Morning Brief",
+    subtitle: "Trigger the morning briefing agent",
+    icon: "☀️",
+    shortcut: "↵ Run",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:action', {
-        detail: { action: 'morning-brief' }, bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:action", {
+          detail: { action: "morning-brief" },
+          bubbles: true,
+        }),
+      );
     },
   },
   {
-    id: 'qa-day-night',
-    label: 'Toggle Day/Night',
-    subtitle: 'Switch between day and night mode',
-    icon: '🌙',
-    shortcut: '↵ Toggle',
+    id: "qa-day-night",
+    label: "Toggle Day/Night",
+    subtitle: "Switch between day and night mode",
+    icon: "🌙",
+    shortcut: "↵ Toggle",
     action: () => {
-      document.dispatchEvent(new CustomEvent('command-palette:toggle-day-night', {
-        bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:toggle-day-night", {
+          bubbles: true,
+        }),
+      );
     },
   },
 ];
@@ -224,34 +271,74 @@ const QUICK_ACTIONS = [
 // ── Agent registry ───────────────────────────────────────────────────────────
 
 const AGENTS = [
-  { id: 'commander',  name: 'Commander',  emoji: '👑', subtitle: 'Strategic, decisive, task-oriented',      zone: 'dispatch' },
-  { id: 'librarian',  name: 'Librarian',  emoji: '📚', subtitle: 'Methodical, curious, knowledge-driven',  zone: 'brain'    },
-  { id: 'archivist',  name: 'Archivist',  emoji: '📜', subtitle: 'Meticulous, patient, detail-focused',    zone: 'archive'  },
-  { id: 'instructor', name: 'Instructor', emoji: '🎓', subtitle: 'Patient, adaptive, skill-focused',       zone: 'skills'   },
-  { id: 'dockmaster', name: 'Dockmaster', emoji: '⚓', subtitle: 'Practical, reliable, integration-savvy', zone: 'docks'    },
+  {
+    id: "commander",
+    name: "Commander",
+    emoji: "👑",
+    subtitle: "Strategic, decisive, task-oriented",
+    zone: "dispatch",
+  },
+  {
+    id: "librarian",
+    name: "Librarian",
+    emoji: "📚",
+    subtitle: "Methodical, curious, knowledge-driven",
+    zone: "brain",
+  },
+  {
+    id: "archivist",
+    name: "Archivist",
+    emoji: "📜",
+    subtitle: "Meticulous, patient, detail-focused",
+    zone: "archive",
+  },
+  {
+    id: "instructor",
+    name: "Instructor",
+    emoji: "🎓",
+    subtitle: "Patient, adaptive, skill-focused",
+    zone: "skills",
+  },
+  {
+    id: "dockmaster",
+    name: "Dockmaster",
+    emoji: "⚓",
+    subtitle: "Practical, reliable, integration-savvy",
+    zone: "docks",
+  },
 ];
 
 // ── Recent commands (localStorage) ───────────────────────────────────────────
 
-const RECENT_COMMANDS_KEY = 'cp-recent-commands';
+const RECENT_COMMANDS_KEY = "cp-recent-commands";
 const MAX_RECENT = 5;
 
 function getRecentCommands() {
   try {
     const raw = localStorage.getItem(RECENT_COMMANDS_KEY);
     return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 function pushRecentCommand(entry) {
   try {
     let recents = getRecentCommands();
     // Remove duplicate by id
-    recents = recents.filter(r => r.id !== entry.id);
-    recents.unshift({ id: entry.id, label: entry.label, icon: entry.icon, category: entry.category, timestamp: Date.now() });
+    recents = recents.filter((r) => r.id !== entry.id);
+    recents.unshift({
+      id: entry.id,
+      label: entry.label,
+      icon: entry.icon,
+      category: entry.category,
+      timestamp: Date.now(),
+    });
     if (recents.length > MAX_RECENT) recents.length = MAX_RECENT;
     localStorage.setItem(RECENT_COMMANDS_KEY, JSON.stringify(recents));
-  } catch { /* ignore quota errors */ }
+  } catch {
+    /* ignore quota errors */
+  }
 }
 
 // ── URL detector ──────────────────────────────────────────────────────────────
@@ -263,15 +350,53 @@ function isURL(str) {
 // ── AI intent detector ────────────────────────────────────────────────────────
 
 const QUESTION_WORDS = new Set([
-  'what', 'how', 'why', 'who', 'when', 'where', 'can', 'does', 'is',
-  'will', 'should', 'could', 'would', 'which', 'whose', 'whom',
+  "what",
+  "how",
+  "why",
+  "who",
+  "when",
+  "where",
+  "can",
+  "does",
+  "is",
+  "will",
+  "should",
+  "could",
+  "would",
+  "which",
+  "whose",
+  "whom",
 ]);
 
 const ACTION_VERBS = new Set([
-  'write', 'draft', 'analyze', 'analyse', 'research', 'find', 'create',
-  'generate', 'summarize', 'summarise', 'explain', 'compare', 'list',
-  'help', 'make', 'build', 'suggest', 'improve', 'fix', 'edit', 'translate',
-  'describe', 'outline', 'plan', 'schedule', 'send', 'check', 'review',
+  "write",
+  "draft",
+  "analyze",
+  "analyse",
+  "research",
+  "find",
+  "create",
+  "generate",
+  "summarize",
+  "summarise",
+  "explain",
+  "compare",
+  "list",
+  "help",
+  "make",
+  "build",
+  "suggest",
+  "improve",
+  "fix",
+  "edit",
+  "translate",
+  "describe",
+  "outline",
+  "plan",
+  "schedule",
+  "send",
+  "check",
+  "review",
 ]);
 
 function shouldPrioritizeAI(query) {
@@ -288,10 +413,10 @@ function shouldPrioritizeAI(query) {
 
 function detectSpecialCommand(query) {
   const q = query.trim().toLowerCase();
-  if (q === '/snapshot' || q === '/snap') return 'snapshot';
-  if (q === '/theme')                     return 'theme';
-  if (q === '/help')                      return 'help';
-  if (q === '/clear')                     return 'clear';
+  if (q === "/snapshot" || q === "/snap") return "snapshot";
+  if (q === "/theme") return "theme";
+  if (q === "/help") return "help";
+  if (q === "/clear") return "clear";
   return null;
 }
 
@@ -313,13 +438,19 @@ function fuzzyMatch(query, candidate) {
 
   // Exact prefix
   if (lower.startsWith(query)) {
-    return { score: 100 + query.length, indices: Array.from({ length: query.length }, (_, i) => i) };
+    return {
+      score: 100 + query.length,
+      indices: Array.from({ length: query.length }, (_, i) => i),
+    };
   }
 
   // Substring match (anywhere)
   const subIdx = lower.indexOf(query);
   if (subIdx !== -1) {
-    return { score: 85 + query.length - subIdx * 0.1, indices: Array.from({ length: query.length }, (_, i) => subIdx + i) };
+    return {
+      score: 85 + query.length - subIdx * 0.1,
+      indices: Array.from({ length: query.length }, (_, i) => subIdx + i),
+    };
   }
 
   // Word start abbreviation match
@@ -330,7 +461,7 @@ function fuzzyMatch(query, candidate) {
     const ch = lower[i];
     const isBoundary = /[\s\-_/]/.test(ch);
     if (!inWord && !isBoundary) {
-      words.push('');
+      words.push("");
       wordStarts.push(i);
       inWord = true;
     }
@@ -338,18 +469,24 @@ function fuzzyMatch(query, candidate) {
     else inWord = false;
   }
 
-  let abbrev = '';
-  for (const w of words) abbrev += w[0] || '';
+  let abbrev = "";
+  for (const w of words) abbrev += w[0] || "";
 
   if (abbrev.startsWith(query)) {
-    return { score: 80 + query.length, indices: wordStarts.slice(0, query.length) };
+    return {
+      score: 80 + query.length,
+      indices: wordStarts.slice(0, query.length),
+    };
   }
 
   // Word body match
   for (let wi = 0; wi < words.length; wi++) {
     if (words[wi].startsWith(query)) {
       const start = wordStarts[wi];
-      return { score: 70 + query.length, indices: Array.from({ length: query.length }, (_, i) => start + i) };
+      return {
+        score: 70 + query.length,
+        indices: Array.from({ length: query.length }, (_, i) => start + i),
+      };
     }
   }
 
@@ -357,7 +494,10 @@ function fuzzyMatch(query, candidate) {
   const indices = [];
   let qi = 0;
   for (let i = 0; i < lower.length && qi < query.length; i++) {
-    if (lower[i] === query[qi]) { indices.push(i); qi++; }
+    if (lower[i] === query[qi]) {
+      indices.push(i);
+      qi++;
+    }
   }
 
   if (qi === query.length) {
@@ -376,10 +516,10 @@ function fuzzyMatch(query, candidate) {
 
 function escapeHtml(str) {
   return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 /**
@@ -391,19 +531,25 @@ function escapeHtml(str) {
 function highlightMatch(label, indices) {
   if (!indices || indices.length === 0) return escapeHtml(label);
   const set = new Set(indices);
-  let html = '';
+  let html = "";
   let inMark = false;
   for (let i = 0; i < label.length; i++) {
     const ch = escapeHtml(label[i]);
     if (set.has(i)) {
-      if (!inMark) { html += '<mark>'; inMark = true; }
+      if (!inMark) {
+        html += "<mark>";
+        inMark = true;
+      }
       html += ch;
     } else {
-      if (inMark) { html += '</mark>'; inMark = false; }
+      if (inMark) {
+        html += "</mark>";
+        inMark = false;
+      }
       html += ch;
     }
   }
-  if (inMark) html += '</mark>';
+  if (inMark) html += "</mark>";
   return html;
 }
 
@@ -460,7 +606,7 @@ export class CommandPalette {
     /** @type {boolean} */
     this._isSearching = false;
     /** @type {string} */
-    this._lastQuery = '';
+    this._lastQuery = "";
     /** @type {string | null} */
     this._worldId = null;
 
@@ -473,59 +619,59 @@ export class CommandPalette {
 
   _createDOM() {
     // Full-screen backdrop
-    this._backdrop = document.createElement('div');
-    this._backdrop.className = 'cp-backdrop';
-    this._backdrop.setAttribute('role', 'dialog');
-    this._backdrop.setAttribute('aria-modal', 'true');
-    this._backdrop.setAttribute('aria-label', 'Command palette');
+    this._backdrop = document.createElement("div");
+    this._backdrop.className = "cp-backdrop";
+    this._backdrop.setAttribute("role", "dialog");
+    this._backdrop.setAttribute("aria-modal", "true");
+    this._backdrop.setAttribute("aria-label", "Command palette");
 
     // Centered modal
-    this._modal = document.createElement('div');
-    this._modal.className = 'cp-modal';
+    this._modal = document.createElement("div");
+    this._modal.className = "cp-modal";
 
     // ── Input area
-    const inputArea = document.createElement('div');
-    inputArea.className = 'cp-input-area';
+    const inputArea = document.createElement("div");
+    inputArea.className = "cp-input-area";
 
-    this._searchIcon = document.createElement('span');
-    this._searchIcon.className = 'cp-search-icon';
+    this._searchIcon = document.createElement("span");
+    this._searchIcon.className = "cp-search-icon";
     this._searchIcon.innerHTML = SVG.search;
     inputArea.appendChild(this._searchIcon);
 
-    this._input = document.createElement('input');
-    this._input.className = 'cp-input';
-    this._input.type = 'text';
-    this._input.placeholder = 'Search your world...';
-    this._input.setAttribute('aria-label', 'Search commands and tasks');
-    this._input.setAttribute('autocomplete', 'off');
-    this._input.setAttribute('spellcheck', 'false');
-    this._input.setAttribute('autocorrect', 'off');
-    this._input.setAttribute('autocapitalize', 'off');
+    this._input = document.createElement("input");
+    this._input.className = "cp-input";
+    this._input.type = "text";
+    this._input.placeholder = "Search your world...";
+    this._input.setAttribute("aria-label", "Search commands and tasks");
+    this._input.setAttribute("autocomplete", "off");
+    this._input.setAttribute("spellcheck", "false");
+    this._input.setAttribute("autocorrect", "off");
+    this._input.setAttribute("autocapitalize", "off");
     inputArea.appendChild(this._input);
 
-    this._spinnerEl = document.createElement('span');
-    this._spinnerEl.className = 'cp-spinner-wrap';
+    this._spinnerEl = document.createElement("span");
+    this._spinnerEl.className = "cp-spinner-wrap";
     this._spinnerEl.innerHTML = SVG.spinner;
-    this._spinnerEl.style.display = 'none';
+    this._spinnerEl.style.display = "none";
     inputArea.appendChild(this._spinnerEl);
 
     // Special command badge (shown when "/" commands are typed)
-    this._commandBadge = document.createElement('span');
-    this._commandBadge.className = 'cp-command-badge';
-    this._commandBadge.style.display = 'none';
+    this._commandBadge = document.createElement("span");
+    this._commandBadge.className = "cp-command-badge";
+    this._commandBadge.style.display = "none";
     inputArea.appendChild(this._commandBadge);
 
     this._modal.appendChild(inputArea);
 
     // ── Results container
-    this._resultsEl = document.createElement('div');
-    this._resultsEl.className = 'cp-results';
-    this._resultsEl.setAttribute('role', 'listbox');
+    this._resultsEl = document.createElement("div");
+    this._resultsEl.className = "cp-results";
+    this._resultsEl.setAttribute("role", "listbox");
     this._modal.appendChild(this._resultsEl);
 
     // ── Footer
-    const footer = document.createElement('div');
-    footer.className = 'cp-footer';
+    const footer = document.createElement("div");
+    footer.className = "cp-footer";
     footer.innerHTML = `
       <div class="cp-footer-hints">
         <span class="cp-hint"><kbd>↑↓</kbd> navigate</span>
@@ -543,8 +689,8 @@ export class CommandPalette {
     document.body.appendChild(this._backdrop);
 
     // ── Empty state (rendered once, shown/hidden)
-    this._emptyEl = document.createElement('div');
-    this._emptyEl.className = 'cp-empty';
+    this._emptyEl = document.createElement("div");
+    this._emptyEl.className = "cp-empty";
     this._emptyEl.innerHTML = `
       <div class="cp-empty-cursor-wrap">
         <span class="cp-empty-text">Start typing to search your world</span><span class="cp-empty-cursor">_</span>
@@ -560,24 +706,24 @@ export class CommandPalette {
   // ── Global keyboard binding ──────────────────────────────────────────────────
 
   _bindGlobalKeys() {
-    document.addEventListener('keydown', (e) => {
-      const isMac = navigator.platform.includes('Mac');
+    document.addEventListener("keydown", (e) => {
+      const isMac = navigator.platform.includes("Mac");
       const modKey = isMac ? e.metaKey : e.ctrlKey;
 
-      if (modKey && e.key === 'k') {
+      if (modKey && e.key === "k") {
         e.preventDefault();
         this.toggle();
         return;
       }
 
       // Open with "/" when not focused in a text field
-      if (e.key === '/' && !this._isOpen) {
+      if (e.key === "/" && !this._isOpen) {
         const active = document.activeElement;
-        const isTextField = active && (
-          active.tagName === 'INPUT' ||
-          active.tagName === 'TEXTAREA' ||
-          active.isContentEditable
-        );
+        const isTextField =
+          active &&
+          (active.tagName === "INPUT" ||
+            active.tagName === "TEXTAREA" ||
+            active.isContentEditable);
         if (!isTextField) {
           e.preventDefault();
           this.open();
@@ -590,30 +736,30 @@ export class CommandPalette {
 
   _bindPaletteEvents() {
     // Input typing
-    this._input.addEventListener('input', () => {
+    this._input.addEventListener("input", () => {
       this._onInput();
     });
 
     // Keyboard navigation
-    this._input.addEventListener('keydown', (e) => {
+    this._input.addEventListener("keydown", (e) => {
       switch (e.key) {
-        case 'ArrowDown':
+        case "ArrowDown":
           e.preventDefault();
           this._moveSelection(1);
           break;
-        case 'ArrowUp':
+        case "ArrowUp":
           e.preventDefault();
           this._moveSelection(-1);
           break;
-        case 'Enter':
+        case "Enter":
           e.preventDefault();
           this._executeSelected();
           break;
-        case 'Escape':
+        case "Escape":
           e.preventDefault();
           this.close();
           break;
-        case 'Tab':
+        case "Tab":
           e.preventDefault();
           this._moveSelection(e.shiftKey ? -1 : 1);
           break;
@@ -621,7 +767,7 @@ export class CommandPalette {
     });
 
     // Backdrop click to dismiss
-    this._backdrop.addEventListener('mousedown', (e) => {
+    this._backdrop.addEventListener("mousedown", (e) => {
       if (e.target === this._backdrop) this.close();
     });
   }
@@ -638,7 +784,7 @@ export class CommandPalette {
       this._showSpecialCommand(special, query);
       return;
     }
-    this._commandBadge.style.display = 'none';
+    this._commandBadge.style.display = "none";
 
     // URL detection
     if (isURL(query)) {
@@ -663,41 +809,50 @@ export class CommandPalette {
       }, 150);
 
       // Dispatch global search event for SearchResults integration
-      document.dispatchEvent(new CustomEvent('command-palette:global-search', {
-        detail: { query, worldId: this._worldId || (window.currentWorldId ?? null) },
-        bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:global-search", {
+          detail: {
+            query,
+            worldId: this._worldId || (window.currentWorldId ?? null),
+          },
+          bubbles: true,
+        }),
+      );
     } else {
       this._setSearching(false);
       // Hide global search results when query is too short
-      document.dispatchEvent(new CustomEvent('command-palette:global-search-clear', {
-        bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("command-palette:global-search-clear", {
+          bubbles: true,
+        }),
+      );
     }
   }
 
   // ── Special command handler ────────────────────────────────────────────────────
 
   _showSpecialCommand(type, query) {
-    this._commandBadge.style.display = 'flex';
+    this._commandBadge.style.display = "flex";
 
     const labels = {
-      snapshot: '📸 Save Snapshot',
-      theme:    '🎨 Open Theme Picker',
-      help:     '⌨️ Keyboard Shortcuts',
-      clear:    '🗑️ Clear Recent Tasks',
+      snapshot: "📸 Save Snapshot",
+      theme: "🎨 Open Theme Picker",
+      help: "⌨️ Keyboard Shortcuts",
+      clear: "🗑️ Clear Recent Tasks",
     };
     this._commandBadge.textContent = labels[type] || query;
 
-    this._results = [{
-      id: `special-${type}`,
-      category: 'Actions',
-      icon: labels[type]?.slice(0, 2) || '⚡',
-      label: labels[type]?.slice(3) || query,
-      subtitle: 'Special command',
-      shortcutBadge: '↵ Run',
-      execute: () => this._executeSpecialCommand(type),
-    }];
+    this._results = [
+      {
+        id: `special-${type}`,
+        category: "Actions",
+        icon: labels[type]?.slice(0, 2) || "⚡",
+        label: labels[type]?.slice(3) || query,
+        subtitle: "Special command",
+        shortcutBadge: "↵ Run",
+        execute: () => this._executeSpecialCommand(type),
+      },
+    ];
 
     this._selectedIndex = 0;
     this._render();
@@ -705,21 +860,32 @@ export class CommandPalette {
 
   _executeSpecialCommand(type) {
     switch (type) {
-      case 'snapshot': {
-        const label = `snapshot-${new Date().toISOString().slice(0, 19).replace('T', '_')}`;
-        document.dispatchEvent(new CustomEvent('command-palette:action', {
-          detail: { action: 'snapshot', label }, bubbles: true,
-        }));
+      case "snapshot": {
+        const label = `snapshot-${new Date().toISOString().slice(0, 19).replace("T", "_")}`;
+        document.dispatchEvent(
+          new CustomEvent("command-palette:action", {
+            detail: { action: "snapshot", label },
+            bubbles: true,
+          }),
+        );
         break;
       }
-      case 'theme':
-        document.dispatchEvent(new CustomEvent('command-palette:open-theme-picker', { bubbles: true }));
+      case "theme":
+        document.dispatchEvent(
+          new CustomEvent("command-palette:open-theme-picker", {
+            bubbles: true,
+          }),
+        );
         break;
-      case 'help':
-        document.dispatchEvent(new CustomEvent('command-palette:show-help', { bubbles: true }));
+      case "help":
+        document.dispatchEvent(
+          new CustomEvent("command-palette:show-help", { bubbles: true }),
+        );
         break;
-      case 'clear':
-        document.dispatchEvent(new CustomEvent('command-palette:clear-tasks', { bubbles: true }));
+      case "clear":
+        document.dispatchEvent(
+          new CustomEvent("command-palette:clear-tasks", { bubbles: true }),
+        );
         break;
     }
   }
@@ -727,20 +893,25 @@ export class CommandPalette {
   // ── URL result ────────────────────────────────────────────────────────────────
 
   _showURLResult(url) {
-    this._commandBadge.style.display = 'none';
-    this._results = [{
-      id: 'open-url',
-      category: 'Actions',
-      icon: '🌐',
-      label: `Open in Globe Room`,
-      subtitle: url,
-      shortcutBadge: '↵ Open',
-      execute: () => {
-        document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-          detail: { zoneId: 'globe', zoneName: 'Globe Room', url }, bubbles: true,
-        }));
+    this._commandBadge.style.display = "none";
+    this._results = [
+      {
+        id: "open-url",
+        category: "Actions",
+        icon: "🌐",
+        label: `Open in Globe Room`,
+        subtitle: url,
+        shortcutBadge: "↵ Open",
+        execute: () => {
+          document.dispatchEvent(
+            new CustomEvent("command-palette:navigate", {
+              detail: { zoneId: "globe", zoneName: "Globe Room", url },
+              bubbles: true,
+            }),
+          );
+        },
       },
-    }];
+    ];
     this._selectedIndex = 0;
     this._render();
   }
@@ -762,29 +933,42 @@ export class CommandPalette {
         if (!q || match) {
           recentResults.push({
             id: `recent-cmd-${recent.id}`,
-            category: 'Recent',
-            icon: recent.icon || '🕐',
+            category: "Recent",
+            icon: recent.icon || "🕐",
             label: recent.label,
-            subtitle: `Recently used${recent.category ? ' · ' + recent.category : ''}`,
-            shortcutBadge: '↵ Open',
+            subtitle: `Recently used${recent.category ? " · " + recent.category : ""}`,
+            shortcutBadge: "↵ Open",
             matchScore: match ? match.score + 5 : 2, // slight boost for recents
             matchIndices: match ? match.indices : [],
             execute: () => {
               // Re-execute: find from zones, actions, or agents
-              const zone = ZONES.find(z => recent.id === `nav-${z.id}`);
+              const zone = ZONES.find((z) => recent.id === `nav-${z.id}`);
               if (zone) {
-                document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-                  detail: { zoneId: zone.id, zoneName: zone.name }, bubbles: true,
-                }));
+                document.dispatchEvent(
+                  new CustomEvent("command-palette:navigate", {
+                    detail: { zoneId: zone.id, zoneName: zone.name },
+                    bubbles: true,
+                  }),
+                );
                 return;
               }
-              const qa = QUICK_ACTIONS.find(a => recent.id === a.id);
-              if (qa) { qa.action(); return; }
-              const agent = AGENTS.find(a => recent.id === `agent-${a.id}`);
+              const qa = QUICK_ACTIONS.find((a) => recent.id === a.id);
+              if (qa) {
+                qa.action();
+                return;
+              }
+              const agent = AGENTS.find((a) => recent.id === `agent-${a.id}`);
               if (agent) {
-                document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-                  detail: { zoneId: agent.zone, zoneName: agent.name, focusAgent: agent.id }, bubbles: true,
-                }));
+                document.dispatchEvent(
+                  new CustomEvent("command-palette:navigate", {
+                    detail: {
+                      zoneId: agent.zone,
+                      zoneName: agent.name,
+                      focusAgent: agent.id,
+                    },
+                    bubbles: true,
+                  }),
+                );
               }
             },
           });
@@ -799,23 +983,34 @@ export class CommandPalette {
     // ── Ask Claude result (appears at top when AI-intent detected, or always present when query exists)
     if (query.length >= 2) {
       const askResult = {
-        id: 'ask-claude',
-        category: 'Ask Claude',
-        icon: '✨',
+        id: "ask-claude",
+        category: "Ask Claude",
+        icon: "✨",
         label: `Ask Claude: ${query}`,
-        subtitle: 'Open Chat Rooms and pre-fill your query',
-        shortcutBadge: '↵ Ask',
+        subtitle: "Open Chat Rooms and pre-fill your query",
+        shortcutBadge: "↵ Ask",
         _queryCapture: query,
         execute: () => {
           const capturedQuery = query;
-          document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-            detail: { zoneId: 'chat', zoneName: 'Chat Rooms', prefill: capturedQuery }, bubbles: true,
-          }));
+          document.dispatchEvent(
+            new CustomEvent("command-palette:navigate", {
+              detail: {
+                zoneId: "chat",
+                zoneName: "Chat Rooms",
+                prefill: capturedQuery,
+              },
+              bubbles: true,
+            }),
+          );
         },
       };
 
       if (prioritizeAI) {
-        results.push({ ...askResult, matchScore: 9999, category: 'Ask Claude' });
+        results.push({
+          ...askResult,
+          matchScore: 9999,
+          category: "Ask Claude",
+        });
       } else {
         // will be added after navigate/actions
         results._askLater = askResult;
@@ -827,23 +1022,26 @@ export class CommandPalette {
     for (const zone of ZONES) {
       // Match against zone name AND zone id for power users
       const matchName = fuzzyMatch(q, zone.name);
-      const matchId   = q ? fuzzyMatch(q, zone.id) : null;
+      const matchId = q ? fuzzyMatch(q, zone.id) : null;
       const match = matchName || matchId;
       if (!q || match) {
         navResults.push({
           id: `nav-${zone.id}`,
-          category: 'Zones',
+          category: "Zones",
           icon: zone.emoji,
           label: zone.name,
-          subtitle: zone.active ? 'Navigate to zone' : 'Coming soon',
-          shortcutBadge: '↵ Open',
+          subtitle: zone.active ? "Navigate to zone" : "Coming soon",
+          shortcutBadge: "↵ Open",
           locked: !zone.active,
           matchScore: match ? match.score : 1,
           matchIndices: matchName ? matchName.indices : [],
           execute: () => {
-            document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-              detail: { zoneId: zone.id, zoneName: zone.name }, bubbles: true,
-            }));
+            document.dispatchEvent(
+              new CustomEvent("command-palette:navigate", {
+                detail: { zoneId: zone.id, zoneName: zone.name },
+                bubbles: true,
+              }),
+            );
           },
         });
       }
@@ -860,17 +1058,21 @@ export class CommandPalette {
     const qaResults = [];
     for (const qa of QUICK_ACTIONS) {
       const matchLabel = fuzzyMatch(q, qa.label);
-      const matchSub   = q ? fuzzyMatch(q, qa.subtitle || '') : null;
+      const matchSub = q ? fuzzyMatch(q, qa.subtitle || "") : null;
       const match = matchLabel || matchSub;
       if (!q || match) {
         qaResults.push({
           id: qa.id,
-          category: 'Actions',
+          category: "Actions",
           icon: qa.icon,
           label: qa.label,
           subtitle: qa.subtitle,
           shortcutBadge: qa.shortcut,
-          matchScore: matchLabel ? matchLabel.score : (matchSub ? matchSub.score - 5 : 1),
+          matchScore: matchLabel
+            ? matchLabel.score
+            : matchSub
+              ? matchSub.score - 5
+              : 1,
           matchIndices: matchLabel ? matchLabel.indices : [],
           execute: qa.action,
         });
@@ -884,22 +1086,33 @@ export class CommandPalette {
       const agentResults = [];
       for (const agent of AGENTS) {
         const matchName = fuzzyMatch(q, agent.name);
-        const matchSub  = fuzzyMatch(q, agent.subtitle || '');
+        const matchSub = fuzzyMatch(q, agent.subtitle || "");
         const match = matchName || matchSub;
         if (match) {
           agentResults.push({
             id: `agent-${agent.id}`,
-            category: 'Agents',
+            category: "Agents",
             icon: agent.emoji,
             label: agent.name,
             subtitle: agent.subtitle,
-            shortcutBadge: '↵ Chat',
-            matchScore: matchName ? matchName.score : (matchSub ? matchSub.score - 5 : 1),
+            shortcutBadge: "↵ Chat",
+            matchScore: matchName
+              ? matchName.score
+              : matchSub
+                ? matchSub.score - 5
+                : 1,
             matchIndices: matchName ? matchName.indices : [],
             execute: () => {
-              document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-                detail: { zoneId: agent.zone, zoneName: agent.name, focusAgent: agent.id }, bubbles: true,
-              }));
+              document.dispatchEvent(
+                new CustomEvent("command-palette:navigate", {
+                  detail: {
+                    zoneId: agent.zone,
+                    zoneName: agent.name,
+                    focusAgent: agent.id,
+                  },
+                  bubbles: true,
+                }),
+              );
             },
           });
         }
@@ -937,7 +1150,9 @@ export class CommandPalette {
 
       // Fetch recent tasks and search results in parallel
       const [recentTasks, searchResults] = await Promise.all([
-        api.db.getRecentTasks ? api.db.getRecentTasks(worldId, 5).catch(() => []) : Promise.resolve([]),
+        api.db.getRecentTasks
+          ? api.db.getRecentTasks(worldId, 5).catch(() => [])
+          : Promise.resolve([]),
         query.length >= 3 && api.db.searchTasks
           ? api.db.searchTasks(worldId, query).catch(() => [])
           : Promise.resolve([]),
@@ -948,7 +1163,7 @@ export class CommandPalette {
 
       // Remove any existing task results from previous search
       this._results = this._results.filter(
-        r => r.category !== 'Recent Tasks' && r.category !== 'Search Tasks'
+        (r) => r.category !== "Recent Tasks" && r.category !== "Search Tasks",
       );
 
       // ── Recent Tasks
@@ -956,16 +1171,23 @@ export class CommandPalette {
         for (const task of recentTasks.slice(0, 5)) {
           this._results.push({
             id: `recent-${task.id || task.taskId}`,
-            category: 'Recent Tasks',
-            icon: '📋',
-            label: task.title || task.name || 'Untitled task',
-            subtitle: [task.zone, task.cost ? `$${Number(task.cost).toFixed(4)}` : null]
-              .filter(Boolean).join(' · '),
-            shortcutBadge: '↵ Open',
+            category: "Recent Tasks",
+            icon: "📋",
+            label: task.title || task.name || "Untitled task",
+            subtitle: [
+              task.zone,
+              task.cost ? `$${Number(task.cost).toFixed(4)}` : null,
+            ]
+              .filter(Boolean)
+              .join(" · "),
+            shortcutBadge: "↵ Open",
             execute: () => {
-              document.dispatchEvent(new CustomEvent('command-palette:open-task', {
-                detail: { taskId: task.id || task.taskId }, bubbles: true,
-              }));
+              document.dispatchEvent(
+                new CustomEvent("command-palette:open-task", {
+                  detail: { taskId: task.id || task.taskId },
+                  bubbles: true,
+                }),
+              );
             },
           });
         }
@@ -976,16 +1198,23 @@ export class CommandPalette {
         for (const task of searchResults.slice(0, 8)) {
           this._results.push({
             id: `search-${task.id || task.taskId}`,
-            category: 'Search Tasks',
-            icon: '🔍',
-            label: task.title || task.name || 'Untitled task',
-            subtitle: [task.zone, task.cost ? `$${Number(task.cost).toFixed(4)}` : null]
-              .filter(Boolean).join(' · '),
-            shortcutBadge: '↵ Open',
+            category: "Search Tasks",
+            icon: "🔍",
+            label: task.title || task.name || "Untitled task",
+            subtitle: [
+              task.zone,
+              task.cost ? `$${Number(task.cost).toFixed(4)}` : null,
+            ]
+              .filter(Boolean)
+              .join(" · "),
+            shortcutBadge: "↵ Open",
             execute: () => {
-              document.dispatchEvent(new CustomEvent('command-palette:open-task', {
-                detail: { taskId: task.id || task.taskId }, bubbles: true,
-              }));
+              document.dispatchEvent(
+                new CustomEvent("command-palette:open-task", {
+                  detail: { taskId: task.id || task.taskId },
+                  bubbles: true,
+                }),
+              );
             },
           });
         }
@@ -994,7 +1223,7 @@ export class CommandPalette {
       this._setSearching(false);
       this._render();
     } catch (err) {
-      console.warn('[CommandPalette] Async search error:', err);
+      console.warn("[CommandPalette] Async search error:", err);
       this._setSearching(false);
     }
   }
@@ -1003,7 +1232,7 @@ export class CommandPalette {
 
   _setSearching(val) {
     this._isSearching = val;
-    this._spinnerEl.style.display = val ? 'flex' : 'none';
+    this._spinnerEl.style.display = val ? "flex" : "none";
   }
 
   // ── Rendering ──────────────────────────────────────────────────────────────────
@@ -1013,7 +1242,7 @@ export class CommandPalette {
 
     // Empty state
     if (!query && this._results.length === 0) {
-      this._resultsEl.innerHTML = '';
+      this._resultsEl.innerHTML = "";
       this._resultsEl.appendChild(this._emptyEl);
       return;
     }
@@ -1030,7 +1259,15 @@ export class CommandPalette {
     }
 
     // Group by category maintaining insertion order
-    const categoryOrder = ['Recent', 'Ask Claude', 'Zones', 'Actions', 'Agents', 'Recent Tasks', 'Search Tasks'];
+    const categoryOrder = [
+      "Recent",
+      "Ask Claude",
+      "Zones",
+      "Actions",
+      "Agents",
+      "Recent Tasks",
+      "Search Tasks",
+    ];
     const grouped = new Map();
     for (const cat of categoryOrder) grouped.set(cat, []);
 
@@ -1041,7 +1278,7 @@ export class CommandPalette {
 
     // Build a flat list with section headers for item index tracking
     const flatItems = []; // just result items, no headers
-    const sections = [];  // { category, items }
+    const sections = []; // { category, items }
 
     for (const [cat, items] of grouped) {
       if (items.length > 0) {
@@ -1058,21 +1295,21 @@ export class CommandPalette {
     let flatIndex = 0;
 
     const CATEGORY_ICONS = {
-      'Recent':        '🕐',
-      'Zones':         '🏙️',
-      'Actions':       '⚡',
-      'Ask Claude':    '✨',
-      'Agents':        '🤖',
-      'Recent Tasks':  '📋',
-      'Search Tasks':  '🔍',
+      Recent: "🕐",
+      Zones: "🏙️",
+      Actions: "⚡",
+      "Ask Claude": "✨",
+      Agents: "🤖",
+      "Recent Tasks": "📋",
+      "Search Tasks": "🔍",
     };
 
     for (const section of sections) {
       // Category header
-      const header = document.createElement('div');
-      header.className = 'cp-section-header';
+      const header = document.createElement("div");
+      header.className = "cp-section-header";
       header.innerHTML = `
-        <span class="cp-section-icon">${CATEGORY_ICONS[section.category] || ''}</span>
+        <span class="cp-section-icon">${CATEGORY_ICONS[section.category] || ""}</span>
         <span class="cp-section-label">${escapeHtml(section.category)}</span>
         <span class="cp-section-count">${section.items.length}</span>
       `;
@@ -1083,32 +1320,36 @@ export class CommandPalette {
         const itemIndex = flatIndex++;
         const isSelected = itemIndex === this._selectedIndex;
 
-        const row = document.createElement('div');
-        row.className = 'cp-row' + (isSelected ? ' cp-row--selected' : '') + (result.locked ? ' cp-row--locked' : '');
-        row.setAttribute('role', 'option');
-        row.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        const row = document.createElement("div");
+        row.className =
+          "cp-row" +
+          (isSelected ? " cp-row--selected" : "") +
+          (result.locked ? " cp-row--locked" : "");
+        row.setAttribute("role", "option");
+        row.setAttribute("aria-selected", isSelected ? "true" : "false");
         row.dataset.index = itemIndex;
 
         // Left: icon
-        const iconEl = document.createElement('span');
-        iconEl.className = 'cp-row-icon';
-        iconEl.textContent = result.icon || '';
+        const iconEl = document.createElement("span");
+        iconEl.className = "cp-row-icon";
+        iconEl.textContent = result.icon || "";
         row.appendChild(iconEl);
 
         // Center: label + subtitle
-        const contentEl = document.createElement('span');
-        contentEl.className = 'cp-row-content';
+        const contentEl = document.createElement("span");
+        contentEl.className = "cp-row-content";
 
-        const labelEl = document.createElement('span');
-        labelEl.className = 'cp-row-label';
-        labelEl.innerHTML = result.matchIndices && result.matchIndices.length > 0
-          ? highlightMatch(result.label, result.matchIndices)
-          : escapeHtml(result.label);
+        const labelEl = document.createElement("span");
+        labelEl.className = "cp-row-label";
+        labelEl.innerHTML =
+          result.matchIndices && result.matchIndices.length > 0
+            ? highlightMatch(result.label, result.matchIndices)
+            : escapeHtml(result.label);
         contentEl.appendChild(labelEl);
 
         if (result.subtitle) {
-          const subEl = document.createElement('span');
-          subEl.className = 'cp-row-subtitle';
+          const subEl = document.createElement("span");
+          subEl.className = "cp-row-subtitle";
           subEl.textContent = result.subtitle;
           contentEl.appendChild(subEl);
         }
@@ -1116,30 +1357,30 @@ export class CommandPalette {
         row.appendChild(contentEl);
 
         // Right: shortcut badge + locked badge
-        const rightEl = document.createElement('span');
-        rightEl.className = 'cp-row-right';
+        const rightEl = document.createElement("span");
+        rightEl.className = "cp-row-right";
 
         if (result.locked) {
-          const lockBadge = document.createElement('span');
-          lockBadge.className = 'cp-badge cp-badge--locked';
-          lockBadge.textContent = 'Soon';
+          const lockBadge = document.createElement("span");
+          lockBadge.className = "cp-badge cp-badge--locked";
+          lockBadge.textContent = "Soon";
           rightEl.appendChild(lockBadge);
         } else if (result.shortcutBadge) {
-          const badge = document.createElement('span');
-          badge.className = 'cp-badge';
-          badge.textContent = isSelected ? result.shortcutBadge : '';
+          const badge = document.createElement("span");
+          badge.className = "cp-badge";
+          badge.textContent = isSelected ? result.shortcutBadge : "";
           rightEl.appendChild(badge);
         }
 
         row.appendChild(rightEl);
 
         // Events
-        row.addEventListener('click', () => {
+        row.addEventListener("click", () => {
           this._selectedIndex = itemIndex;
           this._executeSelected();
         });
 
-        row.addEventListener('mouseenter', () => {
+        row.addEventListener("mouseenter", () => {
           this._selectedIndex = itemIndex;
           this._updateSelectionHighlight();
         });
@@ -1149,19 +1390,19 @@ export class CommandPalette {
     }
 
     // Animate old results out, new ones in
-    this._resultsEl.classList.add('cp-results--transitioning');
-    this._resultsEl.innerHTML = '';
+    this._resultsEl.classList.add("cp-results--transitioning");
+    this._resultsEl.innerHTML = "";
     this._resultsEl.appendChild(fragment);
 
     // Staggered fade-in for each row
-    const rows = this._resultsEl.querySelectorAll('.cp-row');
+    const rows = this._resultsEl.querySelectorAll(".cp-row");
     rows.forEach((row, i) => {
       row.style.animationDelay = `${i * 20}ms`;
-      row.classList.add('cp-row--animating');
+      row.classList.add("cp-row--animating");
     });
 
     requestAnimationFrame(() => {
-      this._resultsEl.classList.remove('cp-results--transitioning');
+      this._resultsEl.classList.remove("cp-results--transitioning");
     });
 
     this._scrollSelectedIntoView();
@@ -1170,18 +1411,22 @@ export class CommandPalette {
   // ── Selection ─────────────────────────────────────────────────────────────────
 
   _moveSelection(delta) {
-    const rows = this._resultsEl.querySelectorAll('.cp-row:not(.cp-row--locked)');
+    const rows = this._resultsEl.querySelectorAll(
+      ".cp-row:not(.cp-row--locked)",
+    );
     if (rows.length === 0) return;
 
     // Build an array of valid (non-locked) indices
     const validIndices = [];
-    this._resultsEl.querySelectorAll('.cp-row').forEach((row, i) => {
-      if (!row.classList.contains('cp-row--locked')) validIndices.push(i);
+    this._resultsEl.querySelectorAll(".cp-row").forEach((row, i) => {
+      if (!row.classList.contains("cp-row--locked")) validIndices.push(i);
     });
 
     const currentPos = validIndices.indexOf(this._selectedIndex);
     let nextPos = currentPos + delta;
-    nextPos = ((nextPos % validIndices.length) + validIndices.length) % validIndices.length;
+    nextPos =
+      ((nextPos % validIndices.length) + validIndices.length) %
+      validIndices.length;
     this._selectedIndex = validIndices[nextPos];
 
     this._updateSelectionHighlight();
@@ -1189,37 +1434,42 @@ export class CommandPalette {
   }
 
   _updateSelectionHighlight() {
-    const rows = this._resultsEl.querySelectorAll('.cp-row');
+    const rows = this._resultsEl.querySelectorAll(".cp-row");
     rows.forEach((row, i) => {
       const isSelected = Number(row.dataset.index) === this._selectedIndex;
-      row.classList.toggle('cp-row--selected', isSelected);
-      row.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+      row.classList.toggle("cp-row--selected", isSelected);
+      row.setAttribute("aria-selected", isSelected ? "true" : "false");
 
       // Show/hide shortcut badge text
-      const badge = row.querySelector('.cp-badge:not(.cp-badge--locked)');
+      const badge = row.querySelector(".cp-badge:not(.cp-badge--locked)");
       if (badge) {
         // Re-look up badge label from results
-        const result = this._results.find(r => r.id && `${r.id}` === row.querySelector('[data-result-id]')?.dataset.resultId);
+        const result = this._results.find(
+          (r) =>
+            r.id &&
+            `${r.id}` ===
+              row.querySelector("[data-result-id]")?.dataset.resultId,
+        );
         if (isSelected && result?.shortcutBadge) {
           badge.textContent = result.shortcutBadge;
         } else if (!isSelected) {
-          badge.textContent = '';
+          badge.textContent = "";
         }
       }
     });
   }
 
   _scrollSelectedIntoView() {
-    const selected = this._resultsEl.querySelector('.cp-row--selected');
+    const selected = this._resultsEl.querySelector(".cp-row--selected");
     if (selected) {
-      selected.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      selected.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   }
 
   // ── Execution ──────────────────────────────────────────────────────────────────
 
   _executeSelected() {
-    const rows = this._resultsEl.querySelectorAll('.cp-row');
+    const rows = this._resultsEl.querySelectorAll(".cp-row");
     let targetIndex = -1;
     let rowIndex = 0;
 
@@ -1239,14 +1489,19 @@ export class CommandPalette {
     if (!result || result.locked) return;
 
     // Record to recent commands (skip the "Recent" category itself and "Ask Claude" dynamic entries)
-    if (result.category !== 'Recent' && result.id !== 'ask-claude') {
-      pushRecentCommand({ id: result.id, label: result.label, icon: result.icon, category: result.category });
+    if (result.category !== "Recent" && result.id !== "ask-claude") {
+      pushRecentCommand({
+        id: result.id,
+        label: result.label,
+        icon: result.icon,
+        category: result.category,
+      });
     }
 
     // Flash the selected row
-    const selectedRow = this._resultsEl.querySelector('.cp-row--selected');
+    const selectedRow = this._resultsEl.querySelector(".cp-row--selected");
     if (selectedRow) {
-      selectedRow.classList.add('cp-row--executing');
+      selectedRow.classList.add("cp-row--executing");
       setTimeout(() => this.close(), 80);
     } else {
       this.close();
@@ -1257,7 +1512,7 @@ export class CommandPalette {
       try {
         result.execute();
       } catch (err) {
-        console.error('[CommandPalette] Execution error:', err);
+        console.error("[CommandPalette] Execution error:", err);
       }
     }, 90);
   }
@@ -1267,7 +1522,15 @@ export class CommandPalette {
    * @returns {ResultItem[]}
    */
   _getFlatResults() {
-    const categoryOrder = ['Recent', 'Ask Claude', 'Zones', 'Actions', 'Agents', 'Recent Tasks', 'Search Tasks'];
+    const categoryOrder = [
+      "Recent",
+      "Ask Claude",
+      "Zones",
+      "Actions",
+      "Agents",
+      "Recent Tasks",
+      "Search Tasks",
+    ];
     const grouped = new Map();
     for (const cat of categoryOrder) grouped.set(cat, []);
     for (const result of this._results) {
@@ -1288,23 +1551,23 @@ export class CommandPalette {
     if (this._isOpen) return;
     this._isOpen = true;
 
-    this._input.value = '';
-    this._commandBadge.style.display = 'none';
+    this._input.value = "";
+    this._commandBadge.style.display = "none";
     this._setSearching(false);
     this._results = [];
     this._selectedIndex = 0;
 
     // Pre-populate with default results (recents + all zones + actions)
-    this._buildSyncResults('');
+    this._buildSyncResults("");
     if (this._results.length > 0) {
       this._render();
     } else {
-      this._resultsEl.innerHTML = '';
+      this._resultsEl.innerHTML = "";
       this._resultsEl.appendChild(this._emptyEl);
     }
 
-    this._backdrop.classList.add('cp-backdrop--open');
-    this._modal.classList.add('cp-modal--open');
+    this._backdrop.classList.add("cp-backdrop--open");
+    this._modal.classList.add("cp-modal--open");
 
     // Focus input after entrance animation begins
     requestAnimationFrame(() => {
@@ -1314,7 +1577,9 @@ export class CommandPalette {
     });
 
     // Announce to screen readers
-    document.dispatchEvent(new CustomEvent('command-palette:opened', { bubbles: true }));
+    document.dispatchEvent(
+      new CustomEvent("command-palette:opened", { bubbles: true }),
+    );
   }
 
   /** Close the command palette. */
@@ -1322,9 +1587,9 @@ export class CommandPalette {
     if (!this._isOpen) return;
     this._isOpen = false;
 
-    this._backdrop.classList.remove('cp-backdrop--open');
-    this._modal.classList.remove('cp-modal--open');
-    this._modal.classList.add('cp-modal--closing');
+    this._backdrop.classList.remove("cp-backdrop--open");
+    this._modal.classList.remove("cp-modal--open");
+    this._modal.classList.add("cp-modal--closing");
 
     // Cancel any in-flight debounce
     if (this._searchDebounceTimer) {
@@ -1334,10 +1599,12 @@ export class CommandPalette {
     this._setSearching(false);
 
     setTimeout(() => {
-      this._modal.classList.remove('cp-modal--closing');
+      this._modal.classList.remove("cp-modal--closing");
     }, 140);
 
-    document.dispatchEvent(new CustomEvent('command-palette:closed', { bubbles: true }));
+    document.dispatchEvent(
+      new CustomEvent("command-palette:closed", { bubbles: true }),
+    );
   }
 
   /** Toggle open / close. */

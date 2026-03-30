@@ -14,7 +14,7 @@
   padding: 24px;
   max-width: 860px;
   margin: 0 auto;
-  font-family: var(--font-sans, 'Inter', -apple-system, sans-serif);
+  font-family: var(--font-sans, "Inter", -apple-system, sans-serif);
   color: var(--text-primary, #e8e8f0);
 }
 
@@ -105,7 +105,7 @@
   background: var(--bg-secondary, rgba(20, 25, 40, 0.9));
   color: var(--text-primary, #e8e8f0);
   font-size: 0.85rem;
-  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-family: var(--font-sans, "Inter", sans-serif);
   outline: none;
   transition: border-color var(--transition-fast, 150ms ease);
 }
@@ -139,7 +139,7 @@
   background: transparent;
   color: var(--text-secondary, #8888a0);
   font-size: 0.75rem;
-  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-family: var(--font-sans, "Inter", sans-serif);
   cursor: pointer;
   transition: all var(--transition-fast, 150ms ease);
 }
@@ -174,7 +174,7 @@
   background: transparent;
   color: var(--text-secondary, #8888a0);
   font-size: 0.78rem;
-  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-family: var(--font-sans, "Inter", sans-serif);
   cursor: pointer;
   transition: all var(--transition-fast, 150ms ease);
 }
@@ -210,7 +210,7 @@
 }
 
 .timeline__container::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 12px;
   top: 0;
@@ -229,7 +229,7 @@
 }
 
 .timeline__time-marker::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 7px;
   top: 50%;
@@ -272,7 +272,7 @@
 }
 
 .timeline__event-card::before {
-  content: '';
+  content: "";
   position: absolute;
   left: -22px;
   top: 16px;
@@ -412,7 +412,7 @@
 
 .timeline__detail-value {
   color: var(--text-secondary, #8888a0);
-  font-family: var(--font-mono, 'SF Mono', monospace);
+  font-family: var(--font-mono, "SF Mono", monospace);
   font-size: 0.75rem;
 }
 

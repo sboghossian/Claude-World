@@ -6,11 +6,11 @@
  */
 
 const TOAST_ICONS = {
-  success: '\u2713',
-  info: '\u2139',
-  warning: '\u26A0',
-  error: '\u2717',
-  achievement: '\u2605',
+  success: "\u2713",
+  info: "\u2139",
+  warning: "\u26A0",
+  error: "\u2717",
+  achievement: "\u2605",
 };
 
 const MAX_TOASTS = 3;
@@ -24,11 +24,11 @@ export class ToastManager {
   }
 
   _createContainer() {
-    this._container = document.createElement('div');
-    this._container.className = 'toast-container';
-    this._container.setAttribute('role', 'status');
-    this._container.setAttribute('aria-live', 'polite');
-    this._container.setAttribute('aria-label', 'Notifications');
+    this._container = document.createElement("div");
+    this._container.className = "toast-container";
+    this._container.setAttribute("role", "status");
+    this._container.setAttribute("aria-live", "polite");
+    this._container.setAttribute("aria-label", "Notifications");
     document.body.appendChild(this._container);
   }
 
@@ -41,34 +41,39 @@ export class ToastManager {
    * @param {number} [options.duration] - Auto-dismiss in ms. 0 = manual dismiss only.
    * @returns {HTMLElement} The toast element (for manual removal).
    */
-  show({ type = 'info', title, description, duration = DEFAULT_DURATION } = {}) {
+  show({
+    type = "info",
+    title,
+    description,
+    duration = DEFAULT_DURATION,
+  } = {}) {
     // Enforce max toasts
     while (this._toasts.length >= MAX_TOASTS) {
       this._dismiss(this._toasts[0]);
     }
 
-    const toast = document.createElement('div');
+    const toast = document.createElement("div");
     toast.className = `toast toast--${type}`;
-    toast.setAttribute('role', 'alert');
+    toast.setAttribute("role", "alert");
 
     // Icon
-    const iconEl = document.createElement('span');
-    iconEl.className = 'toast__icon';
+    const iconEl = document.createElement("span");
+    iconEl.className = "toast__icon";
     iconEl.textContent = TOAST_ICONS[type] || TOAST_ICONS.info;
     toast.appendChild(iconEl);
 
     // Content
-    const contentEl = document.createElement('div');
-    contentEl.className = 'toast__content';
+    const contentEl = document.createElement("div");
+    contentEl.className = "toast__content";
 
-    const titleEl = document.createElement('div');
-    titleEl.className = 'toast__title';
+    const titleEl = document.createElement("div");
+    titleEl.className = "toast__title";
     titleEl.textContent = title;
     contentEl.appendChild(titleEl);
 
     if (description) {
-      const descEl = document.createElement('div');
-      descEl.className = 'toast__desc';
+      const descEl = document.createElement("div");
+      descEl.className = "toast__desc";
       descEl.textContent = description;
       contentEl.appendChild(descEl);
     }
@@ -76,11 +81,11 @@ export class ToastManager {
     toast.appendChild(contentEl);
 
     // Close button
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'toast__close';
-    closeBtn.setAttribute('aria-label', 'Dismiss notification');
-    closeBtn.textContent = '\u00D7';
-    closeBtn.addEventListener('click', () => this._dismiss(toast));
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "toast__close";
+    closeBtn.setAttribute("aria-label", "Dismiss notification");
+    closeBtn.textContent = "\u00D7";
+    closeBtn.addEventListener("click", () => this._dismiss(toast));
     toast.appendChild(closeBtn);
 
     this._container.appendChild(toast);
@@ -88,7 +93,7 @@ export class ToastManager {
 
     // Trigger entrance animation
     requestAnimationFrame(() => {
-      toast.classList.add('toast--visible');
+      toast.classList.add("toast--visible");
     });
 
     // Auto-dismiss
@@ -107,8 +112,8 @@ export class ToastManager {
     if (!toast || !toast.parentNode) return;
 
     clearTimeout(toast._dismissTimer);
-    toast.classList.remove('toast--visible');
-    toast.classList.add('toast--exiting');
+    toast.classList.remove("toast--visible");
+    toast.classList.add("toast--exiting");
 
     setTimeout(() => {
       toast.remove();

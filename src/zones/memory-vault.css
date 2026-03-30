@@ -114,7 +114,10 @@
   font-size: 11px;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
   white-space: nowrap;
   text-align: center;
 }
@@ -160,7 +163,9 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 12px;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .mv-card:hover {
@@ -282,7 +287,9 @@
   color: var(--text-dim);
   cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .mv-action-btn:hover {
@@ -500,7 +507,9 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity var(--transition-fast), background var(--transition-fast);
+  transition:
+    opacity var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .mv-btn--primary {

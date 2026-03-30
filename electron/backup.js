@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
 
 // ── Constants ─────────────────────────────────────────────────────────
-const BACKUP_DIR = path.join(os.homedir(), '.claude-world', 'backups');
+const BACKUP_DIR = path.join(os.homedir(), ".claude-world", "backups");
 const MAX_BACKUPS = 10;
 const DEFAULT_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
-const PREFIX = 'claude-world-';
-const SUFFIX = '.db.bak';
+const PREFIX = "claude-world-";
+const SUFFIX = ".db.bak";
 
 // ── State ─────────────────────────────────────────────────────────────
 let _dbPath = null;
@@ -33,10 +33,11 @@ function ensureDir() {
  */
 function backupFilename() {
   const now = new Date();
-  const ts = now.toISOString()
-    .replace(/[-:]/g, '')
-    .replace('T', 'T')
-    .replace(/\.\d+Z$/, '');
+  const ts = now
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace("T", "T")
+    .replace(/\.\d+Z$/, "");
   return `${PREFIX}${ts}${SUFFIX}`;
 }
 
@@ -46,15 +47,15 @@ function backupFilename() {
  * @returns {Date|null}
  */
 function parseTimestamp(filename) {
-  const base = filename.replace(PREFIX, '').replace(SUFFIX, '');
+  const base = filename.replace(PREFIX, "").replace(SUFFIX, "");
   // base looks like 20260330T143022
   if (base.length < 15) return null;
-  const year  = base.slice(0, 4);
+  const year = base.slice(0, 4);
   const month = base.slice(4, 6);
-  const day   = base.slice(6, 8);
-  const hour  = base.slice(9, 11);
-  const min   = base.slice(11, 13);
-  const sec   = base.slice(13, 15);
+  const day = base.slice(6, 8);
+  const hour = base.slice(9, 11);
+  const min = base.slice(11, 13);
+  const sec = base.slice(13, 15);
   const d = new Date(`${year}-${month}-${day}T${hour}:${min}:${sec}Z`);
   return isNaN(d.getTime()) ? null : d;
 }
@@ -80,9 +81,9 @@ function dbExists() {
  * @param {'auto'|'manual'} [trigger='auto'] — What triggered this backup.
  * @returns {{ success: boolean, path?: string, filename?: string, size?: number, trigger?: string, error?: string }}
  */
-function createBackup(trigger = 'auto') {
+function createBackup(trigger = "auto") {
   if (!dbExists()) {
-    return { success: false, error: 'Database file not found or empty' };
+    return { success: false, error: "Database file not found or empty" };
   }
 
   try {
@@ -98,7 +99,7 @@ function createBackup(trigger = 'auto') {
     fs.copyFileSync(_dbPath, dest);
 
     // Also copy WAL/SHM if present (best-effort)
-    for (const ext of ['-wal', '-shm']) {
+    for (const ext of ["-wal", "-shm"]) {
       const src = _dbPath + ext;
       if (fs.existsSync(src)) {
         fs.copyFileSync(src, dest + ext);
@@ -107,7 +108,9 @@ function createBackup(trigger = 'auto') {
 
     const stat = fs.statSync(dest);
 
-    console.log(`[backup] Created ${trigger} backup: ${filename} (${(stat.size / 1024).toFixed(1)} KB)`);
+    console.log(
+      `[backup] Created ${trigger} backup: ${filename} (${(stat.size / 1024).toFixed(1)} KB)`,
+    );
 
     // Prune old backups after successful write
     pruneBackups();
@@ -121,7 +124,7 @@ function createBackup(trigger = 'auto') {
       created_at: new Date().toISOString(),
     };
   } catch (err) {
-    console.error('[backup] Failed to create backup:', err.message);
+    console.error("[backup] Failed to create backup:", err.message);
     return { success: false, error: err.message };
   }
 }
@@ -133,13 +136,18 @@ function createBackup(trigger = 'auto') {
 function listBackups() {
   ensureDir();
   try {
-    const files = fs.readdirSync(BACKUP_DIR)
-      .filter(f => f.startsWith(PREFIX) && f.endsWith(SUFFIX));
+    const files = fs
+      .readdirSync(BACKUP_DIR)
+      .filter((f) => f.startsWith(PREFIX) && f.endsWith(SUFFIX));
 
-    const backups = files.map(filename => {
+    const backups = files.map((filename) => {
       const fullPath = path.join(BACKUP_DIR, filename);
       let size = 0;
-      try { size = fs.statSync(fullPath).size; } catch { /* skip */ }
+      try {
+        size = fs.statSync(fullPath).size;
+      } catch {
+        /* skip */
+      }
       const ts = parseTimestamp(filename);
       return {
         filename,
@@ -158,7 +166,7 @@ function listBackups() {
 
     return backups;
   } catch (err) {
-    console.error('[backup] Failed to list backups:', err.message);
+    console.error("[backup] Failed to list backups:", err.message);
     return [];
   }
 }
@@ -176,13 +184,17 @@ function pruneBackups() {
       try {
         fs.unlinkSync(bk.path);
         // Also remove WAL/SHM companions
-        for (const ext of ['-wal', '-shm']) {
+        for (const ext of ["-wal", "-shm"]) {
           const companion = bk.path + ext;
           if (fs.existsSync(companion)) fs.unlinkSync(companion);
         }
         deleted++;
       } catch (err) {
-        console.warn('[backup] Failed to delete old backup:', bk.filename, err.message);
+        console.warn(
+          "[backup] Failed to delete old backup:",
+          bk.filename,
+          err.message,
+        );
       }
     }
     if (deleted > 0) {
@@ -201,10 +213,10 @@ function deleteBackup(filename) {
   const fullPath = path.join(BACKUP_DIR, filename);
   try {
     if (!fs.existsSync(fullPath)) {
-      return { success: false, error: 'Backup file not found' };
+      return { success: false, error: "Backup file not found" };
     }
     fs.unlinkSync(fullPath);
-    for (const ext of ['-wal', '-shm']) {
+    for (const ext of ["-wal", "-shm"]) {
       const companion = fullPath + ext;
       if (fs.existsSync(companion)) fs.unlinkSync(companion);
     }
@@ -224,29 +236,29 @@ function deleteBackup(filename) {
  */
 function restoreFromBackup(backupPath) {
   if (!_dbPath) {
-    return { success: false, error: 'Database path not initialized' };
+    return { success: false, error: "Database path not initialized" };
   }
   if (!fs.existsSync(backupPath)) {
-    return { success: false, error: 'Backup file does not exist' };
+    return { success: false, error: "Backup file does not exist" };
   }
 
   try {
     // Create a safety backup of the current DB before overwriting
-    createBackup('pre-restore');
+    createBackup("pre-restore");
 
     // Copy backup over the active DB
     fs.copyFileSync(backupPath, _dbPath);
 
     // Remove WAL/SHM from the active DB so SQLite starts fresh
-    for (const ext of ['-wal', '-shm']) {
+    for (const ext of ["-wal", "-shm"]) {
       const walPath = _dbPath + ext;
       if (fs.existsSync(walPath)) fs.unlinkSync(walPath);
     }
 
-    console.log('[backup] Restored database from:', backupPath);
+    console.log("[backup] Restored database from:", backupPath);
     return { success: true };
   } catch (err) {
-    console.error('[backup] Restore failed:', err.message);
+    console.error("[backup] Restore failed:", err.message);
     return { success: false, error: err.message };
   }
 }
@@ -272,9 +284,11 @@ function scheduleBackups(intervalMs) {
   _intervalMs = intervalMs || DEFAULT_INTERVAL_MS;
   if (!_enabled) return;
   _intervalHandle = setInterval(() => {
-    createBackup('auto');
+    createBackup("auto");
   }, _intervalMs);
-  console.log(`[backup] Scheduled auto-backup every ${(_intervalMs / 60000).toFixed(0)} min`);
+  console.log(
+    `[backup] Scheduled auto-backup every ${(_intervalMs / 60000).toFixed(0)} min`,
+  );
 }
 
 /**
@@ -295,11 +309,11 @@ function stopSchedule() {
  */
 function initBackup(dbPath) {
   _dbPath = dbPath;
-  console.log('[backup] Initialized. DB path:', dbPath);
-  console.log('[backup] Backup dir:', BACKUP_DIR);
+  console.log("[backup] Initialized. DB path:", dbPath);
+  console.log("[backup] Backup dir:", BACKUP_DIR);
 
   // Startup backup (before any writes)
-  createBackup('auto');
+  createBackup("auto");
 
   // Start periodic backups
   scheduleBackups(_intervalMs);
@@ -312,9 +326,9 @@ function initBackup(dbPath) {
 function cleanup() {
   stopSchedule();
   if (_enabled && dbExists()) {
-    createBackup('auto');
+    createBackup("auto");
   }
-  console.log('[backup] Cleanup complete');
+  console.log("[backup] Cleanup complete");
 }
 
 // ── Module exports ────────────────────────────────────────────────────

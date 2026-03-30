@@ -43,7 +43,7 @@
 }
 
 .airport-zone__section-title::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--border);
@@ -74,13 +74,14 @@
   flex-direction: column;
   gap: 8px;
   overflow: hidden;
-  transition: border-color var(--transition-fast),
-              box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 /* Sky-blue top accent bar */
 .airport-zone__cargo-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -166,9 +167,10 @@
   font-weight: 600;
   cursor: pointer;
   text-align: center;
-  transition: background var(--transition-fast),
-              border-color var(--transition-fast),
-              opacity var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    opacity var(--transition-fast);
 }
 
 .airport-zone__cargo-btn:hover:not(:disabled) {
@@ -186,8 +188,13 @@
 }
 
 @keyframes airport-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* ── Import terminal ──────────────────────────────────────────── */
@@ -211,9 +218,10 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   user-select: none;
-  transition: border-color var(--transition-fast),
-              background var(--transition-fast),
-              box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
   outline: none;
 }
 
@@ -315,7 +323,9 @@
   cursor: pointer;
   flex-shrink: 0;
   padding: 0;
-  transition: color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .airport-zone__import-close:hover {
@@ -404,9 +414,10 @@
   font-weight: 600;
   cursor: pointer;
   align-self: flex-start;
-  transition: background var(--transition-fast),
-              border-color var(--transition-fast),
-              opacity var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    opacity var(--transition-fast);
 }
 
 .airport-zone__import-btn:hover:not(:disabled) {
@@ -498,9 +509,10 @@
   font-weight: 500;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background var(--transition-fast),
-              border-color var(--transition-fast),
-              opacity var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    opacity var(--transition-fast);
 }
 
 .airport-zone__token-copy {
@@ -580,9 +592,10 @@
   font-family: var(--font-sans);
   font-size: 11px;
   cursor: pointer;
-  transition: color var(--transition-fast),
-              border-color var(--transition-fast),
-              background var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .airport-zone__curl-copy:hover {
@@ -629,7 +642,9 @@
   font-size: 10px;
   cursor: pointer;
   font-family: var(--font-sans);
-  transition: color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .airport-zone__log-clear:hover {
@@ -810,13 +825,25 @@
 }
 
 @keyframes airport-toast-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.airport-zone__toast--success { border-color: #22c55e; }
-.airport-zone__toast--error   { border-color: #ef4444; }
-.airport-zone__toast--info    { border-color: #38bdf8; }
+.airport-zone__toast--success {
+  border-color: #22c55e;
+}
+.airport-zone__toast--error {
+  border-color: #ef4444;
+}
+.airport-zone__toast--info {
+  border-color: #38bdf8;
+}
 
 /* ── Spinner (used in btn loading states) ─────────────────────── */
 
@@ -831,7 +858,9 @@
 }
 
 @keyframes airport-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── Responsive: single column on narrow panels ───────────────── */

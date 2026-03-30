@@ -19,8 +19,8 @@
  * @returns {string}
  */
 function escapeHTML(str) {
-  if (!str) return '';
-  const div = document.createElement('div');
+  if (!str) return "";
+  const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
 }
@@ -31,10 +31,10 @@ function escapeHTML(str) {
  * @returns {string}
  */
 function relativeTime(iso) {
-  if (!iso) return 'Never';
+  if (!iso) return "Never";
   const ms = Date.now() - new Date(iso).getTime();
   const secs = Math.floor(ms / 1000);
-  if (secs < 60) return 'Just now';
+  if (secs < 60) return "Just now";
   const mins = Math.floor(secs / 60);
   if (mins < 60) return `${mins}m ago`;
   const hours = Math.floor(mins / 60);
@@ -66,45 +66,49 @@ function fmtWords(n) {
 
 const CONTENT_TYPES = {
   blog: {
-    label: 'Blog Post',
-    icon: '📝',
+    label: "Blog Post",
+    icon: "📝",
     placeholder: 'e.g. "How AI is transforming content marketing in 2025"',
   },
   tweet: {
-    label: 'Twitter Thread',
-    icon: '🐦',
+    label: "Twitter Thread",
+    icon: "🐦",
     placeholder: 'e.g. "5 productivity tips for remote teams"',
   },
   newsletter: {
-    label: 'Newsletter',
-    icon: '📧',
+    label: "Newsletter",
+    icon: "📧",
     placeholder: 'e.g. "Weekly roundup: top AI tools to try this week"',
   },
   linkedin: {
-    label: 'LinkedIn Post',
-    icon: '💼',
+    label: "LinkedIn Post",
+    icon: "💼",
     placeholder: 'e.g. "Lessons learned after 3 years building a startup"',
   },
   ad: {
-    label: 'Ad Copy',
-    icon: '📢',
-    placeholder: 'e.g. "Launch campaign for our new SaaS product targeting CTOs"',
+    label: "Ad Copy",
+    icon: "📢",
+    placeholder:
+      'e.g. "Launch campaign for our new SaaS product targeting CTOs"',
   },
 };
 
 const TONES = {
-  professional: { label: 'Professional', emoji: '🎩' },
-  casual:       { label: 'Casual',       emoji: '😎' },
-  witty:        { label: 'Witty',        emoji: '🃏' },
-  urgent:       { label: 'Urgent',       emoji: '🔥' },
+  professional: { label: "Professional", emoji: "🎩" },
+  casual: { label: "Casual", emoji: "😎" },
+  witty: { label: "Witty", emoji: "🃏" },
+  urgent: { label: "Urgent", emoji: "🔥" },
 };
 
 const SYSTEM_PROMPTS = {
-  blog: 'You are an expert blogger. Write engaging, SEO-friendly blog posts with clear headings and actionable insights.',
-  tweet: 'You are a social media expert. Write a Twitter thread (5-7 tweets) with hook, value, and CTA. Number each tweet.',
-  newsletter: 'You are a newsletter writer. Write a concise, value-packed newsletter with a strong subject line.',
-  linkedin: 'You are a LinkedIn content strategist. Write a professional post that drives engagement.',
-  ad: 'You are an advertising copywriter. Write compelling ad copy with headline, body, and CTA. Under 100 words.',
+  blog: "You are an expert blogger. Write engaging, SEO-friendly blog posts with clear headings and actionable insights.",
+  tweet:
+    "You are a social media expert. Write a Twitter thread (5-7 tweets) with hook, value, and CTA. Number each tweet.",
+  newsletter:
+    "You are a newsletter writer. Write a concise, value-packed newsletter with a strong subject line.",
+  linkedin:
+    "You are a LinkedIn content strategist. Write a professional post that drives engagement.",
+  ad: "You are an advertising copywriter. Write compelling ad copy with headline, body, and CTA. Under 100 words.",
 };
 
 // ── MarketingPlaza class ──────────────────────────────────────────────
@@ -116,9 +120,9 @@ export class MarketingPlaza {
     /** @type {Array<object>} */
     this._pieces = [];
     /** @type {string} */
-    this._activeType = 'blog';
+    this._activeType = "blog";
     /** @type {string} */
-    this._activeTone = 'professional';
+    this._activeTone = "professional";
     /** @type {boolean} */
     this._generating = false;
     /** @type {HTMLElement|null} */
@@ -140,7 +144,7 @@ export class MarketingPlaza {
     this._typePills = {};
     this._tonePills = {};
     this._streamCursor = null;
-    this._currentContent = '';
+    this._currentContent = "";
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -148,12 +152,12 @@ export class MarketingPlaza {
   // ═══════════════════════════════════════════════════════════════════
 
   _injectCSS() {
-    const id = 'marketing-plaza-styles';
+    const id = "marketing-plaza-styles";
     if (document.getElementById(id)) return;
-    const link = document.createElement('link');
+    const link = document.createElement("link");
     link.id = id;
-    link.rel = 'stylesheet';
-    link.href = 'src/zones/marketing-plaza.css';
+    link.rel = "stylesheet";
+    link.href = "src/zones/marketing-plaza.css";
     document.head.appendChild(link);
   }
 
@@ -164,9 +168,9 @@ export class MarketingPlaza {
   render() {
     this._injectCSS();
 
-    const root = this._el('div', 'marketing-plaza');
-    root.setAttribute('role', 'region');
-    root.setAttribute('aria-label', 'Marketing Plaza');
+    const root = this._el("div", "marketing-plaza");
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-label", "Marketing Plaza");
     this._el_root = root;
 
     // Header
@@ -176,7 +180,7 @@ export class MarketingPlaza {
     root.appendChild(this._buildStats());
 
     // Main body: library + generator
-    const body = this._el('div', 'mp-body');
+    const body = this._el("div", "mp-body");
     body.appendChild(this._buildLibrary());
     body.appendChild(this._buildGenerator());
     root.appendChild(body);
@@ -191,13 +195,14 @@ export class MarketingPlaza {
   // ═══════════════════════════════════════════════════════════════════
 
   _buildHeader() {
-    const header = this._el('header', 'mp-header');
+    const header = this._el("header", "mp-header");
 
-    const titleRow = this._el('div', 'mp-header__title-row');
-    const title = this._el('h2', 'mp-header__title');
-    title.textContent = '📣 Marketing Plaza';
-    const subtitle = this._el('span', 'mp-header__subtitle');
-    subtitle.textContent = 'AI-powered content factory. Generate, store, and copy.';
+    const titleRow = this._el("div", "mp-header__title-row");
+    const title = this._el("h2", "mp-header__title");
+    title.textContent = "📣 Marketing Plaza";
+    const subtitle = this._el("span", "mp-header__subtitle");
+    subtitle.textContent =
+      "AI-powered content factory. Generate, store, and copy.";
     titleRow.appendChild(title);
     titleRow.appendChild(subtitle);
     header.appendChild(titleRow);
@@ -206,19 +211,19 @@ export class MarketingPlaza {
   }
 
   _buildStats() {
-    const bar = this._el('div', 'mp-stats-bar');
+    const bar = this._el("div", "mp-stats-bar");
 
     const stats = [
-      { label: 'Pieces Generated', ref: '_statsTotal', value: '0' },
-      { label: 'Words This Week',  ref: '_statsWords', value: '0' },
-      { label: 'Top Type',         ref: '_statsTopType', value: '—' },
+      { label: "Pieces Generated", ref: "_statsTotal", value: "0" },
+      { label: "Words This Week", ref: "_statsWords", value: "0" },
+      { label: "Top Type", ref: "_statsTopType", value: "—" },
     ];
 
     for (const s of stats) {
-      const item = this._el('div', 'mp-stat');
-      const val = this._el('span', 'mp-stat__value');
+      const item = this._el("div", "mp-stat");
+      const val = this._el("span", "mp-stat__value");
       val.textContent = s.value;
-      const lbl = this._el('span', 'mp-stat__label');
+      const lbl = this._el("span", "mp-stat__label");
       lbl.textContent = s.label;
       item.appendChild(val);
       item.appendChild(lbl);
@@ -230,19 +235,19 @@ export class MarketingPlaza {
   }
 
   _buildLibrary() {
-    const panel = this._el('section', 'mp-library');
-    panel.setAttribute('aria-label', 'Content Library');
+    const panel = this._el("section", "mp-library");
+    panel.setAttribute("aria-label", "Content Library");
 
-    const head = this._el('div', 'mp-library__head');
-    const heading = this._el('h3', 'mp-library__heading');
-    heading.textContent = 'Content Library';
+    const head = this._el("div", "mp-library__head");
+    const heading = this._el("h3", "mp-library__heading");
+    heading.textContent = "Content Library";
     head.appendChild(heading);
     panel.appendChild(head);
 
     // Grid
-    const grid = this._el('div', 'mp-grid');
-    grid.setAttribute('role', 'list');
-    grid.setAttribute('aria-label', 'Content pieces');
+    const grid = this._el("div", "mp-grid");
+    grid.setAttribute("role", "list");
+    grid.setAttribute("aria-label", "Content pieces");
     panel.appendChild(grid);
     this._libraryGrid = grid;
 
@@ -253,28 +258,34 @@ export class MarketingPlaza {
   }
 
   _buildGenerator() {
-    const panel = this._el('section', 'mp-generator');
-    panel.setAttribute('aria-label', 'Content Generator');
+    const panel = this._el("section", "mp-generator");
+    panel.setAttribute("aria-label", "Content Generator");
 
     // Panel heading
-    const heading = this._el('h3', 'mp-generator__heading');
-    heading.textContent = 'Generate Content';
+    const heading = this._el("h3", "mp-generator__heading");
+    heading.textContent = "Generate Content";
     panel.appendChild(heading);
 
     // Content type pills
-    const typeLabel = this._el('div', 'mp-field-label');
-    typeLabel.textContent = 'Content Type';
+    const typeLabel = this._el("div", "mp-field-label");
+    typeLabel.textContent = "Content Type";
     panel.appendChild(typeLabel);
 
-    const typePillRow = this._el('div', 'mp-pills');
-    typePillRow.setAttribute('role', 'group');
-    typePillRow.setAttribute('aria-label', 'Content type selector');
+    const typePillRow = this._el("div", "mp-pills");
+    typePillRow.setAttribute("role", "group");
+    typePillRow.setAttribute("aria-label", "Content type selector");
 
     for (const [key, cfg] of Object.entries(CONTENT_TYPES)) {
-      const pill = this._el('button', `mp-pill${key === this._activeType ? ' mp-pill--active' : ''}`);
+      const pill = this._el(
+        "button",
+        `mp-pill${key === this._activeType ? " mp-pill--active" : ""}`,
+      );
       pill.dataset.type = key;
-      pill.setAttribute('aria-pressed', key === this._activeType ? 'true' : 'false');
-      pill.setAttribute('aria-label', cfg.label);
+      pill.setAttribute(
+        "aria-pressed",
+        key === this._activeType ? "true" : "false",
+      );
+      pill.setAttribute("aria-label", cfg.label);
       pill.textContent = `${cfg.icon} ${cfg.label}`;
       typePillRow.appendChild(pill);
       this._typePills[key] = pill;
@@ -283,19 +294,25 @@ export class MarketingPlaza {
     panel.appendChild(typePillRow);
 
     // Tone selector
-    const toneLabel = this._el('div', 'mp-field-label');
-    toneLabel.textContent = 'Tone';
+    const toneLabel = this._el("div", "mp-field-label");
+    toneLabel.textContent = "Tone";
     panel.appendChild(toneLabel);
 
-    const tonePillRow = this._el('div', 'mp-pills mp-pills--tone');
-    tonePillRow.setAttribute('role', 'group');
-    tonePillRow.setAttribute('aria-label', 'Tone selector');
+    const tonePillRow = this._el("div", "mp-pills mp-pills--tone");
+    tonePillRow.setAttribute("role", "group");
+    tonePillRow.setAttribute("aria-label", "Tone selector");
 
     for (const [key, cfg] of Object.entries(TONES)) {
-      const pill = this._el('button', `mp-pill mp-pill--sm${key === this._activeTone ? ' mp-pill--active' : ''}`);
+      const pill = this._el(
+        "button",
+        `mp-pill mp-pill--sm${key === this._activeTone ? " mp-pill--active" : ""}`,
+      );
       pill.dataset.tone = key;
-      pill.setAttribute('aria-pressed', key === this._activeTone ? 'true' : 'false');
-      pill.setAttribute('aria-label', cfg.label);
+      pill.setAttribute(
+        "aria-pressed",
+        key === this._activeTone ? "true" : "false",
+      );
+      pill.setAttribute("aria-label", cfg.label);
       pill.textContent = `${cfg.emoji} ${cfg.label}`;
       tonePillRow.appendChild(pill);
       this._tonePills[key] = pill;
@@ -304,64 +321,70 @@ export class MarketingPlaza {
     panel.appendChild(tonePillRow);
 
     // Title input
-    const titleLabel = this._el('label', 'mp-field-label');
-    titleLabel.textContent = 'Title / Headline';
-    titleLabel.setAttribute('for', 'mp-title-input');
+    const titleLabel = this._el("label", "mp-field-label");
+    titleLabel.textContent = "Title / Headline";
+    titleLabel.setAttribute("for", "mp-title-input");
     panel.appendChild(titleLabel);
 
-    this._titleInput = this._el('input', 'mp-input');
-    this._titleInput.id = 'mp-title-input';
-    this._titleInput.type = 'text';
-    this._titleInput.placeholder = 'Give this piece a title…';
-    this._titleInput.setAttribute('aria-required', 'true');
+    this._titleInput = this._el("input", "mp-input");
+    this._titleInput.id = "mp-title-input";
+    this._titleInput.type = "text";
+    this._titleInput.placeholder = "Give this piece a title…";
+    this._titleInput.setAttribute("aria-required", "true");
     panel.appendChild(this._titleInput);
 
     // Brief / topic textarea
-    const briefLabel = this._el('label', 'mp-field-label');
-    briefLabel.textContent = 'Topic / Brief';
-    briefLabel.setAttribute('for', 'mp-brief-input');
+    const briefLabel = this._el("label", "mp-field-label");
+    briefLabel.textContent = "Topic / Brief";
+    briefLabel.setAttribute("for", "mp-brief-input");
     panel.appendChild(briefLabel);
 
-    this._briefInput = this._el('textarea', 'mp-textarea');
-    this._briefInput.id = 'mp-brief-input';
+    this._briefInput = this._el("textarea", "mp-textarea");
+    this._briefInput.id = "mp-brief-input";
     this._briefInput.rows = 4;
-    this._briefInput.setAttribute('aria-required', 'true');
-    this._briefInput.setAttribute('aria-label', 'Topic or brief for content generation');
+    this._briefInput.setAttribute("aria-required", "true");
+    this._briefInput.setAttribute(
+      "aria-label",
+      "Topic or brief for content generation",
+    );
     this._updateBriefPlaceholder();
     panel.appendChild(this._briefInput);
 
     // Generate button
-    this._generateBtn = this._el('button', 'mp-generate-btn');
-    this._generateBtn.textContent = '✨ Generate';
-    this._generateBtn.setAttribute('aria-label', 'Generate content with AI');
+    this._generateBtn = this._el("button", "mp-generate-btn");
+    this._generateBtn.textContent = "✨ Generate";
+    this._generateBtn.setAttribute("aria-label", "Generate content with AI");
     panel.appendChild(this._generateBtn);
 
     // Output section (hidden until generation)
-    const outputSection = this._el('div', 'mp-output');
+    const outputSection = this._el("div", "mp-output");
     outputSection.hidden = true;
-    outputSection.setAttribute('aria-live', 'polite');
-    outputSection.setAttribute('aria-label', 'Generated content');
+    outputSection.setAttribute("aria-live", "polite");
+    outputSection.setAttribute("aria-label", "Generated content");
     this._outputSection = outputSection;
 
-    const outputHead = this._el('div', 'mp-output__head');
-    const outputLabel = this._el('div', 'mp-output__label');
-    outputLabel.textContent = 'Output';
+    const outputHead = this._el("div", "mp-output__head");
+    const outputLabel = this._el("div", "mp-output__label");
+    outputLabel.textContent = "Output";
 
-    this._copyBtn = this._el('button', 'mp-copy-btn');
-    this._copyBtn.textContent = 'Copy';
-    this._copyBtn.setAttribute('aria-label', 'Copy generated content to clipboard');
-    this._copyBtn.setAttribute('title', 'Copy to clipboard');
+    this._copyBtn = this._el("button", "mp-copy-btn");
+    this._copyBtn.textContent = "Copy";
+    this._copyBtn.setAttribute(
+      "aria-label",
+      "Copy generated content to clipboard",
+    );
+    this._copyBtn.setAttribute("title", "Copy to clipboard");
 
     outputHead.appendChild(outputLabel);
     outputHead.appendChild(this._copyBtn);
     outputSection.appendChild(outputHead);
 
-    this._streamOutput = this._el('pre', 'mp-stream-output');
-    this._streamOutput.setAttribute('tabindex', '0');
-    this._streamOutput.setAttribute('aria-label', 'Generated content text');
+    this._streamOutput = this._el("pre", "mp-stream-output");
+    this._streamOutput.setAttribute("tabindex", "0");
+    this._streamOutput.setAttribute("aria-label", "Generated content text");
     outputSection.appendChild(this._streamOutput);
 
-    this._streamMeta = this._el('div', 'mp-stream-meta');
+    this._streamMeta = this._el("div", "mp-stream-meta");
     outputSection.appendChild(this._streamMeta);
 
     panel.appendChild(outputSection);
@@ -376,26 +399,26 @@ export class MarketingPlaza {
   _bindEvents() {
     // Type pill selection
     for (const [key, pill] of Object.entries(this._typePills)) {
-      pill.addEventListener('click', () => this._selectType(key));
+      pill.addEventListener("click", () => this._selectType(key));
     }
 
     // Tone pill selection
     for (const [key, pill] of Object.entries(this._tonePills)) {
-      pill.addEventListener('click', () => this._selectTone(key));
+      pill.addEventListener("click", () => this._selectTone(key));
     }
 
     // Generate button
-    this._generateBtn.addEventListener('click', () => this._generate());
+    this._generateBtn.addEventListener("click", () => this._generate());
 
     // Copy button
-    this._copyBtn.addEventListener('click', () => this._copyToClipboard());
+    this._copyBtn.addEventListener("click", () => this._copyToClipboard());
 
     // Library grid delegated click — open modal
-    this._libraryGrid.addEventListener('click', (e) => {
-      const card = e.target.closest('.mp-card');
+    this._libraryGrid.addEventListener("click", (e) => {
+      const card = e.target.closest(".mp-card");
       if (!card) return;
       const id = card.dataset.id;
-      const piece = this._pieces.find(p => p.id === id);
+      const piece = this._pieces.find((p) => p.id === id);
       if (piece) this._openPieceModal(piece);
     });
   }
@@ -414,10 +437,10 @@ export class MarketingPlaza {
     let pieces = [];
     try {
       if (window.api && window.api.db && window.api.db.getContentPieces) {
-        pieces = await window.api.db.getContentPieces(worldId, 100) || [];
+        pieces = (await window.api.db.getContentPieces(worldId, 100)) || [];
       }
     } catch (err) {
-      console.warn('[MarketingPlaza] Failed to load content pieces:', err);
+      console.warn("[MarketingPlaza] Failed to load content pieces:", err);
     }
 
     this._pieces = pieces;
@@ -435,8 +458,8 @@ export class MarketingPlaza {
 
     for (const [k, pill] of Object.entries(this._typePills)) {
       const active = k === key;
-      pill.classList.toggle('mp-pill--active', active);
-      pill.setAttribute('aria-pressed', active ? 'true' : 'false');
+      pill.classList.toggle("mp-pill--active", active);
+      pill.setAttribute("aria-pressed", active ? "true" : "false");
     }
 
     this._updateBriefPlaceholder();
@@ -448,15 +471,17 @@ export class MarketingPlaza {
 
     for (const [k, pill] of Object.entries(this._tonePills)) {
       const active = k === key;
-      pill.classList.toggle('mp-pill--active', active);
-      pill.setAttribute('aria-pressed', active ? 'true' : 'false');
+      pill.classList.toggle("mp-pill--active", active);
+      pill.setAttribute("aria-pressed", active ? "true" : "false");
     }
   }
 
   _updateBriefPlaceholder() {
     if (!this._briefInput) return;
     const cfg = CONTENT_TYPES[this._activeType];
-    this._briefInput.placeholder = cfg ? cfg.placeholder : 'Describe what you want to write about…';
+    this._briefInput.placeholder = cfg
+      ? cfg.placeholder
+      : "Describe what you want to write about…";
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -466,35 +491,43 @@ export class MarketingPlaza {
   async _generate() {
     if (this._generating) return;
 
-    const brief = this._briefInput ? this._briefInput.value.trim() : '';
-    const title = this._titleInput ? this._titleInput.value.trim() : '';
+    const brief = this._briefInput ? this._briefInput.value.trim() : "";
+    const title = this._titleInput ? this._titleInput.value.trim() : "";
 
     if (!brief) {
-      this._toast('warning', 'Missing Brief', 'Please enter a topic or brief before generating.');
+      this._toast(
+        "warning",
+        "Missing Brief",
+        "Please enter a topic or brief before generating.",
+      );
       this._briefInput && this._briefInput.focus();
       return;
     }
 
     if (!title) {
-      this._toast('warning', 'Missing Title', 'Please give this piece a title.');
+      this._toast(
+        "warning",
+        "Missing Title",
+        "Please give this piece a title.",
+      );
       this._titleInput && this._titleInput.focus();
       return;
     }
 
     this._generating = true;
     this._generateBtn.disabled = true;
-    this._generateBtn.textContent = '⏳ Generating…';
-    this._currentContent = '';
+    this._generateBtn.textContent = "⏳ Generating…";
+    this._currentContent = "";
 
     // Show output panel with streaming state
     this._outputSection.hidden = false;
-    this._streamOutput.textContent = '';
-    this._streamMeta.textContent = '';
+    this._streamOutput.textContent = "";
+    this._streamMeta.textContent = "";
     this._copyBtn.disabled = true;
 
     // Add typewriter cursor
-    this._streamCursor = this._el('span', 'mp-cursor');
-    this._streamCursor.textContent = '▋';
+    this._streamCursor = this._el("span", "mp-cursor");
+    this._streamCursor.textContent = "▋";
     this._streamOutput.appendChild(this._streamCursor);
 
     const typeCfg = CONTENT_TYPES[this._activeType];
@@ -505,14 +538,14 @@ export class MarketingPlaza {
     const startedAt = Date.now();
 
     try {
-      let content = '';
+      let content = "";
       let tokensUsed = 0;
       let costUsd = 0;
 
       if (window.api && window.api.ai && window.api.ai.dispatch) {
         const task = {
           worldId: this._worldId,
-          zoneType: 'marketing',
+          zoneType: "marketing",
           contentType: this._activeType,
           tone: this._activeTone,
           systemPrompt,
@@ -522,7 +555,11 @@ export class MarketingPlaza {
         };
 
         const result = await window.api.ai.dispatch(task);
-        content = result.text || result.content || result.result || JSON.stringify(result);
+        content =
+          result.text ||
+          result.content ||
+          result.result ||
+          JSON.stringify(result);
         tokensUsed = (result.input_tokens || 0) + (result.output_tokens || 0);
         costUsd = result.cost_usd || 0;
 
@@ -549,7 +586,7 @@ export class MarketingPlaza {
       if (tokensUsed) metaParts.push(`${tokensUsed.toLocaleString()} tokens`);
       if (costUsd) metaParts.push(`$${costUsd.toFixed(4)}`);
       metaParts.push(`${(latencyMs / 1000).toFixed(1)}s`);
-      this._streamMeta.textContent = metaParts.join(' · ');
+      this._streamMeta.textContent = metaParts.join(" · ");
 
       this._copyBtn.disabled = false;
 
@@ -557,22 +594,25 @@ export class MarketingPlaza {
       let savedId = null;
       try {
         if (window.api && window.api.db && window.api.db.createContentPiece) {
-          const newPiece = await window.api.db.createContentPiece(this._worldId, {
-            content_type: this._activeType,
-            title,
-            brief,
-            content,
-            tone: this._activeTone,
-            word_count: wc,
-            tokens_used: tokensUsed,
-            cost_usd: costUsd,
-          });
+          const newPiece = await window.api.db.createContentPiece(
+            this._worldId,
+            {
+              content_type: this._activeType,
+              title,
+              brief,
+              content,
+              tone: this._activeTone,
+              word_count: wc,
+              tokens_used: tokensUsed,
+              cost_usd: costUsd,
+            },
+          );
           if (newPiece) {
             savedId = newPiece.id || newPiece;
           }
         }
       } catch (dbErr) {
-        console.warn('[MarketingPlaza] Could not persist piece:', dbErr);
+        console.warn("[MarketingPlaza] Could not persist piece:", dbErr);
       }
 
       // Add to local pieces array
@@ -595,28 +635,41 @@ export class MarketingPlaza {
       this._updateStats();
 
       // Emit task-complete event
-      document.dispatchEvent(new CustomEvent('dispatch:task-complete', {
-        detail: { worldId: this._worldId, zoneType: 'marketing', success: true },
-        bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("dispatch:task-complete", {
+          detail: {
+            worldId: this._worldId,
+            zoneType: "marketing",
+            success: true,
+          },
+          bubbles: true,
+        }),
+      );
 
-      this._toast('success', 'Content Generated', `"${title}" is ready and saved to your library.`);
-
+      this._toast(
+        "success",
+        "Content Generated",
+        `"${title}" is ready and saved to your library.`,
+      );
     } catch (err) {
-      console.error('[MarketingPlaza] Generation failed:', err);
+      console.error("[MarketingPlaza] Generation failed:", err);
 
       if (this._streamCursor && this._streamCursor.parentNode) {
         this._streamCursor.parentNode.removeChild(this._streamCursor);
       }
       this._streamCursor = null;
-      this._streamOutput.textContent = `Error: ${err.message || 'Generation failed. Please try again.'}`;
-      this._streamMeta.textContent = '';
+      this._streamOutput.textContent = `Error: ${err.message || "Generation failed. Please try again."}`;
+      this._streamMeta.textContent = "";
 
-      this._toast('error', 'Generation Failed', err.message || 'An unexpected error occurred.');
+      this._toast(
+        "error",
+        "Generation Failed",
+        err.message || "An unexpected error occurred.",
+      );
     } finally {
       this._generating = false;
       this._generateBtn.disabled = false;
-      this._generateBtn.textContent = '✨ Generate';
+      this._generateBtn.textContent = "✨ Generate";
     }
   }
 
@@ -641,13 +694,16 @@ export class MarketingPlaza {
         }
 
         const end = Math.min(idx + BATCH, total);
-        const chunk = chars.slice(idx, end).join('');
+        const chunk = chars.slice(idx, end).join("");
         idx = end;
 
         // Insert text before the cursor
         const textNode = document.createTextNode(chunk);
         if (this._streamCursor && this._streamCursor.parentNode) {
-          this._streamCursor.parentNode.insertBefore(textNode, this._streamCursor);
+          this._streamCursor.parentNode.insertBefore(
+            textNode,
+            this._streamCursor,
+          );
         } else {
           this._streamOutput.appendChild(textNode);
         }
@@ -674,15 +730,19 @@ export class MarketingPlaza {
       await navigator.clipboard.writeText(content);
       const btn = this._copyBtn;
       const original = btn.textContent;
-      btn.textContent = 'Copied!';
-      btn.classList.add('mp-copy-btn--copied');
+      btn.textContent = "Copied!";
+      btn.classList.add("mp-copy-btn--copied");
       setTimeout(() => {
         btn.textContent = original;
-        btn.classList.remove('mp-copy-btn--copied');
+        btn.classList.remove("mp-copy-btn--copied");
       }, 2000);
     } catch (err) {
-      console.warn('[MarketingPlaza] Clipboard write failed:', err);
-      this._toast('error', 'Copy Failed', 'Could not access clipboard. Please copy manually.');
+      console.warn("[MarketingPlaza] Clipboard write failed:", err);
+      this._toast(
+        "error",
+        "Copy Failed",
+        "Could not access clipboard. Please copy manually.",
+      );
     }
   }
 
@@ -692,7 +752,7 @@ export class MarketingPlaza {
 
   _renderLibrary() {
     if (!this._libraryGrid) return;
-    this._libraryGrid.innerHTML = '';
+    this._libraryGrid.innerHTML = "";
 
     if (this._pieces.length === 0) {
       this._renderLibraryEmpty();
@@ -706,13 +766,13 @@ export class MarketingPlaza {
 
   _renderLibraryEmpty() {
     if (!this._libraryGrid) return;
-    this._libraryGrid.innerHTML = '';
+    this._libraryGrid.innerHTML = "";
 
-    const empty = this._el('div', 'mp-empty-state');
-    const emptyIcon = this._el('div', 'mp-empty-state__icon');
-    emptyIcon.textContent = '📝';
-    const emptyMsg = this._el('div', 'mp-empty-state__msg');
-    emptyMsg.textContent = 'No content yet. Generate your first piece!';
+    const empty = this._el("div", "mp-empty-state");
+    const emptyIcon = this._el("div", "mp-empty-state__icon");
+    emptyIcon.textContent = "📝";
+    const emptyMsg = this._el("div", "mp-empty-state__msg");
+    emptyMsg.textContent = "No content yet. Generate your first piece!";
     empty.appendChild(emptyIcon);
     empty.appendChild(emptyMsg);
     this._libraryGrid.appendChild(empty);
@@ -720,48 +780,50 @@ export class MarketingPlaza {
 
   _buildCard(piece) {
     const typeCfg = CONTENT_TYPES[piece.content_type] || CONTENT_TYPES.blog;
-    const wc = piece.word_count || wordCount(piece.content || '');
+    const wc = piece.word_count || wordCount(piece.content || "");
 
-    const card = this._el('article', 'mp-card');
-    card.setAttribute('role', 'listitem');
-    card.setAttribute('tabindex', '0');
+    const card = this._el("article", "mp-card");
+    card.setAttribute("role", "listitem");
+    card.setAttribute("tabindex", "0");
     card.dataset.id = piece.id;
-    card.setAttribute('aria-label', `${typeCfg.label}: ${piece.title}`);
+    card.setAttribute("aria-label", `${typeCfg.label}: ${piece.title}`);
 
     // Card header
-    const cardHead = this._el('div', 'mp-card__head');
+    const cardHead = this._el("div", "mp-card__head");
 
-    const typeBadge = this._el('span', `mp-type-badge mp-type-badge--${piece.content_type}`);
+    const typeBadge = this._el(
+      "span",
+      `mp-type-badge mp-type-badge--${piece.content_type}`,
+    );
     typeBadge.textContent = `${typeCfg.icon} ${typeCfg.label}`;
 
-    const toneBadge = this._el('span', 'mp-tone-badge');
-    toneBadge.textContent = piece.tone || 'professional';
+    const toneBadge = this._el("span", "mp-tone-badge");
+    toneBadge.textContent = piece.tone || "professional";
 
     cardHead.appendChild(typeBadge);
     cardHead.appendChild(toneBadge);
     card.appendChild(cardHead);
 
     // Title
-    const cardTitle = this._el('h4', 'mp-card__title');
+    const cardTitle = this._el("h4", "mp-card__title");
     cardTitle.textContent = piece.title;
     card.appendChild(cardTitle);
 
     // Brief excerpt
     if (piece.brief) {
-      const cardBrief = this._el('p', 'mp-card__brief');
-      cardBrief.textContent = piece.brief.length > 80
-        ? piece.brief.slice(0, 80) + '…'
-        : piece.brief;
+      const cardBrief = this._el("p", "mp-card__brief");
+      cardBrief.textContent =
+        piece.brief.length > 80 ? piece.brief.slice(0, 80) + "…" : piece.brief;
       card.appendChild(cardBrief);
     }
 
     // Footer
-    const cardFoot = this._el('div', 'mp-card__foot');
+    const cardFoot = this._el("div", "mp-card__foot");
 
-    const wordEl = this._el('span', 'mp-card__meta');
+    const wordEl = this._el("span", "mp-card__meta");
     wordEl.textContent = `${fmtWords(wc)} words`;
 
-    const dateEl = this._el('span', 'mp-card__meta');
+    const dateEl = this._el("span", "mp-card__meta");
     dateEl.textContent = relativeTime(piece.created_at);
 
     cardFoot.appendChild(wordEl);
@@ -769,8 +831,8 @@ export class MarketingPlaza {
     card.appendChild(cardFoot);
 
     // Keyboard support
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         this._openPieceModal(piece);
       }
@@ -785,51 +847,54 @@ export class MarketingPlaza {
 
   _openPieceModal(piece) {
     // Remove existing modal if any
-    const existing = document.getElementById('mp-modal');
+    const existing = document.getElementById("mp-modal");
     if (existing) existing.remove();
 
     const typeCfg = CONTENT_TYPES[piece.content_type] || CONTENT_TYPES.blog;
-    const wc = piece.word_count || wordCount(piece.content || '');
+    const wc = piece.word_count || wordCount(piece.content || "");
 
-    const overlay = this._el('div', 'mp-modal-overlay');
-    overlay.id = 'mp-modal';
-    overlay.setAttribute('role', 'dialog');
-    overlay.setAttribute('aria-modal', 'true');
-    overlay.setAttribute('aria-label', piece.title);
+    const overlay = this._el("div", "mp-modal-overlay");
+    overlay.id = "mp-modal";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", piece.title);
 
-    const modal = this._el('div', 'mp-modal');
+    const modal = this._el("div", "mp-modal");
 
     // Modal header
-    const modalHead = this._el('div', 'mp-modal__head');
+    const modalHead = this._el("div", "mp-modal__head");
 
-    const headLeft = this._el('div', 'mp-modal__head-left');
-    const modalBadge = this._el('span', `mp-type-badge mp-type-badge--${piece.content_type}`);
+    const headLeft = this._el("div", "mp-modal__head-left");
+    const modalBadge = this._el(
+      "span",
+      `mp-type-badge mp-type-badge--${piece.content_type}`,
+    );
     modalBadge.textContent = `${typeCfg.icon} ${typeCfg.label}`;
-    const modalTitle = this._el('h3', 'mp-modal__title');
+    const modalTitle = this._el("h3", "mp-modal__title");
     modalTitle.textContent = piece.title;
     headLeft.appendChild(modalBadge);
     headLeft.appendChild(modalTitle);
 
-    const headRight = this._el('div', 'mp-modal__head-right');
+    const headRight = this._el("div", "mp-modal__head-right");
 
-    const modalCopyBtn = this._el('button', 'mp-copy-btn');
-    modalCopyBtn.textContent = 'Copy';
-    modalCopyBtn.setAttribute('aria-label', 'Copy content to clipboard');
-    modalCopyBtn.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(piece.content || '').catch(() => {});
+    const modalCopyBtn = this._el("button", "mp-copy-btn");
+    modalCopyBtn.textContent = "Copy";
+    modalCopyBtn.setAttribute("aria-label", "Copy content to clipboard");
+    modalCopyBtn.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(piece.content || "").catch(() => {});
       const orig = modalCopyBtn.textContent;
-      modalCopyBtn.textContent = 'Copied!';
-      modalCopyBtn.classList.add('mp-copy-btn--copied');
+      modalCopyBtn.textContent = "Copied!";
+      modalCopyBtn.classList.add("mp-copy-btn--copied");
       setTimeout(() => {
         modalCopyBtn.textContent = orig;
-        modalCopyBtn.classList.remove('mp-copy-btn--copied');
+        modalCopyBtn.classList.remove("mp-copy-btn--copied");
       }, 2000);
     });
 
-    const closeBtn = this._el('button', 'mp-modal__close');
-    closeBtn.textContent = '✕';
-    closeBtn.setAttribute('aria-label', 'Close modal');
-    closeBtn.addEventListener('click', () => overlay.remove());
+    const closeBtn = this._el("button", "mp-modal__close");
+    closeBtn.textContent = "✕";
+    closeBtn.setAttribute("aria-label", "Close modal");
+    closeBtn.addEventListener("click", () => overlay.remove());
 
     headRight.appendChild(modalCopyBtn);
     headRight.appendChild(closeBtn);
@@ -839,17 +904,17 @@ export class MarketingPlaza {
     modal.appendChild(modalHead);
 
     // Meta bar
-    const metaBar = this._el('div', 'mp-modal__meta');
+    const metaBar = this._el("div", "mp-modal__meta");
     const metaItems = [
-      { label: 'Tone', value: piece.tone || 'professional' },
-      { label: 'Words', value: fmtWords(wc) },
-      { label: 'Created', value: relativeTime(piece.created_at) },
+      { label: "Tone", value: piece.tone || "professional" },
+      { label: "Words", value: fmtWords(wc) },
+      { label: "Created", value: relativeTime(piece.created_at) },
     ];
     if (piece.cost_usd) {
-      metaItems.push({ label: 'Cost', value: `$${piece.cost_usd.toFixed(4)}` });
+      metaItems.push({ label: "Cost", value: `$${piece.cost_usd.toFixed(4)}` });
     }
     for (const m of metaItems) {
-      const metaItem = this._el('span', 'mp-modal__meta-item');
+      const metaItem = this._el("span", "mp-modal__meta-item");
       metaItem.innerHTML = `<strong>${escapeHTML(m.label)}:</strong> ${escapeHTML(String(m.value))}`;
       metaBar.appendChild(metaItem);
     }
@@ -857,33 +922,33 @@ export class MarketingPlaza {
 
     // Brief if present
     if (piece.brief) {
-      const briefEl = this._el('div', 'mp-modal__brief');
+      const briefEl = this._el("div", "mp-modal__brief");
       briefEl.textContent = piece.brief;
       modal.appendChild(briefEl);
     }
 
     // Content body
-    const contentEl = this._el('pre', 'mp-modal__content');
-    contentEl.textContent = piece.content || '';
-    contentEl.setAttribute('tabindex', '0');
+    const contentEl = this._el("pre", "mp-modal__content");
+    contentEl.textContent = piece.content || "";
+    contentEl.setAttribute("tabindex", "0");
     modal.appendChild(contentEl);
 
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 
     // Close on overlay click
-    overlay.addEventListener('click', (e) => {
+    overlay.addEventListener("click", (e) => {
       if (e.target === overlay) overlay.remove();
     });
 
     // Close on Escape
     const escHandler = (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         overlay.remove();
-        document.removeEventListener('keydown', escHandler);
+        document.removeEventListener("keydown", escHandler);
       }
     };
-    document.addEventListener('keydown', escHandler);
+    document.addEventListener("keydown", escHandler);
 
     // Focus the modal
     closeBtn.focus();
@@ -902,21 +967,28 @@ export class MarketingPlaza {
     // Words this week
     const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
     const weeklyWords = this._pieces
-      .filter(p => new Date(p.created_at).getTime() > oneWeekAgo)
-      .reduce((sum, p) => sum + (p.word_count || wordCount(p.content || '')), 0);
+      .filter((p) => new Date(p.created_at).getTime() > oneWeekAgo)
+      .reduce(
+        (sum, p) => sum + (p.word_count || wordCount(p.content || "")),
+        0,
+      );
     this._statsWords.textContent = fmtWords(weeklyWords);
 
     // Most popular type
     if (total === 0) {
-      this._statsTopType.textContent = '—';
+      this._statsTopType.textContent = "—";
     } else {
       const typeCounts = {};
       for (const p of this._pieces) {
         typeCounts[p.content_type] = (typeCounts[p.content_type] || 0) + 1;
       }
-      const topKey = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0][0];
+      const topKey = Object.entries(typeCounts).sort(
+        (a, b) => b[1] - a[1],
+      )[0][0];
       const topCfg = CONTENT_TYPES[topKey];
-      this._statsTopType.textContent = topCfg ? `${topCfg.icon} ${topCfg.label}` : topKey;
+      this._statsTopType.textContent = topCfg
+        ? `${topCfg.icon} ${topCfg.label}`
+        : topKey;
     }
   }
 
@@ -925,7 +997,11 @@ export class MarketingPlaza {
   // ═══════════════════════════════════════════════════════════════════
 
   _simulatedContent(type, title, brief) {
-    const timestamp = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const timestamp = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
     const templates = {
       blog: `# ${title}
@@ -1051,10 +1127,12 @@ Introducing the solution designed for teams who can't afford to waste time on co
   // ═══════════════════════════════════════════════════════════════════
 
   _toast(type, title, description) {
-    document.dispatchEvent(new CustomEvent('toast:show', {
-      detail: { type, title, description },
-      bubbles: true,
-    }));
+    document.dispatchEvent(
+      new CustomEvent("toast:show", {
+        detail: { type, title, description },
+        bubbles: true,
+      }),
+    );
   }
 
   // ═══════════════════════════════════════════════════════════════════

@@ -16,7 +16,7 @@
 /* ── Base bubble ───────────────────────────────────────────────────────────── */
 
 .thought-bubble {
-  --agent-color: #7c3aed;  /* overridden per-instance via inline style */
+  --agent-color: #7c3aed; /* overridden per-instance via inline style */
   --glass-bg: rgba(12, 12, 20, 0.82);
   --glass-border: rgba(255, 255, 255, 0.13);
   --text-color: #e8e8f0;
@@ -57,7 +57,9 @@
   transform-origin: bottom center;
 
   /* Smooth repositioning */
-  transition: left 0.12s ease-out, top 0.12s ease-out;
+  transition:
+    left 0.12s ease-out,
+    top 0.12s ease-out;
 
   will-change: opacity, transform;
 }
@@ -80,7 +82,7 @@
 
 /* Outer tail (border outline) */
 .tb-tail::before {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 2px;
   left: calc(-1 * var(--tail-size));
@@ -132,7 +134,9 @@
 
 .tb-text {
   display: inline;
-  font-family: 'Berkeley Mono', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+  font-family:
+    "Berkeley Mono", "JetBrains Mono", "Fira Code", "Cascadia Code",
+    ui-monospace, monospace;
   font-size: 12px;
   font-weight: 400;
   line-height: 1.5;
@@ -154,8 +158,13 @@
 }
 
 @keyframes tb-blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* ── Mood modifiers ─────────────────────────────────────────────────────────── */
@@ -171,12 +180,24 @@
 }
 
 @keyframes tb-wobble {
-  0%   { transform: rotate(0deg);    }
-  20%  { transform: rotate(-8deg);   }
-  40%  { transform: rotate(8deg);    }
-  60%  { transform: rotate(-4deg);   }
-  80%  { transform: rotate(4deg);    }
-  100% { transform: rotate(0deg);    }
+  0% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-8deg);
+  }
+  40% {
+    transform: rotate(8deg);
+  }
+  60% {
+    transform: rotate(-4deg);
+  }
+  80% {
+    transform: rotate(4deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 /* Excited: pulsing glow on the border */
@@ -186,7 +207,8 @@
 }
 
 @keyframes tb-excited-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.5),
       -4px 0 16px -4px var(--agent-color),
@@ -207,8 +229,12 @@
 }
 
 @keyframes tb-bounce {
-  from { transform: translateY(0);    }
-  to   { transform: translateY(-3px); }
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-3px);
+  }
 }
 
 /* Tired: desaturated, droopy style */
@@ -239,11 +265,22 @@
 }
 
 @keyframes tb-jitter {
-  0%, 100% { transform: translateX(0);    }
-  20%       { transform: translateX(-2px); }
-  40%       { transform: translateX(2px);  }
-  60%       { transform: translateX(-2px); }
-  80%       { transform: translateX(2px);  }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-2px);
+  }
+  40% {
+    transform: translateX(2px);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
 }
 
 /* ── Entrance / exit keyframes ─────────────────────────────────────────────── */

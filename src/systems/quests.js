@@ -11,15 +11,15 @@
 // Maps DOM event names to the trigger_type stored in the quests table.
 
 const EVENT_TO_TRIGGER = {
-  'zone-click':                'zone_enter',
-  'connector-docks:key-saved': 'api_connect',
-  'agent-dialogue:send':       'task_complete',
-  'skills-academy:create':     'skill_create',
-  'task:scheduled':            'task_schedule',
-  'treasury:budget-set':       'budget_set',
-  'connector-docks:provider-count': 'provider_count',
-  'skills-academy:publish':    'skill_publish',
-  'memory-vault:add':          null, // incidental tracking, no quest trigger
+  "zone-click": "zone_enter",
+  "connector-docks:key-saved": "api_connect",
+  "agent-dialogue:send": "task_complete",
+  "skills-academy:create": "skill_create",
+  "task:scheduled": "task_schedule",
+  "treasury:budget-set": "budget_set",
+  "connector-docks:provider-count": "provider_count",
+  "skills-academy:publish": "skill_publish",
+  "memory-vault:add": null, // incidental tracking, no quest trigger
 };
 
 // ── QuestEngine ────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ export class QuestEngine {
       const rows = await window.api.db.getQuests(worldId);
       this.quests = rows || [];
     } catch (err) {
-      console.error('[QuestEngine] Failed to load quests:', err);
+      console.error("[QuestEngine] Failed to load quests:", err);
       this.quests = [];
     }
   }
@@ -93,7 +93,7 @@ export class QuestEngine {
     if (!triggerType) return;
 
     const detail = e.detail || {};
-    const triggerValue = detail.zoneId || detail.value || detail.count || 'any';
+    const triggerValue = detail.zoneId || detail.value || detail.count || "any";
 
     this.checkTrigger(triggerType, String(triggerValue));
   }
@@ -115,7 +115,8 @@ export class QuestEngine {
     if (active.trigger_type !== triggerType) return;
 
     // Value must match: 'any' accepts everything, otherwise exact match
-    if (active.trigger_value !== 'any' && active.trigger_value !== triggerValue) return;
+    if (active.trigger_value !== "any" && active.trigger_value !== triggerValue)
+      return;
 
     // Trigger matched — complete the quest
     this.completeQuest(active);
@@ -136,18 +137,21 @@ export class QuestEngine {
       await window.api.db.completeQuest(quest.id);
 
       // 2. Award XP
-      const xpResult = await window.api.db.addXP(this._worldId, quest.reward_xp);
+      const xpResult = await window.api.db.addXP(
+        this._worldId,
+        quest.reward_xp,
+      );
 
       // 3. Update local state
       const idx = this.quests.findIndex((q) => q.id === quest.id);
       if (idx !== -1) {
-        this.quests[idx].status = 'completed';
+        this.quests[idx].status = "completed";
         this.quests[idx].completed_at = new Date().toISOString();
       }
 
       // 4. Emit quest:completed event
       document.dispatchEvent(
-        new CustomEvent('quest:completed', {
+        new CustomEvent("quest:completed", {
           detail: {
             quest,
             xp: quest.reward_xp,
@@ -156,48 +160,48 @@ export class QuestEngine {
             totalXP: xpResult?.xp,
           },
           bubbles: true,
-        })
+        }),
       );
 
       // 5. Show celebration toast
       document.dispatchEvent(
-        new CustomEvent('toast:show', {
+        new CustomEvent("toast:show", {
           detail: {
-            type: 'achievement',
+            type: "achievement",
             title: `Quest Complete: ${quest.title}`,
             description: `+${quest.reward_xp} XP earned!`,
             duration: 5000,
           },
           bubbles: true,
-        })
+        }),
       );
 
       // 6. If leveled up, show level-up toast after a brief delay
       if (xpResult?.leveledUp) {
         setTimeout(() => {
           document.dispatchEvent(
-            new CustomEvent('toast:show', {
+            new CustomEvent("toast:show", {
               detail: {
-                type: 'achievement',
-                title: 'Level Up!',
+                type: "achievement",
+                title: "Level Up!",
                 description: `You are now Level ${xpResult.level}!`,
                 duration: 5000,
               },
               bubbles: true,
-            })
+            }),
           );
         }, 600);
       }
 
       // 7. Emit celebration event for renderer (confetti, etc.)
       document.dispatchEvent(
-        new CustomEvent('quest:celebration', {
+        new CustomEvent("quest:celebration", {
           detail: {
             quest,
             zoneId: quest.trigger_value,
           },
           bubbles: true,
-        })
+        }),
       );
 
       // 8. Activate next quest in the chain
@@ -205,13 +209,13 @@ export class QuestEngine {
 
       // 9. Emit HUD update event
       document.dispatchEvent(
-        new CustomEvent('quest:chain-updated', {
+        new CustomEvent("quest:chain-updated", {
           detail: { quests: this.quests },
           bubbles: true,
-        })
+        }),
       );
     } catch (err) {
-      console.error('[QuestEngine] Failed to complete quest:', err);
+      console.error("[QuestEngine] Failed to complete quest:", err);
     } finally {
       this._completing = false;
     }
@@ -226,16 +230,16 @@ export class QuestEngine {
       (q) =>
         q.chain_id === completedQuest.chain_id &&
         q.sort_order === completedQuest.sort_order + 1 &&
-        q.status === 'locked'
+        q.status === "locked",
     );
 
     if (!nextQuest) return;
 
     try {
       await window.api.db.activateQuest(nextQuest.id);
-      nextQuest.status = 'active';
+      nextQuest.status = "active";
     } catch (err) {
-      console.error('[QuestEngine] Failed to activate next quest:', err);
+      console.error("[QuestEngine] Failed to activate next quest:", err);
     }
   }
 
@@ -246,7 +250,7 @@ export class QuestEngine {
    * @returns {Object|null}
    */
   getActiveQuest() {
-    return this.quests.find((q) => q.status === 'active') || null;
+    return this.quests.find((q) => q.status === "active") || null;
   }
 
   /**
@@ -262,7 +266,7 @@ export class QuestEngine {
    * @returns {number}
    */
   getCompletedCount() {
-    return this.quests.filter((q) => q.status === 'completed').length;
+    return this.quests.filter((q) => q.status === "completed").length;
   }
 
   /**
@@ -284,12 +288,16 @@ export class QuestEngine {
     const total = this.quests.length;
 
     return {
-      name: active ? active.title : completed === total ? 'All Quests Complete!' : 'No Active Quest',
+      name: active
+        ? active.title
+        : completed === total
+          ? "All Quests Complete!"
+          : "No Active Quest",
       progress: total > 0 ? completed / total : 0,
       steps: this.quests.map((q) => ({
         label: q.title,
-        completed: q.status === 'completed',
-        current: q.status === 'active',
+        completed: q.status === "completed",
+        current: q.status === "active",
       })),
     };
   }

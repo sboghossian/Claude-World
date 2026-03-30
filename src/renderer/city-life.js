@@ -12,33 +12,33 @@
  *  5. Road activity lines — light packets traveling between active zones
  */
 
-import { Container, Graphics, Ticker } from 'pixi.js';
-import { TILE_WIDTH, TILE_HEIGHT, GRID_SIZE, COLORS } from './constants.js';
+import { Container, Graphics, Ticker } from "pixi.js";
+import { TILE_WIDTH, TILE_HEIGHT, GRID_SIZE, COLORS } from "./constants.js";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const rand    = (lo, hi) => lo + Math.random() * (hi - lo);
+const rand = (lo, hi) => lo + Math.random() * (hi - lo);
 const randInt = (lo, hi) => Math.floor(rand(lo, hi + 1));
-const lerp    = (a, b, t) => a + (b - a) * t;
-const clamp   = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 /** Isometric tile → world-container screen position (top vertex of tile). */
 function tileToScreen(tileX, tileY) {
   return {
-    x: (tileX - tileY) * (TILE_WIDTH  / 2),
+    x: (tileX - tileY) * (TILE_WIDTH / 2),
     y: (tileX + tileY) * (TILE_HEIGHT / 2),
   };
 }
 
 /** Pick the accent color for a zone type string. */
-function zoneColor(type = 'default') {
+function zoneColor(type = "default") {
   const MAP = {
-    core:     0x4a90d9,
+    core: 0x4a90d9,
     business: 0x4caf50,
     advanced: 0x9c5ec7,
-    edge:     0xe8893c,
-    council:  0x7c3aed,
-    default:  0xffd700,
+    edge: 0xe8893c,
+    council: 0x7c3aed,
+    default: 0xffd700,
   };
   return MAP[type] ?? MAP.default;
 }
@@ -60,27 +60,27 @@ export class CityLife {
    * @param {import('pixi.js').Container}   worldContainer  — the isometric world layer
    */
   constructor(app, worldContainer) {
-    this._app            = app;
+    this._app = app;
     this._worldContainer = worldContainer;
-    this._time           = 0;
-    this._running        = false;
+    this._time = 0;
+    this._running = false;
 
     // Sub-containers (all children of worldContainer so they depth-sort correctly)
-    this._shadowLayer = new Container();   // under agents
-    this._glowLayer   = new Container();   // zone halos
-    this._lifeLayer   = new Container();   // smoke, windows, packets
+    this._shadowLayer = new Container(); // under agents
+    this._glowLayer = new Container(); // zone halos
+    this._lifeLayer = new Container(); // smoke, windows, packets
     worldContainer.addChild(this._shadowLayer);
     worldContainer.addChild(this._glowLayer);
     worldContainer.addChild(this._lifeLayer);
 
     // Particle pool
-    this._particles = [];   // array of { gfx, elapsed, duration, update }
+    this._particles = []; // array of { gfx, elapsed, duration, update }
 
     // Window light state
-    this._windowLights = [];  // { gfx, nextFlipAt, on, tileX, tileY }
+    this._windowLights = []; // { gfx, nextFlipAt, on, tileX, tileY }
 
     // Smoke emitters (one per registered building)
-    this._smokeEmitters = [];  // { tileX, tileY, particles: [], nextEmitAt }
+    this._smokeEmitters = []; // { tileX, tileY, particles: [], nextEmitAt }
 
     // Agent shadow registry: Map<agentId, Graphics>
     this._agentShadows = new Map();
@@ -140,7 +140,8 @@ export class CityLife {
         gfx,
         on: true,
         nextFlipAt: this._time + rand(2, 8),
-        tileX, tileY,
+        tileX,
+        tileY,
       });
     }
   }
@@ -153,7 +154,9 @@ export class CityLife {
    */
   registerBuilding(tileX, tileY, heightPx = 48) {
     this._smokeEmitters.push({
-      tileX, tileY, heightPx,
+      tileX,
+      tileY,
+      heightPx,
       particles: [],
       nextEmitAt: this._time + rand(0.3, 1.2),
     });
@@ -195,10 +198,10 @@ export class CityLife {
    * @param {number} tileY
    * @param {string} zoneType   — 'core' | 'business' | 'advanced' | 'edge' | 'council'
    */
-  registerZoneGlow(zoneKey, tileX, tileY, zoneType = 'default') {
+  registerZoneGlow(zoneKey, tileX, tileY, zoneType = "default") {
     if (this._zoneGlows.has(zoneKey)) return;
 
-    const color  = zoneColor(zoneType);
+    const color = zoneColor(zoneType);
     const { x, y } = tileToScreen(tileX, tileY);
 
     const gfx = new Graphics();
@@ -206,7 +209,11 @@ export class CityLife {
     gfx.y = y;
     this._glowLayer.addChild(gfx);
 
-    this._zoneGlows.set(zoneKey, { gfx, phase: Math.random() * Math.PI * 2, color });
+    this._zoneGlows.set(zoneKey, {
+      gfx,
+      phase: Math.random() * Math.PI * 2,
+      color,
+    });
   }
 
   /**
@@ -227,7 +234,7 @@ export class CityLife {
    * @param {{tileX:number,tileY:number}} toZone
    * @param {string} zoneType
    */
-  registerRoadLink(fromZone, toZone, zoneType = 'default') {
+  registerRoadLink(fromZone, toZone, zoneType = "default") {
     this._roadLinks.push({
       fromZone,
       toZone,
@@ -318,7 +325,7 @@ export class CityLife {
     const spiralDir = Math.random() > 0.5 ? 1 : -1;
     const p = {
       gfx,
-      elapsed:  0,
+      elapsed: 0,
       duration,
       spiralDir,
       initX: gfx.x,
@@ -353,7 +360,7 @@ export class CityLife {
       if (!sprite.parent) continue; // sprite not yet added to stage
       // Convert agent global position to shadow layer local
       const global = sprite.getGlobalPosition();
-      const local  = this._shadowLayer.toLocal(global);
+      const local = this._shadowLayer.toLocal(global);
       shadow.x = local.x;
       shadow.y = local.y + (sprite.height ?? 16) * 0.45;
     }
@@ -369,7 +376,8 @@ export class CityLife {
 
     for (const [, entry] of this._zoneGlows) {
       const { gfx, phase, color } = entry;
-      const alpha = 0.08 + 0.04 * Math.sin(this._time * Math.PI * 2 * 0.5 + phase);
+      const alpha =
+        0.08 + 0.04 * Math.sin(this._time * Math.PI * 2 * 0.5 + phase);
       gfx.clear();
       gfx.circle(0, 0, 60);
       gfx.fill({ color, alpha: clamp(alpha, 0, 0.15) });
@@ -393,23 +401,23 @@ export class CityLife {
 
   _spawnRoadPacket(link) {
     const from = tileToScreen(link.fromZone.tileX, link.fromZone.tileY);
-    const to   = tileToScreen(link.toZone.tileX,   link.toZone.tileY);
+    const to = tileToScreen(link.toZone.tileX, link.toZone.tileY);
 
     // Trail of 3 dots
     const TRAIL = 3;
     for (let i = 0; i < TRAIL; i++) {
       const gfx = new Graphics();
-      const r   = clamp(3 - i, 1, 3);
+      const r = clamp(3 - i, 1, 3);
       gfx.circle(0, 0, r);
       gfx.fill({ color: link.color, alpha: 0.9 - i * 0.25 });
       gfx.x = from.x;
       gfx.y = from.y;
       this._lifeLayer.addChild(gfx);
 
-      const dx   = to.x - from.x;
-      const dy   = to.y - from.y;
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const spd  = 200; // px/s
+      const spd = 200; // px/s
       const duration = dist / spd;
       const startDelay = i * 0.06; // stagger trail dots
 
@@ -417,9 +425,11 @@ export class CityLife {
         gfx,
         elapsed: -startDelay, // negative elapsed acts as delay
         duration,
-        fromX: from.x, fromY: from.y,
-        toX: to.x, toY: to.y,
-        type: 'packet',
+        fromX: from.x,
+        fromY: from.y,
+        toX: to.x,
+        toY: to.y,
+        type: "packet",
         trailAlpha: 0.9 - i * 0.25,
       });
     }
@@ -443,10 +453,11 @@ export class CityLife {
       p.gfx.visible = true;
       const t = clamp(p.elapsed / p.duration, 0, 1);
 
-      if (p.type === 'packet') {
+      if (p.type === "packet") {
         p.gfx.x = lerp(p.fromX, p.toX, t);
         p.gfx.y = lerp(p.fromY, p.toY, t);
-        p.gfx.alpha = t < 0.85 ? p.trailAlpha : p.trailAlpha * (1 - (t - 0.85) / 0.15);
+        p.gfx.alpha =
+          t < 0.85 ? p.trailAlpha : p.trailAlpha * (1 - (t - 0.85) / 0.15);
       }
 
       if (t >= 1) {

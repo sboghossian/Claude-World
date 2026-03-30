@@ -16,14 +16,14 @@
 
 // ── Constants ───────────────────────────────────────────────────────
 
-const STORAGE_KEY = 'claude-world:last-briefing-date';
+const STORAGE_KEY = "claude-world:last-briefing-date";
 
 /** Greeting by time of day */
 function getGreeting() {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
 }
 
 /** Format a date as YYYY-MM-DD */
@@ -41,7 +41,8 @@ export class MorningBriefing {
    */
   constructor(options = {}) {
     this._getStats = options.getStats || MorningBriefing._defaultStats;
-    this._getActiveQuest = options.getActiveQuest || MorningBriefing._defaultQuest;
+    this._getActiveQuest =
+      options.getActiveQuest || MorningBriefing._defaultQuest;
 
     /** @type {HTMLElement|null} */
     this._overlay = null;
@@ -83,7 +84,7 @@ export class MorningBriefing {
    */
   dismiss() {
     if (this._overlay) {
-      this._overlay.classList.add('briefing--closing');
+      this._overlay.classList.add("briefing--closing");
 
       // Wait for CSS transition to finish
       setTimeout(() => {
@@ -94,9 +95,9 @@ export class MorningBriefing {
         this._shown = false;
 
         // Emit event
-        if (typeof document !== 'undefined') {
+        if (typeof document !== "undefined") {
           document.dispatchEvent(
-            new CustomEvent('briefing:shown', { bubbles: true })
+            new CustomEvent("briefing:shown", { bubbles: true }),
           );
         }
       }, 300);
@@ -155,32 +156,32 @@ export class MorningBriefing {
     this.destroy();
 
     // Overlay
-    this._overlay = document.createElement('div');
-    this._overlay.className = 'briefing-overlay';
-    this._overlay.setAttribute('role', 'dialog');
-    this._overlay.setAttribute('aria-label', 'Morning Briefing');
+    this._overlay = document.createElement("div");
+    this._overlay.className = "briefing-overlay";
+    this._overlay.setAttribute("role", "dialog");
+    this._overlay.setAttribute("aria-label", "Morning Briefing");
 
     // Panel
-    const panel = document.createElement('div');
-    panel.className = 'briefing-panel';
+    const panel = document.createElement("div");
+    panel.className = "briefing-panel";
 
     // ── Commander header ──────────────────────────────────────────
-    const header = document.createElement('div');
-    header.className = 'briefing-header';
+    const header = document.createElement("div");
+    header.className = "briefing-header";
 
-    const avatar = document.createElement('div');
-    avatar.className = 'briefing-avatar';
-    avatar.textContent = '\u{1F451}';
+    const avatar = document.createElement("div");
+    avatar.className = "briefing-avatar";
+    avatar.textContent = "\u{1F451}";
 
-    const greeting = document.createElement('div');
-    greeting.className = 'briefing-greeting';
+    const greeting = document.createElement("div");
+    greeting.className = "briefing-greeting";
 
-    const greetTitle = document.createElement('h2');
-    greetTitle.className = 'briefing-greeting__title';
+    const greetTitle = document.createElement("h2");
+    greetTitle.className = "briefing-greeting__title";
     greetTitle.textContent = `${getGreeting()}, Commander`;
 
-    const greetSub = document.createElement('p');
-    greetSub.className = 'briefing-greeting__subtitle';
+    const greetSub = document.createElement("p");
+    greetSub.className = "briefing-greeting__subtitle";
     greetSub.textContent = this._getDateString();
 
     greeting.appendChild(greetTitle);
@@ -190,53 +191,59 @@ export class MorningBriefing {
     panel.appendChild(header);
 
     // ── Stats cards ───────────────────────────────────────────────
-    const cardsContainer = document.createElement('div');
-    cardsContainer.className = 'briefing-cards';
+    const cardsContainer = document.createElement("div");
+    cardsContainer.className = "briefing-cards";
 
     const cards = [
       {
-        label: 'Tasks Completed',
+        label: "Tasks Completed",
         value: `${stats.tasksCompleted}`,
-        icon: '\u2713',
-        colorClass: 'briefing-card--green',
+        icon: "\u2713",
+        colorClass: "briefing-card--green",
       },
       {
-        label: 'Cost Yesterday',
+        label: "Cost Yesterday",
         value: `$${stats.costYesterday.toFixed(2)}`,
-        icon: '\u{1F4B0}',
-        colorClass: stats.costYesterday > 5 ? 'briefing-card--amber' : 'briefing-card--blue',
+        icon: "\u{1F4B0}",
+        colorClass:
+          stats.costYesterday > 5
+            ? "briefing-card--amber"
+            : "briefing-card--blue",
       },
       {
-        label: 'Active Agents',
+        label: "Active Agents",
         value: `${stats.activeAgents}`,
-        icon: '\u{1F916}',
-        colorClass: 'briefing-card--blue',
+        icon: "\u{1F916}",
+        colorClass: "briefing-card--blue",
       },
       {
-        label: 'Zones Unlocked',
+        label: "Zones Unlocked",
         value: `${stats.zonesUnlocked}`,
-        icon: '\u{1F5FA}',
-        colorClass: stats.newZoneUnlocks > 0 ? 'briefing-card--gold' : 'briefing-card--default',
+        icon: "\u{1F5FA}",
+        colorClass:
+          stats.newZoneUnlocks > 0
+            ? "briefing-card--gold"
+            : "briefing-card--default",
       },
     ];
 
     for (const card of cards) {
-      const cardEl = document.createElement('div');
+      const cardEl = document.createElement("div");
       cardEl.className = `briefing-card ${card.colorClass}`;
 
-      const iconEl = document.createElement('span');
-      iconEl.className = 'briefing-card__icon';
+      const iconEl = document.createElement("span");
+      iconEl.className = "briefing-card__icon";
       iconEl.textContent = card.icon;
 
-      const bodyEl = document.createElement('div');
-      bodyEl.className = 'briefing-card__body';
+      const bodyEl = document.createElement("div");
+      bodyEl.className = "briefing-card__body";
 
-      const valueEl = document.createElement('div');
-      valueEl.className = 'briefing-card__value';
+      const valueEl = document.createElement("div");
+      valueEl.className = "briefing-card__value";
       valueEl.textContent = card.value;
 
-      const labelEl = document.createElement('div');
-      labelEl.className = 'briefing-card__label';
+      const labelEl = document.createElement("div");
+      labelEl.className = "briefing-card__label";
       labelEl.textContent = card.label;
 
       bodyEl.appendChild(valueEl);
@@ -250,61 +257,61 @@ export class MorningBriefing {
 
     // ── New zone unlocks ─────────────────────────────────────────
     if (stats.newZoneUnlocks > 0 && stats.newZoneNames.length > 0) {
-      const unlockSection = document.createElement('div');
-      unlockSection.className = 'briefing-section';
+      const unlockSection = document.createElement("div");
+      unlockSection.className = "briefing-section";
 
-      const unlockTitle = document.createElement('div');
-      unlockTitle.className = 'briefing-section__title';
-      unlockTitle.textContent = 'New Zone Unlocks';
+      const unlockTitle = document.createElement("div");
+      unlockTitle.className = "briefing-section__title";
+      unlockTitle.textContent = "New Zone Unlocks";
       unlockSection.appendChild(unlockTitle);
 
-      const unlockList = document.createElement('div');
-      unlockList.className = 'briefing-section__content';
-      unlockList.textContent = stats.newZoneNames.join(', ');
+      const unlockList = document.createElement("div");
+      unlockList.className = "briefing-section__content";
+      unlockList.textContent = stats.newZoneNames.join(", ");
       unlockSection.appendChild(unlockList);
 
       panel.appendChild(unlockSection);
     }
 
     // ── Today's Focus ────────────────────────────────────────────
-    const focusSection = document.createElement('div');
-    focusSection.className = 'briefing-focus';
+    const focusSection = document.createElement("div");
+    focusSection.className = "briefing-focus";
 
-    const focusTitle = document.createElement('div');
-    focusTitle.className = 'briefing-focus__title';
+    const focusTitle = document.createElement("div");
+    focusTitle.className = "briefing-focus__title";
     focusTitle.textContent = "Today's Focus";
 
-    const focusContent = document.createElement('div');
-    focusContent.className = 'briefing-focus__content';
+    const focusContent = document.createElement("div");
+    focusContent.className = "briefing-focus__content";
 
     if (quest) {
-      const questName = document.createElement('div');
-      questName.className = 'briefing-focus__quest';
+      const questName = document.createElement("div");
+      questName.className = "briefing-focus__quest";
       questName.textContent = quest.name;
 
-      const questProgress = document.createElement('div');
-      questProgress.className = 'briefing-focus__progress';
+      const questProgress = document.createElement("div");
+      questProgress.className = "briefing-focus__progress";
 
-      const progressBar = document.createElement('div');
-      progressBar.className = 'briefing-focus__bar';
+      const progressBar = document.createElement("div");
+      progressBar.className = "briefing-focus__bar";
 
-      const progressFill = document.createElement('div');
-      progressFill.className = 'briefing-focus__bar-fill';
+      const progressFill = document.createElement("div");
+      progressFill.className = "briefing-focus__bar-fill";
       progressFill.style.width = `${Math.min(100, quest.progress * 100)}%`;
 
       progressBar.appendChild(progressFill);
       questProgress.appendChild(progressBar);
 
-      const progressLabel = document.createElement('span');
-      progressLabel.className = 'briefing-focus__bar-label';
+      const progressLabel = document.createElement("span");
+      progressLabel.className = "briefing-focus__bar-label";
       progressLabel.textContent = `${Math.round(quest.progress * 100)}% complete`;
       questProgress.appendChild(progressLabel);
 
       // Next step hint
       const nextStep = quest.steps.find((s) => !s.completed);
       if (nextStep) {
-        const hint = document.createElement('div');
-        hint.className = 'briefing-focus__hint';
+        const hint = document.createElement("div");
+        hint.className = "briefing-focus__hint";
         hint.textContent = `Next: ${nextStep.label}`;
         focusContent.appendChild(questName);
         focusContent.appendChild(questProgress);
@@ -314,9 +321,10 @@ export class MorningBriefing {
         focusContent.appendChild(questProgress);
       }
     } else {
-      const noQuest = document.createElement('div');
-      noQuest.className = 'briefing-focus__empty';
-      noQuest.textContent = 'No active quest. Visit the Dispatch Tower to start one.';
+      const noQuest = document.createElement("div");
+      noQuest.className = "briefing-focus__empty";
+      noQuest.textContent =
+        "No active quest. Visit the Dispatch Tower to start one.";
       focusContent.appendChild(noQuest);
     }
 
@@ -325,14 +333,14 @@ export class MorningBriefing {
     panel.appendChild(focusSection);
 
     // ── Dismiss button ───────────────────────────────────────────
-    const footer = document.createElement('div');
-    footer.className = 'briefing-footer';
+    const footer = document.createElement("div");
+    footer.className = "briefing-footer";
 
-    const dismissBtn = document.createElement('button');
-    dismissBtn.className = 'briefing-dismiss';
-    dismissBtn.textContent = 'Dismiss';
-    dismissBtn.setAttribute('aria-label', 'Dismiss briefing');
-    dismissBtn.addEventListener('click', () => this.dismiss());
+    const dismissBtn = document.createElement("button");
+    dismissBtn.className = "briefing-dismiss";
+    dismissBtn.textContent = "Dismiss";
+    dismissBtn.setAttribute("aria-label", "Dismiss briefing");
+    dismissBtn.addEventListener("click", () => this.dismiss());
 
     footer.appendChild(dismissBtn);
     panel.appendChild(footer);
@@ -342,13 +350,13 @@ export class MorningBriefing {
 
     // Trigger entrance animation
     requestAnimationFrame(() => {
-      this._overlay?.classList.add('briefing--open');
+      this._overlay?.classList.add("briefing--open");
     });
 
     this._shown = true;
 
     // Allow clicking the overlay background to dismiss
-    this._overlay.addEventListener('click', (e) => {
+    this._overlay.addEventListener("click", (e) => {
       if (e.target === this._overlay) {
         this.dismiss();
       }
@@ -356,12 +364,12 @@ export class MorningBriefing {
 
     // Escape key dismisses
     this._escHandler = (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         this.dismiss();
-        document.removeEventListener('keydown', this._escHandler);
+        document.removeEventListener("keydown", this._escHandler);
       }
     };
-    document.addEventListener('keydown', this._escHandler);
+    document.addEventListener("keydown", this._escHandler);
   }
 
   /**
@@ -371,8 +379,13 @@ export class MorningBriefing {
    */
   _getDateString() {
     const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return now.toLocaleDateString('en-US', options);
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return now.toLocaleDateString("en-US", options);
   }
 
   // ── Default stat providers ─────────────────────────────────────────
@@ -417,12 +430,12 @@ export class MorningBriefing {
    */
   static _defaultQuest() {
     return {
-      name: 'Welcome to Claude World',
+      name: "Welcome to Claude World",
       progress: 0.3,
       steps: [
-        { label: 'Open the Dispatch Tower', completed: true },
-        { label: 'Talk to the Commander', completed: false },
-        { label: 'Send your first task', completed: false },
+        { label: "Open the Dispatch Tower", completed: true },
+        { label: "Talk to the Commander", completed: false },
+        { label: "Send your first task", completed: false },
       ],
     };
   }
@@ -691,11 +704,11 @@ const BRIEFING_STYLES = `
 `;
 
 // Inject styles once
-if (typeof document !== 'undefined') {
-  const existingStyle = document.getElementById('briefing-styles');
+if (typeof document !== "undefined") {
+  const existingStyle = document.getElementById("briefing-styles");
   if (!existingStyle) {
-    const style = document.createElement('style');
-    style.id = 'briefing-styles';
+    const style = document.createElement("style");
+    style.id = "briefing-styles";
     style.textContent = BRIEFING_STYLES;
     document.head.appendChild(style);
   }

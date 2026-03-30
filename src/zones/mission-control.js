@@ -24,56 +24,101 @@ const MC_MAX_FEED = 200;
 const MC_SPARKLINE_POINTS = 24; // 24 hours of hourly buckets
 
 const DEFCON_LEVELS = [
-  { level: 5, label: 'DEFCON 5', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
-  { level: 4, label: 'DEFCON 4', color: '#84cc16', bg: 'rgba(132,204,22,0.12)' },
-  { level: 3, label: 'DEFCON 3', color: '#f59e0b', bg: 'rgba(245,158,11,0.15)' },
-  { level: 2, label: 'DEFCON 2', color: '#f97316', bg: 'rgba(249,115,22,0.18)' },
-  { level: 1, label: 'DEFCON 1', color: '#ef4444', bg: 'rgba(239,68,68,0.22)' },
+  { level: 5, label: "DEFCON 5", color: "#22c55e", bg: "rgba(34,197,94,0.12)" },
+  {
+    level: 4,
+    label: "DEFCON 4",
+    color: "#84cc16",
+    bg: "rgba(132,204,22,0.12)",
+  },
+  {
+    level: 3,
+    label: "DEFCON 3",
+    color: "#f59e0b",
+    bg: "rgba(245,158,11,0.15)",
+  },
+  {
+    level: 2,
+    label: "DEFCON 2",
+    color: "#f97316",
+    bg: "rgba(249,115,22,0.18)",
+  },
+  { level: 1, label: "DEFCON 1", color: "#ef4444", bg: "rgba(239,68,68,0.22)" },
 ];
 
 /** Canonical agent definitions (mirrors seed.js) */
 const AGENT_DEFS = [
-  { id: 'commander',    emoji: '\u{1F451}', name: 'Commander',    role: 'Dispatcher',    zone: 'dispatch_tower'  },
-  { id: 'librarian',    emoji: '\u{1F4DA}', name: 'Librarian',    role: 'Researcher',    zone: 'brain_library'   },
-  { id: 'teacher',      emoji: '\u{1F393}', name: 'Teacher',      role: 'Trainer',       zone: 'skills_academy'  },
-  { id: 'archivist',    emoji: '\u{1F4DC}', name: 'Archivist',    role: 'Memory Keeper', zone: 'memory_vault'    },
-  { id: 'harbormaster', emoji: '\u{2693}',  name: 'Harbor Master', role: 'Integrator',   zone: 'connector_docks' },
+  {
+    id: "commander",
+    emoji: "\u{1F451}",
+    name: "Commander",
+    role: "Dispatcher",
+    zone: "dispatch_tower",
+  },
+  {
+    id: "librarian",
+    emoji: "\u{1F4DA}",
+    name: "Librarian",
+    role: "Researcher",
+    zone: "brain_library",
+  },
+  {
+    id: "teacher",
+    emoji: "\u{1F393}",
+    name: "Teacher",
+    role: "Trainer",
+    zone: "skills_academy",
+  },
+  {
+    id: "archivist",
+    emoji: "\u{1F4DC}",
+    name: "Archivist",
+    role: "Memory Keeper",
+    zone: "memory_vault",
+  },
+  {
+    id: "harbormaster",
+    emoji: "\u{2693}",
+    name: "Harbor Master",
+    role: "Integrator",
+    zone: "connector_docks",
+  },
 ];
 
 /** All 20 zones — matches seed.js ZONE_DEFS order */
 const ZONE_DEFS = [
-  { id: 'dispatch_tower',  icon: '\u{1F3F0}', name: 'Dispatch Tower'   },
-  { id: 'brain_library',   icon: '\u{1F4DA}', name: 'Brain Library'    },
-  { id: 'skills_academy',  icon: '\u{1F3AF}', name: 'Skills Academy'   },
-  { id: 'memory_vault',    icon: '\u{1F5C4}', name: 'Memory Vault'     },
-  { id: 'connector_docks', icon: '\u{2693}',  name: 'Connector Docks'  },
-  { id: 'chat_rooms',      icon: '\u{1F4AC}', name: 'Chat Rooms'       },
-  { id: 'treasury',        icon: '\u{1F4B0}', name: 'Treasury'         },
-  { id: 'minion_tunnels',  icon: '\u{26CF}',  name: 'Minion Tunnels'   },
-  { id: 'legal_tower',     icon: '\u{2696}',  name: 'Legal Tower'      },
-  { id: 'sales_district',  icon: '\u{1F4C8}', name: 'Sales District'   },
-  { id: 'marketing_plaza', icon: '\u{1F4E3}', name: 'Marketing Plaza'  },
-  { id: 'the_exchange',    icon: '\u{1F504}', name: 'The Exchange'     },
-  { id: 'the_market',      icon: '\u{1F6D2}', name: 'The Market'       },
-  { id: 'the_council',     icon: '\u{1F3DB}', name: 'The Council'      },
-  { id: 'rd_lab',          icon: '\u{1F52C}', name: 'R&D Lab'          },
-  { id: 'the_archive',     icon: '\u{1F4DC}', name: 'The Archive'      },
-  { id: 'airport',         icon: '\u{2708}',  name: 'Airport'          },
-  { id: 'globe_room',      icon: '\u{1F310}', name: 'Globe Room'       },
-  { id: 'broadcast_tower', icon: '\u{1F4E1}', name: 'Broadcast Tower'  },
-  { id: 'mission_control', icon: '\u{1F6F0}', name: 'Mission Control'  },
+  { id: "dispatch_tower", icon: "\u{1F3F0}", name: "Dispatch Tower" },
+  { id: "brain_library", icon: "\u{1F4DA}", name: "Brain Library" },
+  { id: "skills_academy", icon: "\u{1F3AF}", name: "Skills Academy" },
+  { id: "memory_vault", icon: "\u{1F5C4}", name: "Memory Vault" },
+  { id: "connector_docks", icon: "\u{2693}", name: "Connector Docks" },
+  { id: "chat_rooms", icon: "\u{1F4AC}", name: "Chat Rooms" },
+  { id: "treasury", icon: "\u{1F4B0}", name: "Treasury" },
+  { id: "minion_tunnels", icon: "\u{26CF}", name: "Minion Tunnels" },
+  { id: "legal_tower", icon: "\u{2696}", name: "Legal Tower" },
+  { id: "sales_district", icon: "\u{1F4C8}", name: "Sales District" },
+  { id: "marketing_plaza", icon: "\u{1F4E3}", name: "Marketing Plaza" },
+  { id: "the_exchange", icon: "\u{1F504}", name: "The Exchange" },
+  { id: "the_market", icon: "\u{1F6D2}", name: "The Market" },
+  { id: "the_council", icon: "\u{1F3DB}", name: "The Council" },
+  { id: "rd_lab", icon: "\u{1F52C}", name: "R&D Lab" },
+  { id: "the_archive", icon: "\u{1F4DC}", name: "The Archive" },
+  { id: "airport", icon: "\u{2708}", name: "Airport" },
+  { id: "globe_room", icon: "\u{1F310}", name: "Globe Room" },
+  { id: "broadcast_tower", icon: "\u{1F4E1}", name: "Broadcast Tower" },
+  { id: "mission_control", icon: "\u{1F6F0}", name: "Mission Control" },
 ];
 
 /** Event-type display config */
 const EVENT_TYPE_CONFIG = {
-  'task':     { badge: 'TASK',     color: '#22c55e' },
-  'quest':    { badge: 'QUEST',    color: '#a78bfa' },
-  'incident': { badge: 'INCIDENT', color: '#ef4444' },
-  'zone':     { badge: 'ZONE',     color: '#38bdf8' },
-  'minion':   { badge: 'MINION',   color: '#fb923c' },
-  'agent':    { badge: 'AGENT',    color: '#fbbf24' },
-  'world':    { badge: 'WORLD',    color: '#6ee7b7' },
-  'system':   { badge: 'SYS',      color: '#94a3b8' },
+  task: { badge: "TASK", color: "#22c55e" },
+  quest: { badge: "QUEST", color: "#a78bfa" },
+  incident: { badge: "INCIDENT", color: "#ef4444" },
+  zone: { badge: "ZONE", color: "#38bdf8" },
+  minion: { badge: "MINION", color: "#fb923c" },
+  agent: { badge: "AGENT", color: "#fbbf24" },
+  world: { badge: "WORLD", color: "#6ee7b7" },
+  system: { badge: "SYS", color: "#94a3b8" },
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────
@@ -84,8 +129,8 @@ const EVENT_TYPE_CONFIG = {
  * @returns {string}
  */
 function escHtml(str) {
-  if (!str) return '';
-  const d = document.createElement('div');
+  if (!str) return "";
+  const d = document.createElement("div");
   d.textContent = str;
   return d.innerHTML;
 }
@@ -120,10 +165,10 @@ function fmtUptime(ms) {
  * @returns {string}
  */
 function relativeTime(iso) {
-  if (!iso) return '—';
+  if (!iso) return "—";
   const ms = Date.now() - new Date(iso).getTime();
   const s = Math.floor(ms / 1000);
-  if (s < 60) return 'just now';
+  if (s < 60) return "just now";
   const m = Math.floor(s / 60);
   if (m < 60) return `${m}m ago`;
   const h = Math.floor(m / 60);
@@ -138,7 +183,7 @@ function relativeTime(iso) {
  * @param {string} color
  */
 function drawSparkline(canvas, data, color) {
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
   const w = canvas.width;
   const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
@@ -151,7 +196,7 @@ function drawSparkline(canvas, data, color) {
   ctx.beginPath();
   ctx.strokeStyle = color;
   ctx.lineWidth = 1.5;
-  ctx.lineJoin = 'round';
+  ctx.lineJoin = "round";
 
   data.forEach((v, i) => {
     const x = i * step;
@@ -165,11 +210,14 @@ function drawSparkline(canvas, data, color) {
   ctx.lineTo((data.length - 1) * step, h);
   ctx.lineTo(0, h);
   ctx.closePath();
-  ctx.fillStyle = color.replace(')', ', 0.12)').replace('rgb(', 'rgba(').replace('#', '');
+  ctx.fillStyle = color
+    .replace(")", ", 0.12)")
+    .replace("rgb(", "rgba(")
+    .replace("#", "");
   // Simple fill using gradient
   const grad = ctx.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0, color + '33');
-  grad.addColorStop(1, color + '00');
+  grad.addColorStop(0, color + "33");
+  grad.addColorStop(1, color + "00");
   ctx.fillStyle = grad;
   ctx.fill();
 }
@@ -218,10 +266,10 @@ export class MissionControl {
     this._refreshTimer = null;
 
     /** Sparkline data buckets: 24 hourly slots */
-    this._sparkTasksPerHour  = new Array(MC_SPARKLINE_POINTS).fill(0);
-    this._sparkXPPerHour     = new Array(MC_SPARKLINE_POINTS).fill(0);
-    this._sparkCostPerHour   = new Array(MC_SPARKLINE_POINTS).fill(0);
-    this._sparkActiveZones   = new Array(MC_SPARKLINE_POINTS).fill(0);
+    this._sparkTasksPerHour = new Array(MC_SPARKLINE_POINTS).fill(0);
+    this._sparkXPPerHour = new Array(MC_SPARKLINE_POINTS).fill(0);
+    this._sparkCostPerHour = new Array(MC_SPARKLINE_POINTS).fill(0);
+    this._sparkActiveZones = new Array(MC_SPARKLINE_POINTS).fill(0);
 
     /** @type {Map<string, Function>} Bound DOM event listeners for cleanup */
     this._listeners = new Map();
@@ -230,7 +278,7 @@ export class MissionControl {
     for (const a of AGENT_DEFS) {
       this._agentState.set(a.id, {
         ...a,
-        mood: 'idle',
+        mood: "idle",
         lastAction: null,
         xpToday: 0,
         busy: false,
@@ -241,7 +289,7 @@ export class MissionControl {
     for (const z of ZONE_DEFS) {
       this._zoneState.set(z.id, {
         ...z,
-        status: 'ruin',
+        status: "ruin",
         buildProgress: 0,
         lastActivity: null,
         unlocked: false,
@@ -260,10 +308,10 @@ export class MissionControl {
   render() {
     this._injectCSS();
 
-    const el = document.createElement('div');
-    el.className = 'mission-control';
-    el.setAttribute('role', 'region');
-    el.setAttribute('aria-label', 'Mission Control');
+    const el = document.createElement("div");
+    el.className = "mission-control";
+    el.setAttribute("role", "region");
+    el.setAttribute("aria-label", "Mission Control");
     this._el = el;
 
     el.innerHTML = this._buildHTML();
@@ -283,7 +331,12 @@ export class MissionControl {
     this._startTicker();
 
     // Initial boot feed entry
-    this._appendFeedItem('\u{1F6F0}', 'system', 'Mission Control online. All systems nominal.', '#22c55e');
+    this._appendFeedItem(
+      "\u{1F6F0}",
+      "system",
+      "Mission Control online. All systems nominal.",
+      "#22c55e",
+    );
   }
 
   /**
@@ -294,10 +347,17 @@ export class MissionControl {
    * @param {string} [color]    Override color
    */
   _appendFeedItem(icon, type, description, color) {
-    const cfg = EVENT_TYPE_CONFIG[type] || EVENT_TYPE_CONFIG['system'];
+    const cfg = EVENT_TYPE_CONFIG[type] || EVENT_TYPE_CONFIG["system"];
     const itemColor = color || cfg.color;
     const ts = fmtTime();
-    const item = { icon, type, description, color: itemColor, ts, id: Date.now() + Math.random() };
+    const item = {
+      icon,
+      type,
+      description,
+      color: itemColor,
+      ts,
+      id: Date.now() + Math.random(),
+    };
 
     this._feed.unshift(item);
     if (this._feed.length > MC_MAX_FEED) {
@@ -329,12 +389,12 @@ export class MissionControl {
   // ═══════════════════════════════════════════════════════════════════════
 
   _injectCSS() {
-    const id = 'mission-control-styles';
+    const id = "mission-control-styles";
     if (document.getElementById(id)) return;
-    const link = document.createElement('link');
+    const link = document.createElement("link");
     link.id = id;
-    link.rel = 'stylesheet';
-    link.href = 'src/zones/mission-control.css';
+    link.rel = "stylesheet";
+    link.href = "src/zones/mission-control.css";
     document.head.appendChild(link);
   }
 
@@ -343,8 +403,8 @@ export class MissionControl {
   // ═══════════════════════════════════════════════════════════════════════
 
   _buildHTML() {
-    const agentCards = AGENT_DEFS.map(a => this._agentCardHTML(a)).join('');
-    const zoneCards  = ZONE_DEFS.map(z => this._zoneCardHTML(z)).join('');
+    const agentCards = AGENT_DEFS.map((a) => this._agentCardHTML(a)).join("");
+    const zoneCards = ZONE_DEFS.map((z) => this._zoneCardHTML(z)).join("");
 
     return `
       <!-- ── Top bar ─────────────────────────────── -->
@@ -352,7 +412,7 @@ export class MissionControl {
         <div class="mc-topbar__defcon" id="mc-defcon">
           <span class="mc-defcon__level" id="mc-defcon-label">DEFCON 5</span>
           <span class="mc-defcon__dots" id="mc-defcon-dots">
-            ${[1,2,3,4,5].map(i => `<span class="mc-defcon__dot mc-defcon__dot--${i}" data-level="${i}"></span>`).join('')}
+            ${[1, 2, 3, 4, 5].map((i) => `<span class="mc-defcon__dot mc-defcon__dot--${i}" data-level="${i}"></span>`).join("")}
           </span>
         </div>
 
@@ -511,19 +571,21 @@ export class MissionControl {
     if (!this._el) return;
 
     // Fullscreen toggle
-    const fsBtn = this._el.querySelector('#mc-fullscreen-btn');
+    const fsBtn = this._el.querySelector("#mc-fullscreen-btn");
     if (fsBtn) {
-      fsBtn.addEventListener('click', () => this._toggleFullscreen());
+      fsBtn.addEventListener("click", () => this._toggleFullscreen());
     }
 
     // Agent card click → agent dialogue
-    this._el.querySelectorAll('.mc-agent').forEach(card => {
-      card.addEventListener('click', () => {
+    this._el.querySelectorAll(".mc-agent").forEach((card) => {
+      card.addEventListener("click", () => {
         const agentId = card.dataset.agent;
-        window.dispatchEvent(new CustomEvent('ui:open-agent', { detail: { agentId } }));
+        window.dispatchEvent(
+          new CustomEvent("ui:open-agent", { detail: { agentId } }),
+        );
       });
-      card.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') {
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           card.click();
         }
@@ -532,16 +594,18 @@ export class MissionControl {
 
     // Zone card hover tooltip is handled via CSS title attribute
     // Zone card click → open zone panel
-    this._el.querySelectorAll('.mc-zone-card').forEach(card => {
-      card.addEventListener('click', () => {
+    this._el.querySelectorAll(".mc-zone-card").forEach((card) => {
+      card.addEventListener("click", () => {
         const zoneId = card.dataset.zone;
-        window.dispatchEvent(new CustomEvent('ui:open-zone', { detail: { zoneId } }));
+        window.dispatchEvent(
+          new CustomEvent("ui:open-zone", { detail: { zoneId } }),
+        );
       });
     });
 
     // Escape key exits fullscreen
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this._fullscreen) this._exitFullscreen();
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && this._fullscreen) this._exitFullscreen();
     });
   }
 
@@ -556,30 +620,32 @@ export class MissionControl {
       window.addEventListener(evtName, bound);
     };
 
-    listen('dispatch:task-complete', d => this._onTaskComplete(d));
-    listen('dispatch:task-start',    d => this._onTaskStart(d));
-    listen('dispatch:task-fail',     d => this._onTaskFail(d));
-    listen('quest:complete',         d => this._onQuestComplete(d));
-    listen('incident:filed',         d => this._onIncidentFiled(d));
-    listen('incident:resolved',      d => this._onIncidentResolved(d));
-    listen('zone:building-complete', d => this._onZoneBuildComplete(d));
-    listen('zone:activity',          d => this._onZoneActivity(d));
-    listen('minion:run-complete',    d => this._onMinionComplete(d));
-    listen('minion:run-start',       d => this._onMinionStart(d));
-    listen('agent:mood-change',      d => this._onAgentMoodChange(d));
-    listen('agent:xp-gain',          d => this._onAgentXPGain(d));
-    listen('world:state-change',     d => this._onWorldStateChange(d));
-    listen('zone:unlocked',          d => this._onZoneUnlocked(d));
+    listen("dispatch:task-complete", (d) => this._onTaskComplete(d));
+    listen("dispatch:task-start", (d) => this._onTaskStart(d));
+    listen("dispatch:task-fail", (d) => this._onTaskFail(d));
+    listen("quest:complete", (d) => this._onQuestComplete(d));
+    listen("incident:filed", (d) => this._onIncidentFiled(d));
+    listen("incident:resolved", (d) => this._onIncidentResolved(d));
+    listen("zone:building-complete", (d) => this._onZoneBuildComplete(d));
+    listen("zone:activity", (d) => this._onZoneActivity(d));
+    listen("minion:run-complete", (d) => this._onMinionComplete(d));
+    listen("minion:run-start", (d) => this._onMinionStart(d));
+    listen("agent:mood-change", (d) => this._onAgentMoodChange(d));
+    listen("agent:xp-gain", (d) => this._onAgentXPGain(d));
+    listen("world:state-change", (d) => this._onWorldStateChange(d));
+    listen("zone:unlocked", (d) => this._onZoneUnlocked(d));
   }
 
   // ── Event handlers ────────────────────────────────────────────────
 
   _onTaskComplete(d) {
     const agentId = d.agentId || d.agent_id || null;
-    const agent   = agentId ? (AGENT_DEFS.find(a => a.id === agentId || a.zone === agentId) || null) : null;
-    const icon    = agent ? agent.emoji : '\u2705';
-    const xp      = d.xp || d.xp_earned || 0;
-    const cost    = d.cost_usd || 0;
+    const agent = agentId
+      ? AGENT_DEFS.find((a) => a.id === agentId || a.zone === agentId) || null
+      : null;
+    const icon = agent ? agent.emoji : "\u2705";
+    const xp = d.xp || d.xp_earned || 0;
+    const cost = d.cost_usd || 0;
 
     this._tasksToday++;
     this._totalXP += xp;
@@ -592,8 +658,8 @@ export class MissionControl {
       if (st) {
         st.busy = false;
         st.xpToday += xp;
-        st.lastAction = `Completed: ${d.taskTitle || d.prompt?.slice(0, 40) || 'task'}`;
-        st.mood = 'satisfied';
+        st.lastAction = `Completed: ${d.taskTitle || d.prompt?.slice(0, 40) || "task"}`;
+        st.mood = "satisfied";
         this._agentState.set(agent.id, st);
         this._updateAgentCard(agent.id);
       }
@@ -603,8 +669,10 @@ export class MissionControl {
       this._touchZone(d.zoneId || d.zone_id);
     }
 
-    this._appendFeedItem(icon, 'task',
-      `Task complete${agent ? ` [${agent.name}]` : ''}${xp ? ` +${xp}XP` : ''}${cost ? ` $${cost.toFixed(4)}` : ''}: ${escHtml(d.taskTitle || d.prompt?.slice(0,60) || '—')}`
+    this._appendFeedItem(
+      icon,
+      "task",
+      `Task complete${agent ? ` [${agent.name}]` : ""}${xp ? ` +${xp}XP` : ""}${cost ? ` $${cost.toFixed(4)}` : ""}: ${escHtml(d.taskTitle || d.prompt?.slice(0, 60) || "—")}`,
     );
 
     this._updateTopBar();
@@ -614,53 +682,63 @@ export class MissionControl {
 
   _onTaskStart(d) {
     const agentId = d.agentId || d.agent_id || null;
-    const agent   = AGENT_DEFS.find(a => a.id === agentId || a.zone === agentId) || null;
-    const icon    = agent ? agent.emoji : '\u{1F504}';
+    const agent =
+      AGENT_DEFS.find((a) => a.id === agentId || a.zone === agentId) || null;
+    const icon = agent ? agent.emoji : "\u{1F504}";
 
     if (agent) {
       const st = this._agentState.get(agent.id);
       if (st) {
         st.busy = true;
-        st.mood = 'working';
-        st.lastAction = `Working on: ${d.taskTitle || d.prompt?.slice(0, 40) || '…'}`;
+        st.mood = "working";
+        st.lastAction = `Working on: ${d.taskTitle || d.prompt?.slice(0, 40) || "…"}`;
         this._agentState.set(agent.id, st);
         this._updateAgentCard(agent.id);
       }
     }
 
-    this._activeAgents = [...this._agentState.values()].filter(a => a.busy).length;
-    this._appendFeedItem(icon, 'task',
-      `Task started${agent ? ` [${agent.name}]` : ''}: ${escHtml(d.taskTitle || d.prompt?.slice(0,60) || '—')}`
+    this._activeAgents = [...this._agentState.values()].filter(
+      (a) => a.busy,
+    ).length;
+    this._appendFeedItem(
+      icon,
+      "task",
+      `Task started${agent ? ` [${agent.name}]` : ""}: ${escHtml(d.taskTitle || d.prompt?.slice(0, 60) || "—")}`,
     );
     this._updateTopBar();
   }
 
   _onTaskFail(d) {
     const agentId = d.agentId || d.agent_id || null;
-    const agent   = AGENT_DEFS.find(a => a.id === agentId || a.zone === agentId) || null;
-    const icon    = agent ? agent.emoji : '\u274C';
+    const agent =
+      AGENT_DEFS.find((a) => a.id === agentId || a.zone === agentId) || null;
+    const icon = agent ? agent.emoji : "\u274C";
 
     if (agent) {
       const st = this._agentState.get(agent.id);
       if (st) {
         st.busy = false;
-        st.mood = 'error';
-        st.lastAction = `Failed: ${d.error || d.reason || 'unknown error'}`;
+        st.mood = "error";
+        st.lastAction = `Failed: ${d.error || d.reason || "unknown error"}`;
         this._agentState.set(agent.id, st);
         this._updateAgentCard(agent.id);
       }
     }
 
-    this._appendFeedItem(icon, 'incident',
-      `Task FAILED${agent ? ` [${agent.name}]` : ''}: ${escHtml(d.error || d.reason || '—')}`,
-      '#ef4444'
+    this._appendFeedItem(
+      icon,
+      "incident",
+      `Task FAILED${agent ? ` [${agent.name}]` : ""}: ${escHtml(d.error || d.reason || "—")}`,
+      "#ef4444",
     );
     this._recalcDefcon(true);
   }
 
   _onQuestComplete(d) {
-    this._appendFeedItem('\u{1F3C6}', 'quest',
-      `Quest complete: ${escHtml(d.questTitle || d.title || d.id || '—')}${d.xp ? ` +${d.xp}XP` : ''}`
+    this._appendFeedItem(
+      "\u{1F3C6}",
+      "quest",
+      `Quest complete: ${escHtml(d.questTitle || d.title || d.id || "—")}${d.xp ? ` +${d.xp}XP` : ""}`,
     );
     if (d.xp) {
       this._totalXP += d.xp;
@@ -670,31 +748,37 @@ export class MissionControl {
 
   _onIncidentFiled(d) {
     const severity = d.severity || 1;
-    this._appendFeedItem('\u26A0\uFE0F', 'incident',
-      `INCIDENT filed [sev:${severity}]: ${escHtml(d.title || d.description || '—')}`,
-      '#ef4444'
+    this._appendFeedItem(
+      "\u26A0\uFE0F",
+      "incident",
+      `INCIDENT filed [sev:${severity}]: ${escHtml(d.title || d.description || "—")}`,
+      "#ef4444",
     );
     this._recalcDefcon(false, severity);
   }
 
   _onIncidentResolved(d) {
-    this._appendFeedItem('\u2705', 'incident',
-      `Incident resolved: ${escHtml(d.title || d.id || '—')}`,
-      '#22c55e'
+    this._appendFeedItem(
+      "\u2705",
+      "incident",
+      `Incident resolved: ${escHtml(d.title || d.id || "—")}`,
+      "#22c55e",
     );
     this._recalcDefcon();
   }
 
   _onZoneBuildComplete(d) {
     const zoneId = d.zoneId || d.zone_id || d.id;
-    const zone   = ZONE_DEFS.find(z => z.id === zoneId);
-    this._appendFeedItem('\u{1F3D7}', 'zone',
-      `Zone built: ${zone ? zone.name : escHtml(zoneId)}`
+    const zone = ZONE_DEFS.find((z) => z.id === zoneId);
+    this._appendFeedItem(
+      "\u{1F3D7}",
+      "zone",
+      `Zone built: ${zone ? zone.name : escHtml(zoneId)}`,
     );
     if (zoneId) {
       const st = this._zoneState.get(zoneId);
       if (st) {
-        st.status = 'active';
+        st.status = "active";
         st.buildProgress = 100;
         st.unlocked = true;
         st.lastActivity = new Date().toISOString();
@@ -712,9 +796,11 @@ export class MissionControl {
   }
 
   _onMinionComplete(d) {
-    const icon = '\u26CF';
-    this._appendFeedItem(icon, 'minion',
-      `Minion run complete [${escHtml(d.minionName || d.name || '—')}]: ${escHtml(d.result?.slice(0, 60) || 'done')}`
+    const icon = "\u26CF";
+    this._appendFeedItem(
+      icon,
+      "minion",
+      `Minion run complete [${escHtml(d.minionName || d.name || "—")}]: ${escHtml(d.result?.slice(0, 60) || "done")}`,
     );
     this._tasksToday++;
     this._pushSparkBucket(this._sparkTasksPerHour, 1);
@@ -724,31 +810,39 @@ export class MissionControl {
   }
 
   _onMinionStart(d) {
-    this._appendFeedItem('\u26CF', 'minion',
-      `Minion activated: ${escHtml(d.minionName || d.name || '—')}`
+    this._appendFeedItem(
+      "\u26CF",
+      "minion",
+      `Minion activated: ${escHtml(d.minionName || d.name || "—")}`,
     );
   }
 
   _onAgentMoodChange(d) {
     const agentId = d.agentId || d.agent_id;
     if (!agentId) return;
-    const agent = AGENT_DEFS.find(a => a.id === agentId || a.zone === agentId);
+    const agent = AGENT_DEFS.find(
+      (a) => a.id === agentId || a.zone === agentId,
+    );
     if (!agent) return;
     const st = this._agentState.get(agent.id);
     if (st) {
-      st.mood = d.mood || 'idle';
+      st.mood = d.mood || "idle";
       this._agentState.set(agent.id, st);
       this._updateAgentCard(agent.id);
     }
-    this._appendFeedItem(agent.emoji, 'agent',
-      `${agent.name} mood changed to: ${escHtml(d.mood || '—')}`
+    this._appendFeedItem(
+      agent.emoji,
+      "agent",
+      `${agent.name} mood changed to: ${escHtml(d.mood || "—")}`,
     );
   }
 
   _onAgentXPGain(d) {
     const agentId = d.agentId || d.agent_id;
     if (!agentId) return;
-    const agent = AGENT_DEFS.find(a => a.id === agentId || a.zone === agentId);
+    const agent = AGENT_DEFS.find(
+      (a) => a.id === agentId || a.zone === agentId,
+    );
     if (!agent) return;
     const st = this._agentState.get(agent.id);
     if (st && d.xp) {
@@ -761,30 +855,39 @@ export class MissionControl {
   }
 
   _onWorldStateChange(d) {
-    const state = d.state || 'idle';
-    const icons = { idle: '\u{1F4A4}', active: '\u{1F7E2}', busy: '\u{1F7E1}', overload: '\u{1F534}' };
-    this._appendFeedItem(icons[state] || '\u{1F310}', 'world',
-      `World state changed: ${state.toUpperCase()}`
+    const state = d.state || "idle";
+    const icons = {
+      idle: "\u{1F4A4}",
+      active: "\u{1F7E2}",
+      busy: "\u{1F7E1}",
+      overload: "\u{1F534}",
+    };
+    this._appendFeedItem(
+      icons[state] || "\u{1F310}",
+      "world",
+      `World state changed: ${state.toUpperCase()}`,
     );
-    if (state === 'overload') this._recalcDefcon(true, 3);
-    else if (state === 'busy') this._recalcDefcon(false, 1);
+    if (state === "overload") this._recalcDefcon(true, 3);
+    else if (state === "busy") this._recalcDefcon(false, 1);
   }
 
   _onZoneUnlocked(d) {
     const zoneId = d.zoneId || d.zone_id || d.id;
-    const zone   = ZONE_DEFS.find(z => z.id === zoneId);
+    const zone = ZONE_DEFS.find((z) => z.id === zoneId);
     if (zoneId) {
       const st = this._zoneState.get(zoneId);
       if (st) {
         st.unlocked = true;
-        st.status   = 'building';
+        st.status = "building";
         st.lastActivity = new Date().toISOString();
         this._zoneState.set(zoneId, st);
         this._updateZoneCard(zoneId);
       }
     }
-    this._appendFeedItem('\u{1F513}', 'zone',
-      `Zone unlocked: ${zone ? zone.name : escHtml(zoneId)}`
+    this._appendFeedItem(
+      "\u{1F513}",
+      "zone",
+      `Zone unlocked: ${zone ? zone.name : escHtml(zoneId)}`,
     );
   }
 
@@ -806,8 +909,10 @@ export class MissionControl {
           st.unlocked = !!z.unlocked;
           st.buildProgress = z.build_progress ?? (z.unlocked ? 100 : 0);
           st.status = z.unlocked
-            ? (z.build_progress < 100 ? 'building' : 'active')
-            : 'ruin';
+            ? z.build_progress < 100
+              ? "building"
+              : "active"
+            : "ruin";
           st.lastActivity = z.last_activity_at || null;
           this._zoneState.set(z.zone_type || z.id, st);
         }
@@ -816,11 +921,13 @@ export class MissionControl {
       // Load agents
       const agents = await window.api.db.getAgents(worldId).catch(() => []);
       for (const a of agents) {
-        const def = AGENT_DEFS.find(d => d.zone === a.zone_id || d.name === a.name);
+        const def = AGENT_DEFS.find(
+          (d) => d.zone === a.zone_id || d.name === a.name,
+        );
         if (def) {
           const st = this._agentState.get(def.id);
           if (st) {
-            st.mood = a.mood || 'idle';
+            st.mood = a.mood || "idle";
             this._agentState.set(def.id, st);
           }
         }
@@ -829,8 +936,12 @@ export class MissionControl {
       // Load today's tasks
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
-      const tasks = await window.api.db.getTasks(worldId, { limit: 1000 }).catch(() => []);
-      const todayTasks = tasks.filter(t => t.created_at && new Date(t.created_at) >= todayStart);
+      const tasks = await window.api.db
+        .getTasks(worldId, { limit: 1000 })
+        .catch(() => []);
+      const todayTasks = tasks.filter(
+        (t) => t.created_at && new Date(t.created_at) >= todayStart,
+      );
       this._tasksToday = todayTasks.length;
       this._totalXP = tasks.reduce((s, t) => s + (t.xp_earned || 0), 0);
 
@@ -840,20 +951,21 @@ export class MissionControl {
       // World start time
       if (tasks.length > 0) {
         const oldest = tasks.reduce((a, b) =>
-          new Date(a.created_at) < new Date(b.created_at) ? a : b
+          new Date(a.created_at) < new Date(b.created_at) ? a : b,
         );
         this._worldStart = new Date(oldest.created_at).getTime();
       }
 
       // Load incidents for DEFCON
-      const incidents = await window.api.db.getIncidents?.(worldId, { status: 'open' }).catch(() => []);
+      const incidents = await window.api.db
+        .getIncidents?.(worldId, { status: "open" })
+        .catch(() => []);
       if (incidents.length > 0) {
-        const maxSev = Math.max(...incidents.map(i => i.severity || 1));
+        const maxSev = Math.max(...incidents.map((i) => i.severity || 1));
         this._recalcDefcon(false, maxSev);
       }
-
     } catch (err) {
-      console.warn('[MissionControl] Initial data load error:', err);
+      console.warn("[MissionControl] Initial data load error:", err);
     }
 
     // Apply loaded state to DOM
@@ -878,8 +990,8 @@ export class MissionControl {
       if (bucketIdx < 0 || bucketIdx >= MC_SPARKLINE_POINTS) continue;
 
       this._sparkTasksPerHour[bucketIdx] += 1;
-      this._sparkXPPerHour[bucketIdx]    += (t.xp_earned || 0);
-      this._sparkCostPerHour[bucketIdx]  += (t.cost_usd || 0);
+      this._sparkXPPerHour[bucketIdx] += t.xp_earned || 0;
+      this._sparkCostPerHour[bucketIdx] += t.cost_usd || 0;
     }
   }
 
@@ -902,14 +1014,14 @@ export class MissionControl {
   }
 
   _updateClock() {
-    const clockEl = this._el?.querySelector('#mc-clock');
+    const clockEl = this._el?.querySelector("#mc-clock");
     if (clockEl) clockEl.textContent = fmtTime();
 
-    const uptimeEl = this._el?.querySelector('#mc-stat-uptime');
+    const uptimeEl = this._el?.querySelector("#mc-stat-uptime");
     if (uptimeEl) {
       uptimeEl.textContent = this._worldStart
         ? fmtUptime(Date.now() - this._worldStart)
-        : '—';
+        : "—";
     }
   }
 
@@ -918,13 +1030,14 @@ export class MissionControl {
   // ═══════════════════════════════════════════════════════════════════════
 
   _updateTopBar() {
-    const xpEl      = this._el?.querySelector('#mc-stat-xp');
-    const agentsEl  = this._el?.querySelector('#mc-stat-agents');
-    const tasksEl   = this._el?.querySelector('#mc-stat-tasks');
+    const xpEl = this._el?.querySelector("#mc-stat-xp");
+    const agentsEl = this._el?.querySelector("#mc-stat-agents");
+    const tasksEl = this._el?.querySelector("#mc-stat-tasks");
 
-    if (xpEl)     xpEl.textContent     = this._totalXP.toLocaleString();
-    if (agentsEl) agentsEl.textContent = `${this._activeAgents} / ${AGENT_DEFS.length}`;
-    if (tasksEl)  tasksEl.textContent  = this._tasksToday.toLocaleString();
+    if (xpEl) xpEl.textContent = this._totalXP.toLocaleString();
+    if (agentsEl)
+      agentsEl.textContent = `${this._activeAgents} / ${AGENT_DEFS.length}`;
+    if (tasksEl) tasksEl.textContent = this._tasksToday.toLocaleString();
   }
 
   _renderAgentCards() {
@@ -939,25 +1052,26 @@ export class MissionControl {
     const st = this._agentState.get(agentId);
     if (!st) return;
 
-    const card    = this._el.querySelector(`#mc-agent-${agentId}`);
-    const dotEl   = this._el.querySelector(`#mc-agent-mood-${agentId}`);
-    const actionEl= this._el.querySelector(`#mc-agent-action-${agentId}`);
-    const xpEl    = this._el.querySelector(`#mc-agent-xp-${agentId}`);
+    const card = this._el.querySelector(`#mc-agent-${agentId}`);
+    const dotEl = this._el.querySelector(`#mc-agent-mood-${agentId}`);
+    const actionEl = this._el.querySelector(`#mc-agent-action-${agentId}`);
+    const xpEl = this._el.querySelector(`#mc-agent-xp-${agentId}`);
 
     if (!card) return;
 
     // Active glow
-    card.classList.toggle('mc-agent--active', !!st.busy);
-    card.classList.toggle('mc-agent--error',  st.mood === 'error');
+    card.classList.toggle("mc-agent--active", !!st.busy);
+    card.classList.toggle("mc-agent--error", st.mood === "error");
 
     // Mood dot
     if (dotEl) {
-      dotEl.className = `mc-agent__mood-dot mc-agent__mood-dot--${st.mood || 'idle'}`;
-      dotEl.title = `Mood: ${st.mood || 'idle'}`;
+      dotEl.className = `mc-agent__mood-dot mc-agent__mood-dot--${st.mood || "idle"}`;
+      dotEl.title = `Mood: ${st.mood || "idle"}`;
     }
 
-    if (actionEl) actionEl.textContent = st.lastAction || 'Awaiting first task\u2026';
-    if (xpEl)     xpEl.textContent     = (st.xpToday || 0).toLocaleString();
+    if (actionEl)
+      actionEl.textContent = st.lastAction || "Awaiting first task\u2026";
+    if (xpEl) xpEl.textContent = (st.xpToday || 0).toLocaleString();
   }
 
   _renderZoneGrid() {
@@ -973,16 +1087,17 @@ export class MissionControl {
     const st = this._zoneState.get(zoneId);
     if (!st) return;
 
-    const card       = this._el.querySelector(`#mc-zone-${zoneId}`);
-    const dot        = this._el.querySelector(`#mc-zone-dot-${zoneId}`);
-    const bar        = this._el.querySelector(`#mc-zone-bar-${zoneId}`);
+    const card = this._el.querySelector(`#mc-zone-${zoneId}`);
+    const dot = this._el.querySelector(`#mc-zone-dot-${zoneId}`);
+    const bar = this._el.querySelector(`#mc-zone-bar-${zoneId}`);
     const activityEl = this._el.querySelector(`#mc-zone-activity-${zoneId}`);
 
     if (!card) return;
 
-    card.className = `mc-zone-card mc-zone-card--${st.status || 'ruin'}`;
-    if (dot) dot.className = `mc-zone-card__dot mc-zone-card__dot--${st.status || 'ruin'}`;
-    if (bar)  bar.style.width = `${st.buildProgress || 0}%`;
+    card.className = `mc-zone-card mc-zone-card--${st.status || "ruin"}`;
+    if (dot)
+      dot.className = `mc-zone-card__dot mc-zone-card__dot--${st.status || "ruin"}`;
+    if (bar) bar.style.width = `${st.buildProgress || 0}%`;
     if (activityEl) activityEl.textContent = relativeTime(st.lastActivity);
   }
 
@@ -990,7 +1105,7 @@ export class MissionControl {
     const st = this._zoneState.get(zoneId);
     if (st) {
       st.lastActivity = new Date().toISOString();
-      if (st.unlocked && st.status === 'ruin') st.status = 'active';
+      if (st.unlocked && st.status === "ruin") st.status = "active";
       this._zoneState.set(zoneId, st);
       this._updateZoneCard(zoneId);
     }
@@ -998,10 +1113,12 @@ export class MissionControl {
   }
 
   _updateActiveZoneCount() {
-    const active = [...this._zoneState.values()].filter(z => z.status === 'active').length;
+    const active = [...this._zoneState.values()].filter(
+      (z) => z.status === "active",
+    ).length;
     this._pushSparkBucket(this._sparkActiveZones, 0); // just update current reading
 
-    const el = this._el?.querySelector('#mc-spark-zones-val');
+    const el = this._el?.querySelector("#mc-spark-zones-val");
     if (el) el.textContent = active;
 
     // Update the last sparkline bucket to current active count
@@ -1012,15 +1129,15 @@ export class MissionControl {
 
   /** @param {object} item @param {object} cfg */
   _prependFeedDOM(item, cfg) {
-    const feed = this._el?.querySelector('#mc-feed');
+    const feed = this._el?.querySelector("#mc-feed");
     if (!feed) return;
 
     // Hide empty state
-    const empty = feed.querySelector('#mc-feed-empty');
-    if (empty) empty.style.display = 'none';
+    const empty = feed.querySelector("#mc-feed-empty");
+    if (empty) empty.style.display = "none";
 
-    const el = document.createElement('div');
-    el.className = 'mc-feed__item mc-feed__item--new';
+    const el = document.createElement("div");
+    el.className = "mc-feed__item mc-feed__item--new";
     el.innerHTML = `
       <span class="mc-feed__ts">${escHtml(item.ts)}</span>
       <span class="mc-feed__icon">${item.icon}</span>
@@ -1030,17 +1147,17 @@ export class MissionControl {
     `;
 
     // Remove cursor from previous last item
-    feed.querySelectorAll('.mc-feed__cursor').forEach(c => c.remove());
+    feed.querySelectorAll(".mc-feed__cursor").forEach((c) => c.remove());
 
     feed.prepend(el);
 
     // Remove animation class after it plays
     requestAnimationFrame(() => {
-      setTimeout(() => el.classList.remove('mc-feed__item--new'), 220);
+      setTimeout(() => el.classList.remove("mc-feed__item--new"), 220);
     });
 
     // Prune DOM to max entries
-    const items = feed.querySelectorAll('.mc-feed__item');
+    const items = feed.querySelectorAll(".mc-feed__item");
     if (items.length > MC_MAX_FEED) {
       for (let i = MC_MAX_FEED; i < items.length; i++) {
         items[i].remove();
@@ -1048,8 +1165,8 @@ export class MissionControl {
     }
 
     // Add blinking cursor to first item
-    const firstCursor = el.querySelector('.mc-feed__cursor');
-    if (firstCursor) firstCursor.style.display = 'inline';
+    const firstCursor = el.querySelector(".mc-feed__cursor");
+    if (firstCursor) firstCursor.style.display = "inline";
   }
 
   // ── Sparklines ────────────────────────────────────────────────────
@@ -1066,30 +1183,33 @@ export class MissionControl {
   _renderSparklines() {
     if (!this._el) return;
 
-    const taskCanvas = this._el.querySelector('#mc-spark-tasks');
-    const xpCanvas   = this._el.querySelector('#mc-spark-xp');
-    const costCanvas  = this._el.querySelector('#mc-spark-cost');
-    const zonesCanvas = this._el.querySelector('#mc-spark-zones');
+    const taskCanvas = this._el.querySelector("#mc-spark-tasks");
+    const xpCanvas = this._el.querySelector("#mc-spark-xp");
+    const costCanvas = this._el.querySelector("#mc-spark-cost");
+    const zonesCanvas = this._el.querySelector("#mc-spark-zones");
 
-    if (taskCanvas)  drawSparkline(taskCanvas,  this._sparkTasksPerHour, '#22c55e');
-    if (xpCanvas)    drawSparkline(xpCanvas,    this._sparkXPPerHour,    '#a78bfa');
-    if (costCanvas)  drawSparkline(costCanvas,  this._sparkCostPerHour,  '#f59e0b');
-    if (zonesCanvas) drawSparkline(zonesCanvas, this._sparkActiveZones,  '#38bdf8');
+    if (taskCanvas)
+      drawSparkline(taskCanvas, this._sparkTasksPerHour, "#22c55e");
+    if (xpCanvas) drawSparkline(xpCanvas, this._sparkXPPerHour, "#a78bfa");
+    if (costCanvas)
+      drawSparkline(costCanvas, this._sparkCostPerHour, "#f59e0b");
+    if (zonesCanvas)
+      drawSparkline(zonesCanvas, this._sparkActiveZones, "#38bdf8");
 
     // Update value labels
-    const lastTask  = this._sparkTasksPerHour[MC_SPARKLINE_POINTS - 1] || 0;
-    const lastXP    = this._sparkXPPerHour[MC_SPARKLINE_POINTS - 1]    || 0;
-    const lastCost  = this._sparkCostPerHour[MC_SPARKLINE_POINTS - 1]  || 0;
-    const lastZones = this._sparkActiveZones[MC_SPARKLINE_POINTS - 1]  || 0;
+    const lastTask = this._sparkTasksPerHour[MC_SPARKLINE_POINTS - 1] || 0;
+    const lastXP = this._sparkXPPerHour[MC_SPARKLINE_POINTS - 1] || 0;
+    const lastCost = this._sparkCostPerHour[MC_SPARKLINE_POINTS - 1] || 0;
+    const lastZones = this._sparkActiveZones[MC_SPARKLINE_POINTS - 1] || 0;
 
     const setVal = (id, v) => {
       const el = this._el.querySelector(id);
       if (el) el.textContent = v;
     };
-    setVal('#mc-spark-tasks-val',  lastTask);
-    setVal('#mc-spark-xp-val',     lastXP);
-    setVal('#mc-spark-cost-val',   `$${lastCost.toFixed(3)}`);
-    setVal('#mc-spark-zones-val',  lastZones);
+    setVal("#mc-spark-tasks-val", lastTask);
+    setVal("#mc-spark-xp-val", lastXP);
+    setVal("#mc-spark-cost-val", `$${lastCost.toFixed(3)}`);
+    setVal("#mc-spark-zones-val", lastZones);
   }
 
   // ── DEFCON ────────────────────────────────────────────────────────
@@ -1103,7 +1223,7 @@ export class MissionControl {
     // DEFCON 5 = peace, DEFCON 1 = max alert
     // Driven by incident severity and failures
     let newLevel = 5;
-    if (failure)     newLevel = Math.min(newLevel, 3);
+    if (failure) newLevel = Math.min(newLevel, 3);
     if (severity >= 4) newLevel = 1;
     else if (severity >= 3) newLevel = 2;
     else if (severity >= 2) newLevel = Math.min(newLevel, 3);
@@ -1115,23 +1235,24 @@ export class MissionControl {
   }
 
   _renderDefcon() {
-    const cfg      = DEFCON_LEVELS.find(d => d.level === this._defcon) || DEFCON_LEVELS[0];
-    const topbar   = this._el?.querySelector('#mc-topbar');
-    const label    = this._el?.querySelector('#mc-defcon-label');
-    const dotsEl   = this._el?.querySelector('#mc-defcon-dots');
+    const cfg =
+      DEFCON_LEVELS.find((d) => d.level === this._defcon) || DEFCON_LEVELS[0];
+    const topbar = this._el?.querySelector("#mc-topbar");
+    const label = this._el?.querySelector("#mc-defcon-label");
+    const dotsEl = this._el?.querySelector("#mc-defcon-dots");
 
     if (label) label.textContent = cfg.label;
     if (topbar) {
-      topbar.style.setProperty('--defcon-color', cfg.color);
-      topbar.style.setProperty('--defcon-bg', cfg.bg);
+      topbar.style.setProperty("--defcon-color", cfg.color);
+      topbar.style.setProperty("--defcon-bg", cfg.bg);
     }
 
     if (dotsEl) {
-      dotsEl.querySelectorAll('.mc-defcon__dot').forEach(dot => {
+      dotsEl.querySelectorAll(".mc-defcon__dot").forEach((dot) => {
         const lvl = parseInt(dot.dataset.level, 10);
         // Levels <= (6 - defcon) are lit (DEFCON 5 = 1 lit, DEFCON 1 = 5 lit)
-        dot.classList.toggle('mc-defcon__dot--active', lvl <= (6 - this._defcon));
-        dot.style.setProperty('--dot-color', cfg.color);
+        dot.classList.toggle("mc-defcon__dot--active", lvl <= 6 - this._defcon);
+        dot.style.setProperty("--dot-color", cfg.color);
       });
     }
   }
@@ -1145,19 +1266,19 @@ export class MissionControl {
 
   _enterFullscreen() {
     if (!this._el) return;
-    this._el.classList.add('mission-control--fullscreen');
+    this._el.classList.add("mission-control--fullscreen");
     this._fullscreen = true;
-    const btn = this._el.querySelector('#mc-fullscreen-btn');
-    if (btn) btn.innerHTML = '&#x2716; Collapse';
-    document.body.classList.add('mc-fullscreen-active');
+    const btn = this._el.querySelector("#mc-fullscreen-btn");
+    if (btn) btn.innerHTML = "&#x2716; Collapse";
+    document.body.classList.add("mc-fullscreen-active");
   }
 
   _exitFullscreen() {
     if (!this._el) return;
-    this._el.classList.remove('mission-control--fullscreen');
+    this._el.classList.remove("mission-control--fullscreen");
     this._fullscreen = false;
-    const btn = this._el.querySelector('#mc-fullscreen-btn');
-    if (btn) btn.innerHTML = '&#x26F6; Expand';
-    document.body.classList.remove('mc-fullscreen-active');
+    const btn = this._el.querySelector("#mc-fullscreen-btn");
+    if (btn) btn.innerHTML = "&#x26F6; Expand";
+    document.body.classList.remove("mc-fullscreen-active");
   }
 }

@@ -34,7 +34,9 @@
   border: none;
   border-bottom: 2px solid transparent;
   cursor: pointer;
-  transition: color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
   font-family: var(--font-sans);
 }
 
@@ -125,7 +127,7 @@
 }
 
 .plugin-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -272,11 +274,13 @@
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .plugin-toggle__track::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 2px;
   left: 2px;
@@ -284,7 +288,9 @@
   height: 14px;
   background: var(--text-secondary);
   border-radius: 50%;
-  transition: transform var(--transition-fast), background var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .plugin-toggle input:checked + .plugin-toggle__track {
@@ -377,9 +383,15 @@
 }
 
 @keyframes plugin-progress-pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
 }
 
 /* ── Detail view ──────────────────────────────────────────────── */

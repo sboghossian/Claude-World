@@ -13,8 +13,8 @@ import {
   TextStyle,
   BlurFilter,
   ColorMatrixFilter,
-} from 'pixi.js';
-import { TILE_WIDTH, TILE_HEIGHT, GRID_SIZE, COLORS } from './constants.js';
+} from "pixi.js";
+import { TILE_WIDTH, TILE_HEIGHT, GRID_SIZE, COLORS } from "./constants.js";
 
 // ── Isometric helpers ─────────────────────────────────────────────────────────
 
@@ -34,18 +34,18 @@ const MAP_CENTER_TILE_Y = GRID_SIZE / 2;
 
 // ── Zone accent colors ────────────────────────────────────────────────────────
 const ZONE_ACCENT = {
-  core:     0x4a90d9,
+  core: 0x4a90d9,
   business: 0x4caf50,
   advanced: 0x9c5ec7,
-  edge:     0xe8893c,
-  council:  0x7c3aed,
-  default:  0xffd700,
+  edge: 0xe8893c,
+  council: 0x7c3aed,
+  default: 0xffd700,
 };
 
 // ── Tiny math helpers ─────────────────────────────────────────────────────────
-const lerp  = (a, b, t) => a + (b - a) * t;
+const lerp = (a, b, t) => a + (b - a) * t;
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-const rand  = (lo, hi) => lo + Math.random() * (hi - lo);
+const rand = (lo, hi) => lo + Math.random() * (hi - lo);
 const randInt = (lo, hi) => Math.floor(rand(lo, hi + 1));
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -54,8 +54,8 @@ const randInt = (lo, hi) => Math.floor(rand(lo, hi + 1));
 
 export class VFXSystem {
   constructor(app) {
-    this._app       = app;
-    this._stage     = app.stage;
+    this._app = app;
+    this._stage = app.stage;
 
     // Top-level overlay container — sits above everything
     this._container = new Container();
@@ -73,29 +73,29 @@ export class VFXSystem {
     this._screenVFX = new Container();
     this._container.addChild(this._screenVFX);
 
-    this._effects  = new Map();   // id → { type, state, gfx, … }
-    this._time     = 0;           // accumulated seconds
-    this._running  = false;
-    this._uid      = 0;
+    this._effects = new Map(); // id → { type, state, gfx, … }
+    this._time = 0; // accumulated seconds
+    this._running = false;
+    this._uid = 0;
 
     // Aurora state
     this._auroraEnabled = true;
-    this._auroraGfx     = null;
-    this._auroraFilter  = null;
+    this._auroraGfx = null;
+    this._auroraFilter = null;
 
     // Heartbeat state
     this._lastHeartbeat = -999;
 
     // Bind DOM events
-    this._onTaskComplete  = this._onTaskComplete.bind(this);
+    this._onTaskComplete = this._onTaskComplete.bind(this);
     this._onQuestComplete = this._onQuestComplete.bind(this);
-    this._onIncident      = this._onIncident.bind(this);
-    this._onXPGained      = this._onXPGained.bind(this);
+    this._onIncident = this._onIncident.bind(this);
+    this._onXPGained = this._onXPGained.bind(this);
 
-    window.addEventListener('dispatch:task-complete', this._onTaskComplete);
-    window.addEventListener('quest:complete',         this._onQuestComplete);
-    window.addEventListener('incident:filed',         this._onIncident);
-    window.addEventListener('world:xp-gained',        this._onXPGained);
+    window.addEventListener("dispatch:task-complete", this._onTaskComplete);
+    window.addEventListener("quest:complete", this._onQuestComplete);
+    window.addEventListener("incident:filed", this._onIncident);
+    window.addEventListener("world:xp-gained", this._onXPGained);
   }
 
   // ── Lifecycle ───────────────────────────────────────────────────────────────
@@ -115,10 +115,10 @@ export class VFXSystem {
 
   destroy() {
     this.stop();
-    window.removeEventListener('dispatch:task-complete', this._onTaskComplete);
-    window.removeEventListener('quest:complete',         this._onQuestComplete);
-    window.removeEventListener('incident:filed',         this._onIncident);
-    window.removeEventListener('world:xp-gained',        this._onXPGained);
+    window.removeEventListener("dispatch:task-complete", this._onTaskComplete);
+    window.removeEventListener("quest:complete", this._onQuestComplete);
+    window.removeEventListener("incident:filed", this._onIncident);
+    window.removeEventListener("world:xp-gained", this._onXPGained);
     this._container.destroy({ children: true });
   }
 
@@ -155,16 +155,26 @@ export class VFXSystem {
     const t = clamp(fx.elapsed / fx.duration, 0, 1);
 
     switch (fx.type) {
-      case 'zone-glow':     return this._tickZoneGlow(fx, t, dt);
-      case 'xp-particle':   return this._tickXPParticle(fx, t, dt);
-      case 'task-burst':    return this._tickTaskBurst(fx, t);
-      case 'flash':         return this._tickFlash(fx, t);
-      case 'gold-spark':    return this._tickGoldSpark(fx, t, dt);
-      case 'heartbeat':     return this._tickHeartbeat(fx, t);
-      case 'lightning':     return this._tickLightning(fx, t);
-      case 'vignette':      return this._tickVignette(fx, t);
-      case 'road-packet':   return this._tickRoadPacket(fx, t, dt);
-      default:              return t >= 1;
+      case "zone-glow":
+        return this._tickZoneGlow(fx, t, dt);
+      case "xp-particle":
+        return this._tickXPParticle(fx, t, dt);
+      case "task-burst":
+        return this._tickTaskBurst(fx, t);
+      case "flash":
+        return this._tickFlash(fx, t);
+      case "gold-spark":
+        return this._tickGoldSpark(fx, t, dt);
+      case "heartbeat":
+        return this._tickHeartbeat(fx, t);
+      case "lightning":
+        return this._tickLightning(fx, t);
+      case "vignette":
+        return this._tickVignette(fx, t);
+      case "road-packet":
+        return this._tickRoadPacket(fx, t, dt);
+      default:
+        return t >= 1;
     }
   }
 
@@ -208,7 +218,7 @@ export class VFXSystem {
     gfx.y = y;
 
     // Draw a diamond-shaped glow matching isometric tile outline
-    const hw = TILE_WIDTH  / 2;
+    const hw = TILE_WIDTH / 2;
     const hh = TILE_HEIGHT / 2;
 
     gfx.setStrokeStyle({ width: 3, color, alpha: 0.8 });
@@ -220,7 +230,10 @@ export class VFXSystem {
     gfx.stroke();
 
     const duration = 1.2;
-    this._addEffect('zone-glow', gfx, duration, { intensity, baseColor: color });
+    this._addEffect("zone-glow", gfx, duration, {
+      intensity,
+      baseColor: color,
+    });
   }
 
   _tickZoneGlow(fx, t) {
@@ -245,13 +258,13 @@ export class VFXSystem {
   triggerXPFountain(screenX, screenY, amount = 10) {
     const count = randInt(20, 30);
     const style = new TextStyle({
-      fontFamily: 'monospace',
-      fontSize:   rand(10, 16),
-      fontWeight: 'bold',
-      fill:       0xffd700,
+      fontFamily: "monospace",
+      fontSize: rand(10, 16),
+      fontWeight: "bold",
+      fill: 0xffd700,
       dropShadow: true,
       dropShadowColor: 0x000000,
-      dropShadowBlur:  2,
+      dropShadowBlur: 2,
       dropShadowDistance: 1,
     });
 
@@ -261,18 +274,24 @@ export class VFXSystem {
       label.y = screenY + rand(-10, 10);
       label.anchor.set(0.5);
 
-      const vx = rand(-30, 30);   // px/s horizontal drift
+      const vx = rand(-30, 30); // px/s horizontal drift
       const vy = rand(-90, -160); // px/s upward speed
       const duration = 1.5;
 
-      this._addEffect('xp-particle', label, duration, { vx, vy }, this._screenVFX);
+      this._addEffect(
+        "xp-particle",
+        label,
+        duration,
+        { vx, vy },
+        this._screenVFX,
+      );
     }
   }
 
   _tickXPParticle(fx, t, dt) {
     fx.gfx.x += fx.vx * dt;
     fx.gfx.y += fx.vy * dt;
-    fx.vy    += 40 * dt; // gentle gravity pull-back
+    fx.vy += 40 * dt; // gentle gravity pull-back
     // Fade out in second half
     fx.gfx.alpha = t < 0.5 ? 1.0 : 1.0 - (t - 0.5) * 2;
     return t >= 1;
@@ -293,12 +312,14 @@ export class VFXSystem {
     gfx.x = x;
     gfx.y = y;
 
-    const RAYS   = 12;
-    const LEN    = 60;
+    const RAYS = 12;
+    const LEN = 60;
     const duration = 0.8;
 
-    this._addEffect('task-burst', gfx, duration, {
-      rays: RAYS, len: LEN, phase: 0,
+    this._addEffect("task-burst", gfx, duration, {
+      rays: RAYS,
+      len: LEN,
+      phase: 0,
     });
   }
 
@@ -307,15 +328,15 @@ export class VFXSystem {
     g.clear();
 
     const RAYS = fx.rays;
-    const len  = fx.len * (1 - t * 0.3); // rays contract slightly
+    const len = fx.len * (1 - t * 0.3); // rays contract slightly
 
     for (let i = 0; i < RAYS; i++) {
       const angle = (i / RAYS) * Math.PI * 2;
       // Interpolate purple(0x8b5cf6) → blue(0x3b82f6)
-      const ci    = i / (RAYS - 1);
-      const r     = Math.round(lerp(0x8b, 0x3b, ci));
-      const gn    = Math.round(lerp(0x5c, 0x82, ci));
-      const b     = Math.round(lerp(0xf6, 0xf6, ci));
+      const ci = i / (RAYS - 1);
+      const r = Math.round(lerp(0x8b, 0x3b, ci));
+      const gn = Math.round(lerp(0x5c, 0x82, ci));
+      const b = Math.round(lerp(0xf6, 0xf6, ci));
       const color = (r << 16) | (gn << 8) | b;
       const alpha = clamp((1 - t) * 0.9, 0, 1);
       const innerR = 6;
@@ -342,7 +363,7 @@ export class VFXSystem {
    * @param {number} tileY
    * @param {string} zoneName
    */
-  triggerBuildingComplete(tileX, tileY, zoneName = '') {
+  triggerBuildingComplete(tileX, tileY, zoneName = "") {
     const screenW = this._app.screen.width;
     const screenH = this._app.screen.height;
 
@@ -351,7 +372,7 @@ export class VFXSystem {
     flashGfx.rect(0, 0, screenW, screenH);
     flashGfx.fill({ color: 0xffffff, alpha: 1 });
     flashGfx.alpha = 0;
-    this._addEffect('flash', flashGfx, 0.4, {}, this._screenVFX);
+    this._addEffect("flash", flashGfx, 0.4, {}, this._screenVFX);
 
     // --- Gold sparks ---
     const { x, y } = tileToScreen(tileX, tileY);
@@ -363,9 +384,9 @@ export class VFXSystem {
       spark.x = x + rand(-20, 20);
       spark.y = y + rand(-10, 10);
 
-      const vx  = rand(-60, 60);
-      const vy  = rand(-200, -80);
-      this._addEffect('gold-spark', spark, 2.0, { vx, vy });
+      const vx = rand(-60, 60);
+      const vy = rand(-200, -80);
+      this._addEffect("gold-spark", spark, 2.0, { vx, vy });
     }
   }
 
@@ -378,7 +399,7 @@ export class VFXSystem {
   _tickGoldSpark(fx, t, dt) {
     fx.gfx.x += fx.vx * dt;
     fx.gfx.y += fx.vy * dt;
-    fx.vy    += 200 * dt; // gravity
+    fx.vy += 200 * dt; // gravity
     fx.gfx.alpha = clamp(1 - t, 0, 1);
     return t >= 1;
   }
@@ -393,14 +414,14 @@ export class VFXSystem {
     gfx.x = x;
     gfx.y = y;
     const duration = 2.5; // expand for 2.5s
-    this._addEffect('heartbeat', gfx, duration, { maxRadius: 400 });
+    this._addEffect("heartbeat", gfx, duration, { maxRadius: 400 });
   }
 
   _tickHeartbeat(fx, t) {
     const g = fx.gfx;
     g.clear();
     const radius = lerp(10, fx.maxRadius, t);
-    const alpha  = 0.15 * (1 - t);
+    const alpha = 0.15 * (1 - t);
     g.setStrokeStyle({ width: 2, color: 0x7c3aed, alpha });
     g.circle(0, 0, radius);
     g.stroke();
@@ -419,8 +440,8 @@ export class VFXSystem {
 
     const screenW = this._app.screen.width;
     const screenH = this._app.screen.height;
-    const bands   = 8;
-    const bandH   = (screenH * 0.20) / bands;
+    const bands = 8;
+    const bandH = (screenH * 0.2) / bands;
 
     const gfx = new Graphics();
     for (let i = 0; i < bands; i++) {
@@ -492,8 +513,8 @@ export class VFXSystem {
       // Start from a random point ~80–140px above the zone center
       const startX = rand(-30, 30);
       const startY = rand(-140, -80);
-      const endX   = rand(-15, 15);
-      const endY   = 0; // zone center
+      const endX = rand(-15, 15);
+      const endY = 0; // zone center
 
       this._drawLightningBolt(gfx, startX, startY, endX, endY, 4);
 
@@ -502,7 +523,7 @@ export class VFXSystem {
       const duration = 0.12;
 
       // Use a simple custom effect with a start-delay baked into elapsed
-      this._addEffect('lightning', gfx, duration + delay, {
+      this._addEffect("lightning", gfx, duration + delay, {
         delay,
         color: 0xc4b5fd,
       });
@@ -580,10 +601,17 @@ export class VFXSystem {
 
     drawVignette(0);
 
-    this._addEffect('vignette', gfx, 2.0, {
-      screenW, screenH,
-      drawVignette,
-    }, this._screenVFX);
+    this._addEffect(
+      "vignette",
+      gfx,
+      2.0,
+      {
+        screenW,
+        screenH,
+        drawVignette,
+      },
+      this._screenVFX,
+    );
   }
 
   _tickVignette(fx, t) {
@@ -607,15 +635,21 @@ export class VFXSystem {
   // ─────────────────────────────────────────────────────────────────────────
 
   _onTaskComplete(e) {
-    const { tileX = 20, tileY = 20, screenX, screenY, xp = 10 } = e.detail ?? {};
+    const {
+      tileX = 20,
+      tileY = 20,
+      screenX,
+      screenY,
+      xp = 10,
+    } = e.detail ?? {};
     this.triggerTaskBurst(tileX, tileY);
-    const sx = screenX ?? this._app.screen.width  / 2;
+    const sx = screenX ?? this._app.screen.width / 2;
     const sy = screenY ?? this._app.screen.height * 0.85;
     this.triggerXPFountain(sx, sy, xp);
   }
 
   _onQuestComplete(e) {
-    const { tileX = 20, tileY = 20, zoneName = '' } = e.detail ?? {};
+    const { tileX = 20, tileY = 20, zoneName = "" } = e.detail ?? {};
     this.triggerBuildingComplete(tileX, tileY, zoneName);
   }
 
@@ -625,7 +659,7 @@ export class VFXSystem {
 
   _onXPGained(e) {
     const { screenX, screenY, amount = 5 } = e.detail ?? {};
-    const sx = screenX ?? this._app.screen.width  / 2;
+    const sx = screenX ?? this._app.screen.width / 2;
     const sy = screenY ?? this._app.screen.height * 0.85;
     this.triggerXPFountain(sx, sy, amount);
   }
@@ -652,10 +686,18 @@ export class VFXSystem {
     const dist = Math.sqrt(dx * dx + dy * dy);
     const duration = dist / 200; // 200 px/s
 
-    this._addEffect('road-packet', gfx, duration, {
-      fromX: from.x, fromY: from.y,
-      toX: to.x, toY: to.y,
-    }, this._worldVFX);
+    this._addEffect(
+      "road-packet",
+      gfx,
+      duration,
+      {
+        fromX: from.x,
+        fromY: from.y,
+        toX: to.x,
+        toY: to.y,
+      },
+      this._worldVFX,
+    );
   }
 
   _tickRoadPacket(fx, t) {

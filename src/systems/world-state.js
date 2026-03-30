@@ -34,7 +34,7 @@
 /** Mood bump per successful task completion */
 const MOOD_SUCCESS_DELTA = 0.05;
 /** Mood penalty per failed task */
-const MOOD_FAILURE_DELTA = -0.10;
+const MOOD_FAILURE_DELTA = -0.1;
 /** Mean-reversion speed per update tick (fraction toward 0.5) */
 const MOOD_DECAY_RATE = 0.02;
 /** Per-active-task mood pressure (pushes mood down slightly) */
@@ -56,7 +56,7 @@ class WorldStateManager {
     this.activeTasks = 0;
 
     /** @type {ActivityState} */
-    this.state = 'idle';
+    this.state = "idle";
 
     /** Mood score: 0 = storm, 1 = sunshine */
     this.moodScore = MOOD_RESTING;
@@ -148,7 +148,7 @@ class WorldStateManager {
 
     // Prune events outside the recent window
     this._recentEvents = this._recentEvents.filter(
-      (e) => now - e.time < RECENT_WINDOW_MS
+      (e) => now - e.time < RECENT_WINDOW_MS,
     );
 
     // Recalculate rolling counters from the pruned list
@@ -198,11 +198,11 @@ class WorldStateManager {
    * @returns {Weather}
    */
   getWeather() {
-    if (this.moodScore < 0.2) return 'storm';
-    if (this.moodScore < 0.4) return 'rain';
-    if (this.moodScore < 0.6) return 'cloudy';
-    if (this.moodScore < 0.8) return 'clear';
-    return 'sunny';
+    if (this.moodScore < 0.2) return "storm";
+    if (this.moodScore < 0.4) return "rain";
+    if (this.moodScore < 0.6) return "cloudy";
+    if (this.moodScore < 0.8) return "clear";
+    return "sunny";
   }
 
   /**
@@ -255,13 +255,13 @@ class WorldStateManager {
    */
   _recalculateState() {
     if (this.activeTasks === 0) {
-      this.state = 'idle';
+      this.state = "idle";
     } else if (this.activeTasks <= 2) {
-      this.state = 'active';
+      this.state = "active";
     } else if (this.activeTasks <= 4) {
-      this.state = 'busy';
+      this.state = "busy";
     } else {
-      this.state = 'overload';
+      this.state = "overload";
     }
   }
 
@@ -275,17 +275,17 @@ class WorldStateManager {
       try {
         cb(snapshot);
       } catch (err) {
-        console.warn('[WorldState] Listener error:', err);
+        console.warn("[WorldState] Listener error:", err);
       }
     }
 
     // Also dispatch a DOM event for UI components
-    if (typeof document !== 'undefined') {
+    if (typeof document !== "undefined") {
       document.dispatchEvent(
-        new CustomEvent('world-state:changed', {
+        new CustomEvent("world-state:changed", {
           detail: snapshot,
           bubbles: true,
-        })
+        }),
       );
     }
   }
@@ -295,7 +295,7 @@ class WorldStateManager {
    * @private
    */
   _startAutoUpdate() {
-    if (typeof setInterval !== 'undefined') {
+    if (typeof setInterval !== "undefined") {
       this._updateTimer = setInterval(() => {
         this.updateMood();
       }, AUTO_UPDATE_INTERVAL_MS);

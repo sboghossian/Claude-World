@@ -24,40 +24,40 @@
 const PAGE_SIZE = 20;
 
 const MODEL_COLORS = {
-  'claude-3-opus':   '#a855f7',
-  'claude-3-sonnet': '#6366f1',
-  'claude-3-haiku':  '#06b6d4',
-  'claude-3.5-sonnet': '#8b5cf6',
-  'claude-4-opus':   '#c084fc',
-  'gpt-4':           '#10b981',
-  'gpt-4o':          '#34d399',
-  'gpt-3.5-turbo':   '#6ee7b7',
-  'default':         '#8888a0',
+  "claude-3-opus": "#a855f7",
+  "claude-3-sonnet": "#6366f1",
+  "claude-3-haiku": "#06b6d4",
+  "claude-3.5-sonnet": "#8b5cf6",
+  "claude-4-opus": "#c084fc",
+  "gpt-4": "#10b981",
+  "gpt-4o": "#34d399",
+  "gpt-3.5-turbo": "#6ee7b7",
+  default: "#8888a0",
 };
 
 const SORT_OPTIONS = [
-  { key: 'newest',   label: 'Newest first' },
-  { key: 'oldest',   label: 'Oldest first' },
-  { key: 'tokens',   label: 'Most tokens' },
-  { key: 'cost',     label: 'Highest cost' },
+  { key: "newest", label: "Newest first" },
+  { key: "oldest", label: "Oldest first" },
+  { key: "tokens", label: "Most tokens" },
+  { key: "cost", label: "Highest cost" },
 ];
 
-const STATUS_FILTERS = ['completed', 'failed', 'pending', 'running'];
+const STATUS_FILTERS = ["completed", "failed", "pending", "running"];
 
 // ── Helpers ────────────────────────────────────────────────────────
 
 function escapeHTML(str) {
-  if (!str) return '';
-  const div = document.createElement('div');
+  if (!str) return "";
+  const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
 }
 
 function relativeTime(iso) {
-  if (!iso) return '';
+  if (!iso) return "";
   const ms = Date.now() - new Date(iso).getTime();
   const secs = Math.floor(ms / 1000);
-  if (secs < 60) return 'Just now';
+  if (secs < 60) return "Just now";
   const mins = Math.floor(secs / 60);
   if (mins < 60) return `${mins}m ago`;
   const hours = Math.floor(mins / 60);
@@ -65,30 +65,35 @@ function relativeTime(iso) {
   const days = Math.floor(hours / 24);
   if (days < 30) return `${days}d ago`;
   return new Date(iso).toLocaleDateString(undefined, {
-    month: 'short', day: 'numeric', year: 'numeric',
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
 function formatDateTime(iso) {
-  if (!iso) return '';
+  if (!iso) return "";
   return new Date(iso).toLocaleString(undefined, {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
 function dateGroupKey(iso) {
-  if (!iso) return 'Unknown';
+  if (!iso) return "Unknown";
   const d = new Date(iso);
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const day = new Date(d.getFullYear(), d.getMonth(), d.getDate());
   const diff = (today - day) / 86400000;
-  if (diff === 0) return 'Today';
-  if (diff === 1) return 'Yesterday';
-  if (diff < 7) return 'This Week';
-  if (diff < 30) return 'This Month';
-  return d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  if (diff === 0) return "Today";
+  if (diff === 1) return "Yesterday";
+  if (diff < 7) return "This Week";
+  if (diff < 30) return "This Month";
+  return d.toLocaleDateString(undefined, { month: "long", year: "numeric" });
 }
 
 function modelColor(model) {
@@ -101,13 +106,13 @@ function modelColor(model) {
 }
 
 function formatTokens(n) {
-  if (!n && n !== 0) return '?';
-  if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+  if (!n && n !== 0) return "?";
+  if (n >= 1000) return (n / 1000).toFixed(1) + "k";
   return String(n);
 }
 
 function formatCost(usd) {
-  if (!usd && usd !== 0) return '$0.00';
+  if (!usd && usd !== 0) return "$0.00";
   if (usd < 0.01) return `$${usd.toFixed(4)}`;
   return `$${usd.toFixed(2)}`;
 }
@@ -117,43 +122,43 @@ function formatCost(usd) {
  * Handles: headers, code blocks, inline code, bold, italic, lists.
  */
 function renderMarkdown(text) {
-  if (!text) return '';
+  if (!text) return "";
   let html = escapeHTML(text);
 
   // Code blocks: ```lang\n...\n```
   html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_m, lang, code) => {
     const langBadge = lang
       ? `<span class="conv-history__code-lang">${lang}</span>`
-      : '';
+      : "";
     return `<pre>${langBadge}<code>${code}</code></pre>`;
   });
 
   // Inline code
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
 
   // Headers
-  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  html = html.replace(/^### (.+)$/gm, "<h3>$1</h3>");
+  html = html.replace(/^## (.+)$/gm, "<h2>$1</h2>");
+  html = html.replace(/^# (.+)$/gm, "<h1>$1</h1>");
 
   // Bold & italic
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
 
   // Unordered lists
-  html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
-  html = html.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
+  html = html.replace(/^- (.+)$/gm, "<li>$1</li>");
+  html = html.replace(/(<li>[\s\S]*?<\/li>)/g, "<ul>$1</ul>");
   // Collapse adjacent <ul> blocks
-  html = html.replace(/<\/ul>\s*<ul>/g, '');
+  html = html.replace(/<\/ul>\s*<ul>/g, "");
 
   // Ordered lists
-  html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+  html = html.replace(/^\d+\. (.+)$/gm, "<li>$1</li>");
 
   // Line breaks (outside pre blocks)
-  html = html.replace(/\n/g, '<br>');
+  html = html.replace(/\n/g, "<br>");
   // Clean up extra <br> inside pre/code blocks
   html = html.replace(/<pre>([\s\S]*?)<\/pre>/g, (_m, inner) => {
-    return '<pre>' + inner.replace(/<br>/g, '\n') + '</pre>';
+    return "<pre>" + inner.replace(/<br>/g, "\n") + "</pre>";
   });
 
   return html;
@@ -176,9 +181,9 @@ export class ConversationHistory {
     this._bulkSelected = new Set();
 
     /** @type {string} Search query */
-    this._searchQuery = '';
+    this._searchQuery = "";
     /** @type {string} Sort key */
-    this._sortKey = 'newest';
+    this._sortKey = "newest";
     /** @type {Set<string>} Active status filters (empty = all) */
     this._statusFilters = new Set();
     /** @type {string|null} Model filter */
@@ -201,10 +206,10 @@ export class ConversationHistory {
   render() {
     this._injectCSS();
 
-    const root = document.createElement('div');
-    root.className = 'conv-history';
-    root.setAttribute('role', 'region');
-    root.setAttribute('aria-label', 'Conversation History');
+    const root = document.createElement("div");
+    root.className = "conv-history";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-label", "Conversation History");
     this._root = root;
 
     this._build();
@@ -238,12 +243,12 @@ export class ConversationHistory {
   // ═══════════════════════════════════════════════════════════════════
 
   _injectCSS() {
-    const id = 'conversation-history-styles';
+    const id = "conversation-history-styles";
     if (document.getElementById(id)) return;
-    const link = document.createElement('link');
+    const link = document.createElement("link");
     link.id = id;
-    link.rel = 'stylesheet';
-    link.href = 'src/zones/conversation-history.css';
+    link.rel = "stylesheet";
+    link.href = "src/zones/conversation-history.css";
     document.head.appendChild(link);
   }
 
@@ -252,42 +257,44 @@ export class ConversationHistory {
   // ═══════════════════════════════════════════════════════════════════
 
   _build() {
-    this._root.innerHTML = '';
+    this._root.innerHTML = "";
 
     // ── Toolbar (search) ──
-    const toolbar = this._el('div', 'conv-history__toolbar');
-    this._searchInput = this._el('input', 'conv-history__search');
-    this._searchInput.type = 'search';
-    this._searchInput.placeholder = 'Search conversations...';
-    this._searchInput.setAttribute('aria-label', 'Search conversations');
+    const toolbar = this._el("div", "conv-history__toolbar");
+    this._searchInput = this._el("input", "conv-history__search");
+    this._searchInput.type = "search";
+    this._searchInput.placeholder = "Search conversations...";
+    this._searchInput.setAttribute("aria-label", "Search conversations");
     toolbar.appendChild(this._searchInput);
     this._root.appendChild(toolbar);
 
     // ── Filters bar ──
-    const filters = this._el('div', 'conv-history__filters');
+    const filters = this._el("div", "conv-history__filters");
 
     // Status filter chips
     for (const status of STATUS_FILTERS) {
-      const chip = this._el('button', 'conv-history__filter-chip');
+      const chip = this._el("button", "conv-history__filter-chip");
       chip.textContent = status;
       chip.dataset.status = status;
-      chip.setAttribute('aria-pressed', 'false');
+      chip.setAttribute("aria-pressed", "false");
       filters.appendChild(chip);
-      chip.addEventListener('click', () => this._toggleStatusFilter(status, chip));
+      chip.addEventListener("click", () =>
+        this._toggleStatusFilter(status, chip),
+      );
     }
 
     // Model filter select
-    this._modelSelect = this._el('select', 'conv-history__sort-select');
-    const modelAll = this._el('option');
-    modelAll.value = '';
-    modelAll.textContent = 'All models';
+    this._modelSelect = this._el("select", "conv-history__sort-select");
+    const modelAll = this._el("option");
+    modelAll.value = "";
+    modelAll.textContent = "All models";
     this._modelSelect.appendChild(modelAll);
     filters.appendChild(this._modelSelect);
 
     // Sort dropdown
-    this._sortSelect = this._el('select', 'conv-history__sort-select');
+    this._sortSelect = this._el("select", "conv-history__sort-select");
     for (const opt of SORT_OPTIONS) {
-      const option = this._el('option');
+      const option = this._el("option");
       option.value = opt.key;
       option.textContent = opt.label;
       this._sortSelect.appendChild(option);
@@ -295,35 +302,38 @@ export class ConversationHistory {
     filters.appendChild(this._sortSelect);
 
     // Bulk actions
-    const bulkWrap = this._el('div', 'conv-history__bulk-actions');
-    this._selectAllBtn = this._el('button', 'conv-history__bulk-btn');
-    this._selectAllBtn.textContent = 'Select all';
+    const bulkWrap = this._el("div", "conv-history__bulk-actions");
+    this._selectAllBtn = this._el("button", "conv-history__bulk-btn");
+    this._selectAllBtn.textContent = "Select all";
     bulkWrap.appendChild(this._selectAllBtn);
 
-    this._exportBtn = this._el('button', 'conv-history__bulk-btn');
-    this._exportBtn.textContent = 'Export JSON';
+    this._exportBtn = this._el("button", "conv-history__bulk-btn");
+    this._exportBtn.textContent = "Export JSON";
     bulkWrap.appendChild(this._exportBtn);
 
-    this._deleteBtn = this._el('button', 'conv-history__bulk-btn conv-history__bulk-btn--danger');
-    this._deleteBtn.textContent = 'Delete';
+    this._deleteBtn = this._el(
+      "button",
+      "conv-history__bulk-btn conv-history__bulk-btn--danger",
+    );
+    this._deleteBtn.textContent = "Delete";
     bulkWrap.appendChild(this._deleteBtn);
 
     filters.appendChild(bulkWrap);
     this._root.appendChild(filters);
 
     // ── Body (split) ──
-    const body = this._el('div', 'conv-history__body');
+    const body = this._el("div", "conv-history__body");
 
     // Sidebar
-    const sidebar = this._el('div', 'conv-history__sidebar');
-    this._listEl = this._el('div', 'conv-history__list');
+    const sidebar = this._el("div", "conv-history__sidebar");
+    this._listEl = this._el("div", "conv-history__list");
     sidebar.appendChild(this._listEl);
-    this._sentinel = this._el('div', 'conv-history__sentinel');
+    this._sentinel = this._el("div", "conv-history__sentinel");
     sidebar.appendChild(this._sentinel);
     body.appendChild(sidebar);
 
     // Detail pane
-    this._detailEl = this._el('div', 'conv-history__detail');
+    this._detailEl = this._el("div", "conv-history__detail");
     this._showDetailEmpty();
     body.appendChild(this._detailEl);
 
@@ -337,7 +347,7 @@ export class ConversationHistory {
   _bindEvents() {
     // Search with debounce
     let searchTimer = null;
-    this._searchInput.addEventListener('input', () => {
+    this._searchInput.addEventListener("input", () => {
       clearTimeout(searchTimer);
       searchTimer = setTimeout(() => {
         this._searchQuery = this._searchInput.value.trim().toLowerCase();
@@ -347,43 +357,46 @@ export class ConversationHistory {
     });
 
     // Sort
-    this._sortSelect.addEventListener('change', () => {
+    this._sortSelect.addEventListener("change", () => {
       this._sortKey = this._sortSelect.value;
       this._renderedCount = 0;
       this._renderList();
     });
 
     // Model filter
-    this._modelSelect.addEventListener('change', () => {
+    this._modelSelect.addEventListener("change", () => {
       this._modelFilter = this._modelSelect.value || null;
       this._renderedCount = 0;
       this._renderList();
     });
 
     // Select all
-    this._selectAllBtn.addEventListener('click', () => this._toggleSelectAll());
+    this._selectAllBtn.addEventListener("click", () => this._toggleSelectAll());
 
     // Export
-    this._exportBtn.addEventListener('click', () => this._exportSelected());
+    this._exportBtn.addEventListener("click", () => this._exportSelected());
 
     // Delete
-    this._deleteBtn.addEventListener('click', () => this._deleteSelected());
+    this._deleteBtn.addEventListener("click", () => this._deleteSelected());
 
     // Infinite scroll
-    this._scrollObserver = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) this._loadMore();
-      }
-    }, { rootMargin: '200px' });
+    this._scrollObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) this._loadMore();
+        }
+      },
+      { rootMargin: "200px" },
+    );
     this._scrollObserver.observe(this._sentinel);
 
     // List click delegation
-    this._listEl.addEventListener('click', (e) => {
-      const item = e.target.closest('.conv-history__item');
+    this._listEl.addEventListener("click", (e) => {
+      const item = e.target.closest(".conv-history__item");
       if (!item) return;
 
       // If click was on the checkbox, handle bulk select
-      if (e.target.classList.contains('conv-history__item-check')) {
+      if (e.target.classList.contains("conv-history__item-check")) {
         const id = item.dataset.id;
         if (this._bulkSelected.has(id)) {
           this._bulkSelected.delete(id);
@@ -397,7 +410,7 @@ export class ConversationHistory {
 
       // Otherwise select conversation
       const id = item.dataset.id;
-      const conv = this._allItems.find(c => c.id === id);
+      const conv = this._allItems.find((c) => c.id === id);
       if (conv) this._selectConversation(conv, item);
     });
   }
@@ -405,12 +418,12 @@ export class ConversationHistory {
   _toggleStatusFilter(status, chip) {
     if (this._statusFilters.has(status)) {
       this._statusFilters.delete(status);
-      chip.classList.remove('conv-history__filter-chip--active');
-      chip.setAttribute('aria-pressed', 'false');
+      chip.classList.remove("conv-history__filter-chip--active");
+      chip.setAttribute("aria-pressed", "false");
     } else {
       this._statusFilters.add(status);
-      chip.classList.add('conv-history__filter-chip--active');
-      chip.setAttribute('aria-pressed', 'true');
+      chip.classList.add("conv-history__filter-chip--active");
+      chip.setAttribute("aria-pressed", "true");
     }
     this._renderedCount = 0;
     this._renderList();
@@ -434,19 +447,19 @@ export class ConversationHistory {
         ? await api.getRecentTasks(this._worldId, 500)
         : [];
 
-      for (const t of (tasks || [])) {
+      for (const t of tasks || []) {
         const inputTokens = t.input_tokens || 0;
         const outputTokens = t.output_tokens || 0;
         items.push({
           id: t.id,
-          type: 'task',
+          type: "task",
           title: this._extractTitle(t.prompt),
-          prompt: t.prompt || '',
-          response: t.response || '',
-          systemPrompt: t.system_prompt || '',
-          model: t.model || 'unknown',
-          provider: t.provider || '',
-          status: t.status || 'completed',
+          prompt: t.prompt || "",
+          response: t.response || "",
+          systemPrompt: t.system_prompt || "",
+          model: t.model || "unknown",
+          provider: t.provider || "",
+          status: t.status || "completed",
           zone_id: t.zone_id || null,
           agent_id: t.agent_id || null,
           inputTokens,
@@ -461,7 +474,7 @@ export class ConversationHistory {
         });
       }
     } catch (err) {
-      console.warn('[ConversationHistory] Failed to load tasks:', err);
+      console.warn("[ConversationHistory] Failed to load tasks:", err);
     }
 
     try {
@@ -470,27 +483,30 @@ export class ConversationHistory {
         ? await api.getProjects(this._worldId)
         : [];
 
-      for (const proj of (projects || [])) {
+      for (const proj of projects || []) {
         const messages = api.getMessages
           ? await api.getMessages(proj.id, 200)
           : [];
         if (!messages || messages.length === 0) continue;
 
-        const totalTokens = messages.reduce((s, m) => s + (m.tokens_used || 0), 0);
+        const totalTokens = messages.reduce(
+          (s, m) => s + (m.tokens_used || 0),
+          0,
+        );
         const totalCost = messages.reduce((s, m) => s + (m.cost_usd || 0), 0);
-        const userMsgs = messages.filter(m => m.role === 'user');
-        const assistantMsgs = messages.filter(m => m.role === 'assistant');
+        const userMsgs = messages.filter((m) => m.role === "user");
+        const assistantMsgs = messages.filter((m) => m.role === "assistant");
 
         items.push({
           id: `proj-${proj.id}`,
-          type: 'chat',
+          type: "chat",
           title: proj.name || this._extractTitle(userMsgs[0]?.content),
-          prompt: userMsgs.map(m => m.content).join('\n\n---\n\n'),
-          response: assistantMsgs.map(m => m.content).join('\n\n---\n\n'),
-          systemPrompt: '',
-          model: messages.find(m => m.model)?.model || 'unknown',
-          provider: '',
-          status: 'completed',
+          prompt: userMsgs.map((m) => m.content).join("\n\n---\n\n"),
+          response: assistantMsgs.map((m) => m.content).join("\n\n---\n\n"),
+          systemPrompt: "",
+          model: messages.find((m) => m.model)?.model || "unknown",
+          provider: "",
+          status: "completed",
           zone_id: null,
           agent_id: null,
           inputTokens: 0,
@@ -499,14 +515,15 @@ export class ConversationHistory {
           cost: totalCost,
           latency: 0,
           created_at: proj.created_at || messages[0]?.created_at,
-          completed_at: proj.updated_at || messages[messages.length - 1]?.created_at,
+          completed_at:
+            proj.updated_at || messages[messages.length - 1]?.created_at,
           error: null,
           metadata: {},
           _messages: messages,
         });
       }
     } catch (err) {
-      console.warn('[ConversationHistory] Failed to load chat projects:', err);
+      console.warn("[ConversationHistory] Failed to load chat projects:", err);
     }
 
     // Sort chronologically descending by default
@@ -518,26 +535,30 @@ export class ConversationHistory {
   }
 
   _extractTitle(text) {
-    if (!text) return 'Untitled';
-    const first = text.split('\n')[0].trim();
-    return first.length > 80 ? first.slice(0, 80) + '...' : first;
+    if (!text) return "Untitled";
+    const first = text.split("\n")[0].trim();
+    return first.length > 80 ? first.slice(0, 80) + "..." : first;
   }
 
   _safeParse(json) {
-    try { return JSON.parse(json); } catch { return {}; }
+    try {
+      return JSON.parse(json);
+    } catch {
+      return {};
+    }
   }
 
   _populateModelFilter() {
     const models = new Set();
     for (const item of this._allItems) {
-      if (item.model && item.model !== 'unknown') models.add(item.model);
+      if (item.model && item.model !== "unknown") models.add(item.model);
     }
     // Clear existing options except "All models"
     while (this._modelSelect.options.length > 1) {
       this._modelSelect.remove(1);
     }
     for (const m of [...models].sort()) {
-      const opt = this._el('option');
+      const opt = this._el("option");
       opt.value = m;
       opt.textContent = m;
       this._modelSelect.appendChild(opt);
@@ -553,37 +574,43 @@ export class ConversationHistory {
 
     // Status filter
     if (this._statusFilters.size > 0) {
-      items = items.filter(i => this._statusFilters.has(i.status));
+      items = items.filter((i) => this._statusFilters.has(i.status));
     }
 
     // Model filter
     if (this._modelFilter) {
-      items = items.filter(i => i.model === this._modelFilter);
+      items = items.filter((i) => i.model === this._modelFilter);
     }
 
     // Search filter
     if (this._searchQuery) {
       const q = this._searchQuery;
-      items = items.filter(i => {
+      items = items.filter((i) => {
         const searchable = [i.title, i.prompt, i.response, i.model, i.status]
-          .filter(Boolean).join(' ').toLowerCase();
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
         return searchable.includes(q);
       });
     }
 
     // Sort
     switch (this._sortKey) {
-      case 'oldest':
-        items = [...items].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      case "oldest":
+        items = [...items].sort(
+          (a, b) => new Date(a.created_at) - new Date(b.created_at),
+        );
         break;
-      case 'tokens':
+      case "tokens":
         items = [...items].sort((a, b) => b.totalTokens - a.totalTokens);
         break;
-      case 'cost':
+      case "cost":
         items = [...items].sort((a, b) => b.cost - a.cost);
         break;
       default: // newest
-        items = [...items].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        items = [...items].sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at),
+        );
     }
 
     return items;
@@ -591,14 +618,14 @@ export class ConversationHistory {
 
   _renderList() {
     const items = this._filteredItems();
-    this._listEl.innerHTML = '';
+    this._listEl.innerHTML = "";
     this._renderedCount = Math.min(PAGE_SIZE, items.length);
 
     if (items.length === 0) {
-      const empty = this._el('div', 'conv-history__list-empty');
+      const empty = this._el("div", "conv-history__list-empty");
       empty.textContent = this._searchQuery
-        ? 'No conversations match your search.'
-        : 'No conversations yet.';
+        ? "No conversations match your search."
+        : "No conversations yet.";
       this._listEl.appendChild(empty);
       return;
     }
@@ -629,7 +656,7 @@ export class ConversationHistory {
       const group = dateGroupKey(item.created_at);
 
       if (group !== lastGroup) {
-        const header = this._el('div', 'conv-history__date-header');
+        const header = this._el("div", "conv-history__date-header");
         header.textContent = group;
         frag.appendChild(header);
         lastGroup = group;
@@ -642,41 +669,44 @@ export class ConversationHistory {
   }
 
   _buildListItem(item) {
-    const el = this._el('div', 'conv-history__item');
+    const el = this._el("div", "conv-history__item");
     el.dataset.id = item.id;
     if (this._selected && this._selected.id === item.id) {
-      el.classList.add('conv-history__item--active');
+      el.classList.add("conv-history__item--active");
     }
 
     // Checkbox for bulk select
-    const check = document.createElement('input');
-    check.type = 'checkbox';
-    check.className = 'conv-history__item-check';
+    const check = document.createElement("input");
+    check.type = "checkbox";
+    check.className = "conv-history__item-check";
     check.checked = this._bulkSelected.has(item.id);
-    check.setAttribute('aria-label', 'Select conversation');
+    check.setAttribute("aria-label", "Select conversation");
     el.appendChild(check);
 
     // Status dot
-    const statusDot = this._el('span', `conv-history__item-status conv-history__item-status--${item.status}`);
+    const statusDot = this._el(
+      "span",
+      `conv-history__item-status conv-history__item-status--${item.status}`,
+    );
     statusDot.title = item.status;
     el.appendChild(statusDot);
 
     // Body
-    const body = this._el('div', 'conv-history__item-body');
+    const body = this._el("div", "conv-history__item-body");
 
-    const title = this._el('div', 'conv-history__item-title');
+    const title = this._el("div", "conv-history__item-title");
     title.textContent = item.title;
     title.title = item.title;
     body.appendChild(title);
 
-    const meta = this._el('div', 'conv-history__item-meta');
+    const meta = this._el("div", "conv-history__item-meta");
 
     // Model icon
-    const modelEl = this._el('span', 'conv-history__item-model');
-    const dot = this._el('span', 'conv-history__item-model-icon');
+    const modelEl = this._el("span", "conv-history__item-model");
+    const dot = this._el("span", "conv-history__item-model-icon");
     dot.style.backgroundColor = modelColor(item.model);
     modelEl.appendChild(dot);
-    modelEl.appendChild(document.createTextNode(item.model || ''));
+    modelEl.appendChild(document.createTextNode(item.model || ""));
     meta.appendChild(modelEl);
 
     // Time
@@ -684,7 +714,7 @@ export class ConversationHistory {
 
     // Token badge
     if (item.totalTokens > 0) {
-      const tokenBadge = this._el('span', 'conv-history__item-tokens');
+      const tokenBadge = this._el("span", "conv-history__item-tokens");
       tokenBadge.textContent = formatTokens(item.totalTokens);
       meta.appendChild(tokenBadge);
     }
@@ -700,9 +730,9 @@ export class ConversationHistory {
   // ═══════════════════════════════════════════════════════════════════
 
   _showDetailEmpty() {
-    this._detailEl.innerHTML = '';
-    const empty = this._el('div', 'conv-history__detail-empty');
-    empty.textContent = 'Select a conversation to view details.';
+    this._detailEl.innerHTML = "";
+    const empty = this._el("div", "conv-history__detail-empty");
+    empty.textContent = "Select a conversation to view details.";
     this._detailEl.appendChild(empty);
   }
 
@@ -710,28 +740,34 @@ export class ConversationHistory {
     this._selected = conv;
 
     // Update active state in sidebar
-    const prev = this._listEl.querySelector('.conv-history__item--active');
-    if (prev) prev.classList.remove('conv-history__item--active');
-    if (itemEl) itemEl.classList.add('conv-history__item--active');
+    const prev = this._listEl.querySelector(".conv-history__item--active");
+    if (prev) prev.classList.remove("conv-history__item--active");
+    if (itemEl) itemEl.classList.add("conv-history__item--active");
 
     this._renderDetail(conv);
   }
 
   _renderDetail(conv) {
-    this._detailEl.innerHTML = '';
+    this._detailEl.innerHTML = "";
 
     // ── Header ──
-    const header = this._el('div', 'conv-history__detail-header');
-    const title = this._el('div', 'conv-history__detail-title');
+    const header = this._el("div", "conv-history__detail-header");
+    const title = this._el("div", "conv-history__detail-title");
     title.textContent = conv.title;
     header.appendChild(title);
 
-    const actions = this._el('div', 'conv-history__detail-actions');
+    const actions = this._el("div", "conv-history__detail-actions");
 
-    const copyPromptBtn = this._actionBtn('Copy Prompt', () => this._copyText(conv.prompt));
-    const copyResponseBtn = this._actionBtn('Copy Response', () => this._copyText(conv.response));
-    const retryBtn = this._actionBtn('Retry', () => this._retry(conv));
-    const templateBtn = this._actionBtn('Use as Template', () => this._useAsTemplate(conv));
+    const copyPromptBtn = this._actionBtn("Copy Prompt", () =>
+      this._copyText(conv.prompt),
+    );
+    const copyResponseBtn = this._actionBtn("Copy Response", () =>
+      this._copyText(conv.response),
+    );
+    const retryBtn = this._actionBtn("Retry", () => this._retry(conv));
+    const templateBtn = this._actionBtn("Use as Template", () =>
+      this._useAsTemplate(conv),
+    );
 
     actions.appendChild(copyPromptBtn);
     actions.appendChild(copyResponseBtn);
@@ -741,23 +777,27 @@ export class ConversationHistory {
     this._detailEl.appendChild(header);
 
     // ── Stats bar ──
-    const stats = this._el('div', 'conv-history__stats');
+    const stats = this._el("div", "conv-history__stats");
 
-    stats.appendChild(this._buildStat(formatTokens(conv.inputTokens), 'Input'));
-    stats.appendChild(this._buildStat(formatTokens(conv.outputTokens), 'Output'));
-    stats.appendChild(this._buildStat(formatTokens(conv.totalTokens), 'Total'));
-    stats.appendChild(this._buildStat(formatCost(conv.cost), 'Cost'));
-    stats.appendChild(this._buildStat(
-      conv.latency ? `${(conv.latency / 1000).toFixed(1)}s` : '-',
-      'Response Time'
-    ));
-    stats.appendChild(this._buildStat(conv.model || '-', 'Model'));
-    stats.appendChild(this._buildStat(conv.status, 'Status'));
+    stats.appendChild(this._buildStat(formatTokens(conv.inputTokens), "Input"));
+    stats.appendChild(
+      this._buildStat(formatTokens(conv.outputTokens), "Output"),
+    );
+    stats.appendChild(this._buildStat(formatTokens(conv.totalTokens), "Total"));
+    stats.appendChild(this._buildStat(formatCost(conv.cost), "Cost"));
+    stats.appendChild(
+      this._buildStat(
+        conv.latency ? `${(conv.latency / 1000).toFixed(1)}s` : "-",
+        "Response Time",
+      ),
+    );
+    stats.appendChild(this._buildStat(conv.model || "-", "Model"));
+    stats.appendChild(this._buildStat(conv.status, "Status"));
 
     this._detailEl.appendChild(stats);
 
     // ── Messages area ──
-    const messagesEl = this._el('div', 'conv-history__messages');
+    const messagesEl = this._el("div", "conv-history__messages");
 
     // If this is a chat project with individual messages, show them
     if (conv._messages && conv._messages.length > 0) {
@@ -767,16 +807,18 @@ export class ConversationHistory {
     } else {
       // Otherwise show prompt/response as two messages
       if (conv.systemPrompt) {
-        messagesEl.appendChild(this._buildMessage('system', conv.systemPrompt));
+        messagesEl.appendChild(this._buildMessage("system", conv.systemPrompt));
       }
       if (conv.prompt) {
-        messagesEl.appendChild(this._buildMessage('user', conv.prompt));
+        messagesEl.appendChild(this._buildMessage("user", conv.prompt));
       }
       if (conv.response) {
-        messagesEl.appendChild(this._buildMessage('assistant', conv.response));
+        messagesEl.appendChild(this._buildMessage("assistant", conv.response));
       }
       if (conv.error) {
-        messagesEl.appendChild(this._buildMessage('system', `Error: ${conv.error}`));
+        messagesEl.appendChild(
+          this._buildMessage("system", `Error: ${conv.error}`),
+        );
       }
     }
 
@@ -784,21 +826,27 @@ export class ConversationHistory {
   }
 
   _buildMessage(role, content) {
-    const wrapper = this._el('div', `conv-history__message conv-history__message--${role}`);
+    const wrapper = this._el(
+      "div",
+      `conv-history__message conv-history__message--${role}`,
+    );
 
-    const header = this._el('div', 'conv-history__message-header');
-    const roleBadge = this._el('span', `conv-history__message-role conv-history__message-role--${role}`);
+    const header = this._el("div", "conv-history__message-header");
+    const roleBadge = this._el(
+      "span",
+      `conv-history__message-role conv-history__message-role--${role}`,
+    );
     roleBadge.textContent = role;
     header.appendChild(roleBadge);
 
-    const copyBtn = this._el('button', 'conv-history__message-copy');
-    copyBtn.textContent = 'Copy';
-    copyBtn.addEventListener('click', () => this._copyText(content));
+    const copyBtn = this._el("button", "conv-history__message-copy");
+    copyBtn.textContent = "Copy";
+    copyBtn.addEventListener("click", () => this._copyText(content));
     header.appendChild(copyBtn);
 
     wrapper.appendChild(header);
 
-    const body = this._el('div', 'conv-history__message-body');
+    const body = this._el("div", "conv-history__message-body");
     body.innerHTML = renderMarkdown(content);
     wrapper.appendChild(body);
 
@@ -806,10 +854,10 @@ export class ConversationHistory {
   }
 
   _buildStat(value, label) {
-    const stat = this._el('div', 'conv-history__stat');
-    const valEl = this._el('div', 'conv-history__stat-value');
+    const stat = this._el("div", "conv-history__stat");
+    const valEl = this._el("div", "conv-history__stat-value");
     valEl.textContent = value;
-    const labelEl = this._el('div', 'conv-history__stat-label');
+    const labelEl = this._el("div", "conv-history__stat-label");
     labelEl.textContent = label;
     stat.appendChild(valEl);
     stat.appendChild(labelEl);
@@ -817,9 +865,9 @@ export class ConversationHistory {
   }
 
   _actionBtn(text, handler) {
-    const btn = this._el('button', 'conv-history__action-btn');
+    const btn = this._el("button", "conv-history__action-btn");
     btn.textContent = text;
-    btn.addEventListener('click', handler);
+    btn.addEventListener("click", handler);
     return btn;
   }
 
@@ -833,42 +881,46 @@ export class ConversationHistory {
       await navigator.clipboard.writeText(text);
     } catch {
       // Fallback
-      const ta = document.createElement('textarea');
+      const ta = document.createElement("textarea");
       ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
       document.body.appendChild(ta);
       ta.select();
-      document.execCommand('copy');
+      document.execCommand("copy");
       document.body.removeChild(ta);
     }
   }
 
   _retry(conv) {
     // Dispatch the same prompt again via event
-    document.dispatchEvent(new CustomEvent('conversation-history:retry', {
-      detail: {
-        prompt: conv.prompt,
-        systemPrompt: conv.systemPrompt,
-        model: conv.model,
-        provider: conv.provider,
-        zone_id: conv.zone_id,
-      },
-      bubbles: true,
-    }));
+    document.dispatchEvent(
+      new CustomEvent("conversation-history:retry", {
+        detail: {
+          prompt: conv.prompt,
+          systemPrompt: conv.systemPrompt,
+          model: conv.model,
+          provider: conv.provider,
+          zone_id: conv.zone_id,
+        },
+        bubbles: true,
+      }),
+    );
   }
 
   _useAsTemplate(conv) {
     // Emit event so prompt library or dispatch zone can pick it up
-    document.dispatchEvent(new CustomEvent('conversation-history:use-template', {
-      detail: {
-        prompt: conv.prompt,
-        systemPrompt: conv.systemPrompt,
-        model: conv.model,
-        title: conv.title,
-      },
-      bubbles: true,
-    }));
+    document.dispatchEvent(
+      new CustomEvent("conversation-history:use-template", {
+        detail: {
+          prompt: conv.prompt,
+          systemPrompt: conv.systemPrompt,
+          model: conv.model,
+          title: conv.title,
+        },
+        bubbles: true,
+      }),
+    );
   }
 
   _toggleSelectAll() {
@@ -876,28 +928,31 @@ export class ConversationHistory {
     if (this._bulkSelected.size === items.length) {
       // Deselect all
       this._bulkSelected.clear();
-      this._selectAllBtn.textContent = 'Select all';
+      this._selectAllBtn.textContent = "Select all";
     } else {
       // Select all
       for (const item of items) this._bulkSelected.add(item.id);
-      this._selectAllBtn.textContent = 'Deselect all';
+      this._selectAllBtn.textContent = "Deselect all";
     }
     // Update checkboxes
-    const checks = this._listEl.querySelectorAll('.conv-history__item-check');
+    const checks = this._listEl.querySelectorAll(".conv-history__item-check");
     for (const check of checks) {
-      const itemEl = check.closest('.conv-history__item');
-      check.checked = itemEl ? this._bulkSelected.has(itemEl.dataset.id) : false;
+      const itemEl = check.closest(".conv-history__item");
+      check.checked = itemEl
+        ? this._bulkSelected.has(itemEl.dataset.id)
+        : false;
     }
   }
 
   _exportSelected() {
-    const ids = this._bulkSelected.size > 0
-      ? this._bulkSelected
-      : new Set(this._filteredItems().map(i => i.id));
+    const ids =
+      this._bulkSelected.size > 0
+        ? this._bulkSelected
+        : new Set(this._filteredItems().map((i) => i.id));
 
     const data = this._allItems
-      .filter(i => ids.has(i.id))
-      .map(i => ({
+      .filter((i) => ids.has(i.id))
+      .map((i) => ({
         id: i.id,
         type: i.type,
         title: i.title,
@@ -914,9 +969,9 @@ export class ConversationHistory {
       }));
 
     const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
+    const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = `conversations-export-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
@@ -927,12 +982,14 @@ export class ConversationHistory {
     if (this._bulkSelected.size === 0) return;
 
     const count = this._bulkSelected.size;
-    const confirmed = confirm(`Delete ${count} conversation${count > 1 ? 's' : ''}? This cannot be undone.`);
+    const confirmed = confirm(
+      `Delete ${count} conversation${count > 1 ? "s" : ""}? This cannot be undone.`,
+    );
     if (!confirmed) return;
 
     // Remove from local state
     const toDelete = new Set(this._bulkSelected);
-    this._allItems = this._allItems.filter(i => !toDelete.has(i.id));
+    this._allItems = this._allItems.filter((i) => !toDelete.has(i.id));
     this._bulkSelected.clear();
 
     // If selected item was deleted, clear detail
@@ -945,10 +1002,12 @@ export class ConversationHistory {
     this._renderList();
 
     // Emit event so other parts of the app can handle DB deletion
-    document.dispatchEvent(new CustomEvent('conversation-history:delete', {
-      detail: { ids: [...toDelete] },
-      bubbles: true,
-    }));
+    document.dispatchEvent(
+      new CustomEvent("conversation-history:delete", {
+        detail: { ids: [...toDelete] },
+        bubbles: true,
+      }),
+    );
   }
 
   // ═══════════════════════════════════════════════════════════════════

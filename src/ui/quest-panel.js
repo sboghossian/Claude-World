@@ -6,14 +6,14 @@
  * progress bar, and XP rewards.
  */
 
-import { questEngine } from '../systems/quests.js';
+import { questEngine } from "../systems/quests.js";
 
 // ── Status helpers ─────────────────────────────────────────────────
 
 const STATUS_ICON = {
-  completed: '\u2713',  // checkmark
-  active: '\u25CF',     // filled circle (glowing dot)
-  locked: '\uD83D\uDD12', // lock
+  completed: "\u2713", // checkmark
+  active: "\u25CF", // filled circle (glowing dot)
+  locked: "\uD83D\uDD12", // lock
 };
 
 /**
@@ -22,12 +22,12 @@ const STATUS_ICON = {
  * @returns {string}
  */
 function formatDate(iso) {
-  if (!iso) return '';
+  if (!iso) return "";
   try {
     const d = new Date(iso);
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
   } catch {
-    return '';
+    return "";
   }
 }
 
@@ -47,8 +47,8 @@ export class QuestPanel {
     this._onKeyDown = this._onKeyDown.bind(this);
 
     // Listen for quest card clicks (the HUD card dispatches this via its own click)
-    document.addEventListener('quest-panel:open', this._onQuestCardClick);
-    document.addEventListener('quest:chain-updated', this._onChainUpdated);
+    document.addEventListener("quest-panel:open", this._onQuestCardClick);
+    document.addEventListener("quest:chain-updated", this._onChainUpdated);
   }
 
   // ── Open / Close ───────────────────────────────────────────────
@@ -63,7 +63,7 @@ export class QuestPanel {
     }
     this._open = true;
     this._createDOM();
-    document.addEventListener('keydown', this._onKeyDown);
+    document.addEventListener("keydown", this._onKeyDown);
   }
 
   /**
@@ -72,10 +72,10 @@ export class QuestPanel {
   close() {
     if (!this._open) return;
     this._open = false;
-    document.removeEventListener('keydown', this._onKeyDown);
+    document.removeEventListener("keydown", this._onKeyDown);
 
     if (this._overlay) {
-      this._overlay.classList.add('quest-panel-overlay--closing');
+      this._overlay.classList.add("quest-panel-overlay--closing");
       setTimeout(() => {
         this._overlay?.remove();
         this._overlay = null;
@@ -102,7 +102,7 @@ export class QuestPanel {
 
   /** @param {KeyboardEvent} e */
   _onKeyDown(e) {
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       e.preventDefault();
       this.close();
     }
@@ -112,44 +112,44 @@ export class QuestPanel {
 
   _createDOM() {
     // Overlay backdrop
-    this._overlay = document.createElement('div');
-    this._overlay.className = 'quest-panel-overlay';
-    this._overlay.addEventListener('click', (e) => {
+    this._overlay = document.createElement("div");
+    this._overlay.className = "quest-panel-overlay";
+    this._overlay.addEventListener("click", (e) => {
       if (e.target === this._overlay) this.close();
     });
 
     // Panel card
-    this._panel = document.createElement('div');
-    this._panel.className = 'quest-panel';
-    this._panel.setAttribute('role', 'dialog');
-    this._panel.setAttribute('aria-label', 'Quest Progress');
+    this._panel = document.createElement("div");
+    this._panel.className = "quest-panel";
+    this._panel.setAttribute("role", "dialog");
+    this._panel.setAttribute("aria-label", "Quest Progress");
 
     // Header
-    const header = document.createElement('div');
-    header.className = 'quest-panel__header';
+    const header = document.createElement("div");
+    header.className = "quest-panel__header";
 
-    const title = document.createElement('h2');
-    title.className = 'quest-panel__title';
-    title.textContent = 'Quest Chain';
+    const title = document.createElement("h2");
+    title.className = "quest-panel__title";
+    title.textContent = "Quest Chain";
 
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'quest-panel__close';
-    closeBtn.setAttribute('aria-label', 'Close quest panel');
-    closeBtn.textContent = '\u00D7';
-    closeBtn.addEventListener('click', () => this.close());
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "quest-panel__close";
+    closeBtn.setAttribute("aria-label", "Close quest panel");
+    closeBtn.textContent = "\u00D7";
+    closeBtn.addEventListener("click", () => this.close());
 
     header.appendChild(title);
     header.appendChild(closeBtn);
     this._panel.appendChild(header);
 
     // Progress summary
-    this._progressSection = document.createElement('div');
-    this._progressSection.className = 'quest-panel__progress';
+    this._progressSection = document.createElement("div");
+    this._progressSection.className = "quest-panel__progress";
     this._panel.appendChild(this._progressSection);
 
     // Timeline container
-    this._timeline = document.createElement('div');
-    this._timeline.className = 'quest-panel__timeline';
+    this._timeline = document.createElement("div");
+    this._timeline.className = "quest-panel__timeline";
     this._panel.appendChild(this._timeline);
 
     this._overlay.appendChild(this._panel);
@@ -157,7 +157,7 @@ export class QuestPanel {
 
     // Animate in
     requestAnimationFrame(() => {
-      this._overlay.classList.add('quest-panel-overlay--visible');
+      this._overlay.classList.add("quest-panel-overlay--visible");
     });
 
     this._refresh();
@@ -187,25 +187,25 @@ export class QuestPanel {
   _renderProgress(completed, total) {
     const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-    this._progressSection.innerHTML = '';
+    this._progressSection.innerHTML = "";
 
-    const label = document.createElement('div');
-    label.className = 'quest-panel__progress-label';
+    const label = document.createElement("div");
+    label.className = "quest-panel__progress-label";
     label.textContent = `${completed} / ${total} quests completed`;
 
-    const barWrap = document.createElement('div');
-    barWrap.className = 'quest-panel__progress-bar';
-    barWrap.setAttribute('role', 'progressbar');
-    barWrap.setAttribute('aria-valuenow', String(pct));
-    barWrap.setAttribute('aria-valuemin', '0');
-    barWrap.setAttribute('aria-valuemax', '100');
+    const barWrap = document.createElement("div");
+    barWrap.className = "quest-panel__progress-bar";
+    barWrap.setAttribute("role", "progressbar");
+    barWrap.setAttribute("aria-valuenow", String(pct));
+    barWrap.setAttribute("aria-valuemin", "0");
+    barWrap.setAttribute("aria-valuemax", "100");
 
-    const fill = document.createElement('div');
-    fill.className = 'quest-panel__progress-fill';
+    const fill = document.createElement("div");
+    fill.className = "quest-panel__progress-fill";
     fill.style.width = `${pct}%`;
 
-    const pctLabel = document.createElement('span');
-    pctLabel.className = 'quest-panel__progress-pct';
+    const pctLabel = document.createElement("span");
+    pctLabel.className = "quest-panel__progress-pct";
     pctLabel.textContent = `${pct}%`;
 
     barWrap.appendChild(fill);
@@ -219,7 +219,7 @@ export class QuestPanel {
    * @param {Array<Object>} quests
    */
   _renderTimeline(quests) {
-    this._timeline.innerHTML = '';
+    this._timeline.innerHTML = "";
 
     for (let i = 0; i < quests.length; i++) {
       const q = quests[i];
@@ -236,20 +236,20 @@ export class QuestPanel {
    * @returns {HTMLElement}
    */
   _createTimelineItem(quest, isLast) {
-    const item = document.createElement('div');
+    const item = document.createElement("div");
     item.className = `quest-panel__item quest-panel__item--${quest.status}`;
 
     // Left column: line + dot
-    const rail = document.createElement('div');
-    rail.className = 'quest-panel__rail';
+    const rail = document.createElement("div");
+    rail.className = "quest-panel__rail";
 
-    const dot = document.createElement('div');
+    const dot = document.createElement("div");
     dot.className = `quest-panel__dot quest-panel__dot--${quest.status}`;
-    dot.textContent = STATUS_ICON[quest.status] || '';
+    dot.textContent = STATUS_ICON[quest.status] || "";
     rail.appendChild(dot);
 
     if (!isLast) {
-      const line = document.createElement('div');
+      const line = document.createElement("div");
       line.className = `quest-panel__line quest-panel__line--${quest.status}`;
       rail.appendChild(line);
     }
@@ -257,52 +257,52 @@ export class QuestPanel {
     item.appendChild(rail);
 
     // Right column: content
-    const content = document.createElement('div');
-    content.className = 'quest-panel__content';
+    const content = document.createElement("div");
+    content.className = "quest-panel__content";
 
-    const titleRow = document.createElement('div');
-    titleRow.className = 'quest-panel__item-title';
+    const titleRow = document.createElement("div");
+    titleRow.className = "quest-panel__item-title";
     titleRow.textContent = quest.title;
     content.appendChild(titleRow);
 
     // Description — only show for completed and active
-    if (quest.status !== 'locked') {
-      const desc = document.createElement('div');
-      desc.className = 'quest-panel__item-desc';
+    if (quest.status !== "locked") {
+      const desc = document.createElement("div");
+      desc.className = "quest-panel__item-desc";
       desc.textContent = quest.description;
       content.appendChild(desc);
     }
 
     // Meta row: XP + date
-    const meta = document.createElement('div');
-    meta.className = 'quest-panel__item-meta';
+    const meta = document.createElement("div");
+    meta.className = "quest-panel__item-meta";
 
-    if (quest.status === 'completed') {
-      const xpBadge = document.createElement('span');
-      xpBadge.className = 'quest-panel__xp-badge quest-panel__xp-badge--earned';
+    if (quest.status === "completed") {
+      const xpBadge = document.createElement("span");
+      xpBadge.className = "quest-panel__xp-badge quest-panel__xp-badge--earned";
       xpBadge.textContent = `+${quest.reward_xp} XP`;
       meta.appendChild(xpBadge);
 
       if (quest.completed_at) {
-        const date = document.createElement('span');
-        date.className = 'quest-panel__item-date';
+        const date = document.createElement("span");
+        date.className = "quest-panel__item-date";
         date.textContent = formatDate(quest.completed_at);
         meta.appendChild(date);
       }
-    } else if (quest.status === 'active') {
-      const xpBadge = document.createElement('span');
-      xpBadge.className = 'quest-panel__xp-badge';
+    } else if (quest.status === "active") {
+      const xpBadge = document.createElement("span");
+      xpBadge.className = "quest-panel__xp-badge";
       xpBadge.textContent = `${quest.reward_xp} XP`;
       meta.appendChild(xpBadge);
 
-      const hint = document.createElement('span');
-      hint.className = 'quest-panel__item-hint';
+      const hint = document.createElement("span");
+      hint.className = "quest-panel__item-hint";
       hint.textContent = this._getProgressHint(quest);
       meta.appendChild(hint);
     } else {
       // locked — just show XP dimmed
-      const xpBadge = document.createElement('span');
-      xpBadge.className = 'quest-panel__xp-badge quest-panel__xp-badge--locked';
+      const xpBadge = document.createElement("span");
+      xpBadge.className = "quest-panel__xp-badge quest-panel__xp-badge--locked";
       xpBadge.textContent = `${quest.reward_xp} XP`;
       meta.appendChild(xpBadge);
     }
@@ -320,23 +320,23 @@ export class QuestPanel {
    */
   _getProgressHint(quest) {
     const hints = {
-      zone_enter: 'Click the zone to enter',
-      api_connect: 'Add an API key at the Docks',
-      task_complete: 'Send a task from the Tower',
-      skill_create: 'Create a skill at the Academy',
-      task_schedule: 'Schedule a task in the Tunnels',
-      budget_set: 'Set a budget in the Treasury',
+      zone_enter: "Click the zone to enter",
+      api_connect: "Add an API key at the Docks",
+      task_complete: "Send a task from the Tower",
+      skill_create: "Create a skill at the Academy",
+      task_schedule: "Schedule a task in the Tunnels",
+      budget_set: "Set a budget in the Treasury",
       provider_count: `Connect ${quest.trigger_value} providers`,
-      skill_publish: 'Publish a skill to the Market',
+      skill_publish: "Publish a skill to the Market",
     };
-    return hints[quest.trigger_type] || '';
+    return hints[quest.trigger_type] || "";
   }
 
   // ── Teardown ───────────────────────────────────────────────────
 
   destroy() {
     this.close();
-    document.removeEventListener('quest-panel:open', this._onQuestCardClick);
-    document.removeEventListener('quest:chain-updated', this._onChainUpdated);
+    document.removeEventListener("quest-panel:open", this._onQuestCardClick);
+    document.removeEventListener("quest:chain-updated", this._onChainUpdated);
   }
 }

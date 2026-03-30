@@ -92,11 +92,21 @@
   flex-shrink: 0;
 }
 
-.ab-palette__dot--trigger   { background: var(--accent-green); }
-.ab-palette__dot--action    { background: var(--accent-blue); }
-.ab-palette__dot--data      { background: var(--accent-purple); }
-.ab-palette__dot--control   { background: var(--accent-amber); }
-.ab-palette__dot--output    { background: var(--accent-red); }
+.ab-palette__dot--trigger {
+  background: var(--accent-green);
+}
+.ab-palette__dot--action {
+  background: var(--accent-blue);
+}
+.ab-palette__dot--data {
+  background: var(--accent-purple);
+}
+.ab-palette__dot--control {
+  background: var(--accent-amber);
+}
+.ab-palette__dot--output {
+  background: var(--accent-red);
+}
 
 /* ── Workflow list ───────────────────────────────────────────────────── */
 
@@ -121,7 +131,9 @@
   border: 1px solid var(--border);
   margin-bottom: 6px;
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .ab-workflow-card:hover {
@@ -162,7 +174,9 @@
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .ab-workflow-card__btn:hover {
@@ -209,7 +223,9 @@
   font-size: 12px;
   font-family: var(--font-sans);
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
   backdrop-filter: var(--blur-light);
 }
 
@@ -234,8 +250,13 @@
 }
 
 @keyframes ab-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 255, 138, 0.3); }
-  50%      { box-shadow: 0 0 12px 4px rgba(74, 255, 138, 0.15); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(74, 255, 138, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 12px 4px rgba(74, 255, 138, 0.15);
+  }
 }
 
 .ab-toolbar-btn--save {
@@ -414,11 +435,26 @@
   margin-bottom: 12px;
 }
 
-.ab-props__type-badge--trigger  { background: rgba(74, 255, 138, 0.15); color: var(--accent-green); }
-.ab-props__type-badge--action   { background: rgba(74, 158, 255, 0.15); color: var(--accent-blue); }
-.ab-props__type-badge--data     { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); }
-.ab-props__type-badge--control  { background: rgba(255, 184, 74, 0.15); color: var(--accent-amber); }
-.ab-props__type-badge--output   { background: rgba(255, 74, 106, 0.15); color: var(--accent-red); }
+.ab-props__type-badge--trigger {
+  background: rgba(74, 255, 138, 0.15);
+  color: var(--accent-green);
+}
+.ab-props__type-badge--action {
+  background: rgba(74, 158, 255, 0.15);
+  color: var(--accent-blue);
+}
+.ab-props__type-badge--data {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--accent-purple);
+}
+.ab-props__type-badge--control {
+  background: rgba(255, 184, 74, 0.15);
+  color: var(--accent-amber);
+}
+.ab-props__type-badge--output {
+  background: rgba(255, 74, 106, 0.15);
+  color: var(--accent-red);
+}
 
 /* ── Delete node button ──────────────────────────────────────────────── */
 

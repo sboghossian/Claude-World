@@ -9,10 +9,10 @@
  * busy energy trails, and overload warning particles.
  */
 
-import { Container, Graphics, BlurFilter } from 'pixi.js';
-import { TILE_WIDTH, TILE_HEIGHT } from './constants.js';
-import { ZONE_DEFS } from './zones.js';
-import { tileToScreen } from './tiles.js';
+import { Container, Graphics, BlurFilter } from "pixi.js";
+import { TILE_WIDTH, TILE_HEIGHT } from "./constants.js";
+import { ZONE_DEFS } from "./zones.js";
+import { tileToScreen } from "./tiles.js";
 
 // ── Particle pool size ──────────────────────────────────────────────
 const POOL_SIZE = 200;
@@ -49,7 +49,7 @@ const EMITTER_CONFIGS = {
     maxSpeed: 15,
     alpha: 0.3,
     fadeOut: true,
-    emitMode: 'area',
+    emitMode: "area",
   },
   active: {
     maxActive: 30,
@@ -63,7 +63,7 @@ const EMITTER_CONFIGS = {
     maxSpeed: 35,
     alpha: 0.6,
     fadeOut: true,
-    emitMode: 'zone',
+    emitMode: "zone",
   },
   busy: {
     maxActive: 60,
@@ -77,7 +77,7 @@ const EMITTER_CONFIGS = {
     maxSpeed: 80,
     alpha: 0.7,
     fadeOut: true,
-    emitMode: 'zone',
+    emitMode: "zone",
   },
   overload: {
     maxActive: 80,
@@ -91,7 +91,7 @@ const EMITTER_CONFIGS = {
     maxSpeed: 100,
     alpha: 0.9,
     fadeOut: true,
-    emitMode: 'edge',
+    emitMode: "edge",
   },
 };
 
@@ -150,10 +150,10 @@ export class WeatherSystem {
     this._pool = [];
 
     /** @type {string} Current activity state */
-    this._currentState = 'idle';
+    this._currentState = "idle";
 
     /** @type {string} Current weather */
-    this._currentWeather = 'cloudy';
+    this._currentWeather = "cloudy";
 
     /** @type {number} Mood score 0..1 */
     this._moodScore = 0.5;
@@ -194,7 +194,7 @@ export class WeatherSystem {
     for (const zone of ZONE_DEFS) {
       const pos = tileToScreen(
         zone.tileX + zone.w / 2,
-        zone.tileY + zone.h / 2
+        zone.tileY + zone.h / 2,
       );
       this._zonePositions.set(zone.id, {
         x: pos.x,
@@ -342,10 +342,10 @@ export class WeatherSystem {
     const angle = Math.random() * Math.PI * 2;
 
     // For idle state, bias upward (negative y)
-    if (config.emitMode === 'area') {
+    if (config.emitMode === "area") {
       p.vx = Math.cos(angle) * speed * 0.3;
       p.vy = -Math.abs(Math.sin(angle)) * speed;
-    } else if (config.emitMode === 'edge') {
+    } else if (config.emitMode === "edge") {
       // Edge particles fly inward from screen edges
       p.vx = Math.cos(angle) * speed;
       p.vy = Math.sin(angle) * speed;
@@ -366,7 +366,7 @@ export class WeatherSystem {
    * @private
    */
   _getSpawnPosition(mode) {
-    if (mode === 'zone') {
+    if (mode === "zone") {
       // Spawn near an active zone, or fall back to random area
       const activeIds = [...this._activeZones.keys()];
       if (activeIds.length > 0) {
@@ -383,7 +383,7 @@ export class WeatherSystem {
       return this._getAreaSpawnPosition();
     }
 
-    if (mode === 'edge') {
+    if (mode === "edge") {
       // Spawn from screen edges — use a large area around the world center
       const centerX = 0;
       const centerY = 0;
@@ -440,7 +440,7 @@ export class WeatherSystem {
       const zp = this._zonePositions.get(zoneId);
       if (!zp) continue;
 
-      const isOverloaded = this._currentState === 'overload';
+      const isOverloaded = this._currentState === "overload";
 
       // Upward glow rectangle
       if (!this._zoneIndicators.has(zoneId)) {
@@ -481,7 +481,7 @@ export class WeatherSystem {
       this._drawGear(gear, isOverloaded ? 0xff4a6a : 0xffd700);
       gear.position.set(
         zp.x + zp.zone.w * TILE_WIDTH * 0.25,
-        zp.y - zp.zone.height * (TILE_HEIGHT / 2) - 20
+        zp.y - zp.zone.height * (TILE_HEIGHT / 2) - 20,
       );
     }
   }
@@ -534,16 +534,13 @@ export class WeatherSystem {
    * @private
    */
   _updateScreenEffects(dt) {
-    const isStorm = this._currentState === 'overload';
+    const isStorm = this._currentState === "overload";
 
     // Camera shake during storms
     if (isStorm) {
       // Undo previous shake
       if (this._preShakePos) {
-        this._world.position.set(
-          this._preShakePos.x,
-          this._preShakePos.y
-        );
+        this._world.position.set(this._preShakePos.x, this._preShakePos.y);
       }
 
       // Apply new shake
@@ -557,10 +554,7 @@ export class WeatherSystem {
       this._world.position.y += this._shakeY;
     } else if (this._preShakePos) {
       // Restore position when storm ends
-      this._world.position.set(
-        this._preShakePos.x,
-        this._preShakePos.y
-      );
+      this._world.position.set(this._preShakePos.x, this._preShakePos.y);
       this._preShakePos = null;
       this._shakeX = 0;
       this._shakeY = 0;
@@ -654,10 +648,10 @@ export class WeatherSystem {
    * @returns {number}
    */
   getSunnyBoost() {
-    if (this._currentWeather === 'sunny') {
+    if (this._currentWeather === "sunny") {
       return 0.08;
     }
-    if (this._currentWeather === 'clear') {
+    if (this._currentWeather === "clear") {
       return 0.03;
     }
     return 0;
@@ -670,12 +664,18 @@ export class WeatherSystem {
    */
   getWeatherTint() {
     switch (this._currentWeather) {
-      case 'sunny': return 0xfff8e0; // Warm golden
-      case 'clear': return 0xffffff; // Neutral
-      case 'cloudy': return 0xe8e8f0; // Slightly cool
-      case 'rain': return 0xc0c8d8; // Grey-blue
-      case 'storm': return 0x8080a0; // Dark grey-purple
-      default: return 0xffffff;
+      case "sunny":
+        return 0xfff8e0; // Warm golden
+      case "clear":
+        return 0xffffff; // Neutral
+      case "cloudy":
+        return 0xe8e8f0; // Slightly cool
+      case "rain":
+        return 0xc0c8d8; // Grey-blue
+      case "storm":
+        return 0x8080a0; // Dark grey-purple
+      default:
+        return 0xffffff;
     }
   }
 
@@ -709,7 +709,9 @@ export class WeatherSystem {
     this._particleContainer.destroy({ children: true });
 
     if (this._zoneIndicatorContainer.parent) {
-      this._zoneIndicatorContainer.parent.removeChild(this._zoneIndicatorContainer);
+      this._zoneIndicatorContainer.parent.removeChild(
+        this._zoneIndicatorContainer,
+      );
     }
     this._zoneIndicatorContainer.destroy({ children: true });
 

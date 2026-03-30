@@ -24,34 +24,34 @@
 // ── Constants ──────────────────────────────────────────────────────────
 
 const RANGES = [
-  { key: '7d',  label: '7 D',  days: 7  },
-  { key: '30d', label: '30 D', days: 30 },
-  { key: '90d', label: '90 D', days: 90 },
-  { key: 'all', label: 'All',  days: 0  },
+  { key: "7d", label: "7 D", days: 7 },
+  { key: "30d", label: "30 D", days: 30 },
+  { key: "90d", label: "90 D", days: 90 },
+  { key: "all", label: "All", days: 0 },
 ];
 
 const PROVIDER_COLORS = {
-  anthropic:  '#d97706',
-  openai:     '#10b981',
-  google:     '#6366f1',
-  other:      '#6b7280',
+  anthropic: "#d97706",
+  openai: "#10b981",
+  google: "#6366f1",
+  other: "#6b7280",
 };
 
 const PROVIDER_LABELS = {
-  anthropic:  'Claude',
-  openai:     'GPT',
-  google:     'Gemini',
-  other:      'Other',
+  anthropic: "Claude",
+  openai: "GPT",
+  google: "Gemini",
+  other: "Other",
 };
 
 const CHART_COLORS = {
-  blue:    '#3b82f6',
-  cyan:    '#22d3ee',
-  green:   '#22c55e',
-  amber:   '#f59e0b',
-  purple:  '#a78bfa',
-  pink:    '#f472b6',
-  red:     '#ef4444',
+  blue: "#3b82f6",
+  cyan: "#22d3ee",
+  green: "#22c55e",
+  amber: "#f59e0b",
+  purple: "#a78bfa",
+  pink: "#f472b6",
+  red: "#ef4444",
 };
 
 // Approximate cost per 1K tokens (blended input/output)
@@ -60,28 +60,28 @@ const COST_PER_1K_TOKENS = 0.008;
 // ── Helpers ────────────────────────────────────────────────────────────
 
 function escHtml(str) {
-  if (!str) return '';
-  const d = document.createElement('div');
+  if (!str) return "";
+  const d = document.createElement("div");
   d.textContent = str;
   return d.innerHTML;
 }
 
 function fmtNumber(n) {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
-  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + "K";
   return String(Math.round(n));
 }
 
 function fmtCost(usd) {
-  if (usd >= 1) return '$' + usd.toFixed(2);
-  if (usd >= 0.01) return '$' + usd.toFixed(3);
-  return '$' + usd.toFixed(4);
+  if (usd >= 1) return "$" + usd.toFixed(2);
+  if (usd >= 0.01) return "$" + usd.toFixed(3);
+  return "$" + usd.toFixed(4);
 }
 
 function fmtMs(ms) {
-  if (ms >= 60_000) return (ms / 60_000).toFixed(1) + 'm';
-  if (ms >= 1000) return (ms / 1000).toFixed(1) + 's';
-  return Math.round(ms) + 'ms';
+  if (ms >= 60_000) return (ms / 60_000).toFixed(1) + "m";
+  if (ms >= 1000) return (ms / 1000).toFixed(1) + "s";
+  return Math.round(ms) + "ms";
 }
 
 /** Return an array of date strings ['2026-03-01', ...] for the last N days. */
@@ -106,9 +106,9 @@ function setupCanvas(canvas, w, h) {
   const ratio = dpr();
   canvas.width = w * ratio;
   canvas.height = h * ratio;
-  canvas.style.width = w + 'px';
-  canvas.style.height = h + 'px';
-  const ctx = canvas.getContext('2d');
+  canvas.style.width = w + "px";
+  canvas.style.height = h + "px";
+  const ctx = canvas.getContext("2d");
   ctx.scale(ratio, ratio);
   return ctx;
 }
@@ -124,7 +124,7 @@ export class Analytics {
     this._el = null;
 
     /** @type {string} Current range key */
-    this._range = '30d';
+    this._range = "30d";
 
     /** @type {object|null} Fetched analytics data */
     this._data = null;
@@ -147,10 +147,10 @@ export class Analytics {
   render() {
     this._injectCSS();
 
-    const el = document.createElement('div');
-    el.className = 'analytics-dashboard';
-    el.setAttribute('role', 'region');
-    el.setAttribute('aria-label', 'Analytics Dashboard');
+    const el = document.createElement("div");
+    el.className = "analytics-dashboard";
+    el.setAttribute("role", "region");
+    el.setAttribute("aria-label", "Analytics Dashboard");
     this._el = el;
 
     el.innerHTML = this._buildShellHTML();
@@ -188,12 +188,12 @@ export class Analytics {
   // ═══════════════════════════════════════════════════════════════════════
 
   _injectCSS() {
-    const id = 'analytics-styles';
+    const id = "analytics-styles";
     if (document.getElementById(id)) return;
-    const link = document.createElement('link');
+    const link = document.createElement("link");
     link.id = id;
-    link.rel = 'stylesheet';
-    link.href = 'src/zones/analytics.css';
+    link.rel = "stylesheet";
+    link.href = "src/zones/analytics.css";
     document.head.appendChild(link);
   }
 
@@ -210,7 +210,7 @@ export class Analytics {
       this._loaded = true;
       this._renderDashboard();
     } catch (err) {
-      console.warn('[Analytics] Failed to fetch data:', err);
+      console.warn("[Analytics] Failed to fetch data:", err);
       // Render with empty/mock data
       this._data = this._emptyData();
       this._loaded = true;
@@ -219,16 +219,26 @@ export class Analytics {
   }
 
   _emptyData() {
-    const rangeCfg = RANGES.find(r => r.key === this._range) || RANGES[1];
+    const rangeCfg = RANGES.find((r) => r.key === this._range) || RANGES[1];
     const days = rangeCfg.days || 30;
     const dates = dateRange(days);
     return {
-      tasksPerDay: dates.map(d => ({ date: d, count: 0 })),
+      tasksPerDay: dates.map((d) => ({ date: d, count: 0 })),
       zoneUsage: [],
       providerUsage: [],
-      tokensPerDay: dates.map(d => ({ date: d, input_tokens: 0, output_tokens: 0, cost: 0 })),
+      tokensPerDay: dates.map((d) => ({
+        date: d,
+        input_tokens: 0,
+        output_tokens: 0,
+        cost: 0,
+      })),
       agentPerformance: [],
-      healthScore: { score: 0, activityScore: 0, diversityScore: 0, questScore: 0 },
+      healthScore: {
+        score: 0,
+        activityScore: 0,
+        diversityScore: 0,
+        questScore: 0,
+      },
       summary: { totalTasks: 0, totalTokens: 0, totalCost: 0, avgLatency: 0 },
     };
   }
@@ -238,10 +248,11 @@ export class Analytics {
   // ═══════════════════════════════════════════════════════════════════════
 
   _buildShellHTML() {
-    const rangeButtons = RANGES.map(r =>
-      `<button class="an-range-btn ${r.key === this._range ? 'an-range-btn--active' : ''}"
-              data-range="${r.key}">${r.label}</button>`
-    ).join('');
+    const rangeButtons = RANGES.map(
+      (r) =>
+        `<button class="an-range-btn ${r.key === this._range ? "an-range-btn--active" : ""}"
+              data-range="${r.key}">${r.label}</button>`,
+    ).join("");
 
     return `
       <header class="an-header">
@@ -270,11 +281,11 @@ export class Analytics {
 
   _wireRangeButtons() {
     if (!this._el) return;
-    const selector = this._el.querySelector('.an-range-selector');
+    const selector = this._el.querySelector(".an-range-selector");
     if (!selector) return;
 
-    selector.addEventListener('click', (e) => {
-      const btn = e.target.closest('.an-range-btn');
+    selector.addEventListener("click", (e) => {
+      const btn = e.target.closest(".an-range-btn");
       if (!btn) return;
       const range = btn.dataset.range;
       if (range === this._range) return;
@@ -282,14 +293,16 @@ export class Analytics {
       this._range = range;
 
       // Update active state
-      selector.querySelectorAll('.an-range-btn').forEach(b =>
-        b.classList.toggle('an-range-btn--active', b.dataset.range === range)
-      );
+      selector
+        .querySelectorAll(".an-range-btn")
+        .forEach((b) =>
+          b.classList.toggle("an-range-btn--active", b.dataset.range === range),
+        );
 
       // Show loading state
-      this._el.querySelectorAll('.an-card').forEach(c => {
-        c.classList.add('an-loading');
-        c.innerHTML = '';
+      this._el.querySelectorAll(".an-card").forEach((c) => {
+        c.classList.add("an-loading");
+        c.innerHTML = "";
       });
 
       this._fetchAndRender();
@@ -304,7 +317,9 @@ export class Analytics {
     if (!this._el || !this._data) return;
 
     // Remove loading states
-    this._el.querySelectorAll('.an-card').forEach(c => c.classList.remove('an-loading'));
+    this._el
+      .querySelectorAll(".an-card")
+      .forEach((c) => c.classList.remove("an-loading"));
 
     this._renderActivityTimeline();
     this._renderZoneUsage();
@@ -319,11 +334,12 @@ export class Analytics {
   // ═══════════════════════════════════════════════════════════════════════
 
   _renderActivityTimeline() {
-    const card = this._el.querySelector('#an-card-timeline');
+    const card = this._el.querySelector("#an-card-timeline");
     if (!card) return;
 
     const data = this._data.tasksPerDay || [];
-    const totalTasks = this._data.summary?.totalTasks || data.reduce((s, d) => s + d.count, 0);
+    const totalTasks =
+      this._data.summary?.totalTasks || data.reduce((s, d) => s + d.count, 0);
 
     card.innerHTML = `
       <div class="an-card__header">
@@ -336,7 +352,7 @@ export class Analytics {
       </div>
     `;
 
-    const canvas = card.querySelector('#an-chart-timeline');
+    const canvas = card.querySelector("#an-chart-timeline");
     if (!canvas) return;
 
     // Wait for layout
@@ -349,22 +365,22 @@ export class Analytics {
     const ctx = setupCanvas(canvas, w, h);
 
     if (data.length === 0) {
-      ctx.fillStyle = '#3a4560';
-      ctx.font = '12px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('No activity data', w / 2, h / 2);
+      ctx.fillStyle = "#3a4560";
+      ctx.font = "12px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("No activity data", w / 2, h / 2);
       return;
     }
 
     const padding = { top: 20, right: 12, bottom: 28, left: 40 };
     const plotW = w - padding.left - padding.right;
     const plotH = h - padding.top - padding.bottom;
-    const maxVal = Math.max(...data.map(d => d.count), 1);
-    const barW = Math.max(2, (plotW / data.length) - 2);
+    const maxVal = Math.max(...data.map((d) => d.count), 1);
+    const barW = Math.max(2, plotW / data.length - 2);
     const gap = (plotW - barW * data.length) / (data.length + 1);
 
     // Grid lines
-    ctx.strokeStyle = 'rgba(59, 130, 246, 0.08)';
+    ctx.strokeStyle = "rgba(59, 130, 246, 0.08)";
     ctx.lineWidth = 0.5;
     const gridLines = 4;
     for (let i = 0; i <= gridLines; i++) {
@@ -376,9 +392,9 @@ export class Analytics {
 
       // Y-axis labels
       const val = Math.round(maxVal - (maxVal / gridLines) * i);
-      ctx.fillStyle = '#6b7a99';
-      ctx.font = '9px SF Mono, monospace';
-      ctx.textAlign = 'right';
+      ctx.fillStyle = "#6b7a99";
+      ctx.font = "9px SF Mono, monospace";
+      ctx.textAlign = "right";
       ctx.fillText(String(val), padding.left - 6, y + 3);
     }
 
@@ -391,7 +407,7 @@ export class Analytics {
       // Bar gradient
       const grad = ctx.createLinearGradient(x, y, x, padding.top + plotH);
       grad.addColorStop(0, CHART_COLORS.blue);
-      grad.addColorStop(1, CHART_COLORS.blue + '44');
+      grad.addColorStop(1, CHART_COLORS.blue + "44");
       ctx.fillStyle = grad;
 
       // Rounded top
@@ -409,9 +425,9 @@ export class Analytics {
       // X-axis labels (show every Nth)
       const showEvery = Math.max(1, Math.floor(data.length / 8));
       if (i % showEvery === 0 || i === data.length - 1) {
-        ctx.fillStyle = '#6b7a99';
-        ctx.font = '8px SF Mono, monospace';
-        ctx.textAlign = 'center';
+        ctx.fillStyle = "#6b7a99";
+        ctx.font = "8px SF Mono, monospace";
+        ctx.textAlign = "center";
         const label = d.date.slice(5); // MM-DD
         ctx.fillText(label, x + barW / 2, h - 6);
       }
@@ -423,7 +439,7 @@ export class Analytics {
   // ═══════════════════════════════════════════════════════════════════════
 
   _renderZoneUsage() {
-    const card = this._el.querySelector('#an-card-zones');
+    const card = this._el.querySelector("#an-card-zones");
     if (!card) return;
 
     const data = (this._data.zoneUsage || []).slice(0, 10);
@@ -439,7 +455,7 @@ export class Analytics {
       </div>
     `;
 
-    const canvas = card.querySelector('#an-chart-zones');
+    const canvas = card.querySelector("#an-chart-zones");
     if (!canvas) return;
 
     requestAnimationFrame(() => this._drawHBarChart(canvas, data));
@@ -452,21 +468,28 @@ export class Analytics {
     const ctx = setupCanvas(canvas, w, h);
 
     if (data.length === 0) {
-      ctx.fillStyle = '#3a4560';
-      ctx.font = '12px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('No zone data', w / 2, h / 2);
+      ctx.fillStyle = "#3a4560";
+      ctx.font = "12px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("No zone data", w / 2, h / 2);
       return;
     }
 
     const labelW = 100;
     const barMax = w - labelW - 60;
-    const maxVal = Math.max(...data.map(d => d.count), 1);
+    const maxVal = Math.max(...data.map((d) => d.count), 1);
 
     const colors = [
-      CHART_COLORS.blue, CHART_COLORS.cyan, CHART_COLORS.green,
-      CHART_COLORS.amber, CHART_COLORS.purple, CHART_COLORS.pink,
-      CHART_COLORS.red, '#64748b', '#84cc16', '#14b8a6',
+      CHART_COLORS.blue,
+      CHART_COLORS.cyan,
+      CHART_COLORS.green,
+      CHART_COLORS.amber,
+      CHART_COLORS.purple,
+      CHART_COLORS.pink,
+      CHART_COLORS.red,
+      "#64748b",
+      "#84cc16",
+      "#14b8a6",
     ];
 
     data.forEach((d, i) => {
@@ -475,16 +498,16 @@ export class Analytics {
       const color = colors[i % colors.length];
 
       // Label
-      ctx.fillStyle = '#c8d0e0';
-      ctx.font = '10px Inter, sans-serif';
-      ctx.textAlign = 'right';
-      const label = (d.zone_name || d.zone_type || 'Unknown').slice(0, 14);
+      ctx.fillStyle = "#c8d0e0";
+      ctx.font = "10px Inter, sans-serif";
+      ctx.textAlign = "right";
+      const label = (d.zone_name || d.zone_type || "Unknown").slice(0, 14);
       ctx.fillText(label, labelW - 8, y + 15);
 
       // Bar
       const grad = ctx.createLinearGradient(labelW, y, labelW + barW, y);
       grad.addColorStop(0, color);
-      grad.addColorStop(1, color + '66');
+      grad.addColorStop(1, color + "66");
       ctx.fillStyle = grad;
 
       const barH = 14;
@@ -494,15 +517,20 @@ export class Analytics {
       ctx.lineTo(labelW + barW - radius, y + 4);
       ctx.quadraticCurveTo(labelW + barW, y + 4, labelW + barW, y + 4 + radius);
       ctx.lineTo(labelW + barW, y + 4 + barH - radius);
-      ctx.quadraticCurveTo(labelW + barW, y + 4 + barH, labelW + barW - radius, y + 4 + barH);
+      ctx.quadraticCurveTo(
+        labelW + barW,
+        y + 4 + barH,
+        labelW + barW - radius,
+        y + 4 + barH,
+      );
       ctx.lineTo(labelW, y + 4 + barH);
       ctx.closePath();
       ctx.fill();
 
       // Count label
-      ctx.fillStyle = '#6b7a99';
-      ctx.font = '9px SF Mono, monospace';
-      ctx.textAlign = 'left';
+      ctx.fillStyle = "#6b7a99";
+      ctx.font = "9px SF Mono, monospace";
+      ctx.textAlign = "left";
       ctx.fillText(String(d.count), labelW + barW + 6, y + 15);
     });
   }
@@ -512,25 +540,27 @@ export class Analytics {
   // ═══════════════════════════════════════════════════════════════════════
 
   _renderProviderStats() {
-    const card = this._el.querySelector('#an-card-providers');
+    const card = this._el.querySelector("#an-card-providers");
     if (!card) return;
 
     const data = this._data.providerUsage || [];
     const total = data.reduce((s, d) => s + d.count, 0) || 1;
 
-    const legendItems = data.map(d => {
-      const pKey = this._normalizeProvider(d.provider);
-      const color = PROVIDER_COLORS[pKey] || PROVIDER_COLORS.other;
-      const label = PROVIDER_LABELS[pKey] || d.provider || 'Unknown';
-      const pct = ((d.count / total) * 100).toFixed(1);
-      return `
+    const legendItems = data
+      .map((d) => {
+        const pKey = this._normalizeProvider(d.provider);
+        const color = PROVIDER_COLORS[pKey] || PROVIDER_COLORS.other;
+        const label = PROVIDER_LABELS[pKey] || d.provider || "Unknown";
+        const pct = ((d.count / total) * 100).toFixed(1);
+        return `
         <div class="an-pie-legend__item">
           <span class="an-pie-legend__dot" style="background:${color}"></span>
           <span class="an-pie-legend__name">${escHtml(label)}</span>
           <span class="an-pie-legend__value">${d.count} (${pct}%)</span>
         </div>
       `;
-    }).join('');
+      })
+      .join("");
 
     card.innerHTML = `
       <div class="an-card__header">
@@ -544,19 +574,19 @@ export class Analytics {
       <div class="an-pie-legend">${legendItems || '<div class="an-empty"><span class="an-empty__icon">\u{1F50D}</span>No provider data yet</div>'}</div>
     `;
 
-    const canvas = card.querySelector('#an-chart-providers');
+    const canvas = card.querySelector("#an-chart-providers");
     if (!canvas) return;
 
     requestAnimationFrame(() => this._drawPieChart(canvas, data, total));
   }
 
   _normalizeProvider(p) {
-    if (!p) return 'other';
+    if (!p) return "other";
     const lp = p.toLowerCase();
-    if (lp.includes('anthropic') || lp.includes('claude')) return 'anthropic';
-    if (lp.includes('openai') || lp.includes('gpt')) return 'openai';
-    if (lp.includes('google') || lp.includes('gemini')) return 'google';
-    return 'other';
+    if (lp.includes("anthropic") || lp.includes("claude")) return "anthropic";
+    if (lp.includes("openai") || lp.includes("gpt")) return "openai";
+    if (lp.includes("google") || lp.includes("gemini")) return "google";
+    return "other";
   }
 
   _drawPieChart(canvas, data, total) {
@@ -572,23 +602,26 @@ export class Analytics {
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
       ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2, true);
-      ctx.fillStyle = 'rgba(59, 130, 246, 0.08)';
+      ctx.fillStyle = "rgba(59, 130, 246, 0.08)";
       ctx.fill();
-      ctx.fillStyle = '#3a4560';
-      ctx.font = '10px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('No data', cx, cy + 4);
+      ctx.fillStyle = "#3a4560";
+      ctx.font = "10px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("No data", cx, cy + 4);
       return;
     }
 
     let angle = -Math.PI / 2;
-    data.forEach(d => {
+    data.forEach((d) => {
       const pKey = this._normalizeProvider(d.provider);
       const color = PROVIDER_COLORS[pKey] || PROVIDER_COLORS.other;
       const sliceAngle = (d.count / total) * Math.PI * 2;
 
       ctx.beginPath();
-      ctx.moveTo(cx + Math.cos(angle) * innerRadius, cy + Math.sin(angle) * innerRadius);
+      ctx.moveTo(
+        cx + Math.cos(angle) * innerRadius,
+        cy + Math.sin(angle) * innerRadius,
+      );
       ctx.arc(cx, cy, radius, angle, angle + sliceAngle);
       ctx.arc(cx, cy, innerRadius, angle + sliceAngle, angle, true);
       ctx.closePath();
@@ -596,7 +629,7 @@ export class Analytics {
       ctx.fill();
 
       // Subtle border
-      ctx.strokeStyle = '#06080e';
+      ctx.strokeStyle = "#06080e";
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
@@ -604,13 +637,13 @@ export class Analytics {
     });
 
     // Center text
-    ctx.fillStyle = '#c8d0e0';
-    ctx.font = 'bold 16px SF Mono, monospace';
-    ctx.textAlign = 'center';
+    ctx.fillStyle = "#c8d0e0";
+    ctx.font = "bold 16px SF Mono, monospace";
+    ctx.textAlign = "center";
     ctx.fillText(fmtNumber(total), cx, cy + 2);
-    ctx.fillStyle = '#6b7a99';
-    ctx.font = '8px Inter, sans-serif';
-    ctx.fillText('TOTAL', cx, cy + 14);
+    ctx.fillStyle = "#6b7a99";
+    ctx.font = "8px Inter, sans-serif";
+    ctx.fillText("TOTAL", cx, cy + 14);
   }
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -618,13 +651,19 @@ export class Analytics {
   // ═══════════════════════════════════════════════════════════════════════
 
   _renderTokenConsumption() {
-    const card = this._el.querySelector('#an-card-tokens');
+    const card = this._el.querySelector("#an-card-tokens");
     if (!card) return;
 
     const data = this._data.tokensPerDay || [];
     const summary = this._data.summary || {};
-    const totalTokens = summary.totalTokens || data.reduce((s, d) => s + (d.input_tokens || 0) + (d.output_tokens || 0), 0);
-    const totalCost = summary.totalCost || data.reduce((s, d) => s + (d.cost || 0), 0);
+    const totalTokens =
+      summary.totalTokens ||
+      data.reduce(
+        (s, d) => s + (d.input_tokens || 0) + (d.output_tokens || 0),
+        0,
+      );
+    const totalCost =
+      summary.totalCost || data.reduce((s, d) => s + (d.cost || 0), 0);
 
     card.innerHTML = `
       <div class="an-card__header">
@@ -645,17 +684,17 @@ export class Analytics {
           <span class="an-token-box__label">Est. Cost</span>
         </div>
         <div class="an-token-box">
-          <span class="an-token-box__value">${data.length > 0 ? fmtNumber(totalTokens / data.length) : '0'}</span>
+          <span class="an-token-box__value">${data.length > 0 ? fmtNumber(totalTokens / data.length) : "0"}</span>
           <span class="an-token-box__label">Avg/Day</span>
         </div>
         <div class="an-token-box">
-          <span class="an-token-box__value">${data.length > 0 ? fmtCost(totalCost / data.length) : '$0'}</span>
+          <span class="an-token-box__value">${data.length > 0 ? fmtCost(totalCost / data.length) : "$0"}</span>
           <span class="an-token-box__label">Avg Cost/Day</span>
         </div>
       </div>
     `;
 
-    const canvas = card.querySelector('#an-chart-tokens');
+    const canvas = card.querySelector("#an-chart-tokens");
     if (!canvas) return;
 
     requestAnimationFrame(() => this._drawLineChart(canvas, data));
@@ -667,10 +706,10 @@ export class Analytics {
     const ctx = setupCanvas(canvas, w, h);
 
     if (data.length === 0) {
-      ctx.fillStyle = '#3a4560';
-      ctx.font = '12px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('No token data', w / 2, h / 2);
+      ctx.fillStyle = "#3a4560";
+      ctx.font = "12px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("No token data", w / 2, h / 2);
       return;
     }
 
@@ -678,14 +717,16 @@ export class Analytics {
     const plotW = w - padding.left - padding.right;
     const plotH = h - padding.top - padding.bottom;
 
-    const values = data.map(d => (d.input_tokens || 0) + (d.output_tokens || 0));
-    const costValues = data.map(d => d.cost || 0);
+    const values = data.map(
+      (d) => (d.input_tokens || 0) + (d.output_tokens || 0),
+    );
+    const costValues = data.map((d) => d.cost || 0);
     const maxTokens = Math.max(...values, 1);
 
     const step = plotW / Math.max(values.length - 1, 1);
 
     // Grid lines
-    ctx.strokeStyle = 'rgba(59, 130, 246, 0.08)';
+    ctx.strokeStyle = "rgba(59, 130, 246, 0.08)";
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
       const y = padding.top + (plotH / 4) * i;
@@ -695,9 +736,9 @@ export class Analytics {
       ctx.stroke();
 
       const val = maxTokens - (maxTokens / 4) * i;
-      ctx.fillStyle = '#6b7a99';
-      ctx.font = '8px SF Mono, monospace';
-      ctx.textAlign = 'right';
+      ctx.fillStyle = "#6b7a99";
+      ctx.font = "8px SF Mono, monospace";
+      ctx.textAlign = "right";
       ctx.fillText(fmtNumber(val), padding.left - 6, y + 3);
     }
 
@@ -712,9 +753,14 @@ export class Analytics {
     ctx.lineTo(padding.left + (values.length - 1) * step, padding.top + plotH);
     ctx.lineTo(padding.left, padding.top + plotH);
     ctx.closePath();
-    const grad = ctx.createLinearGradient(0, padding.top, 0, padding.top + plotH);
-    grad.addColorStop(0, CHART_COLORS.cyan + '33');
-    grad.addColorStop(1, CHART_COLORS.cyan + '00');
+    const grad = ctx.createLinearGradient(
+      0,
+      padding.top,
+      0,
+      padding.top + plotH,
+    );
+    grad.addColorStop(0, CHART_COLORS.cyan + "33");
+    grad.addColorStop(1, CHART_COLORS.cyan + "00");
     ctx.fillStyle = grad;
     ctx.fill();
 
@@ -722,7 +768,7 @@ export class Analytics {
     ctx.beginPath();
     ctx.strokeStyle = CHART_COLORS.cyan;
     ctx.lineWidth = 2;
-    ctx.lineJoin = 'round';
+    ctx.lineJoin = "round";
     values.forEach((v, i) => {
       const x = padding.left + i * step;
       const y = padding.top + plotH - (v / maxTokens) * plotH;
@@ -750,16 +796,17 @@ export class Analytics {
     const showEvery = Math.max(1, Math.floor(data.length / 8));
     data.forEach((d, i) => {
       if (i % showEvery === 0 || i === data.length - 1) {
-        ctx.fillStyle = '#6b7a99';
-        ctx.font = '8px SF Mono, monospace';
-        ctx.textAlign = 'center';
+        ctx.fillStyle = "#6b7a99";
+        ctx.font = "8px SF Mono, monospace";
+        ctx.textAlign = "center";
         ctx.fillText(d.date.slice(5), padding.left + i * step, h - 6);
       }
     });
 
     // Dots on last point
     const lastX = padding.left + (values.length - 1) * step;
-    const lastY = padding.top + plotH - (values[values.length - 1] / maxTokens) * plotH;
+    const lastY =
+      padding.top + plotH - (values[values.length - 1] / maxTokens) * plotH;
     ctx.beginPath();
     ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
     ctx.fillStyle = CHART_COLORS.cyan;
@@ -771,21 +818,26 @@ export class Analytics {
   // ═══════════════════════════════════════════════════════════════════════
 
   _renderAgentPerformance() {
-    const card = this._el.querySelector('#an-card-agents');
+    const card = this._el.querySelector("#an-card-agents");
     if (!card) return;
 
     const agents = this._data.agentPerformance || [];
 
-    const rows = agents.length > 0
-      ? agents.map((a, i) => `
+    const rows =
+      agents.length > 0
+        ? agents
+            .map(
+              (a, i) => `
           <div class="an-leader-row">
-            <span class="an-leader__rank">${i === 0 ? '\u{1F451}' : '#' + (i + 1)}</span>
-            <span class="an-leader__name">${escHtml(a.name || a.agent_id || 'Agent')}</span>
+            <span class="an-leader__rank">${i === 0 ? "\u{1F451}" : "#" + (i + 1)}</span>
+            <span class="an-leader__name">${escHtml(a.name || a.agent_id || "Agent")}</span>
             <span class="an-leader__tasks">${a.tasks_completed || 0} tasks</span>
-            <span class="an-leader__time">${a.avg_latency ? fmtMs(a.avg_latency) : '--'} avg</span>
+            <span class="an-leader__time">${a.avg_latency ? fmtMs(a.avg_latency) : "--"} avg</span>
           </div>
-        `).join('')
-      : '<div class="an-empty"><span class="an-empty__icon">\u{1F464}</span>No agent data yet</div>';
+        `,
+            )
+            .join("")
+        : '<div class="an-empty"><span class="an-empty__icon">\u{1F464}</span>No agent data yet</div>';
 
     card.innerHTML = `
       <div class="an-card__header">
@@ -805,10 +857,15 @@ export class Analytics {
   // ═══════════════════════════════════════════════════════════════════════
 
   _renderHealthScore() {
-    const card = this._el.querySelector('#an-card-health');
+    const card = this._el.querySelector("#an-card-health");
     if (!card) return;
 
-    const health = this._data.healthScore || { score: 0, activityScore: 0, diversityScore: 0, questScore: 0 };
+    const health = this._data.healthScore || {
+      score: 0,
+      activityScore: 0,
+      diversityScore: 0,
+      questScore: 0,
+    };
     const score = Math.min(100, Math.max(0, health.score || 0));
 
     let scoreColor = CHART_COLORS.blue;
@@ -851,8 +908,8 @@ export class Analytics {
   }
 
   _animateHealthScore(target) {
-    const numEl = this._el?.querySelector('#an-health-number');
-    const barEl = this._el?.querySelector('#an-health-bar');
+    const numEl = this._el?.querySelector("#an-health-number");
+    const barEl = this._el?.querySelector("#an-health-bar");
     if (!numEl) return;
 
     let current = 0;
@@ -867,7 +924,7 @@ export class Analytics {
       current = Math.round(eased * target);
 
       numEl.textContent = String(current);
-      if (barEl) barEl.style.width = current + '%';
+      if (barEl) barEl.style.width = current + "%";
 
       if (progress < 1) {
         requestAnimationFrame(step);
@@ -882,17 +939,19 @@ export class Analytics {
   // ═══════════════════════════════════════════════════════════════════════
 
   _animateCounters(container) {
-    const statEls = container.querySelectorAll('.an-stat__value, .an-token-box__value');
-    statEls.forEach(el => {
+    const statEls = container.querySelectorAll(
+      ".an-stat__value, .an-token-box__value",
+    );
+    statEls.forEach((el) => {
       const text = el.textContent.trim();
       const numMatch = text.match(/^[\$]?([\d,.]+)/);
       if (!numMatch) return;
 
-      const target = parseFloat(numMatch[1].replace(/,/g, ''));
+      const target = parseFloat(numMatch[1].replace(/,/g, ""));
       if (isNaN(target) || target === 0) return;
 
-      const prefix = text.startsWith('$') ? '$' : '';
-      const suffix = text.replace(/^[\$]?[\d,.]+/, '');
+      const prefix = text.startsWith("$") ? "$" : "";
+      const suffix = text.replace(/^[\$]?[\d,.]+/, "");
       let current = 0;
       const duration = 800;
       const startTime = performance.now();
@@ -904,7 +963,8 @@ export class Analytics {
         current = eased * target;
 
         if (target >= 1000) {
-          el.textContent = prefix + Math.round(current).toLocaleString() + suffix;
+          el.textContent =
+            prefix + Math.round(current).toLocaleString() + suffix;
         } else if (target >= 1) {
           el.textContent = prefix + current.toFixed(2) + suffix;
         } else {

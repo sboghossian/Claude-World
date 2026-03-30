@@ -127,7 +127,9 @@
   border-radius: var(--radius-md);
   padding: 14px 16px;
   margin-bottom: 10px;
-  transition: border-color var(--transition-fast), background var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .sa-card:hover {
@@ -187,7 +189,10 @@
   font-size: 11px;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .sa-card__btn:hover {
@@ -261,7 +266,9 @@
   color: var(--text-secondary);
   font-size: 16px;
   cursor: pointer;
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
   flex-shrink: 0;
   padding: 0;
 }
@@ -600,7 +607,9 @@
   color: var(--text-dim);
   font-size: 12px;
   cursor: pointer;
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
   padding: 0;
 }
 
@@ -702,7 +711,9 @@
   font-weight: 600;
   cursor: pointer;
   border: 1px solid var(--border);
-  transition: opacity var(--transition-fast), background var(--transition-fast);
+  transition:
+    opacity var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .sa-confirm__btn--cancel {

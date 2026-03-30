@@ -12,46 +12,46 @@
 
 const COUNCIL_PROVIDERS = [
   {
-    id: 'anthropic',
-    name: 'Claude',
-    model: 'claude-3-5-sonnet-20241022',
-    icon: '\uD83D\uDFE0',
-    color: '#d97706',
-    colorDim: '#d9770620',
-    available: () => _hasKey('anthropic'),
+    id: "anthropic",
+    name: "Claude",
+    model: "claude-3-5-sonnet-20241022",
+    icon: "\uD83D\uDFE0",
+    color: "#d97706",
+    colorDim: "#d9770620",
+    available: () => _hasKey("anthropic"),
     comingSoon: false,
   },
   {
-    id: 'openai',
-    name: 'GPT-4o',
-    model: 'gpt-4o',
-    icon: '\uD83D\uDFE2',
-    color: '#10a37f',
-    colorDim: '#10a37f20',
-    available: () => _hasKey('openai'),
+    id: "openai",
+    name: "GPT-4o",
+    model: "gpt-4o",
+    icon: "\uD83D\uDFE2",
+    color: "#10a37f",
+    colorDim: "#10a37f20",
+    available: () => _hasKey("openai"),
     comingSoon: false,
   },
   {
-    id: 'google',
-    name: 'Gemini',
-    model: 'gemini-1.5-pro',
-    icon: '\uD83D\uDD35',
-    color: '#4285f4',
-    colorDim: '#4285f420',
+    id: "google",
+    name: "Gemini",
+    model: "gemini-1.5-pro",
+    icon: "\uD83D\uDD35",
+    color: "#4285f4",
+    colorDim: "#4285f420",
     available: () => false,
     comingSoon: true,
-    hint: 'Add key in Docks',
+    hint: "Add key in Docks",
   },
   {
-    id: 'mistral',
-    name: 'Mistral',
-    model: 'mistral-large-latest',
-    icon: '\u26AB',
-    color: '#9ca3af',
-    colorDim: '#9ca3af20',
+    id: "mistral",
+    name: "Mistral",
+    model: "mistral-large-latest",
+    icon: "\u26AB",
+    color: "#9ca3af",
+    colorDim: "#9ca3af20",
     available: () => false,
     comingSoon: true,
-    hint: 'Add key in Docks',
+    hint: "Add key in Docks",
   },
 ];
 
@@ -70,7 +70,7 @@ async function _loadKeyCache() {
       }
     }
   } catch (err) {
-    console.warn('[council] Could not load key cache:', err);
+    console.warn("[council] Could not load key cache:", err);
   }
   _keyCacheReady = true;
 }
@@ -89,15 +89,21 @@ function el(tag, className, attrs = {}) {
   const e = document.createElement(tag);
   if (className) e.className = className;
   for (const [k, v] of Object.entries(attrs)) {
-    if (k === 'textContent') { e.textContent = v; continue; }
-    if (k === 'innerHTML') { e.innerHTML = v; continue; }
+    if (k === "textContent") {
+      e.textContent = v;
+      continue;
+    }
+    if (k === "innerHTML") {
+      e.innerHTML = v;
+      continue;
+    }
     e.setAttribute(k, v);
   }
   return e;
 }
 
 function formatCost(usd) {
-  if (!usd || usd === 0) return '$0.000';
+  if (!usd || usd === 0) return "$0.000";
   if (usd < 0.001) return `$${usd.toFixed(5)}`;
   return `$${usd.toFixed(4)}`;
 }
@@ -115,7 +121,7 @@ async function _councilExec(action, params = {}) {
       return await window.api.db.executeCouncilQuery(action, params);
     }
   } catch (err) {
-    console.warn('[council] DB exec failed:', err);
+    console.warn("[council] DB exec failed:", err);
   }
   return null;
 }
@@ -126,7 +132,7 @@ async function _councilQuery(action, params = {}) {
       return await window.api.db.getCouncilData(action, params);
     }
   } catch (err) {
-    console.warn('[council] DB query failed:', err);
+    console.warn("[council] DB query failed:", err);
   }
   return [];
 }
@@ -135,7 +141,9 @@ function _generateId() {
   // Simple hex id matching the SQL DEFAULT pattern
   const arr = new Uint8Array(8);
   crypto.getRandomValues(arr);
-  return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+  return Array.from(arr)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 // ── Council class ─────────────────────────────────────────────────
@@ -162,9 +170,9 @@ export class Council {
   render(worldId) {
     this._worldId = worldId;
 
-    const root = el('div', 'council');
-    root.setAttribute('role', 'region');
-    root.setAttribute('aria-label', 'The Council — multi-model AI comparison');
+    const root = el("div", "council");
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-label", "The Council — multi-model AI comparison");
     this._root = root;
 
     root.appendChild(this._buildHeader());
@@ -190,18 +198,22 @@ export class Council {
   // ── Header ──────────────────────────────────────────────────────
 
   _buildHeader() {
-    const header = el('div', 'council__header');
+    const header = el("div", "council__header");
 
-    const titleBlock = el('div', 'council__title-block');
-    const title = el('h2', 'council__title', { textContent: '\uD83C\uDFDB\uFE0F The Council' });
-    const subtitle = el('p', 'council__subtitle', {
-      textContent: 'One question. Many minds. You decide.',
+    const titleBlock = el("div", "council__title-block");
+    const title = el("h2", "council__title", {
+      textContent: "\uD83C\uDFDB\uFE0F The Council",
+    });
+    const subtitle = el("p", "council__subtitle", {
+      textContent: "One question. Many minds. You decide.",
     });
     titleBlock.appendChild(title);
     titleBlock.appendChild(subtitle);
 
-    const meta = el('div', 'council__meta');
-    const memberCount = el('span', 'council__member-count', { textContent: '\u2026' });
+    const meta = el("div", "council__meta");
+    const memberCount = el("span", "council__member-count", {
+      textContent: "\u2026",
+    });
     this._memberCount = memberCount;
     meta.appendChild(memberCount);
 
@@ -213,30 +225,33 @@ export class Council {
   // ── Prompt area ─────────────────────────────────────────────────
 
   _buildPromptArea() {
-    const area = el('div', 'council__prompt-area');
+    const area = el("div", "council__prompt-area");
 
     // Textarea
-    const textarea = el('textarea', 'council__prompt-input');
-    textarea.setAttribute('placeholder', 'Ask the Council\u2026');
-    textarea.setAttribute('rows', '4');
-    textarea.setAttribute('aria-label', 'Council prompt');
-    textarea.addEventListener('input', () => this._updateConveneButton());
+    const textarea = el("textarea", "council__prompt-input");
+    textarea.setAttribute("placeholder", "Ask the Council\u2026");
+    textarea.setAttribute("rows", "4");
+    textarea.setAttribute("aria-label", "Council prompt");
+    textarea.addEventListener("input", () => this._updateConveneButton());
     this._promptTextarea = textarea;
     area.appendChild(textarea);
 
     // Model selector row
-    const selectorRow = el('div', 'council__model-selector');
-    selectorRow.setAttribute('role', 'group');
-    selectorRow.setAttribute('aria-label', 'Select models for the council');
+    const selectorRow = el("div", "council__model-selector");
+    selectorRow.setAttribute("role", "group");
+    selectorRow.setAttribute("aria-label", "Select models for the council");
     this._selectorRow = selectorRow;
     area.appendChild(selectorRow);
 
     // Convene button
-    const conveneBtn = el('button', 'council__convene-btn');
-    conveneBtn.textContent = 'Convene the Council \u2192';
+    const conveneBtn = el("button", "council__convene-btn");
+    conveneBtn.textContent = "Convene the Council \u2192";
     conveneBtn.disabled = true;
-    conveneBtn.setAttribute('aria-label', 'Convene the Council — send prompt to all selected models');
-    conveneBtn.addEventListener('click', () => this._onConvene());
+    conveneBtn.setAttribute(
+      "aria-label",
+      "Convene the Council — send prompt to all selected models",
+    );
+    conveneBtn.addEventListener("click", () => this._onConvene());
     this._conveneBtn = conveneBtn;
     area.appendChild(conveneBtn);
 
@@ -245,30 +260,33 @@ export class Council {
 
   _refreshModelSelector() {
     if (!this._selectorRow) return;
-    this._selectorRow.innerHTML = '';
+    this._selectorRow.innerHTML = "";
 
     let seated = 0;
     for (const provider of COUNCIL_PROVIDERS) {
       const isAvailable = !provider.comingSoon && provider.available();
-      const chip = el('label', 'council__model-chip');
-      chip.setAttribute('title', provider.comingSoon ? (provider.hint || 'Coming soon') : provider.name);
+      const chip = el("label", "council__model-chip");
+      chip.setAttribute(
+        "title",
+        provider.comingSoon ? provider.hint || "Coming soon" : provider.name,
+      );
 
       if (!isAvailable) {
-        chip.classList.add('council__model-chip--disabled');
+        chip.classList.add("council__model-chip--disabled");
       }
 
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
       checkbox.value = provider.id;
       checkbox.disabled = !isAvailable;
-      checkbox.setAttribute('aria-label', provider.name);
+      checkbox.setAttribute("aria-label", provider.name);
 
       if (isAvailable && this._selectedModels.has(provider.id)) {
         checkbox.checked = true;
         seated++;
       }
 
-      checkbox.addEventListener('change', () => {
+      checkbox.addEventListener("change", () => {
         if (checkbox.checked) {
           this._selectedModels.add(provider.id);
         } else {
@@ -278,14 +296,20 @@ export class Council {
         this._updateMemberCount();
       });
 
-      const icon = el('span', 'council__model-icon', { textContent: provider.icon });
+      const icon = el("span", "council__model-icon", {
+        textContent: provider.icon,
+      });
       icon.style.color = provider.color;
-      icon.setAttribute('aria-hidden', 'true');
+      icon.setAttribute("aria-hidden", "true");
 
-      const name = el('span', 'council__model-name', { textContent: provider.name });
+      const name = el("span", "council__model-name", {
+        textContent: provider.name,
+      });
 
       if (provider.comingSoon) {
-        const badge = el('span', 'council__model-badge', { textContent: provider.hint || 'Soon' });
+        const badge = el("span", "council__model-badge", {
+          textContent: provider.hint || "Soon",
+        });
         chip.appendChild(checkbox);
         chip.appendChild(icon);
         chip.appendChild(name);
@@ -305,31 +329,33 @@ export class Council {
   _updateMemberCount() {
     if (!this._memberCount) return;
     const count = this._selectedModels.size;
-    this._memberCount.textContent = count === 0
-      ? 'No councilors seated'
-      : `${count} Councilor${count !== 1 ? 's' : ''} seated`;
+    this._memberCount.textContent =
+      count === 0
+        ? "No councilors seated"
+        : `${count} Councilor${count !== 1 ? "s" : ""} seated`;
   }
 
   _updateConveneButton() {
     if (!this._conveneBtn || !this._promptTextarea) return;
     const hasPrompt = this._promptTextarea.value.trim().length > 0;
     const hasModels = this._selectedModels.size >= 2;
-    this._conveneBtn.disabled = !hasPrompt || !hasModels || this._sessionInProgress;
+    this._conveneBtn.disabled =
+      !hasPrompt || !hasModels || this._sessionInProgress;
   }
 
   // ── Response area ───────────────────────────────────────────────
 
   _buildResponseArea() {
-    const area = el('div', 'council__response-area');
-    area.setAttribute('aria-live', 'polite');
-    area.setAttribute('aria-label', 'Council responses');
+    const area = el("div", "council__response-area");
+    area.setAttribute("aria-live", "polite");
+    area.setAttribute("aria-label", "Council responses");
 
-    const grid = el('div', 'council__response-grid');
+    const grid = el("div", "council__response-grid");
     this._responseGrid = grid;
     area.appendChild(grid);
 
-    const compareSection = el('div', 'council__compare-section');
-    compareSection.style.display = 'none';
+    const compareSection = el("div", "council__compare-section");
+    compareSection.style.display = "none";
     this._compareSection = compareSection;
     area.appendChild(compareSection);
 
@@ -339,31 +365,33 @@ export class Council {
   // ── History panel ───────────────────────────────────────────────
 
   _buildHistoryPanel() {
-    const panel = el('div', 'council__history-panel');
+    const panel = el("div", "council__history-panel");
 
-    const toggle = el('button', 'council__history-toggle');
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-controls', 'council-history-list');
+    const toggle = el("button", "council__history-toggle");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-controls", "council-history-list");
 
-    const toggleIcon = el('span', 'council__history-toggle-icon', { textContent: '\u25B6' });
-    const toggleLabel = el('span', null, { textContent: 'Recent Sessions' });
+    const toggleIcon = el("span", "council__history-toggle-icon", {
+      textContent: "\u25B6",
+    });
+    const toggleLabel = el("span", null, { textContent: "Recent Sessions" });
     toggle.appendChild(toggleIcon);
     toggle.appendChild(toggleLabel);
 
-    toggle.addEventListener('click', () => {
+    toggle.addEventListener("click", () => {
       this._historyCollapsed = !this._historyCollapsed;
-      toggleIcon.textContent = this._historyCollapsed ? '\u25B6' : '\u25BC';
-      toggle.setAttribute('aria-expanded', String(!this._historyCollapsed));
-      historyList.style.display = this._historyCollapsed ? 'none' : 'block';
+      toggleIcon.textContent = this._historyCollapsed ? "\u25B6" : "\u25BC";
+      toggle.setAttribute("aria-expanded", String(!this._historyCollapsed));
+      historyList.style.display = this._historyCollapsed ? "none" : "block";
     });
 
     panel.appendChild(toggle);
 
-    const historyList = el('div', 'council__history-list');
-    historyList.id = 'council-history-list';
-    historyList.style.display = 'none';
-    historyList.setAttribute('role', 'list');
-    historyList.setAttribute('aria-label', 'Past council sessions');
+    const historyList = el("div", "council__history-list");
+    historyList.id = "council-history-list";
+    historyList.style.display = "none";
+    historyList.setAttribute("role", "list");
+    historyList.setAttribute("aria-label", "Past council sessions");
     this._historyList = historyList;
     panel.appendChild(historyList);
 
@@ -377,7 +405,9 @@ export class Council {
     const prompt = this._promptTextarea.value.trim();
     if (!prompt || this._selectedModels.size < 2) return;
 
-    const selectedProviders = COUNCIL_PROVIDERS.filter(p => this._selectedModels.has(p.id));
+    const selectedProviders = COUNCIL_PROVIDERS.filter((p) =>
+      this._selectedModels.has(p.id),
+    );
     await this.convene(this._worldId, prompt, selectedProviders);
   }
 
@@ -393,15 +423,20 @@ export class Council {
 
     // 1. Save council session
     const sessionId = _generateId();
-    const modelsJson = JSON.stringify(selectedModels.map(p => ({ provider: p.id, model: p.model })));
+    const modelsJson = JSON.stringify(
+      selectedModels.map((p) => ({ provider: p.id, model: p.model })),
+    );
 
-    await _councilExec('insertSession', {
-      id: sessionId, worldId, prompt, modelsJson,
+    await _councilExec("insertSession", {
+      id: sessionId,
+      worldId,
+      prompt,
+      modelsJson,
     });
 
     // 2. Build seat cards
-    this._responseGrid.innerHTML = '';
-    this._compareSection.style.display = 'none';
+    this._responseGrid.innerHTML = "";
+    this._compareSection.style.display = "none";
 
     // Set grid column count
     const colCount = Math.min(selectedModels.length, 4);
@@ -415,8 +450,11 @@ export class Council {
       responseIds[provider.id] = responseId;
 
       // Insert pending response row
-      await _councilExec('insertPendingResponse', {
-        id: responseId, sessionId, provider: provider.id, model: provider.model,
+      await _councilExec("insertPendingResponse", {
+        id: responseId,
+        sessionId,
+        provider: provider.id,
+        model: provider.model,
       });
 
       const card = this._buildSeatCard(provider);
@@ -443,48 +481,64 @@ export class Council {
           });
         } else {
           // Graceful degradation for dev/testing
-          await new Promise(r => setTimeout(r, 800 + Math.random() * 1200));
+          await new Promise((r) => setTimeout(r, 800 + Math.random() * 1200));
           response = {
-            text: `[Dev mode] Response from ${provider.name} for: "${prompt.slice(0, 60)}${prompt.length > 60 ? '...' : ''}"`,
+            text: `[Dev mode] Response from ${provider.name} for: "${prompt.slice(0, 60)}${prompt.length > 60 ? "..." : ""}"`,
             cost_usd: Math.random() * 0.005,
             tokens_used: Math.floor(Math.random() * 500) + 100,
           };
         }
 
         const latencyMs = Date.now() - startTime;
-        const text = response?.text || response?.content || String(response || '');
+        const text =
+          response?.text || response?.content || String(response || "");
         const costUsd = response?.cost_usd || 0;
         const tokensUsed = response?.tokens_used || 0;
 
-        results[provider.id] = { text, costUsd, tokensUsed, latencyMs, error: null };
+        results[provider.id] = {
+          text,
+          costUsd,
+          tokensUsed,
+          latencyMs,
+          error: null,
+        };
 
         // Update DB
-        await _councilExec('completeResponse', {
-          responseId, response: text, costUsd, tokensUsed, latencyMs,
+        await _councilExec("completeResponse", {
+          responseId,
+          response: text,
+          costUsd,
+          tokensUsed,
+          latencyMs,
         });
 
         // Update card
         card.setResponse(text, costUsd, latencyMs);
 
         // Emit event
-        emit('dispatch:task-complete', {
+        emit("dispatch:task-complete", {
           provider: provider.id,
           model: provider.model,
           sessionId,
           responseId,
         });
-
       } catch (err) {
         const latencyMs = Date.now() - startTime;
-        const errMsg = err?.message || 'Unknown error';
+        const errMsg = err?.message || "Unknown error";
 
-        results[provider.id] = { text: null, costUsd: 0, tokensUsed: 0, latencyMs, error: errMsg };
+        results[provider.id] = {
+          text: null,
+          costUsd: 0,
+          tokensUsed: 0,
+          latencyMs,
+          error: errMsg,
+        };
 
-        await _councilExec('errorResponse', { responseId, latencyMs });
+        await _councilExec("errorResponse", { responseId, latencyMs });
 
         card.setError(errMsg);
 
-        emit('dispatch:task-complete', {
+        emit("dispatch:task-complete", {
           provider: provider.id,
           model: provider.model,
           sessionId,
@@ -508,75 +562,85 @@ export class Council {
   // ── Seat card builder ───────────────────────────────────────────
 
   _buildSeatCard(provider) {
-    const card = el('div', 'council__seat-card council__seat-card--thinking');
-    card.setAttribute('role', 'article');
-    card.setAttribute('aria-label', `${provider.name} response`);
+    const card = el("div", "council__seat-card council__seat-card--thinking");
+    card.setAttribute("role", "article");
+    card.setAttribute("aria-label", `${provider.name} response`);
 
     // Card header
-    const cardHeader = el('div', 'council__seat-header');
-    const providerIcon = el('span', 'council__seat-icon', { textContent: provider.icon });
+    const cardHeader = el("div", "council__seat-header");
+    const providerIcon = el("span", "council__seat-icon", {
+      textContent: provider.icon,
+    });
     providerIcon.style.color = provider.color;
-    providerIcon.setAttribute('aria-hidden', 'true');
-    const providerName = el('span', 'council__seat-name', { textContent: provider.name });
-    const modelTag = el('span', 'council__seat-model', { textContent: provider.model });
+    providerIcon.setAttribute("aria-hidden", "true");
+    const providerName = el("span", "council__seat-name", {
+      textContent: provider.name,
+    });
+    const modelTag = el("span", "council__seat-model", {
+      textContent: provider.model,
+    });
     cardHeader.appendChild(providerIcon);
     cardHeader.appendChild(providerName);
     cardHeader.appendChild(modelTag);
     card.appendChild(cardHeader);
 
     // Thinking indicator
-    const thinking = el('div', 'council__thinking');
-    const spinner = el('div', 'council__thinking-spinner');
-    spinner.setAttribute('aria-hidden', 'true');
-    const thinkingLabel = el('span', 'council__thinking-label', { textContent: 'Thinking\u2026' });
+    const thinking = el("div", "council__thinking");
+    const spinner = el("div", "council__thinking-spinner");
+    spinner.setAttribute("aria-hidden", "true");
+    const thinkingLabel = el("span", "council__thinking-label", {
+      textContent: "Thinking\u2026",
+    });
     thinking.appendChild(spinner);
     thinking.appendChild(thinkingLabel);
     card.appendChild(thinking);
 
     // Response body (hidden initially)
-    const body = el('div', 'council__seat-body');
-    body.style.display = 'none';
+    const body = el("div", "council__seat-body");
+    body.style.display = "none";
     card.appendChild(body);
 
     // Footer
-    const footer = el('div', 'council__seat-footer');
-    footer.style.display = 'none';
+    const footer = el("div", "council__seat-footer");
+    footer.style.display = "none";
     card.appendChild(footer);
 
     // Copy button
-    const copyBtn = el('button', 'council__copy-btn', { textContent: 'Copy' });
-    copyBtn.style.display = 'none';
-    copyBtn.setAttribute('aria-label', `Copy ${provider.name} response`);
+    const copyBtn = el("button", "council__copy-btn", { textContent: "Copy" });
+    copyBtn.style.display = "none";
+    copyBtn.setAttribute("aria-label", `Copy ${provider.name} response`);
     card.appendChild(copyBtn);
 
     // Methods to update card state
     function setResponse(text, costUsd, latencyMs) {
-      card.classList.remove('council__seat-card--thinking');
-      card.classList.add('council__seat-card--complete');
-      thinking.style.display = 'none';
+      card.classList.remove("council__seat-card--thinking");
+      card.classList.add("council__seat-card--complete");
+      thinking.style.display = "none";
 
       body.textContent = text;
-      body.style.display = 'block';
+      body.style.display = "block";
 
       footer.textContent = `${formatCost(costUsd)} \u00B7 ${latencyMs}ms`;
-      footer.style.display = 'block';
+      footer.style.display = "block";
 
-      copyBtn.style.display = 'inline-flex';
-      copyBtn.addEventListener('click', () => {
+      copyBtn.style.display = "inline-flex";
+      copyBtn.addEventListener("click", () => {
         navigator.clipboard.writeText(text).catch(() => {});
-        copyBtn.textContent = 'Copied!';
-        setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500);
+        copyBtn.textContent = "Copied!";
+        setTimeout(() => {
+          copyBtn.textContent = "Copy";
+        }, 1500);
       });
     }
 
     function setError(errMsg) {
-      card.classList.remove('council__seat-card--thinking');
-      card.classList.add('council__seat-card--error');
-      thinking.style.display = 'none';
+      card.classList.remove("council__seat-card--thinking");
+      card.classList.add("council__seat-card--error");
+      thinking.style.display = "none";
 
       body.textContent = `Error: ${errMsg}`;
-      body.classList.add('council__seat-body--error');
-      body.style.display = 'block';
+      body.classList.add("council__seat-body--error");
+      body.style.display = "block";
     }
 
     return { el: card, setResponse, setError };
@@ -585,61 +649,85 @@ export class Council {
   // ── Compare table ───────────────────────────────────────────────
 
   _showCompare(providers, results) {
-    this._compareSection.innerHTML = '';
-    this._compareSection.style.display = 'block';
+    this._compareSection.innerHTML = "";
+    this._compareSection.style.display = "block";
 
-    const toggle = el('button', 'council__compare-toggle');
-    toggle.textContent = '\uD83D\uDCCA Compare';
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-controls', 'council-compare-table');
+    const toggle = el("button", "council__compare-toggle");
+    toggle.textContent = "\uD83D\uDCCA Compare";
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-controls", "council-compare-table");
 
-    const table = el('div', 'council__compare-table');
-    table.id = 'council-compare-table';
-    table.style.display = 'none';
-    table.setAttribute('role', 'table');
-    table.setAttribute('aria-label', 'Model comparison');
+    const table = el("div", "council__compare-table");
+    table.id = "council-compare-table";
+    table.style.display = "none";
+    table.setAttribute("role", "table");
+    table.setAttribute("aria-label", "Model comparison");
 
     // Header row
-    const headerRow = el('div', 'council__compare-row council__compare-row--header');
-    headerRow.setAttribute('role', 'row');
-    headerRow.appendChild(el('div', 'council__compare-cell council__compare-cell--label', { textContent: 'Model' }));
-    headerRow.appendChild(el('div', 'council__compare-cell', { textContent: 'Words' }));
-    headerRow.appendChild(el('div', 'council__compare-cell', { textContent: 'Cost' }));
-    headerRow.appendChild(el('div', 'council__compare-cell', { textContent: 'Latency' }));
+    const headerRow = el(
+      "div",
+      "council__compare-row council__compare-row--header",
+    );
+    headerRow.setAttribute("role", "row");
+    headerRow.appendChild(
+      el("div", "council__compare-cell council__compare-cell--label", {
+        textContent: "Model",
+      }),
+    );
+    headerRow.appendChild(
+      el("div", "council__compare-cell", { textContent: "Words" }),
+    );
+    headerRow.appendChild(
+      el("div", "council__compare-cell", { textContent: "Cost" }),
+    );
+    headerRow.appendChild(
+      el("div", "council__compare-cell", { textContent: "Latency" }),
+    );
     table.appendChild(headerRow);
 
     for (const provider of providers) {
       const r = results[provider.id];
       if (!r) continue;
-      const row = el('div', 'council__compare-row');
-      row.setAttribute('role', 'row');
+      const row = el("div", "council__compare-row");
+      row.setAttribute("role", "row");
 
-      const nameCell = el('div', 'council__compare-cell council__compare-cell--label');
-      const rowIcon = el('span', null, { textContent: provider.icon });
+      const nameCell = el(
+        "div",
+        "council__compare-cell council__compare-cell--label",
+      );
+      const rowIcon = el("span", null, { textContent: provider.icon });
       rowIcon.style.color = provider.color;
-      rowIcon.setAttribute('aria-hidden', 'true');
-      const rowName = el('span', null, { textContent: ' ' + provider.name });
+      rowIcon.setAttribute("aria-hidden", "true");
+      const rowName = el("span", null, { textContent: " " + provider.name });
       nameCell.appendChild(rowIcon);
       nameCell.appendChild(rowName);
 
       row.appendChild(nameCell);
-      row.appendChild(el('div', 'council__compare-cell', {
-        textContent: r.error ? '\u2014' : String(countWords(r.text)),
-      }));
-      row.appendChild(el('div', 'council__compare-cell', {
-        textContent: r.error ? 'Error' : formatCost(r.costUsd),
-      }));
-      row.appendChild(el('div', 'council__compare-cell', {
-        textContent: `${r.latencyMs}ms`,
-      }));
+      row.appendChild(
+        el("div", "council__compare-cell", {
+          textContent: r.error ? "\u2014" : String(countWords(r.text)),
+        }),
+      );
+      row.appendChild(
+        el("div", "council__compare-cell", {
+          textContent: r.error ? "Error" : formatCost(r.costUsd),
+        }),
+      );
+      row.appendChild(
+        el("div", "council__compare-cell", {
+          textContent: `${r.latencyMs}ms`,
+        }),
+      );
       table.appendChild(row);
     }
 
-    toggle.addEventListener('click', () => {
-      const expanded = toggle.getAttribute('aria-expanded') === 'true';
-      toggle.setAttribute('aria-expanded', String(!expanded));
-      table.style.display = expanded ? 'none' : 'block';
-      toggle.textContent = expanded ? '\uD83D\uDCCA Compare' : '\uD83D\uDCCA Hide Comparison';
+    toggle.addEventListener("click", () => {
+      const expanded = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!expanded));
+      table.style.display = expanded ? "none" : "block";
+      toggle.textContent = expanded
+        ? "\uD83D\uDCCA Compare"
+        : "\uD83D\uDCCA Hide Comparison";
     });
 
     this._compareSection.appendChild(toggle);
@@ -655,13 +743,13 @@ export class Council {
   async loadHistory(worldId) {
     if (!this._historyList) return;
 
-    const sessions = await _councilQuery('getSessionsWithCounts', { worldId });
+    const sessions = await _councilQuery("getSessionsWithCounts", { worldId });
 
-    this._historyList.innerHTML = '';
+    this._historyList.innerHTML = "";
 
     if (!sessions || sessions.length === 0) {
-      const empty = el('div', 'council__history-empty', {
-        textContent: 'No sessions yet. Convene your first council.',
+      const empty = el("div", "council__history-empty", {
+        textContent: "No sessions yet. Convene your first council.",
       });
       this._historyList.appendChild(empty);
       return;
@@ -674,29 +762,35 @@ export class Council {
   }
 
   _buildHistoryItem(session) {
-    const item = el('div', 'council__history-item');
-    item.setAttribute('role', 'listitem');
-    item.setAttribute('tabindex', '0');
-    item.setAttribute('aria-label', `Council session: ${session.prompt.slice(0, 60)}`);
+    const item = el("div", "council__history-item");
+    item.setAttribute("role", "listitem");
+    item.setAttribute("tabindex", "0");
+    item.setAttribute(
+      "aria-label",
+      `Council session: ${session.prompt.slice(0, 60)}`,
+    );
 
     let modelCount = 0;
     try {
-      const parsed = JSON.parse(session.models_json || '[]');
+      const parsed = JSON.parse(session.models_json || "[]");
       modelCount = parsed.length;
     } catch {}
 
-    const preview = el('div', 'council__history-prompt', {
-      textContent: session.prompt.length > 80
-        ? session.prompt.slice(0, 80) + '\u2026'
-        : session.prompt,
+    const preview = el("div", "council__history-prompt", {
+      textContent:
+        session.prompt.length > 80
+          ? session.prompt.slice(0, 80) + "\u2026"
+          : session.prompt,
     });
 
-    const meta = el('div', 'council__history-meta');
-    const countBadge = el('span', 'council__history-badge', {
-      textContent: `${modelCount} model${modelCount !== 1 ? 's' : ''}`,
+    const meta = el("div", "council__history-meta");
+    const countBadge = el("span", "council__history-badge", {
+      textContent: `${modelCount} model${modelCount !== 1 ? "s" : ""}`,
     });
     const timeStr = _formatRelativeTime(session.created_at);
-    const timeBadge = el('span', 'council__history-time', { textContent: timeStr });
+    const timeBadge = el("span", "council__history-time", {
+      textContent: timeStr,
+    });
 
     meta.appendChild(countBadge);
     meta.appendChild(timeBadge);
@@ -705,9 +799,9 @@ export class Council {
     item.appendChild(meta);
 
     const onClick = () => this._loadSession(session);
-    item.addEventListener('click', onClick);
-    item.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
+    item.addEventListener("click", onClick);
+    item.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         onClick();
       }
@@ -723,26 +817,30 @@ export class Council {
     }
 
     // Load responses
-    const responses = await _councilQuery('getResponsesBySession', { sessionId: session.id });
+    const responses = await _councilQuery("getResponsesBySession", {
+      sessionId: session.id,
+    });
 
     if (!responses || responses.length === 0) return;
 
     // Build provider list from responses
-    const providers = responses.map(r => {
-      const p = COUNCIL_PROVIDERS.find(p => p.id === r.provider);
-      return p || {
-        id: r.provider,
-        name: r.provider,
-        model: r.model,
-        icon: '\u26AB',
-        color: '#9ca3af',
-        colorDim: '#9ca3af20',
-      };
+    const providers = responses.map((r) => {
+      const p = COUNCIL_PROVIDERS.find((p) => p.id === r.provider);
+      return (
+        p || {
+          id: r.provider,
+          name: r.provider,
+          model: r.model,
+          icon: "\u26AB",
+          color: "#9ca3af",
+          colorDim: "#9ca3af20",
+        }
+      );
     });
 
     // Rebuild response grid
-    this._responseGrid.innerHTML = '';
-    this._compareSection.style.display = 'none';
+    this._responseGrid.innerHTML = "";
+    this._compareSection.style.display = "none";
 
     const colCount = Math.min(providers.length, 4);
     this._responseGrid.style.gridTemplateColumns = `repeat(${colCount}, 1fr)`;
@@ -755,7 +853,7 @@ export class Council {
       const card = this._buildSeatCard(provider);
       this._responseGrid.appendChild(card.el);
 
-      if (r.status === 'complete' && r.response) {
+      if (r.status === "complete" && r.response) {
         card.setResponse(r.response, r.cost_usd || 0, r.latency_ms || 0);
         results[provider.id] = {
           text: r.response,
@@ -764,9 +862,15 @@ export class Council {
           latencyMs: r.latency_ms || 0,
           error: null,
         };
-      } else if (r.status === 'error') {
-        card.setError('Response failed');
-        results[provider.id] = { text: null, costUsd: 0, tokensUsed: 0, latencyMs: r.latency_ms || 0, error: 'Response failed' };
+      } else if (r.status === "error") {
+        card.setError("Response failed");
+        results[provider.id] = {
+          text: null,
+          costUsd: 0,
+          tokensUsed: 0,
+          latencyMs: r.latency_ms || 0,
+          error: "Response failed",
+        };
       }
     }
 
@@ -775,7 +879,7 @@ export class Council {
     // Expand history panel so they can see
     if (this._historyCollapsed) {
       // scroll into view
-      this._responseGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      this._responseGrid.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
 }
@@ -788,7 +892,7 @@ function _formatRelativeTime(dateStr) {
     const now = new Date();
     const diffMs = now - date;
     const diffMin = Math.floor(diffMs / 60000);
-    if (diffMin < 1) return 'Just now';
+    if (diffMin < 1) return "Just now";
     if (diffMin < 60) return `${diffMin}m ago`;
     const diffHrs = Math.floor(diffMin / 60);
     if (diffHrs < 24) return `${diffHrs}h ago`;
@@ -796,7 +900,7 @@ function _formatRelativeTime(dateStr) {
     if (diffDays < 30) return `${diffDays}d ago`;
     return date.toLocaleDateString();
   } catch {
-    return 'Unknown';
+    return "Unknown";
   }
 }
 
@@ -808,12 +912,12 @@ let _stylesLoaded = false;
  * Dynamically load council.css if not already loaded.
  * @param {string} [basePath=''] — path prefix to the zones/ directory
  */
-export function loadCouncilStyles(basePath = '') {
+export function loadCouncilStyles(basePath = "") {
   if (_stylesLoaded) return;
   _stylesLoaded = true;
 
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
   link.href = `${basePath}council.css`;
   document.head.appendChild(link);
 }

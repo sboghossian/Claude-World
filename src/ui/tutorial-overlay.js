@@ -16,18 +16,17 @@
 
 // ── Constants ──────────────────────────────────────────────────────
 const SPOTLIGHT_PADDING = 12;
-const SPOTLIGHT_RADIUS  = 10;
-const TOOLTIP_GAP       = 16;
-const TRANSITION_MS     = 350;
+const SPOTLIGHT_RADIUS = 10;
+const TOOLTIP_GAP = 16;
+const TRANSITION_MS = 350;
 
 // ── Helper ─────────────────────────────────────────────────────────
 function createElement(tag, cls, html) {
   const el = document.createElement(tag);
-  if (cls)  el.className = cls;
+  if (cls) el.className = cls;
   if (html) el.innerHTML = html;
   return el;
 }
-
 
 export class TutorialOverlay {
   constructor() {
@@ -36,7 +35,7 @@ export class TutorialOverlay {
     /** @type {Function|null} */ this.onSkip = null;
 
     /** @type {HTMLElement|null} */ this._container = null;
-    /** @type {SVGElement|null} */  this._svg = null;
+    /** @type {SVGElement|null} */ this._svg = null;
     /** @type {HTMLElement|null} */ this._tooltip = null;
     /** @type {HTMLElement|null} */ this._dotsContainer = null;
     /** @type {HTMLElement|null} */ this._arrow = null;
@@ -79,7 +78,7 @@ export class TutorialOverlay {
       document.body.appendChild(this._container);
       // Force paint before transition
       void this._container.offsetWidth;
-      this._container.classList.add('tut-overlay--visible');
+      this._container.classList.add("tut-overlay--visible");
     }
 
     // Update spotlight
@@ -89,9 +88,13 @@ export class TutorialOverlay {
     this._textEl.textContent = step.text;
 
     // Update buttons
-    this._backBtn.style.display = step.isFirst ? 'none' : '';
-    this._nextBtn.textContent   = step.isLast ? (step.hasAction ? 'Finish' : 'Done') : 'Next';
-    this._skipBtn.style.display = step.isLast ? 'none' : '';
+    this._backBtn.style.display = step.isFirst ? "none" : "";
+    this._nextBtn.textContent = step.isLast
+      ? step.hasAction
+        ? "Finish"
+        : "Done"
+      : "Next";
+    this._skipBtn.style.display = step.isLast ? "none" : "";
 
     // Update counter
     this._counterEl.textContent = `${step.stepIndex + 1} / ${step.totalSteps}`;
@@ -102,12 +105,12 @@ export class TutorialOverlay {
     // Position tooltip
     requestAnimationFrame(() => {
       this._positionTooltip(step.targetEl, step.position);
-      this._tooltip.classList.add('tut-tooltip--visible');
+      this._tooltip.classList.add("tut-tooltip--visible");
     });
 
     // Scroll target into view if needed
     if (step.targetEl) {
-      step.targetEl.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+      step.targetEl.scrollIntoView?.({ behavior: "smooth", block: "nearest" });
     }
   }
 
@@ -115,23 +118,23 @@ export class TutorialOverlay {
    * Hide the overlay (without destroying it).
    */
   hide() {
-    this._container.classList.remove('tut-overlay--visible');
-    this._tooltip.classList.remove('tut-tooltip--visible');
+    this._container.classList.remove("tut-overlay--visible");
+    this._tooltip.classList.remove("tut-tooltip--visible");
   }
 
   /**
    * Destroy the overlay and remove all DOM / listeners.
    */
   destroy() {
-    this._container.classList.remove('tut-overlay--visible');
+    this._container.classList.remove("tut-overlay--visible");
 
     // Wait for fade-out transition, then remove
     setTimeout(() => {
       this._container.remove();
     }, TRANSITION_MS + 50);
 
-    document.removeEventListener('keydown', this._keyHandler);
-    window.removeEventListener('resize', this._resizeHandler);
+    document.removeEventListener("keydown", this._keyHandler);
+    window.removeEventListener("resize", this._resizeHandler);
     this.onNext = null;
     this.onBack = null;
     this.onSkip = null;
@@ -142,16 +145,16 @@ export class TutorialOverlay {
 
   _build() {
     // Root container
-    this._container = createElement('div', 'tut-overlay');
-    this._container.setAttribute('role', 'dialog');
-    this._container.setAttribute('aria-label', 'Tutorial guide');
-    this._container.setAttribute('aria-modal', 'true');
+    this._container = createElement("div", "tut-overlay");
+    this._container.setAttribute("role", "dialog");
+    this._container.setAttribute("aria-label", "Tutorial guide");
+    this._container.setAttribute("aria-modal", "true");
 
     // SVG overlay with spotlight cutout
-    this._svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    this._svg.classList.add('tut-overlay__svg');
-    this._svg.setAttribute('width', '100%');
-    this._svg.setAttribute('height', '100%');
+    this._svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    this._svg.classList.add("tut-overlay__svg");
+    this._svg.setAttribute("width", "100%");
+    this._svg.setAttribute("height", "100%");
     this._svg.innerHTML = `
       <defs>
         <mask id="tut-spotlight-mask">
@@ -169,52 +172,55 @@ export class TutorialOverlay {
     this._container.appendChild(this._svg);
 
     // Pulse ring (separate element for animation)
-    this._pulseRing = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    this._pulseRing.classList.add('tut-spotlight-pulse');
-    this._pulseRing.setAttribute('rx', SPOTLIGHT_RADIUS);
-    this._pulseRing.setAttribute('ry', SPOTLIGHT_RADIUS);
-    this._pulseRing.setAttribute('fill', 'none');
-    this._pulseRing.setAttribute('stroke', 'rgba(74,158,255,0.3)');
-    this._pulseRing.setAttribute('stroke-width', '2');
+    this._pulseRing = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "rect",
+    );
+    this._pulseRing.classList.add("tut-spotlight-pulse");
+    this._pulseRing.setAttribute("rx", SPOTLIGHT_RADIUS);
+    this._pulseRing.setAttribute("ry", SPOTLIGHT_RADIUS);
+    this._pulseRing.setAttribute("fill", "none");
+    this._pulseRing.setAttribute("stroke", "rgba(74,158,255,0.3)");
+    this._pulseRing.setAttribute("stroke-width", "2");
     this._svg.appendChild(this._pulseRing);
 
     // Tooltip card
-    this._tooltip = createElement('div', 'tut-tooltip');
+    this._tooltip = createElement("div", "tut-tooltip");
 
     // Arrow / caret
-    this._arrow = createElement('div', 'tut-tooltip__arrow');
+    this._arrow = createElement("div", "tut-tooltip__arrow");
     this._tooltip.appendChild(this._arrow);
 
     // Text body
-    this._textEl = createElement('p', 'tut-tooltip__text');
+    this._textEl = createElement("p", "tut-tooltip__text");
     this._tooltip.appendChild(this._textEl);
 
     // Dots container
-    this._dotsContainer = createElement('div', 'tut-tooltip__dots');
+    this._dotsContainer = createElement("div", "tut-tooltip__dots");
     this._tooltip.appendChild(this._dotsContainer);
 
     // Footer row: Back | Counter | Skip | Next
-    const footer = createElement('div', 'tut-tooltip__footer');
+    const footer = createElement("div", "tut-tooltip__footer");
 
-    this._backBtn = createElement('button', 'tut-btn tut-btn--ghost', '← Back');
-    this._backBtn.setAttribute('aria-label', 'Previous step');
-    this._backBtn.addEventListener('click', (e) => {
+    this._backBtn = createElement("button", "tut-btn tut-btn--ghost", "← Back");
+    this._backBtn.setAttribute("aria-label", "Previous step");
+    this._backBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       this.onBack?.();
     });
 
-    this._counterEl = createElement('span', 'tut-tooltip__counter', '1 / 5');
+    this._counterEl = createElement("span", "tut-tooltip__counter", "1 / 5");
 
-    this._skipBtn = createElement('button', 'tut-btn tut-btn--ghost', 'Skip');
-    this._skipBtn.setAttribute('aria-label', 'Skip tutorial');
-    this._skipBtn.addEventListener('click', (e) => {
+    this._skipBtn = createElement("button", "tut-btn tut-btn--ghost", "Skip");
+    this._skipBtn.setAttribute("aria-label", "Skip tutorial");
+    this._skipBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       this.onSkip?.();
     });
 
-    this._nextBtn = createElement('button', 'tut-btn tut-btn--primary', 'Next');
-    this._nextBtn.setAttribute('aria-label', 'Next step');
-    this._nextBtn.addEventListener('click', (e) => {
+    this._nextBtn = createElement("button", "tut-btn tut-btn--primary", "Next");
+    this._nextBtn.setAttribute("aria-label", "Next step");
+    this._nextBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       this.onNext?.();
     });
@@ -228,8 +234,12 @@ export class TutorialOverlay {
     this._container.appendChild(this._tooltip);
 
     // Prevent clicks on the dark area from propagating (but allow clicks inside spotlight)
-    this._container.addEventListener('click', (e) => {
-      if (e.target === this._container || e.target === this._svg || e.target.tagName === 'rect') {
+    this._container.addEventListener("click", (e) => {
+      if (
+        e.target === this._container ||
+        e.target === this._svg ||
+        e.target.tagName === "rect"
+      ) {
         // Clicked the overlay background — do nothing (don't dismiss)
         e.stopPropagation();
       }
@@ -244,8 +254,8 @@ export class TutorialOverlay {
    * @private
    */
   _updateSpotlight(targetEl) {
-    const cutout = this._svg.querySelector('.tut-spotlight-cutout');
-    const border = this._svg.querySelector('.tut-spotlight-border');
+    const cutout = this._svg.querySelector(".tut-spotlight-cutout");
+    const border = this._svg.querySelector(".tut-spotlight-border");
 
     if (!targetEl) {
       // No target — center a generic spotlight
@@ -261,9 +271,9 @@ export class TutorialOverlay {
 
     const rect = targetEl.getBoundingClientRect();
     const spot = {
-      x: rect.left   - SPOTLIGHT_PADDING,
-      y: rect.top    - SPOTLIGHT_PADDING,
-      w: rect.width  + SPOTLIGHT_PADDING * 2,
+      x: rect.left - SPOTLIGHT_PADDING,
+      y: rect.top - SPOTLIGHT_PADDING,
+      w: rect.width + SPOTLIGHT_PADDING * 2,
       h: rect.height + SPOTLIGHT_PADDING * 2,
     };
 
@@ -280,10 +290,10 @@ export class TutorialOverlay {
    * @private
    */
   _applySpotlightRect(svgRect, spot) {
-    svgRect.setAttribute('x', spot.x);
-    svgRect.setAttribute('y', spot.y);
-    svgRect.setAttribute('width',  spot.w);
-    svgRect.setAttribute('height', spot.h);
+    svgRect.setAttribute("x", spot.x);
+    svgRect.setAttribute("y", spot.y);
+    svgRect.setAttribute("width", spot.w);
+    svgRect.setAttribute("height", spot.h);
   }
 
   // ─── Tooltip Positioning ─────────────────────────────────────────
@@ -306,61 +316,61 @@ export class TutorialOverlay {
 
     if (!targetEl) {
       // Center tooltip
-      top  = (vh - th) / 2 + 60;
+      top = (vh - th) / 2 + 60;
       left = (vw - tw) / 2;
     } else {
       const rect = targetEl.getBoundingClientRect();
-      const cx   = rect.left + rect.width / 2;
-      const cy   = rect.top + rect.height / 2;
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
 
       switch (position) {
-        case 'top':
-          top  = rect.top - th - TOOLTIP_GAP - SPOTLIGHT_PADDING;
+        case "top":
+          top = rect.top - th - TOOLTIP_GAP - SPOTLIGHT_PADDING;
           left = cx - tw / 2;
-          this._setArrowPosition('bottom');
+          this._setArrowPosition("bottom");
           break;
 
-        case 'bottom':
-          top  = rect.bottom + TOOLTIP_GAP + SPOTLIGHT_PADDING;
+        case "bottom":
+          top = rect.bottom + TOOLTIP_GAP + SPOTLIGHT_PADDING;
           left = cx - tw / 2;
-          this._setArrowPosition('top');
+          this._setArrowPosition("top");
           break;
 
-        case 'left':
-          top  = cy - th / 2;
+        case "left":
+          top = cy - th / 2;
           left = rect.left - tw - TOOLTIP_GAP - SPOTLIGHT_PADDING;
-          this._setArrowPosition('right');
+          this._setArrowPosition("right");
           break;
 
-        case 'right':
-          top  = cy - th / 2;
+        case "right":
+          top = cy - th / 2;
           left = rect.right + TOOLTIP_GAP + SPOTLIGHT_PADDING;
-          this._setArrowPosition('left');
+          this._setArrowPosition("left");
           break;
 
-        case 'bottom-left':
-          top  = rect.bottom + TOOLTIP_GAP + SPOTLIGHT_PADDING;
+        case "bottom-left":
+          top = rect.bottom + TOOLTIP_GAP + SPOTLIGHT_PADDING;
           left = rect.left - SPOTLIGHT_PADDING;
-          this._setArrowPosition('top');
+          this._setArrowPosition("top");
           break;
 
-        case 'bottom-right':
-          top  = rect.bottom + TOOLTIP_GAP + SPOTLIGHT_PADDING;
+        case "bottom-right":
+          top = rect.bottom + TOOLTIP_GAP + SPOTLIGHT_PADDING;
           left = rect.right - tw + SPOTLIGHT_PADDING;
-          this._setArrowPosition('top');
+          this._setArrowPosition("top");
           break;
 
         default:
-          top  = rect.bottom + TOOLTIP_GAP + SPOTLIGHT_PADDING;
+          top = rect.bottom + TOOLTIP_GAP + SPOTLIGHT_PADDING;
           left = cx - tw / 2;
-          this._setArrowPosition('top');
+          this._setArrowPosition("top");
       }
     }
 
     // Clamp to viewport
     const margin = 16;
     left = Math.max(margin, Math.min(left, vw - tw - margin));
-    top  = Math.max(margin, Math.min(top,  vh - th - margin));
+    top = Math.max(margin, Math.min(top, vh - th - margin));
 
     tooltip.style.transform = `translate(${Math.round(left)}px, ${Math.round(top)}px)`;
   }
@@ -383,11 +393,11 @@ export class TutorialOverlay {
    * @private
    */
   _renderDots(current, total) {
-    this._dotsContainer.innerHTML = '';
+    this._dotsContainer.innerHTML = "";
     for (let i = 0; i < total; i++) {
-      const dot = createElement('span', 'tut-dot');
-      if (i === current) dot.classList.add('tut-dot--active');
-      if (i < current)   dot.classList.add('tut-dot--done');
+      const dot = createElement("span", "tut-dot");
+      if (i === current) dot.classList.add("tut-dot--active");
+      if (i < current) dot.classList.add("tut-dot--done");
       this._dotsContainer.appendChild(dot);
     }
   }
@@ -398,19 +408,19 @@ export class TutorialOverlay {
     this._keyHandler = (e) => {
       if (!this._container.parentNode) return;
 
-      if (e.key === 'Enter' || e.key === 'ArrowRight') {
+      if (e.key === "Enter" || e.key === "ArrowRight") {
         e.preventDefault();
         this.onNext?.();
-      } else if (e.key === 'Escape') {
+      } else if (e.key === "Escape") {
         e.preventDefault();
         this.onSkip?.();
-      } else if (e.key === 'ArrowLeft') {
+      } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         this.onBack?.();
       }
     };
 
-    document.addEventListener('keydown', this._keyHandler);
+    document.addEventListener("keydown", this._keyHandler);
 
     // Re-position on resize
     this._resizeHandler = () => {
@@ -418,11 +428,14 @@ export class TutorialOverlay {
       this._resizeRaf = requestAnimationFrame(() => {
         if (this._currentStep) {
           this._updateSpotlight(this._currentStep.targetEl);
-          this._positionTooltip(this._currentStep.targetEl, this._currentStep.position);
+          this._positionTooltip(
+            this._currentStep.targetEl,
+            this._currentStep.position,
+          );
         }
       });
     };
 
-    window.addEventListener('resize', this._resizeHandler);
+    window.addEventListener("resize", this._resizeHandler);
   }
 }

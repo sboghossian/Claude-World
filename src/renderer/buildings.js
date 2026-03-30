@@ -13,22 +13,26 @@
  *   1.0         — complete: full height, full colors, all windows, no scaffold
  */
 
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics } from "pixi.js";
 import {
-  TILE_WIDTH, TILE_HEIGHT, HEIGHT_UNIT_PX, HEIGHT_RUIN, COLORS,
-} from './constants.js';
-import { ZONE_DEFS } from './zones.js';
-import { tileToScreen } from './tiles.js';
+  TILE_WIDTH,
+  TILE_HEIGHT,
+  HEIGHT_UNIT_PX,
+  HEIGHT_RUIN,
+  COLORS,
+} from "./constants.js";
+import { ZONE_DEFS } from "./zones.js";
+import { tileToScreen } from "./tiles.js";
 
 // ── Construction stage thresholds ────────────────────────────────────
 const STAGE_SCAFFOLD_START = 0.0;
-const STAGE_WALLS_START    = 0.35;
-const STAGE_FINISH_START   = 0.75;
-const STAGE_COMPLETE       = 1.0;
+const STAGE_WALLS_START = 0.35;
+const STAGE_FINISH_START = 0.75;
+const STAGE_COMPLETE = 1.0;
 
 // Scaffold colors
-const SCAFFOLD_POLE_COLOR  = 0xb85c20;  // dark orange-brown
-const SCAFFOLD_PLANK_COLOR = 0xd4832a;  // lighter orange-brown
+const SCAFFOLD_POLE_COLOR = 0xb85c20; // dark orange-brown
+const SCAFFOLD_PLANK_COLOR = 0xd4832a; // lighter orange-brown
 
 /**
  * @typedef {Object} BuildingSprite
@@ -60,14 +64,14 @@ function lerp(a, b, t) {
  */
 function lerpColor(colorA, colorB, t) {
   const rA = (colorA >> 16) & 0xff;
-  const gA = (colorA >>  8) & 0xff;
-  const bA =  colorA        & 0xff;
+  const gA = (colorA >> 8) & 0xff;
+  const bA = colorA & 0xff;
   const rB = (colorB >> 16) & 0xff;
-  const gB = (colorB >>  8) & 0xff;
-  const bB =  colorB        & 0xff;
-  const r  = Math.round(lerp(rA, rB, t));
-  const g  = Math.round(lerp(gA, gB, t));
-  const b  = Math.round(lerp(bA, bB, t));
+  const gB = (colorB >> 8) & 0xff;
+  const bB = colorB & 0xff;
+  const r = Math.round(lerp(rA, rB, t));
+  const g = Math.round(lerp(gA, gB, t));
+  const b = Math.round(lerp(bA, bB, t));
   return (r << 16) | (g << 8) | b;
 }
 
@@ -80,8 +84,8 @@ function lerpColor(colorA, colorB, t) {
  */
 function lerpPalette(palA, palB, t) {
   return {
-    top:   lerpColor(palA.top,   palB.top,   t),
-    left:  lerpColor(palA.left,  palB.left,  t),
+    top: lerpColor(palA.top, palB.top, t),
+    left: lerpColor(palA.left, palB.left, t),
     right: lerpColor(palA.right, palB.right, t),
   };
 }
@@ -101,7 +105,9 @@ export class BuildingManager {
   /** Build all zone buildings and add to container. */
   _buildAll() {
     // Sort zones by depth (tileX + tileY ascending) for painter's algorithm
-    const sorted = [...ZONE_DEFS].sort((a, b) => (a.tileX + a.tileY) - (b.tileX + b.tileY));
+    const sorted = [...ZONE_DEFS].sort(
+      (a, b) => a.tileX + a.tileY - (b.tileX + b.tileY),
+    );
 
     for (const zone of sorted) {
       const entry = this._createEntry(zone);
@@ -123,8 +129,8 @@ export class BuildingManager {
     gfx.position.set(pos.x, pos.y);
 
     // Store interactive flag
-    gfx.eventMode = 'static';
-    gfx.cursor = 'pointer';
+    gfx.eventMode = "static";
+    gfx.cursor = "pointer";
 
     // Initial progress: 1.0 if already active, 0.0 if locked
     const progress = zone.active ? 1.0 : 0.0;
@@ -133,8 +139,8 @@ export class BuildingManager {
     const entry = { zoneId: zone.id, gfx, hovered: false, zone, progress };
 
     // Hover events
-    gfx.on('pointerenter', () => this._onHover(entry, true));
-    gfx.on('pointerleave', () => this._onHover(entry, false));
+    gfx.on("pointerenter", () => this._onHover(entry, true));
+    gfx.on("pointerleave", () => this._onHover(entry, false));
 
     // Draw initial appearance
     this._rebuildBuilding(entry);
@@ -150,7 +156,7 @@ export class BuildingManager {
    * @param {number} progress  0.0 (ruin) → 1.0 (complete)
    */
   setZoneProgress(zoneId, progress) {
-    const entry = this.buildings.find(b => b.zoneId === zoneId);
+    const entry = this.buildings.find((b) => b.zoneId === zoneId);
     if (!entry) return;
     entry.progress = Math.max(0, Math.min(1, progress));
     this._rebuildBuilding(entry);
@@ -162,7 +168,7 @@ export class BuildingManager {
    * @returns {number}  0.0–1.0, or -1 if not found
    */
   getZoneProgress(zoneId) {
-    const entry = this.buildings.find(b => b.zoneId === zoneId);
+    const entry = this.buildings.find((b) => b.zoneId === zoneId);
     return entry ? entry.progress : -1;
   }
 
@@ -190,9 +196,9 @@ export class BuildingManager {
 
     // Test in reverse order (front buildings first)
     for (let i = this.buildings.length - 1; i >= 0; i--) {
-      const b   = this.buildings[i];
+      const b = this.buildings[i];
       const zone = b.zone;
-      const pos  = tileToScreen(zone.tileX, zone.tileY);
+      const pos = tileToScreen(zone.tileX, zone.tileY);
 
       // Effective visible height for hit-test
       const hPx = this._effectiveHeight(b) * HEIGHT_UNIT_PX;
@@ -203,7 +209,12 @@ export class BuildingManager {
       const minY = pos.y - hPx;
       const maxY = pos.y + (zone.w + zone.h) * hh;
 
-      if (worldX >= minX && worldX <= maxX && worldY >= minY && worldY <= maxY) {
+      if (
+        worldX >= minX &&
+        worldX <= maxX &&
+        worldY >= minY &&
+        worldY <= maxY
+      ) {
         return zone;
       }
     }
@@ -241,11 +252,11 @@ export class BuildingManager {
       // ── Fully complete ──────────────────────────────────────────
       this._drawIsoBox(gfx, zone, zone.height, COLORS[zone.district], false);
       this._drawWindowGlow(gfx, zone, zone.height, 1.0);
-
     } else if (p >= STAGE_FINISH_START) {
       // ── Near-complete (0.75–0.99) ───────────────────────────────
       // t runs 0→1 within this stage
-      const t = (p - STAGE_FINISH_START) / (STAGE_COMPLETE - STAGE_FINISH_START);
+      const t =
+        (p - STAGE_FINISH_START) / (STAGE_COMPLETE - STAGE_FINISH_START);
       const palette = COLORS[zone.district];
 
       this._drawIsoBox(gfx, zone, zone.height, palette, false);
@@ -256,11 +267,11 @@ export class BuildingManager {
       // Scaffolding fades out
       const scaffoldAlpha = 1.0 - t;
       this._drawScaffolding(gfx, zone, zone.height, 1.0, scaffoldAlpha);
-
     } else if (p >= STAGE_WALLS_START) {
       // ── Walls rising (0.35–0.75) ────────────────────────────────
       // t runs 0→1 within this stage
-      const t = (p - STAGE_WALLS_START) / (STAGE_FINISH_START - STAGE_WALLS_START);
+      const t =
+        (p - STAGE_WALLS_START) / (STAGE_FINISH_START - STAGE_WALLS_START);
 
       // Height grows from HEIGHT_RUIN up to full zone.height
       const currentHeight = lerp(HEIGHT_RUIN, zone.height, t);
@@ -272,16 +283,14 @@ export class BuildingManager {
 
       // Scaffolding at full density around the growing walls
       this._drawScaffolding(gfx, zone, zone.height, 1.0, 1.0);
-
     } else if (p > STAGE_SCAFFOLD_START) {
       // ── Scaffolding phase (0.0–0.35) ────────────────────────────
       // Ruins base, then scaffold density grows with progress
-      const scaffoldDensity = p / STAGE_WALLS_START;  // 0→1
+      const scaffoldDensity = p / STAGE_WALLS_START; // 0→1
 
       this._drawIsoBox(gfx, zone, HEIGHT_RUIN, COLORS.ruin, true);
       this._drawGhostOutline(gfx, zone);
       this._drawScaffolding(gfx, zone, zone.height, scaffoldDensity, 1.0);
-
     } else {
       // ── Pure ruins (p === 0.0) ───────────────────────────────────
       this._drawIsoBox(gfx, zone, HEIGHT_RUIN, COLORS.ruin, true);
@@ -297,19 +306,19 @@ export class BuildingManager {
    * @returns {{ topX, topY, rightX, rightY, botX, botY, leftX, leftY }}
    */
   _footprint(zone) {
-    const hw = TILE_WIDTH  / 2;
+    const hw = TILE_WIDTH / 2;
     const hh = TILE_HEIGHT / 4;
-    const w  = zone.w;
-    const h  = zone.h;
+    const w = zone.w;
+    const h = zone.h;
     return {
-      topX:   0,
-      topY:   0,
+      topX: 0,
+      topY: 0,
       rightX: w * hw,
       rightY: w * hh,
-      botX:   (w - h) * hw,
-      botY:   (w + h) * hh,
+      botX: (w - h) * hw,
+      botY: (w + h) * hh,
       leftX: -h * hw,
-      leftY:  h * hh,
+      leftY: h * hh,
     };
   }
 
@@ -322,34 +331,38 @@ export class BuildingManager {
    * @param {boolean} isRuin
    */
   _drawIsoBox(gfx, zone, height, palette, isRuin) {
-    const { topX, topY, rightX, rightY, botX, botY, leftX, leftY } = this._footprint(zone);
+    const { topX, topY, rightX, rightY, botX, botY, leftX, leftY } =
+      this._footprint(zone);
     const hPx = height * HEIGHT_UNIT_PX;
     const alpha = isRuin ? 0.6 : 1.0;
 
     // ── Top face ──────────────────────────────────────────────────
     gfx.poly([
-      topX,   topY   - hPx,
-      rightX, rightY - hPx,
-      botX,   botY   - hPx,
-      leftX,  leftY  - hPx,
+      topX,
+      topY - hPx,
+      rightX,
+      rightY - hPx,
+      botX,
+      botY - hPx,
+      leftX,
+      leftY - hPx,
     ]);
     gfx.fill({ color: palette.top, alpha });
 
     // ── Left face ─────────────────────────────────────────────────
-    gfx.poly([
-      leftX, leftY  - hPx,
-      botX,  botY   - hPx,
-      botX,  botY,
-      leftX, leftY,
-    ]);
+    gfx.poly([leftX, leftY - hPx, botX, botY - hPx, botX, botY, leftX, leftY]);
     gfx.fill({ color: palette.left, alpha });
 
     // ── Right face ────────────────────────────────────────────────
     gfx.poly([
-      rightX, rightY - hPx,
-      botX,   botY   - hPx,
-      botX,   botY,
-      rightX, rightY,
+      rightX,
+      rightY - hPx,
+      botX,
+      botY - hPx,
+      botX,
+      botY,
+      rightX,
+      rightY,
     ]);
     gfx.fill({ color: palette.right, alpha });
 
@@ -358,19 +371,23 @@ export class BuildingManager {
 
     // Top face outline
     gfx.poly([
-      topX,   topY   - hPx,
-      rightX, rightY - hPx,
-      botX,   botY   - hPx,
-      leftX,  leftY  - hPx,
+      topX,
+      topY - hPx,
+      rightX,
+      rightY - hPx,
+      botX,
+      botY - hPx,
+      leftX,
+      leftY - hPx,
     ]);
     gfx.stroke({ color: 0x000000, alpha: edgeAlpha, width: 1 });
 
     // Vertical edges
     const verts = [
-      [topX,   topY   - hPx, topX,   topY],
+      [topX, topY - hPx, topX, topY],
       [rightX, rightY - hPx, rightX, rightY],
-      [botX,   botY   - hPx, botX,   botY],
-      [leftX,  leftY  - hPx, leftX,  leftY],
+      [botX, botY - hPx, botX, botY],
+      [leftX, leftY - hPx, leftX, leftY],
     ];
     for (const [x1, y1, x2, y2] of verts) {
       gfx.moveTo(x1, y1);
@@ -389,33 +406,38 @@ export class BuildingManager {
    * @param {import('./zones.js').ZoneDef} zone
    */
   _drawGhostOutline(gfx, zone) {
-    const { topX, topY, rightX, rightY, botX, botY, leftX, leftY } = this._footprint(zone);
+    const { topX, topY, rightX, rightY, botX, botY, leftX, leftY } =
+      this._footprint(zone);
     const hPx = zone.height * HEIGHT_UNIT_PX;
 
     // Top face at full height
     gfx.poly([
-      topX,   topY   - hPx,
-      rightX, rightY - hPx,
-      botX,   botY   - hPx,
-      leftX,  leftY  - hPx,
+      topX,
+      topY - hPx,
+      rightX,
+      rightY - hPx,
+      botX,
+      botY - hPx,
+      leftX,
+      leftY - hPx,
     ]);
     gfx.stroke({ color: 0xaaaaaa, alpha: 0.3, width: 1 });
 
     // Dashed vertical edges to full height for the 3 visible corners
     const corners = [
       [rightX, rightY],
-      [botX,   botY],
-      [leftX,  leftY],
+      [botX, botY],
+      [leftX, leftY],
     ];
     for (const [cx, cy] of corners) {
-      const dashLen  = 3;
-      const gapLen   = 3;
-      const totalH   = hPx - HEIGHT_RUIN * HEIGHT_UNIT_PX;
-      let   drawn    = 0;
-      const startY   = cy - HEIGHT_RUIN * HEIGHT_UNIT_PX;
+      const dashLen = 3;
+      const gapLen = 3;
+      const totalH = hPx - HEIGHT_RUIN * HEIGHT_UNIT_PX;
+      let drawn = 0;
+      const startY = cy - HEIGHT_RUIN * HEIGHT_UNIT_PX;
       while (drawn < totalH) {
         const segStart = startY - drawn;
-        const segEnd   = Math.max(segStart - dashLen, cy - hPx);
+        const segEnd = Math.max(segStart - dashLen, cy - hPx);
         gfx.moveTo(cx, segStart);
         gfx.lineTo(cx, segEnd);
         gfx.stroke({ color: 0xaaaaaa, alpha: 0.25, width: 1 });
@@ -442,15 +464,16 @@ export class BuildingManager {
   _drawScaffolding(gfx, zone, scaffoldHeight, density, alpha) {
     if (alpha <= 0 || density <= 0) return;
 
-    const { topX, topY, rightX, rightY, botX, botY, leftX, leftY } = this._footprint(zone);
+    const { topX, topY, rightX, rightY, botX, botY, leftX, leftY } =
+      this._footprint(zone);
     const hPx = scaffoldHeight * HEIGHT_UNIT_PX;
 
     // The 4 footprint corners we attach poles to
     const corners = [
-      { x: topX,   y: topY   },
+      { x: topX, y: topY },
       { x: rightX, y: rightY },
-      { x: botX,   y: botY   },
-      { x: leftX,  y: leftY  },
+      { x: botX, y: botY },
+      { x: leftX, y: leftY },
     ];
 
     // ── Vertical poles ─────────────────────────────────────────────
@@ -464,27 +487,31 @@ export class BuildingManager {
     // Space planks every ~8 px vertically.  Gate each plank by density so
     // they accumulate from the bottom up as density increases.
     const plankSpacing = 8;
-    const totalPlanks  = Math.max(1, Math.floor(hPx / plankSpacing));
+    const totalPlanks = Math.max(1, Math.floor(hPx / plankSpacing));
 
     // Pairs of corners to connect with planks (the 4 edges of the footprint)
     const edges = [
-      [corners[0], corners[1]],  // top → right
-      [corners[1], corners[2]],  // right → bottom
-      [corners[2], corners[3]],  // bottom → left
-      [corners[3], corners[0]],  // left → top
+      [corners[0], corners[1]], // top → right
+      [corners[1], corners[2]], // right → bottom
+      [corners[2], corners[3]], // bottom → left
+      [corners[3], corners[0]], // left → top
     ];
 
     for (let i = 0; i < totalPlanks; i++) {
       // i=0 is the lowest plank; i=totalPlanks-1 is the topmost
-      const plankFraction = (i + 1) / totalPlanks;  // 0→1 from bottom
-      if (plankFraction > density) break;            // density gates from bottom up
+      const plankFraction = (i + 1) / totalPlanks; // 0→1 from bottom
+      if (plankFraction > density) break; // density gates from bottom up
 
       const yOffset = -(i + 1) * plankSpacing;
 
       for (const [cA, cB] of edges) {
         gfx.moveTo(cA.x, cA.y + yOffset);
         gfx.lineTo(cB.x, cB.y + yOffset);
-        gfx.stroke({ color: SCAFFOLD_PLANK_COLOR, alpha: alpha * 0.85, width: 1 });
+        gfx.stroke({
+          color: SCAFFOLD_PLANK_COLOR,
+          alpha: alpha * 0.85,
+          width: 1,
+        });
       }
     }
   }
@@ -499,28 +526,27 @@ export class BuildingManager {
   _drawWindowGlow(gfx, zone, height, completeFraction) {
     if (completeFraction <= 0) return;
 
-    const hw   = TILE_WIDTH  / 2;
-    const hh   = TILE_HEIGHT / 4;
-    const w    = zone.w;
-    const h    = zone.h;
-    const hPx  = height * HEIGHT_UNIT_PX;
+    const hw = TILE_WIDTH / 2;
+    const hh = TILE_HEIGHT / 4;
+    const w = zone.w;
+    const h = zone.h;
+    const hPx = height * HEIGHT_UNIT_PX;
 
     const rightX = w * hw;
     const rightY = w * hh;
-    const botX   = (w - h) * hw;
-    const botY   = (w + h) * hh;
+    const botX = (w - h) * hw;
+    const botY = (w + h) * hh;
 
     const windowCount = Math.min(zone.h, 3);
-    const rowsPerCol  = Math.min(height - 1, 2);
+    const rowsPerCol = Math.min(height - 1, 2);
     const totalWindows = windowCount * rowsPerCol;
 
     // Determine how many windows to illuminate based on completeFraction
     const lit = Math.ceil(totalWindows * completeFraction);
     let drawn = 0;
 
-    outer:
-    for (let i = 0; i < windowCount; i++) {
-      const t  = (i + 0.5) / windowCount;
+    outer: for (let i = 0; i < windowCount; i++) {
+      const t = (i + 0.5) / windowCount;
       const wx = rightX + (botX - rightX) * t;
       const wy = rightY + (botY - rightY) * t;
 
@@ -554,13 +580,14 @@ export class BuildingManager {
    * @returns {number}  height in units
    */
   _effectiveHeight(entry) {
-    const p    = entry.progress;
+    const p = entry.progress;
     const zone = entry.zone;
 
     if (p >= STAGE_COMPLETE) return zone.height;
     if (p >= STAGE_FINISH_START) return zone.height;
     if (p >= STAGE_WALLS_START) {
-      const t = (p - STAGE_WALLS_START) / (STAGE_FINISH_START - STAGE_WALLS_START);
+      const t =
+        (p - STAGE_WALLS_START) / (STAGE_FINISH_START - STAGE_WALLS_START);
       return lerp(HEIGHT_RUIN, zone.height, t);
     }
     return HEIGHT_RUIN;

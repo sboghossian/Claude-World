@@ -3,21 +3,21 @@
  * Manages the first-time user experience for Claude World.
  */
 export class OnboardingSystem {
-  #state = 'not_started';
+  #state = "not_started";
   #worldId = null;
   #worldName = null;
   #template = null;
 
   static STATES = Object.freeze({
-    NOT_STARTED:     'not_started',
-    NAMING:          'naming',
-    TEMPLATE_SELECT: 'template_select',
-    MEET_COMMANDER:  'meet_commander',
-    FIRST_TASK:      'first_task',
-    COMPLETE:        'complete',
+    NOT_STARTED: "not_started",
+    NAMING: "naming",
+    TEMPLATE_SELECT: "template_select",
+    MEET_COMMANDER: "meet_commander",
+    FIRST_TASK: "first_task",
+    COMPLETE: "complete",
   });
 
-  static LS_KEY = 'cw:onboarding_complete';
+  static LS_KEY = "cw:onboarding_complete";
 
   // ─── Public API ──────────────────────────────────────────────────────────────
 
@@ -35,19 +35,22 @@ export class OnboardingSystem {
     try {
       world = await window.api.db.getWorld(1);
     } catch (err) {
-      console.warn('[OnboardingSystem] getWorld() failed — treating as no world.', err);
+      console.warn(
+        "[OnboardingSystem] getWorld() failed — treating as no world.",
+        err,
+      );
     }
 
     if (world) {
       // World already exists; mark complete silently.
       this.#worldId = world.id ?? 1;
       this.#state = OnboardingSystem.STATES.COMPLETE;
-      localStorage.setItem(OnboardingSystem.LS_KEY, '1');
+      localStorage.setItem(OnboardingSystem.LS_KEY, "1");
       return;
     }
 
     this.#state = OnboardingSystem.STATES.NAMING;
-    this.#emit('onboarding:start');
+    this.#emit("onboarding:start");
   }
 
   /**
@@ -57,11 +60,13 @@ export class OnboardingSystem {
    * @param {'startup_founder' | 'developer' | 'freelancer'} template
    */
   async createWorld(name, template) {
-    if (!name || typeof name !== 'string' || name.trim().length < 2) {
-      throw new Error('[OnboardingSystem] createWorld: name must be at least 2 characters.');
+    if (!name || typeof name !== "string" || name.trim().length < 2) {
+      throw new Error(
+        "[OnboardingSystem] createWorld: name must be at least 2 characters.",
+      );
     }
     if (!template) {
-      throw new Error('[OnboardingSystem] createWorld: template is required.');
+      throw new Error("[OnboardingSystem] createWorld: template is required.");
     }
 
     this.#state = OnboardingSystem.STATES.MEET_COMMANDER;
@@ -74,14 +79,14 @@ export class OnboardingSystem {
       throw err;
     }
 
-    this.#worldId   = result?.id ?? result?.worldId ?? 1;
+    this.#worldId = result?.id ?? result?.worldId ?? 1;
     this.#worldName = name.trim();
-    this.#template  = template;
+    this.#template = template;
 
-    this.#emit('onboarding:world-created', {
-      worldId:   this.#worldId,
+    this.#emit("onboarding:world-created", {
+      worldId: this.#worldId,
       worldName: this.#worldName,
-      template:  this.#template,
+      template: this.#template,
     });
   }
 
@@ -91,8 +96,8 @@ export class OnboardingSystem {
    */
   complete() {
     this.#state = OnboardingSystem.STATES.COMPLETE;
-    localStorage.setItem(OnboardingSystem.LS_KEY, '1');
-    this.#emit('onboarding:complete', { worldId: this.#worldId });
+    localStorage.setItem(OnboardingSystem.LS_KEY, "1");
+    this.#emit("onboarding:complete", { worldId: this.#worldId });
   }
 
   /**
@@ -100,15 +105,23 @@ export class OnboardingSystem {
    * @returns {boolean}
    */
   isComplete() {
-    return localStorage.getItem(OnboardingSystem.LS_KEY) === '1';
+    return localStorage.getItem(OnboardingSystem.LS_KEY) === "1";
   }
 
   // ─── Accessors ───────────────────────────────────────────────────────────────
 
-  get state()     { return this.#state; }
-  get worldId()   { return this.#worldId; }
-  get worldName() { return this.#worldName; }
-  get template()  { return this.#template; }
+  get state() {
+    return this.#state;
+  }
+  get worldId() {
+    return this.#worldId;
+  }
+  get worldName() {
+    return this.#worldName;
+  }
+  get template() {
+    return this.#template;
+  }
 
   // ─── Private helpers ─────────────────────────────────────────────────────────
 

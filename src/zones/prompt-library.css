@@ -220,12 +220,30 @@
   white-space: nowrap;
 }
 
-.pl-badge--General   { background: rgba(99,102,241,0.2); color: var(--accent-indigo); }
-.pl-badge--Code      { background: rgba(74,255,138,0.15); color: var(--accent-green); }
-.pl-badge--Writing   { background: rgba(236,72,153,0.15); color: var(--accent-pink); }
-.pl-badge--Analysis  { background: rgba(6,182,212,0.15); color: var(--accent-cyan); }
-.pl-badge--Creative  { background: rgba(249,115,22,0.15); color: var(--accent-orange); }
-.pl-badge--Custom    { background: rgba(168,85,247,0.15); color: var(--accent-purple); }
+.pl-badge--General {
+  background: rgba(99, 102, 241, 0.2);
+  color: var(--accent-indigo);
+}
+.pl-badge--Code {
+  background: rgba(74, 255, 138, 0.15);
+  color: var(--accent-green);
+}
+.pl-badge--Writing {
+  background: rgba(236, 72, 153, 0.15);
+  color: var(--accent-pink);
+}
+.pl-badge--Analysis {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--accent-cyan);
+}
+.pl-badge--Creative {
+  background: rgba(249, 115, 22, 0.15);
+  color: var(--accent-orange);
+}
+.pl-badge--Custom {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--accent-purple);
+}
 
 /* ── Card body ──────────────────────────────────────────────────── */
 
@@ -291,8 +309,12 @@
 }
 
 @keyframes plFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .pl-modal {
@@ -309,8 +331,14 @@
 }
 
 @keyframes plSlideUp {
-  from { transform: translateY(24px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .pl-modal__title {

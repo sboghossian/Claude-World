@@ -17,59 +17,62 @@ const TYPEWRITER_DELAY_MS = 20;
 
 /** Agent role to CSS color variable mapping. */
 const ROLE_COLORS = {
-  dispatcher:  'var(--agent-dispatcher)',
-  researcher:  'var(--agent-researcher)',
-  trainer:     'var(--agent-trainer)',
-  memory:      'var(--agent-memory)',
-  integrator:  'var(--agent-integrator)',
+  dispatcher: "var(--agent-dispatcher)",
+  researcher: "var(--agent-researcher)",
+  trainer: "var(--agent-trainer)",
+  memory: "var(--agent-memory)",
+  integrator: "var(--agent-integrator)",
 };
 
 /** Default greeting lines keyed by agent id. */
 const GREETINGS = {
-  commander:  'The tower is operational. What needs dispatching?',
-  librarian:  'The archives are quiet today. What knowledge shall we catalog?',
-  instructor: 'Welcome to the academy. Ready to train a new skill?',
-  archivist:  'Memory banks are stable. What would you like me to remember?',
-  dockmaster: 'The docks are clear. Any new connections to establish?',
+  commander: "The tower is operational. What needs dispatching?",
+  librarian: "The archives are quiet today. What knowledge shall we catalog?",
+  instructor: "Welcome to the academy. Ready to train a new skill?",
+  archivist: "Memory banks are stable. What would you like me to remember?",
+  dockmaster: "The docks are clear. Any new connections to establish?",
 };
 
 /** Quick-action sets keyed by role (lowercase). Falls back to default. */
 const QUICK_ACTIONS = {
   dispatcher: [
-    { label: 'Route Task', prompt: 'Route the following task to the best agent: ' },
-    { label: 'Summarize',  prompt: 'Summarize the current task queue.' },
-    { label: 'Analyze',    prompt: 'Analyze the overall system workload.' },
-    { label: 'Draft',      prompt: 'Draft a task delegation plan for: ' },
+    {
+      label: "Route Task",
+      prompt: "Route the following task to the best agent: ",
+    },
+    { label: "Summarize", prompt: "Summarize the current task queue." },
+    { label: "Analyze", prompt: "Analyze the overall system workload." },
+    { label: "Draft", prompt: "Draft a task delegation plan for: " },
   ],
   researcher: [
-    { label: 'Research',   prompt: 'Research the following topic: ' },
-    { label: 'Summarize',  prompt: 'Summarize the key findings on: ' },
-    { label: 'Analyze',    prompt: 'Analyze the data for: ' },
-    { label: 'Draft',      prompt: 'Draft a research brief on: ' },
+    { label: "Research", prompt: "Research the following topic: " },
+    { label: "Summarize", prompt: "Summarize the key findings on: " },
+    { label: "Analyze", prompt: "Analyze the data for: " },
+    { label: "Draft", prompt: "Draft a research brief on: " },
   ],
   trainer: [
-    { label: 'Create Skill', prompt: 'Create a new skill for: ' },
-    { label: 'Summarize',    prompt: 'Summarize training progress for: ' },
-    { label: 'Analyze',      prompt: 'Analyze skill gaps in: ' },
-    { label: 'Draft',        prompt: 'Draft a training plan for: ' },
+    { label: "Create Skill", prompt: "Create a new skill for: " },
+    { label: "Summarize", prompt: "Summarize training progress for: " },
+    { label: "Analyze", prompt: "Analyze skill gaps in: " },
+    { label: "Draft", prompt: "Draft a training plan for: " },
   ],
   memory: [
-    { label: 'Remember',  prompt: 'Remember the following: ' },
-    { label: 'Recall',    prompt: 'Recall everything about: ' },
-    { label: 'Summarize', prompt: 'Summarize stored memories about: ' },
-    { label: 'Analyze',   prompt: 'Analyze memory patterns for: ' },
+    { label: "Remember", prompt: "Remember the following: " },
+    { label: "Recall", prompt: "Recall everything about: " },
+    { label: "Summarize", prompt: "Summarize stored memories about: " },
+    { label: "Analyze", prompt: "Analyze memory patterns for: " },
   ],
   integrator: [
-    { label: 'Connect',   prompt: 'Establish a new connection to: ' },
-    { label: 'Summarize', prompt: 'Summarize active integrations.' },
-    { label: 'Analyze',   prompt: 'Analyze integration health for: ' },
-    { label: 'Draft',     prompt: 'Draft an integration plan for: ' },
+    { label: "Connect", prompt: "Establish a new connection to: " },
+    { label: "Summarize", prompt: "Summarize active integrations." },
+    { label: "Analyze", prompt: "Analyze integration health for: " },
+    { label: "Draft", prompt: "Draft an integration plan for: " },
   ],
   _default: [
-    { label: 'Ask',       prompt: '' },
-    { label: 'Summarize', prompt: 'Summarize: ' },
-    { label: 'Analyze',   prompt: 'Analyze: ' },
-    { label: 'Draft',     prompt: 'Draft: ' },
+    { label: "Ask", prompt: "" },
+    { label: "Summarize", prompt: "Summarize: " },
+    { label: "Analyze", prompt: "Analyze: " },
+    { label: "Draft", prompt: "Draft: " },
   ],
 };
 
@@ -80,8 +83,14 @@ function el(tag, cls, attrs) {
   if (cls) e.className = cls;
   if (attrs) {
     for (const [k, v] of Object.entries(attrs)) {
-      if (k === 'textContent') { e.textContent = v; continue; }
-      if (k === 'innerHTML')   { e.innerHTML = v; continue; }
+      if (k === "textContent") {
+        e.textContent = v;
+        continue;
+      }
+      if (k === "innerHTML") {
+        e.innerHTML = v;
+        continue;
+      }
       e.setAttribute(k, v);
     }
   }
@@ -89,7 +98,7 @@ function el(tag, cls, attrs) {
 }
 
 function formatTime(date) {
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 // ── AgentDialogue class ─────────────────────────────────────────
@@ -134,13 +143,14 @@ export class AgentDialogue {
    */
   open(agentData) {
     this._agent = {
-      id:          agentData.id || 'unknown',
-      name:        agentData.name || 'Unknown',
-      role:        agentData.role || 'Agent',
-      personality: agentData.personality || 'Adaptive',
-      level:       agentData.level ?? 1,
-      xp:          agentData.xp ?? 0,
-      colorKey:    agentData.colorKey || agentData.role?.toLowerCase() || 'dispatcher',
+      id: agentData.id || "unknown",
+      name: agentData.name || "Unknown",
+      role: agentData.role || "Agent",
+      personality: agentData.personality || "Adaptive",
+      level: agentData.level ?? 1,
+      xp: agentData.xp ?? 0,
+      colorKey:
+        agentData.colorKey || agentData.role?.toLowerCase() || "dispatcher",
     };
 
     this._messages = [];
@@ -153,9 +163,9 @@ export class AgentDialogue {
     const initial = this._agent.name.charAt(0).toUpperCase();
 
     this._panel._show(
-      'agent-dialogue',
+      "agent-dialogue",
       this._agent.id,
-      '',              // no emoji icon — we render our own avatar
+      "", // no emoji icon — we render our own avatar
       this._agent.name,
       content,
     );
@@ -163,9 +173,10 @@ export class AgentDialogue {
     this._isOpen = true;
 
     // Show greeting with typewriter effect
-    const greeting = GREETINGS[this._agent.id] ||
+    const greeting =
+      GREETINGS[this._agent.id] ||
       `Greetings. I am ${this._agent.name}. How can I assist you?`;
-    this.addMessage('agent', greeting);
+    this.addMessage("agent", greeting);
 
     // Focus the input after opening
     requestAnimationFrame(() => {
@@ -201,16 +212,19 @@ export class AgentDialogue {
 
     if (!this._messagesEl) return;
 
-    if (role === 'user') {
+    if (role === "user") {
       this._appendMessageDOM(msg, text);
       this._scrollToBottom();
     } else {
       // Agent: show typing indicator, then typewriter
       this.showLoading();
-      this._typewriterTimer = setTimeout(() => {
-        this.hideLoading();
-        this._typewriteMessage(msg);
-      }, 400 + Math.random() * 200);
+      this._typewriterTimer = setTimeout(
+        () => {
+          this.hideLoading();
+          this._typewriteMessage(msg);
+        },
+        400 + Math.random() * 200,
+      );
     }
   }
 
@@ -218,7 +232,7 @@ export class AgentDialogue {
   showLoading() {
     if (this._typingEl) {
       this._typingEl.hidden = false;
-      this._typingEl.setAttribute('aria-hidden', 'false');
+      this._typingEl.setAttribute("aria-hidden", "false");
       this._scrollToBottom();
     }
   }
@@ -227,7 +241,7 @@ export class AgentDialogue {
   hideLoading() {
     if (this._typingEl) {
       this._typingEl.hidden = true;
-      this._typingEl.setAttribute('aria-hidden', 'true');
+      this._typingEl.setAttribute("aria-hidden", "true");
     }
   }
 
@@ -238,38 +252,48 @@ export class AgentDialogue {
     const agent = this._agent;
     const roleColor = ROLE_COLORS[agent.colorKey] || ROLE_COLORS.dispatcher;
 
-    const root = el('div', 'agent-dialogue');
-    root.setAttribute('role', 'region');
-    root.setAttribute('aria-label', `Dialogue with ${agent.name}`);
+    const root = el("div", "agent-dialogue");
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-label", `Dialogue with ${agent.name}`);
     this._root = root;
 
     // ── Header ────────────────────────────────────────────────────
-    const header = el('div', 'agent-dialogue__header');
+    const header = el("div", "agent-dialogue__header");
 
-    const avatar = el('div', 'agent-dialogue__avatar');
+    const avatar = el("div", "agent-dialogue__avatar");
     avatar.style.background = roleColor;
     avatar.textContent = agent.name.charAt(0).toUpperCase();
-    avatar.setAttribute('aria-hidden', 'true');
+    avatar.setAttribute("aria-hidden", "true");
 
-    const info = el('div', 'agent-dialogue__info');
+    const info = el("div", "agent-dialogue__info");
 
-    const name = el('div', 'agent-dialogue__name', { textContent: agent.name });
+    const name = el("div", "agent-dialogue__name", { textContent: agent.name });
 
-    const badges = el('div', 'agent-dialogue__badges');
-    const roleBadge = el('span', 'agent-dialogue__badge agent-dialogue__badge--role', { textContent: agent.role });
-    const personalityBadge = el('span', 'agent-dialogue__badge agent-dialogue__badge--personality', { textContent: agent.personality });
+    const badges = el("div", "agent-dialogue__badges");
+    const roleBadge = el(
+      "span",
+      "agent-dialogue__badge agent-dialogue__badge--role",
+      { textContent: agent.role },
+    );
+    const personalityBadge = el(
+      "span",
+      "agent-dialogue__badge agent-dialogue__badge--personality",
+      { textContent: agent.personality },
+    );
     badges.appendChild(roleBadge);
     badges.appendChild(personalityBadge);
 
-    const level = el('div', 'agent-dialogue__level');
-    const levelText = el('span', 'agent-dialogue__level-text', { textContent: `Lv. ${agent.level}` });
-    const xpBar = el('div', 'agent-dialogue__xp-bar');
-    xpBar.setAttribute('role', 'progressbar');
-    xpBar.setAttribute('aria-label', `Experience: ${agent.xp}%`);
-    xpBar.setAttribute('aria-valuenow', String(agent.xp));
-    xpBar.setAttribute('aria-valuemin', '0');
-    xpBar.setAttribute('aria-valuemax', '100');
-    const xpFill = el('div', 'agent-dialogue__xp-fill');
+    const level = el("div", "agent-dialogue__level");
+    const levelText = el("span", "agent-dialogue__level-text", {
+      textContent: `Lv. ${agent.level}`,
+    });
+    const xpBar = el("div", "agent-dialogue__xp-bar");
+    xpBar.setAttribute("role", "progressbar");
+    xpBar.setAttribute("aria-label", `Experience: ${agent.xp}%`);
+    xpBar.setAttribute("aria-valuenow", String(agent.xp));
+    xpBar.setAttribute("aria-valuemin", "0");
+    xpBar.setAttribute("aria-valuemax", "100");
+    const xpFill = el("div", "agent-dialogue__xp-fill");
     xpFill.style.width = `${agent.xp}%`;
     xpFill.style.background = roleColor;
     xpBar.appendChild(xpFill);
@@ -284,29 +308,32 @@ export class AgentDialogue {
     root.appendChild(header);
 
     // ── Messages area ─────────────────────────────────────────────
-    const messages = el('div', 'agent-dialogue__messages');
-    messages.setAttribute('role', 'log');
-    messages.setAttribute('aria-label', 'Message history');
-    messages.setAttribute('aria-live', 'polite');
-    messages.setAttribute('aria-relevant', 'additions');
+    const messages = el("div", "agent-dialogue__messages");
+    messages.setAttribute("role", "log");
+    messages.setAttribute("aria-label", "Message history");
+    messages.setAttribute("aria-live", "polite");
+    messages.setAttribute("aria-relevant", "additions");
     this._messagesEl = messages;
     root.appendChild(messages);
 
     // ── Typing indicator (hidden by default) ──────────────────────
-    const typing = el('div', 'agent-dialogue__typing');
+    const typing = el("div", "agent-dialogue__typing");
     typing.hidden = true;
-    typing.setAttribute('aria-hidden', 'true');
-    typing.setAttribute('aria-label', `${agent.name} is typing`);
+    typing.setAttribute("aria-hidden", "true");
+    typing.setAttribute("aria-label", `${agent.name} is typing`);
 
-    const typingAvatar = el('div', 'agent-dialogue__avatar agent-dialogue__avatar--small');
+    const typingAvatar = el(
+      "div",
+      "agent-dialogue__avatar agent-dialogue__avatar--small",
+    );
     typingAvatar.style.background = roleColor;
     typingAvatar.textContent = agent.name.charAt(0).toUpperCase();
-    typingAvatar.setAttribute('aria-hidden', 'true');
+    typingAvatar.setAttribute("aria-hidden", "true");
 
-    const dots = el('div', 'agent-dialogue__typing-dots');
-    dots.appendChild(el('span', 'agent-dialogue__typing-dot'));
-    dots.appendChild(el('span', 'agent-dialogue__typing-dot'));
-    dots.appendChild(el('span', 'agent-dialogue__typing-dot'));
+    const dots = el("div", "agent-dialogue__typing-dots");
+    dots.appendChild(el("span", "agent-dialogue__typing-dot"));
+    dots.appendChild(el("span", "agent-dialogue__typing-dot"));
+    dots.appendChild(el("span", "agent-dialogue__typing-dot"));
 
     typing.appendChild(typingAvatar);
     typing.appendChild(dots);
@@ -315,42 +342,42 @@ export class AgentDialogue {
 
     // ── Quick actions ─────────────────────────────────────────────
     const actionsData = QUICK_ACTIONS[agent.colorKey] || QUICK_ACTIONS._default;
-    const actions = el('div', 'agent-dialogue__actions');
-    actions.setAttribute('role', 'toolbar');
-    actions.setAttribute('aria-label', 'Quick actions');
+    const actions = el("div", "agent-dialogue__actions");
+    actions.setAttribute("role", "toolbar");
+    actions.setAttribute("aria-label", "Quick actions");
     this._actionsEl = actions;
 
     for (const action of actionsData) {
-      const btn = el('button', 'agent-dialogue__action-btn', {
+      const btn = el("button", "agent-dialogue__action-btn", {
         textContent: action.label,
-        'aria-label': `${action.label} action`,
+        "aria-label": `${action.label} action`,
       });
-      btn.addEventListener('click', () => this._handleQuickAction(action));
+      btn.addEventListener("click", () => this._handleQuickAction(action));
       actions.appendChild(btn);
     }
     root.appendChild(actions);
 
     // ── Input bar ─────────────────────────────────────────────────
-    const inputBar = el('div', 'agent-dialogue__input-bar');
+    const inputBar = el("div", "agent-dialogue__input-bar");
 
-    const input = el('input', 'agent-dialogue__input', {
-      type: 'text',
+    const input = el("input", "agent-dialogue__input", {
+      type: "text",
       placeholder: `Ask ${agent.name} something...`,
-      'aria-label': `Message input for ${agent.name}`,
-      autocomplete: 'off',
+      "aria-label": `Message input for ${agent.name}`,
+      autocomplete: "off",
     });
     this._inputEl = input;
 
-    const sendBtn = el('button', 'agent-dialogue__send-btn', {
-      textContent: 'Send',
-      'aria-label': 'Send message',
+    const sendBtn = el("button", "agent-dialogue__send-btn", {
+      textContent: "Send",
+      "aria-label": "Send message",
     });
     this._sendBtn = sendBtn;
 
-    sendBtn.addEventListener('click', () => this._handleSend());
+    sendBtn.addEventListener("click", () => this._handleSend());
 
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         e.stopPropagation();
         this._handleSend();
@@ -376,24 +403,37 @@ export class AgentDialogue {
     const agent = this._agent;
     const roleColor = ROLE_COLORS[agent.colorKey] || ROLE_COLORS.dispatcher;
 
-    const wrap = el('div', `agent-dialogue__msg agent-dialogue__msg--${msg.role}`);
-    wrap.setAttribute('role', 'article');
-    wrap.setAttribute('aria-label', `${msg.role === 'agent' ? agent.name : 'You'} at ${formatTime(msg.timestamp)}`);
+    const wrap = el(
+      "div",
+      `agent-dialogue__msg agent-dialogue__msg--${msg.role}`,
+    );
+    wrap.setAttribute("role", "article");
+    wrap.setAttribute(
+      "aria-label",
+      `${msg.role === "agent" ? agent.name : "You"} at ${formatTime(msg.timestamp)}`,
+    );
 
-    if (msg.role === 'agent') {
-      const av = el('div', 'agent-dialogue__avatar agent-dialogue__avatar--small');
+    if (msg.role === "agent") {
+      const av = el(
+        "div",
+        "agent-dialogue__avatar agent-dialogue__avatar--small",
+      );
       av.style.background = roleColor;
       av.textContent = agent.name.charAt(0).toUpperCase();
-      av.setAttribute('aria-hidden', 'true');
+      av.setAttribute("aria-hidden", "true");
       wrap.appendChild(av);
     }
 
-    const bubbleWrap = el('div');
+    const bubbleWrap = el("div");
 
-    const bubble = el('div', 'agent-dialogue__bubble', { textContent: displayText });
+    const bubble = el("div", "agent-dialogue__bubble", {
+      textContent: displayText,
+    });
     bubbleWrap.appendChild(bubble);
 
-    const ts = el('div', 'agent-dialogue__timestamp', { textContent: formatTime(msg.timestamp) });
+    const ts = el("div", "agent-dialogue__timestamp", {
+      textContent: formatTime(msg.timestamp),
+    });
     bubbleWrap.appendChild(ts);
 
     wrap.appendChild(bubbleWrap);
@@ -407,7 +447,7 @@ export class AgentDialogue {
    * @param {{role: string, text: string, timestamp: Date}} msg
    */
   _typewriteMessage(msg) {
-    const bubble = this._appendMessageDOM(msg, '');
+    const bubble = this._appendMessageDOM(msg, "");
     let i = 0;
     const text = msg.text;
 
@@ -444,16 +484,18 @@ export class AgentDialogue {
     const text = this._inputEl.value.trim();
     if (!text) return;
 
-    this._inputEl.value = '';
+    this._inputEl.value = "";
 
     // Add user message
-    this.addMessage('user', text);
+    this.addMessage("user", text);
 
     // Emit event for the dispatch system
-    document.dispatchEvent(new CustomEvent('agent-dialogue:send', {
-      detail: { agentId: this._agent.id, message: text },
-      bubbles: true,
-    }));
+    document.dispatchEvent(
+      new CustomEvent("agent-dialogue:send", {
+        detail: { agentId: this._agent.id, message: text },
+        bubbles: true,
+      }),
+    );
   }
 
   /**

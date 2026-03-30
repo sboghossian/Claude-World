@@ -183,27 +183,32 @@
 }
 
 /* Category accent colors */
-.shortcuts-overlay__category[data-category="navigation"] .shortcuts-overlay__category-header {
+.shortcuts-overlay__category[data-category="navigation"]
+  .shortcuts-overlay__category-header {
   color: var(--accent-blue);
   border-bottom-color: rgba(74, 158, 255, 0.2);
 }
 
-.shortcuts-overlay__category[data-category="zones"] .shortcuts-overlay__category-header {
+.shortcuts-overlay__category[data-category="zones"]
+  .shortcuts-overlay__category-header {
   color: var(--accent-purple);
   border-bottom-color: rgba(168, 85, 247, 0.2);
 }
 
-.shortcuts-overlay__category[data-category="ui"] .shortcuts-overlay__category-header {
+.shortcuts-overlay__category[data-category="ui"]
+  .shortcuts-overlay__category-header {
   color: var(--accent-green);
   border-bottom-color: rgba(74, 255, 138, 0.2);
 }
 
-.shortcuts-overlay__category[data-category="world"] .shortcuts-overlay__category-header {
+.shortcuts-overlay__category[data-category="world"]
+  .shortcuts-overlay__category-header {
   color: var(--accent-amber);
   border-bottom-color: rgba(255, 184, 74, 0.2);
 }
 
-.shortcuts-overlay__category[data-category="debug"] .shortcuts-overlay__category-header {
+.shortcuts-overlay__category[data-category="debug"]
+  .shortcuts-overlay__category-header {
   color: var(--accent-red);
   border-bottom-color: rgba(255, 74, 106, 0.2);
 }
@@ -263,11 +268,11 @@
   font-size: 11px;
   font-weight: 600;
   color: var(--text-primary);
-  background:
-    linear-gradient(180deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.04) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-bottom-width: 2px;
   border-bottom-color: rgba(0, 0, 0, 0.3);

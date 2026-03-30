@@ -8,31 +8,31 @@
 /* ── Variables & root ─────────────────────────────────────────── */
 
 .sales-district {
-  --sd-bg:            #0d1117;
-  --sd-surface:       #161b22;
-  --sd-surface-2:     #1c2128;
-  --sd-surface-3:     #21262d;
-  --sd-border:        #30363d;
+  --sd-bg: #0d1117;
+  --sd-surface: #161b22;
+  --sd-surface-2: #1c2128;
+  --sd-surface-3: #21262d;
+  --sd-border: #30363d;
   --sd-border-subtle: #21262d;
-  --sd-text:          #e6edf3;
-  --sd-text-dim:      #8b949e;
-  --sd-text-muted:    #484f58;
-  --sd-accent:        #10b981;
-  --sd-accent-dim:    #059669;
-  --sd-accent-glow:   rgba(16, 185, 129, 0.15);
-  --sd-accent-text:   #34d399;
-  --sd-warn:          #f59e0b;
-  --sd-error:         #ef4444;
-  --sd-success:       #10b981;
-  --sd-closed-gold:   #fbbf24;
-  --sd-radius-sm:     4px;
-  --sd-radius-md:     8px;
-  --sd-radius-lg:     12px;
-  --sd-radius-xl:     16px;
-  --sd-shadow:        0 2px 8px rgba(0, 0, 0, 0.4);
-  --sd-shadow-lg:     0 4px 24px rgba(0, 0, 0, 0.6);
-  --sd-transition:    150ms ease;
-  --sd-font-mono:     'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --sd-text: #e6edf3;
+  --sd-text-dim: #8b949e;
+  --sd-text-muted: #484f58;
+  --sd-accent: #10b981;
+  --sd-accent-dim: #059669;
+  --sd-accent-glow: rgba(16, 185, 129, 0.15);
+  --sd-accent-text: #34d399;
+  --sd-warn: #f59e0b;
+  --sd-error: #ef4444;
+  --sd-success: #10b981;
+  --sd-closed-gold: #fbbf24;
+  --sd-radius-sm: 4px;
+  --sd-radius-md: 8px;
+  --sd-radius-lg: 12px;
+  --sd-radius-xl: 16px;
+  --sd-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --sd-shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.6);
+  --sd-transition: 150ms ease;
+  --sd-font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
 
   display: flex;
   flex-direction: column;
@@ -77,7 +77,7 @@
 }
 
 .sd-header__title::before {
-  content: '📈';
+  content: "📈";
   font-size: 16px;
 }
 
@@ -106,8 +106,11 @@
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: background var(--sd-transition), color var(--sd-transition),
-              box-shadow var(--sd-transition), opacity var(--sd-transition);
+  transition:
+    background var(--sd-transition),
+    color var(--sd-transition),
+    box-shadow var(--sd-transition),
+    opacity var(--sd-transition);
   border: 1px solid transparent;
   white-space: nowrap;
   text-decoration: none;
@@ -178,7 +181,9 @@
   background: transparent;
   border: none;
   color: var(--sd-text-dim);
-  transition: background var(--sd-transition), color var(--sd-transition);
+  transition:
+    background var(--sd-transition),
+    color var(--sd-transition);
 }
 
 .sd-icon-btn:hover {
@@ -280,12 +285,16 @@
   border-radius: var(--sd-radius-lg);
   border: 1px solid var(--sd-border);
   overflow: hidden;
-  transition: border-color var(--sd-transition), box-shadow var(--sd-transition);
+  transition:
+    border-color var(--sd-transition),
+    box-shadow var(--sd-transition);
 }
 
 .sd-column--drag-over {
   border-color: var(--sd-accent);
-  box-shadow: 0 0 0 2px var(--sd-accent-glow), var(--sd-shadow);
+  box-shadow:
+    0 0 0 2px var(--sd-accent-glow),
+    var(--sd-shadow);
 }
 
 .sd-column__header {
@@ -320,7 +329,9 @@
   border-radius: 10px;
   font-variant-numeric: tabular-nums;
   border: 1px solid var(--sd-border);
-  transition: color var(--sd-transition), background var(--sd-transition);
+  transition:
+    color var(--sd-transition),
+    background var(--sd-transition);
 }
 
 .sd-column__count--has-leads {
@@ -375,8 +386,11 @@
   border-radius: var(--sd-radius-md);
   padding: 10px 12px;
   cursor: pointer;
-  transition: border-color var(--sd-transition), box-shadow var(--sd-transition),
-              background var(--sd-transition), transform var(--sd-transition);
+  transition:
+    border-color var(--sd-transition),
+    box-shadow var(--sd-transition),
+    background var(--sd-transition),
+    transform var(--sd-transition);
   user-select: none;
 }
 
@@ -574,7 +588,9 @@
   font-size: 13px;
   font-family: inherit;
   padding: 8px 10px;
-  transition: border-color var(--sd-transition), box-shadow var(--sd-transition);
+  transition:
+    border-color var(--sd-transition),
+    box-shadow var(--sd-transition);
   width: 100%;
   box-sizing: border-box;
   outline: none;
@@ -739,7 +755,9 @@
   white-space: pre-wrap;
   word-break: break-word;
   line-height: 1.7;
-  transition: border-color var(--sd-transition), box-shadow var(--sd-transition);
+  transition:
+    border-color var(--sd-transition),
+    box-shadow var(--sd-transition);
   outline: none;
 }
 
@@ -799,8 +817,11 @@
   border: 1px solid var(--sd-border);
   border-radius: 20px;
   color: var(--sd-text-dim);
-  transition: background var(--sd-transition), color var(--sd-transition),
-              border-color var(--sd-transition), box-shadow var(--sd-transition);
+  transition:
+    background var(--sd-transition),
+    color var(--sd-transition),
+    border-color var(--sd-transition),
+    box-shadow var(--sd-transition);
 }
 
 .sd-stage-pill:hover {
@@ -824,8 +845,13 @@
 /* ── Loading state ────────────────────────────────────────────── */
 
 @keyframes sd-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .sd-btn:disabled {
@@ -903,14 +929,28 @@
 
 /* ── Column accent by stage ───────────────────────────────────── */
 
-.sd-column[data-stage="prospect"]   .sd-column__title { color: var(--sd-text); }
-.sd-column[data-stage="contacted"]  .sd-column__title { color: #60a5fa; }
-.sd-column[data-stage="qualified"]  .sd-column__title { color: var(--sd-accent-text); }
-.sd-column[data-stage="closed_won"] .sd-column__title { color: var(--sd-closed-gold); }
+.sd-column[data-stage="prospect"] .sd-column__title {
+  color: var(--sd-text);
+}
+.sd-column[data-stage="contacted"] .sd-column__title {
+  color: #60a5fa;
+}
+.sd-column[data-stage="qualified"] .sd-column__title {
+  color: var(--sd-accent-text);
+}
+.sd-column[data-stage="closed_won"] .sd-column__title {
+  color: var(--sd-closed-gold);
+}
 
-.sd-column[data-stage="contacted"]  { border-top: 2px solid #3b82f6; }
-.sd-column[data-stage="qualified"]  { border-top: 2px solid var(--sd-accent); }
-.sd-column[data-stage="closed_won"] { border-top: 2px solid var(--sd-closed-gold); }
+.sd-column[data-stage="contacted"] {
+  border-top: 2px solid #3b82f6;
+}
+.sd-column[data-stage="qualified"] {
+  border-top: 2px solid var(--sd-accent);
+}
+.sd-column[data-stage="closed_won"] {
+  border-top: 2px solid var(--sd-closed-gold);
+}
 
 /* ── Deal value color for closed column ───────────────────────── */
 

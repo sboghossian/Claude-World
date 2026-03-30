@@ -1,4 +1,4 @@
-const { safeStorage } = require('electron');
+const { safeStorage } = require("electron");
 
 class KeyStore {
   /**
@@ -9,7 +9,7 @@ class KeyStore {
    */
   constructor(db) {
     if (!db) {
-      throw new Error('KeyStore requires a database instance');
+      throw new Error("KeyStore requires a database instance");
     }
     this.db = db;
     this._ensureTable();
@@ -38,15 +38,15 @@ class KeyStore {
    * @param {string} [displayName]
    */
   store(provider, apiKey, displayName) {
-    if (!provider || typeof provider !== 'string') {
-      throw new Error('provider must be a non-empty string');
+    if (!provider || typeof provider !== "string") {
+      throw new Error("provider must be a non-empty string");
     }
-    if (!apiKey || typeof apiKey !== 'string') {
-      throw new Error('apiKey must be a non-empty string');
+    if (!apiKey || typeof apiKey !== "string") {
+      throw new Error("apiKey must be a non-empty string");
     }
     if (!safeStorage.isEncryptionAvailable()) {
       throw new Error(
-        'OS-level encryption is not available on this system. Cannot store API keys securely.'
+        "OS-level encryption is not available on this system. Cannot store API keys securely.",
       );
     }
 
@@ -55,7 +55,7 @@ class KeyStore {
     this.db
       .prepare(
         `INSERT OR REPLACE INTO api_keys (provider, encrypted_key, display_name, added_at, is_active)
-         VALUES (?, ?, ?, datetime('now'), 1)`
+         VALUES (?, ?, ?, datetime('now'), 1)`,
       )
       .run(provider, encrypted, displayName || provider);
   }
@@ -69,18 +69,24 @@ class KeyStore {
    */
   get(provider) {
     const row = this.db
-      .prepare('SELECT encrypted_key FROM api_keys WHERE provider = ? AND is_active = 1')
+      .prepare(
+        "SELECT encrypted_key FROM api_keys WHERE provider = ? AND is_active = 1",
+      )
       .get(provider);
 
     if (!row) return null;
 
     if (!safeStorage.isEncryptionAvailable()) {
-      throw new Error('OS-level encryption is not available — cannot decrypt key');
+      throw new Error(
+        "OS-level encryption is not available — cannot decrypt key",
+      );
     }
 
     // Update last_used timestamp
     this.db
-      .prepare("UPDATE api_keys SET last_used = datetime('now') WHERE provider = ?")
+      .prepare(
+        "UPDATE api_keys SET last_used = datetime('now') WHERE provider = ?",
+      )
       .run(provider);
 
     return safeStorage.decryptString(Buffer.from(row.encrypted_key));
@@ -94,7 +100,7 @@ class KeyStore {
   list() {
     return this.db
       .prepare(
-        'SELECT provider, display_name, added_at, last_used, total_spent, is_active FROM api_keys ORDER BY provider'
+        "SELECT provider, display_name, added_at, last_used, total_spent, is_active FROM api_keys ORDER BY provider",
       )
       .all();
   }
@@ -105,11 +111,11 @@ class KeyStore {
    * @param {string} provider
    */
   delete(provider) {
-    if (!provider || typeof provider !== 'string') {
-      throw new Error('provider must be a non-empty string');
+    if (!provider || typeof provider !== "string") {
+      throw new Error("provider must be a non-empty string");
     }
     const result = this.db
-      .prepare('DELETE FROM api_keys WHERE provider = ?')
+      .prepare("DELETE FROM api_keys WHERE provider = ?")
       .run(provider);
 
     if (result.changes === 0) {
@@ -124,11 +130,13 @@ class KeyStore {
    * @param {number} amount  USD amount
    */
   recordSpend(provider, amount) {
-    if (typeof amount !== 'number' || amount < 0) {
-      throw new Error('amount must be a non-negative number');
+    if (typeof amount !== "number" || amount < 0) {
+      throw new Error("amount must be a non-negative number");
     }
     this.db
-      .prepare('UPDATE api_keys SET total_spent = total_spent + ? WHERE provider = ?')
+      .prepare(
+        "UPDATE api_keys SET total_spent = total_spent + ? WHERE provider = ?",
+      )
       .run(amount, provider);
   }
 
@@ -139,7 +147,7 @@ class KeyStore {
    */
   deactivate(provider) {
     this.db
-      .prepare('UPDATE api_keys SET is_active = 0 WHERE provider = ?')
+      .prepare("UPDATE api_keys SET is_active = 0 WHERE provider = ?")
       .run(provider);
   }
 
@@ -150,7 +158,7 @@ class KeyStore {
    */
   activate(provider) {
     this.db
-      .prepare('UPDATE api_keys SET is_active = 1 WHERE provider = ?')
+      .prepare("UPDATE api_keys SET is_active = 1 WHERE provider = ?")
       .run(provider);
   }
 }

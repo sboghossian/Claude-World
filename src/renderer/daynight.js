@@ -5,8 +5,8 @@
  * dawn, day, dusk, and night phases over a configurable period.
  */
 
-import { ColorMatrixFilter } from 'pixi.js';
-import { DAY_CYCLE_MS, DAY_PHASES } from './constants.js';
+import { ColorMatrixFilter } from "pixi.js";
+import { DAY_CYCLE_MS, DAY_PHASES } from "./constants.js";
 
 /**
  * Linearly interpolate between two hex colors.
@@ -16,8 +16,12 @@ import { DAY_CYCLE_MS, DAY_PHASES } from './constants.js';
  * @returns {number}
  */
 function lerpColor(c1, c2, t) {
-  const r1 = (c1 >> 16) & 0xff, g1 = (c1 >> 8) & 0xff, b1 = c1 & 0xff;
-  const r2 = (c2 >> 16) & 0xff, g2 = (c2 >> 8) & 0xff, b2 = c2 & 0xff;
+  const r1 = (c1 >> 16) & 0xff,
+    g1 = (c1 >> 8) & 0xff,
+    b1 = c1 & 0xff;
+  const r2 = (c2 >> 16) & 0xff,
+    g2 = (c2 >> 8) & 0xff,
+    b2 = c2 & 0xff;
   const r = Math.round(r1 + (r2 - r1) * t);
   const g = Math.round(g1 + (g2 - g1) * t);
   const b = Math.round(b1 + (b2 - b1) * t);
@@ -51,7 +55,7 @@ export class DayNightCycle {
     /** Current normalized time-of-day (0..1) */
     this.timeOfDay = 0;
     /** Current phase name */
-    this.phase = 'day';
+    this.phase = "day";
     /** Night intensity 0..1 (for building glow) */
     this.nightIntensity = 0;
   }
@@ -73,7 +77,8 @@ export class DayNightCycle {
       const [name, phase] = phases[i];
       if (this.timeOfDay >= phase.start && this.timeOfDay < phase.end) {
         this.phase = name;
-        const phaseProgress = (this.timeOfDay - phase.start) / (phase.end - phase.start);
+        const phaseProgress =
+          (this.timeOfDay - phase.start) / (phase.end - phase.start);
 
         // Get next phase for interpolation
         const nextIdx = (i + 1) % phases.length;
@@ -84,16 +89,20 @@ export class DayNightCycle {
           // Transition zone: blend toward next phase
           const blendT = (phaseProgress - 0.7) / 0.3;
           currentTint = lerpColor(phase.tint, nextPhase.tint, blendT);
-          currentBrightness = lerp(phase.brightness, nextPhase.brightness, blendT);
+          currentBrightness = lerp(
+            phase.brightness,
+            nextPhase.brightness,
+            blendT,
+          );
         } else {
           currentTint = phase.tint;
           currentBrightness = phase.brightness;
         }
 
         // Night intensity for glow effects
-        if (name === 'night') {
+        if (name === "night") {
           this.nightIntensity = Math.sin(phaseProgress * Math.PI);
-        } else if (name === 'dusk') {
+        } else if (name === "dusk") {
           this.nightIntensity = phaseProgress * 0.5;
         }
         break;

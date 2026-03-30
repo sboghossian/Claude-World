@@ -19,9 +19,9 @@
  *   minimap.mount();
  */
 
-import { GRID_SIZE, TILE_WIDTH, TILE_HEIGHT } from '../renderer/constants.js';
-import { ZONE_DEFS } from '../renderer/zones.js';
-import { tileToScreen } from '../renderer/tiles.js';
+import { GRID_SIZE, TILE_WIDTH, TILE_HEIGHT } from "../renderer/constants.js";
+import { ZONE_DEFS } from "../renderer/zones.js";
+import { tileToScreen } from "../renderer/tiles.js";
 
 // ── Layout constants ────────────────────────────────────────────────
 const MAP_W = 180;
@@ -31,10 +31,10 @@ const UPDATE_INTERVAL = 100; // 10fps
 
 // ── District accent colors (CSS strings for Canvas 2D) ──────────────
 const DISTRICT_COLORS = {
-  core:     '#4a9eff',
-  business: '#4aff8a',
-  advanced: '#a855f7',
-  edge:     '#ffb84a',
+  core: "#4a9eff",
+  business: "#4aff8a",
+  advanced: "#a855f7",
+  edge: "#ffb84a",
 };
 
 // Fog ring opacities (matching fog.js ring definitions)
@@ -74,7 +74,7 @@ function tileRing(tx, ty) {
   const cx = GRID_SIZE / 2;
   const cy = GRID_SIZE / 2;
   const dist = Math.max(Math.abs(tx - cx), Math.abs(ty - cy));
-  if (dist < 5)  return 0;
+  if (dist < 5) return 0;
   if (dist < 10) return 1;
   if (dist < 15) return 2;
   if (dist < 20) return 3;
@@ -153,7 +153,7 @@ export class Minimap {
     this._startUpdateLoop();
     this._render();
 
-    console.log('[Minimap] Mounted');
+    console.log("[Minimap] Mounted");
   }
 
   /**
@@ -180,46 +180,46 @@ export class Minimap {
     this._root = null;
     this._canvas = null;
     this._ctx = null;
-    console.log('[Minimap] Destroyed');
+    console.log("[Minimap] Destroyed");
   }
 
   // ── DOM construction ────────────────────────────────────────────
 
   _buildDOM() {
     // Root container
-    this._root = el('div', 'minimap');
-    this._root.setAttribute('role', 'navigation');
-    this._root.setAttribute('aria-label', 'World minimap');
+    this._root = el("div", "minimap");
+    this._root.setAttribute("role", "navigation");
+    this._root.setAttribute("aria-label", "World minimap");
 
     // Toggle button
-    const toggle = el('button', 'minimap__toggle');
-    toggle.setAttribute('aria-label', 'Toggle minimap');
-    toggle.title = 'Toggle minimap';
-    const chevron = el('span', 'minimap__toggle-icon');
-    chevron.textContent = '\u25BC'; // down-pointing triangle
+    const toggle = el("button", "minimap__toggle");
+    toggle.setAttribute("aria-label", "Toggle minimap");
+    toggle.title = "Toggle minimap";
+    const chevron = el("span", "minimap__toggle-icon");
+    chevron.textContent = "\u25BC"; // down-pointing triangle
     toggle.appendChild(chevron);
     this._toggleBtn = toggle;
 
     // Body (canvas wrapper)
-    this._body = el('div', 'minimap__body');
+    this._body = el("div", "minimap__body");
 
     // Canvas
-    this._canvas = document.createElement('canvas');
-    this._canvas.className = 'minimap__canvas';
+    this._canvas = document.createElement("canvas");
+    this._canvas.className = "minimap__canvas";
     this._canvas.width = MAP_W;
     this._canvas.height = MAP_H;
-    this._ctx = this._canvas.getContext('2d');
+    this._ctx = this._canvas.getContext("2d");
 
     // Tooltip
-    this._tooltip = el('div', 'minimap__tooltip');
-    this._tooltipDot = el('span', 'minimap__tooltip__dot');
-    this._tooltipText = document.createTextNode('');
+    this._tooltip = el("div", "minimap__tooltip");
+    this._tooltipDot = el("span", "minimap__tooltip__dot");
+    this._tooltipText = document.createTextNode("");
     this._tooltip.appendChild(this._tooltipDot);
     this._tooltip.appendChild(this._tooltipText);
 
     // Label
-    const label = el('span', 'minimap__label');
-    label.textContent = 'MAP';
+    const label = el("span", "minimap__label");
+    label.textContent = "MAP";
 
     // Assemble
     this._body.appendChild(this._canvas);
@@ -233,29 +233,29 @@ export class Minimap {
   // ── Event binding ───────────────────────────────────────────────
 
   _bindEvents() {
-    this._canvas.addEventListener('click', this._onCanvasClick);
-    this._canvas.addEventListener('mousemove', this._onCanvasMove);
-    this._canvas.addEventListener('mouseleave', this._onCanvasLeave);
-    this._canvas.addEventListener('mousedown', this._onCanvasDown);
-    window.addEventListener('mousemove', this._onWindowMove);
-    window.addEventListener('mouseup', this._onWindowUp);
-    this._toggleBtn.addEventListener('click', this._onToggle);
-    document.addEventListener('keydown', this._onKeydown);
+    this._canvas.addEventListener("click", this._onCanvasClick);
+    this._canvas.addEventListener("mousemove", this._onCanvasMove);
+    this._canvas.addEventListener("mouseleave", this._onCanvasLeave);
+    this._canvas.addEventListener("mousedown", this._onCanvasDown);
+    window.addEventListener("mousemove", this._onWindowMove);
+    window.addEventListener("mouseup", this._onWindowUp);
+    this._toggleBtn.addEventListener("click", this._onToggle);
+    document.addEventListener("keydown", this._onKeydown);
   }
 
   _unbindEvents() {
     if (this._canvas) {
-      this._canvas.removeEventListener('click', this._onCanvasClick);
-      this._canvas.removeEventListener('mousemove', this._onCanvasMove);
-      this._canvas.removeEventListener('mouseleave', this._onCanvasLeave);
-      this._canvas.removeEventListener('mousedown', this._onCanvasDown);
+      this._canvas.removeEventListener("click", this._onCanvasClick);
+      this._canvas.removeEventListener("mousemove", this._onCanvasMove);
+      this._canvas.removeEventListener("mouseleave", this._onCanvasLeave);
+      this._canvas.removeEventListener("mousedown", this._onCanvasDown);
     }
-    window.removeEventListener('mousemove', this._onWindowMove);
-    window.removeEventListener('mouseup', this._onWindowUp);
+    window.removeEventListener("mousemove", this._onWindowMove);
+    window.removeEventListener("mouseup", this._onWindowUp);
     if (this._toggleBtn) {
-      this._toggleBtn.removeEventListener('click', this._onToggle);
+      this._toggleBtn.removeEventListener("click", this._onToggle);
     }
-    document.removeEventListener('keydown', this._onKeydown);
+    document.removeEventListener("keydown", this._onKeydown);
   }
 
   // ── Update loop (10fps) ─────────────────────────────────────────
@@ -300,7 +300,9 @@ export class Minimap {
     // Build a set of active zone tiles (they punch through fog)
     const activeTiles = new Set();
     for (const zone of ZONE_DEFS) {
-      const entry = this._buildingManager.buildings.find(b => b.zoneId === zone.id);
+      const entry = this._buildingManager.buildings.find(
+        (b) => b.zoneId === zone.id,
+      );
       const isActive = entry ? entry.progress > 0 : zone.active;
       if (isActive) {
         for (let dx = 0; dx < zone.w; dx++) {
@@ -346,7 +348,7 @@ export class Minimap {
     const drawW = MAP_W - PADDING * 2;
     const drawH = MAP_H - PADDING * 2;
 
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
     ctx.lineWidth = 0.5;
 
     // Draw lines every 8 tiles
@@ -377,8 +379,10 @@ export class Minimap {
     const tileH = drawH / GRID_SIZE;
 
     for (const zone of ZONE_DEFS) {
-      const entry = this._buildingManager.buildings.find(b => b.zoneId === zone.id);
-      const progress = entry ? entry.progress : (zone.active ? 1.0 : 0.0);
+      const entry = this._buildingManager.buildings.find(
+        (b) => b.zoneId === zone.id,
+      );
+      const progress = entry ? entry.progress : zone.active ? 1.0 : 0.0;
       const isActive = progress > 0;
       const isHovered = this._hoveredZone && this._hoveredZone.id === zone.id;
 
@@ -388,7 +392,7 @@ export class Minimap {
       const ph = zone.h * tileH;
 
       if (isActive) {
-        const color = DISTRICT_COLORS[zone.district] || '#4a9eff';
+        const color = DISTRICT_COLORS[zone.district] || "#4a9eff";
 
         // Glow
         ctx.shadowColor = color;
@@ -411,11 +415,11 @@ export class Minimap {
       } else {
         // Locked zone — dim dot
         ctx.globalAlpha = isHovered ? 0.4 : 0.2;
-        ctx.fillStyle = '#555570';
+        ctx.fillStyle = "#555570";
         ctx.fillRect(px, py, pw, ph);
 
         ctx.globalAlpha = isHovered ? 0.5 : 0.25;
-        ctx.strokeStyle = '#555570';
+        ctx.strokeStyle = "#555570";
         ctx.lineWidth = 0.5;
         ctx.strokeRect(px, py, pw, ph);
 
@@ -439,10 +443,10 @@ export class Minimap {
     // Visible world-space rectangle:
     // world position = (screenPos - canvas/2) / zoom - cam.{x,y}
     // Top-left corner in world coords:
-    const worldLeft = -cam.x - (screenW / 2) / cam.zoom;
-    const worldTop  = -cam.y - (screenH / 2) / cam.zoom;
-    const worldRight  = -cam.x + (screenW / 2) / cam.zoom;
-    const worldBottom = -cam.y + (screenH / 2) / cam.zoom;
+    const worldLeft = -cam.x - screenW / 2 / cam.zoom;
+    const worldTop = -cam.y - screenH / 2 / cam.zoom;
+    const worldRight = -cam.x + screenW / 2 / cam.zoom;
+    const worldBottom = -cam.y + screenH / 2 / cam.zoom;
 
     // Convert world coords to tile coords (inverse of tileToScreen).
     // tileToScreen: x = (tX - tY) * (TW/2), y = (tX + tY) * (TH/4)
@@ -451,8 +455,8 @@ export class Minimap {
     const hw = TILE_WIDTH;
     const hh = TILE_HEIGHT;
     const worldToTile = (wx, wy) => ({
-      tileX: wx / hw + 2 * wy / hh,
-      tileY: 2 * wy / hh - wx / hw,
+      tileX: wx / hw + (2 * wy) / hh,
+      tileY: (2 * wy) / hh - wx / hw,
     });
 
     const tl = worldToTile(worldLeft, worldTop);
@@ -470,13 +474,13 @@ export class Minimap {
     // Dashed white rectangle
     ctx.save();
     ctx.setLineDash([3, 3]);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
     ctx.lineWidth = 1.5;
     ctx.strokeRect(rx, ry, rw, rh);
     ctx.setLineDash([]);
 
     // Subtle fill
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+    ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
     ctx.fillRect(rx, ry, rw, rh);
     ctx.restore();
   }
@@ -507,10 +511,12 @@ export class Minimap {
     cam._followTarget = null; // Break any follow
 
     // Dispatch event for other systems
-    document.dispatchEvent(new CustomEvent('camera:pan-to', {
-      detail: { tileX, tileY, worldX: screenPos.x, worldY: screenPos.y },
-      bubbles: true,
-    }));
+    document.dispatchEvent(
+      new CustomEvent("camera:pan-to", {
+        detail: { tileX, tileY, worldX: screenPos.x, worldY: screenPos.y },
+        bubbles: true,
+      }),
+    );
   }
 
   // ── Interaction: hover tooltip ──────────────────────────────────
@@ -561,8 +567,12 @@ export class Minimap {
 
       // Expand hit area slightly for small buildings
       const pad = 2;
-      if (mx >= px - pad && mx <= px + pw + pad &&
-          my >= py - pad && my <= py + ph + pad) {
+      if (
+        mx >= px - pad &&
+        mx <= px + pw + pad &&
+        my >= py - pad &&
+        my <= py + ph + pad
+      ) {
         return zone;
       }
     }
@@ -571,12 +581,12 @@ export class Minimap {
 
   _showTooltip(mx, my, zone) {
     const color = zone.active
-      ? (DISTRICT_COLORS[zone.district] || '#4a9eff')
-      : '#555570';
+      ? DISTRICT_COLORS[zone.district] || "#4a9eff"
+      : "#555570";
 
     this._tooltipDot.style.background = color;
     this._tooltipText.textContent = zone.name;
-    this._tooltip.classList.add('minimap__tooltip--visible');
+    this._tooltip.classList.add("minimap__tooltip--visible");
     this._positionTooltip(mx, my);
   }
 
@@ -592,7 +602,7 @@ export class Minimap {
   }
 
   _hideTooltip() {
-    this._tooltip.classList.remove('minimap__tooltip--visible');
+    this._tooltip.classList.remove("minimap__tooltip--visible");
   }
 
   // ── Interaction: draggable viewport ─────────────────────────────
@@ -611,7 +621,7 @@ export class Minimap {
       this._dragStartMY = my;
       this._dragStartCamX = this._camera.targetX;
       this._dragStartCamY = this._camera.targetY;
-      this._body.classList.add('minimap__body--dragging');
+      this._body.classList.add("minimap__body--dragging");
     }
   }
 
@@ -644,8 +654,10 @@ export class Minimap {
   _onWindowUp() {
     if (this._dragging) {
       // Small delay to prevent the click handler from firing
-      setTimeout(() => { this._dragging = false; }, 50);
-      this._body.classList.remove('minimap__body--dragging');
+      setTimeout(() => {
+        this._dragging = false;
+      }, 50);
+      this._body.classList.remove("minimap__body--dragging");
     }
   }
 
@@ -659,16 +671,16 @@ export class Minimap {
     const screenW = this._worldCanvas.width || window.innerWidth;
     const screenH = this._worldCanvas.height || window.innerHeight;
 
-    const worldLeft   = -cam.x - (screenW / 2) / cam.zoom;
-    const worldTop    = -cam.y - (screenH / 2) / cam.zoom;
-    const worldRight  = -cam.x + (screenW / 2) / cam.zoom;
-    const worldBottom = -cam.y + (screenH / 2) / cam.zoom;
+    const worldLeft = -cam.x - screenW / 2 / cam.zoom;
+    const worldTop = -cam.y - screenH / 2 / cam.zoom;
+    const worldRight = -cam.x + screenW / 2 / cam.zoom;
+    const worldBottom = -cam.y + screenH / 2 / cam.zoom;
 
     const hw = TILE_WIDTH;
     const hh = TILE_HEIGHT;
     const worldToTile = (wx, wy) => ({
-      tileX: wx / hw + 2 * wy / hh,
-      tileY: 2 * wy / hh - wx / hw,
+      tileX: wx / hw + (2 * wy) / hh,
+      tileY: (2 * wy) / hh - wx / hw,
     });
 
     const tl = worldToTile(worldLeft, worldTop);
@@ -685,12 +697,12 @@ export class Minimap {
   _onToggle(e) {
     e.stopPropagation();
     this._collapsed = !this._collapsed;
-    this._root.classList.toggle('minimap--collapsed', this._collapsed);
+    this._root.classList.toggle("minimap--collapsed", this._collapsed);
   }
 
   _onKeydown(e) {
     // Cmd/Ctrl + Shift + M toggles minimap
-    if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'm') {
+    if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "m") {
       e.preventDefault();
       this._onToggle(e);
     }

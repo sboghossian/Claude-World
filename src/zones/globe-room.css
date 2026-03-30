@@ -8,29 +8,29 @@
 /* ── Variables & root ─────────────────────────────────────────── */
 
 .globe-room {
-  --gr-bg:           #0d1117;
-  --gr-surface:      #161b22;
-  --gr-surface-2:    #1c2128;
-  --gr-border:       #21262d;
-  --gr-border-hi:    #30363d;
-  --gr-text:         #e6edf3;
-  --gr-text-dim:     #8b949e;
-  --gr-text-muted:   #484f58;
-  --gr-accent:       #14b8a6;
-  --gr-accent-dim:   #0d9488;
-  --gr-accent-glow:  #14b8a633;
-  --gr-accent-bg:    #14b8a611;
-  --gr-error:        #f85149;
-  --gr-warn:         #d29922;
-  --gr-monitor:      #a78bfa;
-  --gr-monitor-bg:   #a78bfa18;
-  --gr-font-mono:    'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-  --gr-radius-sm:    4px;
-  --gr-radius-md:    8px;
-  --gr-radius-lg:    12px;
-  --gr-shadow:       0 4px 24px #00000044;
-  --gr-sidebar-w:    232px;
-  --gr-transition:   0.15s ease;
+  --gr-bg: #0d1117;
+  --gr-surface: #161b22;
+  --gr-surface-2: #1c2128;
+  --gr-border: #21262d;
+  --gr-border-hi: #30363d;
+  --gr-text: #e6edf3;
+  --gr-text-dim: #8b949e;
+  --gr-text-muted: #484f58;
+  --gr-accent: #14b8a6;
+  --gr-accent-dim: #0d9488;
+  --gr-accent-glow: #14b8a633;
+  --gr-accent-bg: #14b8a611;
+  --gr-error: #f85149;
+  --gr-warn: #d29922;
+  --gr-monitor: #a78bfa;
+  --gr-monitor-bg: #a78bfa18;
+  --gr-font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  --gr-radius-sm: 4px;
+  --gr-radius-md: 8px;
+  --gr-radius-lg: 12px;
+  --gr-shadow: 0 4px 24px #00000044;
+  --gr-sidebar-w: 232px;
+  --gr-transition: 0.15s ease;
 
   display: flex;
   flex-direction: column;
@@ -50,18 +50,14 @@
   padding: 20px 20px 14px;
   border-bottom: 1px solid var(--gr-border);
   flex-shrink: 0;
-  background: linear-gradient(
-    135deg,
-    var(--gr-surface) 0%,
-    #0d1117 100%
-  );
+  background: linear-gradient(135deg, var(--gr-surface) 0%, #0d1117 100%);
   position: relative;
   overflow: hidden;
 }
 
 /* Subtle globe-grid background motif */
 .gr-header::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background-image:
@@ -139,7 +135,9 @@
   font-size: 13px;
   outline: none;
   padding: 9px 14px;
-  transition: border-color var(--gr-transition), box-shadow var(--gr-transition);
+  transition:
+    border-color var(--gr-transition),
+    box-shadow var(--gr-transition);
   min-width: 0;
 }
 
@@ -162,7 +160,9 @@
   font-size: 13px;
   font-weight: 700;
   padding: 9px 18px;
-  transition: background var(--gr-transition), box-shadow var(--gr-transition);
+  transition:
+    background var(--gr-transition),
+    box-shadow var(--gr-transition);
   outline: none;
   flex-shrink: 0;
   white-space: nowrap;
@@ -199,7 +199,9 @@
 }
 
 @keyframes gr-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── Body layout ──────────────────────────────────────────────── */
@@ -259,7 +261,9 @@
   gap: 2px;
 }
 
-.gr-history-list::-webkit-scrollbar { width: 3px; }
+.gr-history-list::-webkit-scrollbar {
+  width: 3px;
+}
 .gr-history-list::-webkit-scrollbar-thumb {
   background: var(--gr-border-hi);
   border-radius: 2px;
@@ -279,7 +283,9 @@
   border-radius: var(--gr-radius-md);
   cursor: pointer;
   padding: 8px 10px;
-  transition: background var(--gr-transition), border-color var(--gr-transition);
+  transition:
+    background var(--gr-transition),
+    border-color var(--gr-transition);
   border: 1px solid transparent;
   outline: none;
 }
@@ -370,7 +376,9 @@
   color: var(--gr-text-muted);
 }
 
-.gr-empty-state[hidden] { display: none; }
+.gr-empty-state[hidden] {
+  display: none;
+}
 
 .gr-empty-state__icon {
   color: var(--gr-accent);
@@ -407,7 +415,9 @@
   z-index: 10;
 }
 
-.gr-loading-overlay[hidden] { display: none; }
+.gr-loading-overlay[hidden] {
+  display: none;
+}
 
 .gr-loading-dots {
   display: flex;
@@ -423,13 +433,27 @@
   animation: gr-bounce 1.2s ease-in-out infinite;
 }
 
-.gr-loading-dots span:nth-child(1) { animation-delay: 0s; }
-.gr-loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-.gr-loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+.gr-loading-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+.gr-loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.gr-loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes gr-bounce {
-  0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
-  40%            { transform: scale(1.0); opacity: 1; }
+  0%,
+  80%,
+  100% {
+    transform: scale(0.7);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .gr-loading-text {
@@ -448,9 +472,13 @@
   flex-direction: column;
 }
 
-.gr-card-container[hidden] { display: none; }
+.gr-card-container[hidden] {
+  display: none;
+}
 
-.gr-card-container::-webkit-scrollbar { width: 4px; }
+.gr-card-container::-webkit-scrollbar {
+  width: 4px;
+}
 .gr-card-container::-webkit-scrollbar-thumb {
   background: var(--gr-border-hi);
   border-radius: 2px;
@@ -512,7 +540,9 @@
   text-transform: uppercase;
 }
 
-.gr-monitor-badge[hidden] { display: none; }
+.gr-monitor-badge[hidden] {
+  display: none;
+}
 
 /* Action buttons */
 
@@ -526,7 +556,10 @@
   font-size: 11px;
   font-weight: 600;
   padding: 5px 12px;
-  transition: background var(--gr-transition), color var(--gr-transition), border-color var(--gr-transition);
+  transition:
+    background var(--gr-transition),
+    color var(--gr-transition),
+    border-color var(--gr-transition);
   outline: none;
   white-space: nowrap;
 }
@@ -615,7 +648,7 @@
 }
 
 .gr-card-list li::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 6px;
   top: 7px;
@@ -701,11 +734,20 @@
 /* ── Responsive tweak ─────────────────────────────────────────── */
 
 @media (max-width: 700px) {
-  .gr-sidebar { width: 160px; min-width: 140px; }
-  .gr-card-topic { font-size: 14px; }
-  .gr-card-header__actions { flex-wrap: wrap; }
+  .gr-sidebar {
+    width: 160px;
+    min-width: 140px;
+  }
+  .gr-card-topic {
+    font-size: 14px;
+  }
+  .gr-card-header__actions {
+    flex-wrap: wrap;
+  }
 }
 
 @media (max-width: 520px) {
-  .gr-sidebar { display: none; }
+  .gr-sidebar {
+    display: none;
+  }
 }

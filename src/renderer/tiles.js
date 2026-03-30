@@ -5,11 +5,9 @@
  * colored diamonds using PixiJS Graphics.
  */
 
-import { Graphics } from 'pixi.js';
-import {
-  TILE_WIDTH, TILE_HEIGHT, GRID_SIZE, COLORS,
-} from './constants.js';
-import { buildPathTiles, ZONE_DEFS } from './zones.js';
+import { Graphics } from "pixi.js";
+import { TILE_WIDTH, TILE_HEIGHT, GRID_SIZE, COLORS } from "./constants.js";
+import { buildPathTiles, ZONE_DEFS } from "./zones.js";
 
 // ── Isometric projection helpers ────────────────────────────────────
 
@@ -50,18 +48,18 @@ export function screenToTile(screenX, screenY) {
 function getTileType(x, y, pathTiles) {
   // Water border: outer 2-tile ring
   if (x < 2 || y < 2 || x >= GRID_SIZE - 2 || y >= GRID_SIZE - 2) {
-    return 'water';
+    return "water";
   }
   // Water: outer 4-tile ring with some variation
   if (x < 4 || y < 4 || x >= GRID_SIZE - 4 || y >= GRID_SIZE - 4) {
     // Slightly shallower water
-    return 'water';
+    return "water";
   }
   // Path tiles
   if (pathTiles.has(`${x},${y}`)) {
-    return 'path';
+    return "path";
   }
-  return 'grass';
+  return "grass";
 }
 
 /**
@@ -76,19 +74,18 @@ function drawDiamond(gfx, sx, sy, color) {
   const hh = TILE_HEIGHT / 2;
 
   gfx.poly([
-    sx,      sy,        // top
-    sx + hw, sy + hh/2, // right
-    sx,      sy + hh,   // bottom
-    sx - hw, sy + hh/2, // left
+    sx,
+    sy, // top
+    sx + hw,
+    sy + hh / 2, // right
+    sx,
+    sy + hh, // bottom
+    sx - hw,
+    sy + hh / 2, // left
   ]);
   gfx.fill({ color });
   // Subtle grid line
-  gfx.poly([
-    sx,      sy,
-    sx + hw, sy + hh/2,
-    sx,      sy + hh,
-    sx - hw, sy + hh/2,
-  ]);
+  gfx.poly([sx, sy, sx + hw, sy + hh / 2, sx, sy + hh, sx - hw, sy + hh / 2]);
   gfx.stroke({ color: 0x000000, alpha: 0.06, width: 0.5 });
 }
 
@@ -119,18 +116,19 @@ export function createTileGrid() {
 
       let color;
       switch (type) {
-        case 'water':
+        case "water":
           // Deeper water at edges
-          color = (tx < 2 || ty < 2 || tx >= GRID_SIZE - 2 || ty >= GRID_SIZE - 2)
-            ? COLORS.waterDeep
-            : COLORS.water;
+          color =
+            tx < 2 || ty < 2 || tx >= GRID_SIZE - 2 || ty >= GRID_SIZE - 2
+              ? COLORS.waterDeep
+              : COLORS.water;
           break;
-        case 'path':
+        case "path":
           color = COLORS.path;
           break;
         default:
           // Alternate grass colors in a checkerboard
-          color = ((tx + ty) % 2 === 0) ? COLORS.grass : COLORS.grassAlt;
+          color = (tx + ty) % 2 === 0 ? COLORS.grass : COLORS.grassAlt;
       }
 
       drawDiamond(gfx, sx, sy, color);

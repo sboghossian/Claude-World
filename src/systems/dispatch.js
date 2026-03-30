@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const { ProviderError } = require('./providers/base');
+const { ProviderError } = require("./providers/base");
 
 /**
  * DispatchManager — routes AI tasks to registered provider adapters.
@@ -75,10 +75,18 @@ class DispatchManager {
   async ping(providerName) {
     const adapter = this._providers.get(providerName);
     if (!adapter) {
-      return { ok: false, latencyMs: 0, error: `Unknown provider "${providerName}"` };
+      return {
+        ok: false,
+        latencyMs: 0,
+        error: `Unknown provider "${providerName}"`,
+      };
     }
     if (!adapter.isConfigured()) {
-      return { ok: false, latencyMs: 0, error: `No API key configured for "${providerName}"` };
+      return {
+        ok: false,
+        latencyMs: 0,
+        error: `No API key configured for "${providerName}"`,
+      };
     }
     return adapter.ping();
   }
@@ -112,7 +120,11 @@ class DispatchManager {
     });
     const latencyMs = Date.now() - start;
 
-    const costUsd = adapter.calculateCost(result.inputTokens, result.outputTokens, result.model);
+    const costUsd = adapter.calculateCost(
+      result.inputTokens,
+      result.outputTokens,
+      result.model,
+    );
 
     // Record spending in key store
     this._recordCost(providerName, costUsd);
@@ -150,20 +162,20 @@ class DispatchManager {
       systemPrompt: task.systemPrompt || null,
       maxTokens,
     })) {
-      if (chunk.type === 'text') {
+      if (chunk.type === "text") {
         yield chunk;
-      } else if (chunk.type === 'done') {
+      } else if (chunk.type === "done") {
         const latencyMs = Date.now() - start;
         const costUsd = adapter.calculateCost(
           chunk.inputTokens,
           chunk.outputTokens,
-          chunk.model
+          chunk.model,
         );
 
         this._recordCost(providerName, costUsd);
 
         yield {
-          type: 'done',
+          type: "done",
           provider: providerName,
           model: chunk.model,
           inputTokens: chunk.inputTokens,
@@ -185,16 +197,16 @@ class DispatchManager {
   _resolveProvider(requested) {
     const providerName = requested || this._defaultProvider;
     if (!providerName) {
-      throw new ProviderError('dispatch', 'No providers registered');
+      throw new ProviderError("dispatch", "No providers registered");
     }
     const adapter = this._providers.get(providerName);
     if (!adapter) {
-      throw new ProviderError('dispatch', `Unknown provider "${providerName}"`);
+      throw new ProviderError("dispatch", `Unknown provider "${providerName}"`);
     }
     if (!adapter.isConfigured()) {
       throw new ProviderError(
         providerName,
-        `No API key configured for "${providerName}". Add one in Settings > API Keys.`
+        `No API key configured for "${providerName}". Add one in Settings > API Keys.`,
       );
     }
     return { adapter, providerName };
@@ -210,7 +222,10 @@ class DispatchManager {
       try {
         this.keyStore.recordSpend(provider, costUsd);
       } catch (err) {
-        console.warn(`[dispatch] Failed to record spend for ${provider}:`, err.message);
+        console.warn(
+          `[dispatch] Failed to record spend for ${provider}:`,
+          err.message,
+        );
       }
     }
   }

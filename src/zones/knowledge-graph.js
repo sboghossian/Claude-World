@@ -22,30 +22,37 @@
 // ── Constants ──────────────────────────────────────────────────────────
 
 const NODE_TYPES = {
-  zone:      { shape: 'hexagon',  color: '#3b82f6', label: 'Zone',      radius: 18 },
-  agent:     { shape: 'circle',   color: '#a855f7', label: 'Agent',     radius: 14 },
-  task:      { shape: 'dot',      color: '#22c55e', label: 'Task',      radius: 6  },
-  skill:     { shape: 'diamond',  color: '#f59e0b', label: 'Skill',     radius: 12 },
-  knowledge: { shape: 'square',   color: '#22d3ee', label: 'Knowledge', radius: 11 },
+  zone: { shape: "hexagon", color: "#3b82f6", label: "Zone", radius: 18 },
+  agent: { shape: "circle", color: "#a855f7", label: "Agent", radius: 14 },
+  task: { shape: "dot", color: "#22c55e", label: "Task", radius: 6 },
+  skill: { shape: "diamond", color: "#f59e0b", label: "Skill", radius: 12 },
+  knowledge: {
+    shape: "square",
+    color: "#22d3ee",
+    label: "Knowledge",
+    radius: 11,
+  },
 };
 
-const EDGE_COLOR        = 'rgba(255,255,255,0.08)';
-const EDGE_HIGHLIGHT    = 'rgba(255,255,255,0.35)';
-const EDGE_DIM          = 'rgba(255,255,255,0.03)';
-const LABEL_FONT        = '10px Inter, -apple-system, sans-serif';
-const FPS_INTERVAL      = 1000 / 30;   // 30 fps cap
-const SEARCH_HIGHLIGHT  = '#ffd700';
+const EDGE_COLOR = "rgba(255,255,255,0.08)";
+const EDGE_HIGHLIGHT = "rgba(255,255,255,0.35)";
+const EDGE_DIM = "rgba(255,255,255,0.03)";
+const LABEL_FONT = "10px Inter, -apple-system, sans-serif";
+const FPS_INTERVAL = 1000 / 30; // 30 fps cap
+const SEARCH_HIGHLIGHT = "#ffd700";
 
 // Physics defaults
-const DEFAULT_GRAVITY   = 0.02;
+const DEFAULT_GRAVITY = 0.02;
 const DEFAULT_REPULSION = 800;
 const DEFAULT_LINK_DIST = 120;
-const DAMPING           = 0.92;
-const MIN_VELOCITY      = 0.01;
+const DAMPING = 0.92;
+const MIN_VELOCITY = 0.01;
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
-function dpr() { return window.devicePixelRatio || 1; }
+function dpr() {
+  return window.devicePixelRatio || 1;
+}
 
 function dist(a, b) {
   const dx = a.x - b.x;
@@ -53,18 +60,20 @@ function dist(a, b) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function clamp(v, lo, hi) {
+  return Math.max(lo, Math.min(hi, v));
+}
 
 function escHtml(s) {
-  if (!s) return '';
-  const d = document.createElement('div');
+  if (!s) return "";
+  const d = document.createElement("div");
   d.textContent = s;
   return d.innerHTML;
 }
 
 function truncate(s, max = 24) {
-  if (!s) return '';
-  return s.length > max ? s.slice(0, max - 1) + '\u2026' : s;
+  if (!s) return "";
+  return s.length > max ? s.slice(0, max - 1) + "\u2026" : s;
 }
 
 // ── KnowledgeGraph class ───────────────────────────────────────────────
@@ -93,36 +102,42 @@ export class KnowledgeGraph {
     this._nodeMap = new Map();
 
     // Interaction state
-    this._dragNode    = null;
-    this._panStart    = null;
-    this._panOffset   = { x: 0, y: 0 };
+    this._dragNode = null;
+    this._panStart = null;
+    this._panOffset = { x: 0, y: 0 };
     this._hoveredNode = null;
     this._selectedNode = null;
-    this._zoom         = 1;
+    this._zoom = 1;
 
     // Filters — all visible by default
-    this._filters = { zone: true, agent: true, task: true, skill: true, knowledge: true };
+    this._filters = {
+      zone: true,
+      agent: true,
+      task: true,
+      skill: true,
+      knowledge: true,
+    };
 
     // Search
-    this._searchQuery = '';
+    this._searchQuery = "";
 
     // Physics tunables
-    this._gravity   = DEFAULT_GRAVITY;
+    this._gravity = DEFAULT_GRAVITY;
     this._repulsion = DEFAULT_REPULSION;
-    this._linkDist  = DEFAULT_LINK_DIST;
+    this._linkDist = DEFAULT_LINK_DIST;
 
     // Animation
-    this._rafId     = null;
+    this._rafId = null;
     this._lastFrame = 0;
-    this._running   = false;
+    this._running = false;
 
     // Bound handlers (for removal)
-    this._onMouseDown  = this._handleMouseDown.bind(this);
-    this._onMouseMove  = this._handleMouseMove.bind(this);
-    this._onMouseUp    = this._handleMouseUp.bind(this);
-    this._onWheel      = this._handleWheel.bind(this);
-    this._onResize     = this._handleResize.bind(this);
-    this._onDblClick   = this._handleDblClick.bind(this);
+    this._onMouseDown = this._handleMouseDown.bind(this);
+    this._onMouseMove = this._handleMouseMove.bind(this);
+    this._onMouseUp = this._handleMouseUp.bind(this);
+    this._onWheel = this._handleWheel.bind(this);
+    this._onResize = this._handleResize.bind(this);
+    this._onDblClick = this._handleDblClick.bind(this);
   }
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -136,45 +151,46 @@ export class KnowledgeGraph {
   render() {
     this._injectCSS();
 
-    const el = document.createElement('div');
-    el.className = 'kg-zone';
-    el.setAttribute('role', 'region');
-    el.setAttribute('aria-label', 'Knowledge Graph');
+    const el = document.createElement("div");
+    el.className = "kg-zone";
+    el.setAttribute("role", "region");
+    el.setAttribute("aria-label", "Knowledge Graph");
     this._el = el;
 
     // Canvas
-    const canvas = document.createElement('canvas');
-    canvas.className = 'kg-canvas';
+    const canvas = document.createElement("canvas");
+    canvas.className = "kg-canvas";
     this._canvas = canvas;
     el.appendChild(canvas);
 
     // Search bar
-    el.insertAdjacentHTML('beforeend', this._buildSearchHTML());
+    el.insertAdjacentHTML("beforeend", this._buildSearchHTML());
 
     // Filter bar
-    el.insertAdjacentHTML('beforeend', this._buildFilterHTML());
+    el.insertAdjacentHTML("beforeend", this._buildFilterHTML());
 
     // Physics panel
-    el.insertAdjacentHTML('beforeend', this._buildPhysicsHTML());
+    el.insertAdjacentHTML("beforeend", this._buildPhysicsHTML());
 
     // Legend
-    el.insertAdjacentHTML('beforeend', this._buildLegendHTML());
+    el.insertAdjacentHTML("beforeend", this._buildLegendHTML());
 
     // Tooltip
-    const tooltip = document.createElement('div');
-    tooltip.className = 'kg-tooltip';
+    const tooltip = document.createElement("div");
+    tooltip.className = "kg-tooltip";
     this._tooltip = tooltip;
     el.appendChild(tooltip);
 
     // Sidebar
-    el.insertAdjacentHTML('beforeend', this._buildSidebarHTML());
+    el.insertAdjacentHTML("beforeend", this._buildSidebarHTML());
 
     // Empty state
-    el.insertAdjacentHTML('beforeend',
+    el.insertAdjacentHTML(
+      "beforeend",
       `<div class="kg-empty" style="display:none;" data-ref="empty">
         <div class="kg-empty-icon">\u26A1</div>
         <div>No graph data yet.<br>Add zones, agents, or tasks to visualise.</div>
-      </div>`
+      </div>`,
     );
 
     // Wire events
@@ -201,13 +217,13 @@ export class KnowledgeGraph {
     this._running = false;
     if (this._rafId) cancelAnimationFrame(this._rafId);
     if (this._canvas) {
-      this._canvas.removeEventListener('mousedown', this._onMouseDown);
-      this._canvas.removeEventListener('mousemove', this._onMouseMove);
-      this._canvas.removeEventListener('mouseup', this._onMouseUp);
-      this._canvas.removeEventListener('wheel', this._onWheel);
-      this._canvas.removeEventListener('dblclick', this._onDblClick);
+      this._canvas.removeEventListener("mousedown", this._onMouseDown);
+      this._canvas.removeEventListener("mousemove", this._onMouseMove);
+      this._canvas.removeEventListener("mouseup", this._onMouseUp);
+      this._canvas.removeEventListener("wheel", this._onWheel);
+      this._canvas.removeEventListener("dblclick", this._onDblClick);
     }
-    window.removeEventListener('resize', this._onResize);
+    window.removeEventListener("resize", this._onResize);
   }
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -215,12 +231,12 @@ export class KnowledgeGraph {
   // ═══════════════════════════════════════════════════════════════════════
 
   _injectCSS() {
-    const id = 'knowledge-graph-styles';
+    const id = "knowledge-graph-styles";
     if (document.getElementById(id)) return;
-    const link = document.createElement('link');
+    const link = document.createElement("link");
     link.id = id;
-    link.rel = 'stylesheet';
-    link.href = 'src/zones/knowledge-graph.css';
+    link.rel = "stylesheet";
+    link.href = "src/zones/knowledge-graph.css";
     document.head.appendChild(link);
   }
 
@@ -238,12 +254,16 @@ export class KnowledgeGraph {
   }
 
   _buildFilterHTML() {
-    const btns = Object.entries(NODE_TYPES).map(([key, cfg]) => `
+    const btns = Object.entries(NODE_TYPES)
+      .map(
+        ([key, cfg]) => `
       <button class="kg-filter-btn active" data-type="${key}">
         <span class="kg-filter-dot" style="background:${cfg.color}"></span>
         ${cfg.label}
       </button>
-    `).join('');
+    `,
+      )
+      .join("");
     return `<div class="kg-filter-bar">${btns}</div>`;
   }
 
@@ -273,27 +293,29 @@ export class KnowledgeGraph {
   }
 
   _buildLegendHTML() {
-    const items = Object.entries(NODE_TYPES).map(([, cfg]) => {
-      let svg;
-      switch (cfg.shape) {
-        case 'hexagon':
-          svg = `<svg class="kg-legend-shape" viewBox="0 0 10 10"><polygon points="5,0 9.3,2.5 9.3,7.5 5,10 0.7,7.5 0.7,2.5" fill="${cfg.color}"/></svg>`;
-          break;
-        case 'circle':
-          svg = `<svg class="kg-legend-shape" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.5" fill="${cfg.color}"/></svg>`;
-          break;
-        case 'dot':
-          svg = `<svg class="kg-legend-shape" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="${cfg.color}"/></svg>`;
-          break;
-        case 'diamond':
-          svg = `<svg class="kg-legend-shape" viewBox="0 0 10 10"><polygon points="5,0 10,5 5,10 0,5" fill="${cfg.color}"/></svg>`;
-          break;
-        case 'square':
-          svg = `<svg class="kg-legend-shape" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" rx="1" fill="${cfg.color}"/></svg>`;
-          break;
-      }
-      return `<div class="kg-legend-item">${svg}<span>${cfg.label}</span></div>`;
-    }).join('');
+    const items = Object.entries(NODE_TYPES)
+      .map(([, cfg]) => {
+        let svg;
+        switch (cfg.shape) {
+          case "hexagon":
+            svg = `<svg class="kg-legend-shape" viewBox="0 0 10 10"><polygon points="5,0 9.3,2.5 9.3,7.5 5,10 0.7,7.5 0.7,2.5" fill="${cfg.color}"/></svg>`;
+            break;
+          case "circle":
+            svg = `<svg class="kg-legend-shape" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.5" fill="${cfg.color}"/></svg>`;
+            break;
+          case "dot":
+            svg = `<svg class="kg-legend-shape" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="${cfg.color}"/></svg>`;
+            break;
+          case "diamond":
+            svg = `<svg class="kg-legend-shape" viewBox="0 0 10 10"><polygon points="5,0 10,5 5,10 0,5" fill="${cfg.color}"/></svg>`;
+            break;
+          case "square":
+            svg = `<svg class="kg-legend-shape" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" rx="1" fill="${cfg.color}"/></svg>`;
+            break;
+        }
+        return `<div class="kg-legend-item">${svg}<span>${cfg.label}</span></div>`;
+      })
+      .join("");
     return `<div class="kg-legend">${items}</div>`;
   }
 
@@ -316,36 +338,36 @@ export class KnowledgeGraph {
     const el = this._el;
 
     // Canvas interactions
-    this._canvas.addEventListener('mousedown', this._onMouseDown);
-    this._canvas.addEventListener('mousemove', this._onMouseMove);
-    this._canvas.addEventListener('mouseup', this._onMouseUp);
-    this._canvas.addEventListener('mouseleave', this._onMouseUp);
-    this._canvas.addEventListener('wheel', this._onWheel, { passive: false });
-    this._canvas.addEventListener('dblclick', this._onDblClick);
-    window.addEventListener('resize', this._onResize);
+    this._canvas.addEventListener("mousedown", this._onMouseDown);
+    this._canvas.addEventListener("mousemove", this._onMouseMove);
+    this._canvas.addEventListener("mouseup", this._onMouseUp);
+    this._canvas.addEventListener("mouseleave", this._onMouseUp);
+    this._canvas.addEventListener("wheel", this._onWheel, { passive: false });
+    this._canvas.addEventListener("dblclick", this._onDblClick);
+    window.addEventListener("resize", this._onResize);
 
     // Filter buttons
-    el.querySelectorAll('.kg-filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+    el.querySelectorAll(".kg-filter-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
         const type = btn.dataset.type;
         this._filters[type] = !this._filters[type];
-        btn.classList.toggle('active', this._filters[type]);
+        btn.classList.toggle("active", this._filters[type]);
       });
     });
 
     // Physics sliders
-    el.querySelectorAll('.kg-slider').forEach(slider => {
-      slider.addEventListener('input', () => {
+    el.querySelectorAll(".kg-slider").forEach((slider) => {
+      slider.addEventListener("input", () => {
         const param = slider.dataset.param;
         const val = Number(slider.value);
         const display = el.querySelector(`[data-val="${param}"]`);
-        if (param === 'gravity') {
+        if (param === "gravity") {
           this._gravity = val / 1000;
           if (display) display.textContent = this._gravity.toFixed(3);
-        } else if (param === 'repulsion') {
+        } else if (param === "repulsion") {
           this._repulsion = val;
           if (display) display.textContent = String(val);
-        } else if (param === 'linkDist') {
+        } else if (param === "linkDist") {
           this._linkDist = val;
           if (display) display.textContent = String(val);
         }
@@ -355,7 +377,7 @@ export class KnowledgeGraph {
     // Search
     const searchInput = el.querySelector('[data-ref="search"]');
     if (searchInput) {
-      searchInput.addEventListener('input', () => {
+      searchInput.addEventListener("input", () => {
         this._searchQuery = searchInput.value.trim().toLowerCase();
       });
     }
@@ -363,9 +385,9 @@ export class KnowledgeGraph {
     // Sidebar close
     const closeBtn = el.querySelector('[data-ref="sidebar-close"]');
     if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
+      closeBtn.addEventListener("click", () => {
         this._selectedNode = null;
-        el.querySelector('[data-ref="sidebar"]').classList.remove('open');
+        el.querySelector('[data-ref="sidebar"]').classList.remove("open");
       });
     }
   }
@@ -389,66 +411,74 @@ export class KnowledgeGraph {
 
     // Fetch all entity types in parallel, gracefully degrading
     const [zones, agents, tasks, skills, knowledge] = await Promise.all([
-      db.getZones   ? db.getZones(wid).catch(() => [])   : Promise.resolve([]),
-      db.getAgents  ? db.getAgents(wid).catch(() => [])   : Promise.resolve([]),
-      db.getTasks   ? db.getTasks(wid, { limit: 200 }).catch(() => []) : Promise.resolve([]),
-      db.getSkills  ? db.getSkills(wid).catch(() => [])   : Promise.resolve([]),
-      db.getKnowledge ? db.getKnowledge(wid).catch(() => []) :
-        db.getBrainEntries ? db.getBrainEntries(wid).catch(() => []) : Promise.resolve([]),
+      db.getZones ? db.getZones(wid).catch(() => []) : Promise.resolve([]),
+      db.getAgents ? db.getAgents(wid).catch(() => []) : Promise.resolve([]),
+      db.getTasks
+        ? db.getTasks(wid, { limit: 200 }).catch(() => [])
+        : Promise.resolve([]),
+      db.getSkills ? db.getSkills(wid).catch(() => []) : Promise.resolve([]),
+      db.getKnowledge
+        ? db.getKnowledge(wid).catch(() => [])
+        : db.getBrainEntries
+          ? db.getBrainEntries(wid).catch(() => [])
+          : Promise.resolve([]),
     ]);
 
     // Build zone nodes
-    for (const z of (zones || [])) {
+    for (const z of zones || []) {
       const id = `zone:${z.id || z.key || z.name}`;
-      this._addNode(id, 'zone', z.name || z.key || 'Zone', { raw: z });
+      this._addNode(id, "zone", z.name || z.key || "Zone", { raw: z });
     }
 
     // Build agent nodes + edges to their zone
-    for (const a of (agents || [])) {
+    for (const a of agents || []) {
       const id = `agent:${a.id || a.name}`;
-      this._addNode(id, 'agent', a.name || 'Agent', { raw: a });
+      this._addNode(id, "agent", a.name || "Agent", { raw: a });
       // Edge: agent → zone
       if (a.zone_key || a.zone || a.zoneKey) {
         const zoneRef = a.zone_key || a.zone || a.zoneKey;
-        const zoneId = this._findNodeId('zone', zoneRef);
+        const zoneId = this._findNodeId("zone", zoneRef);
         if (zoneId) this._edges.push({ source: id, target: zoneId });
       }
     }
 
     // Build task nodes + edges
-    for (const t of (tasks || [])) {
+    for (const t of tasks || []) {
       const id = `task:${t.id}`;
-      const label = truncate(t.prompt || t.description || t.title || `Task #${t.id}`, 20);
-      this._addNode(id, 'task', label, { raw: t });
+      const label = truncate(
+        t.prompt || t.description || t.title || `Task #${t.id}`,
+        20,
+      );
+      this._addNode(id, "task", label, { raw: t });
       // Edge: task → zone
       if (t.zone_key || t.zone || t.zoneKey) {
         const zoneRef = t.zone_key || t.zone || t.zoneKey;
-        const zoneId = this._findNodeId('zone', zoneRef);
+        const zoneId = this._findNodeId("zone", zoneRef);
         if (zoneId) this._edges.push({ source: id, target: zoneId });
       }
       // Edge: task → agent
       if (t.agent_id || t.agentId || t.agent) {
         const agentRef = String(t.agent_id || t.agentId || t.agent);
-        const agentId = this._findNodeId('agent', agentRef);
+        const agentId = this._findNodeId("agent", agentRef);
         if (agentId) this._edges.push({ source: id, target: agentId });
       }
     }
 
     // Build skill nodes + edges to agents
-    for (const s of (skills || [])) {
+    for (const s of skills || []) {
       const id = `skill:${s.id || s.name}`;
-      this._addNode(id, 'skill', s.name || s.skill || 'Skill', { raw: s });
+      this._addNode(id, "skill", s.name || s.skill || "Skill", { raw: s });
       if (s.agent_id || s.agentId || s.agent) {
         const agentRef = String(s.agent_id || s.agentId || s.agent);
-        const agentId = this._findNodeId('agent', agentRef);
+        const agentId = this._findNodeId("agent", agentRef);
         if (agentId) this._edges.push({ source: id, target: agentId });
       }
     }
 
     // Build knowledge nodes
-    for (const k of (knowledge || [])) {
+    for (const k of knowledge || []) {
       const id = `knowledge:${k.id || k.key}`;
-      this._addNode(id, 'knowledge', k.title || k.key || 'Entry', { raw: k });
+      this._addNode(id, "knowledge", k.title || k.key || "Entry", { raw: k });
     }
 
     this._showEmpty(this._nodes.length === 0);
@@ -466,14 +496,15 @@ export class KnowledgeGraph {
     if (this._nodeMap.has(direct)) return direct;
     // Fuzzy match on label
     for (const [id, n] of this._nodeMap) {
-      if (n.type === type && (n.label === ref || id.endsWith(`:${ref}`))) return id;
+      if (n.type === type && (n.label === ref || id.endsWith(`:${ref}`)))
+        return id;
     }
     return null;
   }
 
   _showEmpty(show) {
     const el = this._el?.querySelector('[data-ref="empty"]');
-    if (el) el.style.display = show ? '' : 'none';
+    if (el) el.style.display = show ? "" : "none";
   }
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -552,8 +583,14 @@ export class KnowledgeGraph {
         const force = this._repulsion / (d * d);
         const fx = (dx / d) * force;
         const fy = (dy / d) * force;
-        if (a !== this._dragNode) { a.vx += fx; a.vy += fy; }
-        if (b !== this._dragNode) { b.vx -= fx; b.vy -= fy; }
+        if (a !== this._dragNode) {
+          a.vx += fx;
+          a.vy += fy;
+        }
+        if (b !== this._dragNode) {
+          b.vx -= fx;
+          b.vy -= fy;
+        }
       }
     }
 
@@ -569,13 +606,23 @@ export class KnowledgeGraph {
       const force = displacement * 0.05;
       const fx = (dx / d) * force;
       const fy = (dy / d) * force;
-      if (a !== this._dragNode) { a.vx += fx; a.vy += fy; }
-      if (b !== this._dragNode) { b.vx -= fx; b.vy -= fy; }
+      if (a !== this._dragNode) {
+        a.vx += fx;
+        a.vy += fy;
+      }
+      if (b !== this._dragNode) {
+        b.vx -= fx;
+        b.vy -= fy;
+      }
     }
 
     // 4. Apply velocity + damping
     for (const n of nodes) {
-      if (n === this._dragNode) { n.vx = 0; n.vy = 0; continue; }
+      if (n === this._dragNode) {
+        n.vx = 0;
+        n.vy = 0;
+        continue;
+      }
       n.vx *= DAMPING;
       n.vy *= DAMPING;
       if (Math.abs(n.vx) < MIN_VELOCITY) n.vx = 0;
@@ -586,11 +633,11 @@ export class KnowledgeGraph {
   }
 
   _visibleNodes() {
-    return this._nodes.filter(n => this._filters[n.type]);
+    return this._nodes.filter((n) => this._filters[n.type]);
   }
 
   _visibleEdges() {
-    return this._edges.filter(e => {
+    return this._edges.filter((e) => {
       const a = this._nodeMap.get(e.source);
       const b = this._nodeMap.get(e.target);
       return a && b && this._filters[a.type] && this._filters[b.type];
@@ -612,11 +659,11 @@ export class KnowledgeGraph {
     if (canvas.width !== W * dpr() || canvas.height !== H * dpr()) {
       canvas.width = W * dpr();
       canvas.height = H * dpr();
-      canvas.style.width = W + 'px';
-      canvas.style.height = H + 'px';
+      canvas.style.width = W + "px";
+      canvas.style.height = H + "px";
     }
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     ctx.save();
     ctx.setTransform(dpr(), 0, 0, dpr(), 0, 0);
 
@@ -667,7 +714,12 @@ export class KnowledgeGraph {
       if (!cfg) continue;
 
       let alpha = 1;
-      if (selected && selected.id !== node.id && connectedIds && !connectedIds.has(node.id)) {
+      if (
+        selected &&
+        selected.id !== node.id &&
+        connectedIds &&
+        !connectedIds.has(node.id)
+      ) {
         alpha = 0.2;
       }
 
@@ -693,9 +745,11 @@ export class KnowledgeGraph {
       // Label
       if (cfg.radius >= 10 || node === this._hoveredNode || isSearchMatch) {
         ctx.font = LABEL_FONT;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillStyle = isSearchMatch ? SEARCH_HIGHLIGHT : 'rgba(232,232,240,0.8)';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.fillStyle = isSearchMatch
+          ? SEARCH_HIGHLIGHT
+          : "rgba(232,232,240,0.8)";
         ctx.fillText(truncate(node.label, 18), node.x, node.y + cfg.radius + 4);
       }
 
@@ -711,11 +765,11 @@ export class KnowledgeGraph {
     const r = cfg.radius;
 
     ctx.fillStyle = cfg.color;
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.strokeStyle = "rgba(255,255,255,0.15)";
     ctx.lineWidth = 1.5;
 
     switch (cfg.shape) {
-      case 'hexagon': {
+      case "hexagon": {
         ctx.beginPath();
         for (let i = 0; i < 6; i++) {
           const angle = (Math.PI / 3) * i - Math.PI / 6;
@@ -728,15 +782,15 @@ export class KnowledgeGraph {
         ctx.stroke();
         break;
       }
-      case 'circle':
-      case 'dot': {
+      case "circle":
+      case "dot": {
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
-        if (cfg.shape === 'circle') ctx.stroke();
+        if (cfg.shape === "circle") ctx.stroke();
         break;
       }
-      case 'diamond': {
+      case "diamond": {
         ctx.beginPath();
         ctx.moveTo(x, y - r);
         ctx.lineTo(x + r, y);
@@ -747,7 +801,7 @@ export class KnowledgeGraph {
         ctx.stroke();
         break;
       }
-      case 'square': {
+      case "square": {
         const half = r * 0.8;
         ctx.beginPath();
         ctx.roundRect(x - half, y - half, half * 2, half * 2, 3);
@@ -802,11 +856,14 @@ export class KnowledgeGraph {
 
     if (node) {
       this._dragNode = node;
-      this._canvas.classList.add('grabbing');
+      this._canvas.classList.add("grabbing");
     } else {
       // Start panning
-      this._panStart = { x: e.clientX - this._panOffset.x, y: e.clientY - this._panOffset.y };
-      this._canvas.classList.add('grabbing');
+      this._panStart = {
+        x: e.clientX - this._panOffset.x,
+        y: e.clientY - this._panOffset.y,
+      };
+      this._canvas.classList.add("grabbing");
     }
   }
 
@@ -835,7 +892,7 @@ export class KnowledgeGraph {
     // Hover detection
     const node = this._nodeAtPoint(mx, my);
     this._hoveredNode = node;
-    this._canvas.classList.toggle('pointer', !!node);
+    this._canvas.classList.toggle("pointer", !!node);
 
     // Tooltip
     if (node && this._tooltip) {
@@ -843,11 +900,11 @@ export class KnowledgeGraph {
       this._tooltip.innerHTML = `
         <div class="kg-tooltip-type">${cfg.label}</div>
         <div>${escHtml(node.label)}</div>`;
-      this._tooltip.style.left = (mx + 14) + 'px';
-      this._tooltip.style.top = (my - 10) + 'px';
-      this._tooltip.classList.add('visible');
+      this._tooltip.style.left = mx + 14 + "px";
+      this._tooltip.style.top = my - 10 + "px";
+      this._tooltip.classList.add("visible");
     } else if (this._tooltip) {
-      this._tooltip.classList.remove('visible');
+      this._tooltip.classList.remove("visible");
     }
   }
 
@@ -859,7 +916,7 @@ export class KnowledgeGraph {
     if (this._panStart) {
       this._panStart = null;
     }
-    this._canvas.classList.remove('grabbing');
+    this._canvas.classList.remove("grabbing");
   }
 
   _handleDblClick(e) {
@@ -911,15 +968,17 @@ export class KnowledgeGraph {
     // Show raw metadata
     if (node.raw) {
       const raw = node.raw;
-      const keys = Object.keys(raw).filter(k => k !== 'id' && typeof raw[k] !== 'object');
+      const keys = Object.keys(raw).filter(
+        (k) => k !== "id" && typeof raw[k] !== "object",
+      );
       for (const k of keys.slice(0, 8)) {
         const val = raw[k];
-        if (val != null && val !== '') {
+        if (val != null && val !== "") {
           html += `<div class="kg-sidebar-detail"><strong>${escHtml(k)}:</strong> ${escHtml(String(val))}</div>`;
         }
       }
     }
-    html += '</div>';
+    html += "</div>";
 
     // Connections
     const connected = this._connectedNodeIds(node.id);
@@ -936,14 +995,14 @@ export class KnowledgeGraph {
             <span>${escHtml(cn.label)}</span>
           </div>`;
       }
-      html += '</div>';
+      html += "</div>";
     }
 
     body.innerHTML = html;
 
     // Wire connection item clicks
-    body.querySelectorAll('.kg-connection-item').forEach(item => {
-      item.addEventListener('click', () => {
+    body.querySelectorAll(".kg-connection-item").forEach((item) => {
+      item.addEventListener("click", () => {
         const nid = item.dataset.nodeId;
         const target = this._nodeMap.get(nid);
         if (target) {
@@ -953,11 +1012,11 @@ export class KnowledgeGraph {
       });
     });
 
-    sidebar.classList.add('open');
+    sidebar.classList.add("open");
   }
 
   _closeSidebar() {
     const sidebar = this._el?.querySelector('[data-ref="sidebar"]');
-    if (sidebar) sidebar.classList.remove('open');
+    if (sidebar) sidebar.classList.remove("open");
   }
 }

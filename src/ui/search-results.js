@@ -12,44 +12,44 @@
  *   sr.show(results);
  */
 
-import { GlobalSearch } from '../systems/global-search.js';
+import { GlobalSearch } from "../systems/global-search.js";
 
 // ── Zone icons (matches command-palette.js ZONES) ────────────────────────────
 
 const ZONE_ICONS = {
-  dispatch:   '\u{1F5FC}',
-  legal:      '\u2696\uFE0F',
-  council:    '\u{1F3DB}\uFE0F',
-  sales:      '\u{1F4C8}',
-  marketing:  '\u{1F4E3}',
-  globe:      '\u{1F310}',
-  broadcast:  '\u{1F4E1}',
-  rnd:        '\u{1F52C}',
-  skills:     '\u{1F393}',
-  chat:       '\u{1F4AC}',
+  dispatch: "\u{1F5FC}",
+  legal: "\u2696\uFE0F",
+  council: "\u{1F3DB}\uFE0F",
+  sales: "\u{1F4C8}",
+  marketing: "\u{1F4E3}",
+  globe: "\u{1F310}",
+  broadcast: "\u{1F4E1}",
+  rnd: "\u{1F52C}",
+  skills: "\u{1F393}",
+  chat: "\u{1F4AC}",
 };
 
 const TYPE_LABELS = {
-  tasks:            'Task',
-  legal_docs:       'Legal Doc',
-  council_sessions: 'Council',
-  leads:            'Lead',
-  content_pieces:   'Content',
-  research_queries: 'Research',
-  broadcast_log:    'Broadcast',
-  experiments:      'Experiment',
-  skills:           'Skill',
-  messages:         'Message',
+  tasks: "Task",
+  legal_docs: "Legal Doc",
+  council_sessions: "Council",
+  leads: "Lead",
+  content_pieces: "Content",
+  research_queries: "Research",
+  broadcast_log: "Broadcast",
+  experiments: "Experiment",
+  skills: "Skill",
+  messages: "Message",
 };
 
 // ── HTML helpers ─────────────────────────────────────────────────────────────
 
 function escapeHtml(str) {
   return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 // ── SearchResults class ──────────────────────────────────────────────────────
@@ -72,7 +72,7 @@ export class SearchResults {
     /** @type {boolean} */
     this._loading = false;
     /** @type {string} */
-    this._lastQuery = '';
+    this._lastQuery = "";
 
     this._createDOM();
     this._bindEvents();
@@ -81,18 +81,18 @@ export class SearchResults {
   // ── DOM creation ───────────────────────────────────────────────────────────
 
   _createDOM() {
-    this._container = document.createElement('div');
-    this._container.className = 'sr-container';
-    this._container.style.display = 'none';
+    this._container = document.createElement("div");
+    this._container.className = "sr-container";
+    this._container.style.display = "none";
 
-    this._listEl = document.createElement('div');
-    this._listEl.className = 'sr-list';
-    this._listEl.setAttribute('role', 'listbox');
-    this._listEl.setAttribute('aria-label', 'Global search results');
+    this._listEl = document.createElement("div");
+    this._listEl.className = "sr-list";
+    this._listEl.setAttribute("role", "listbox");
+    this._listEl.setAttribute("aria-label", "Global search results");
     this._container.appendChild(this._listEl);
 
     // Insert after the command palette input area, before the results
-    const cpResults = this._paletteEl.querySelector('.cp-results');
+    const cpResults = this._paletteEl.querySelector(".cp-results");
     if (cpResults) {
       this._paletteEl.insertBefore(this._container, cpResults);
     } else {
@@ -104,8 +104,8 @@ export class SearchResults {
 
   _bindEvents() {
     // Listen for clicks on result items
-    this._listEl.addEventListener('click', (e) => {
-      const row = e.target.closest('.sr-row');
+    this._listEl.addEventListener("click", (e) => {
+      const row = e.target.closest(".sr-row");
       if (!row) return;
       const idx = parseInt(row.dataset.index, 10);
       if (!isNaN(idx) && this._results[idx]) {
@@ -124,8 +124,14 @@ export class SearchResults {
     this._onGlobalSearchClear = () => {
       this.hide();
     };
-    document.addEventListener('command-palette:global-search', this._onGlobalSearch);
-    document.addEventListener('command-palette:global-search-clear', this._onGlobalSearchClear);
+    document.addEventListener(
+      "command-palette:global-search",
+      this._onGlobalSearch,
+    );
+    document.addEventListener(
+      "command-palette:global-search-clear",
+      this._onGlobalSearchClear,
+    );
   }
 
   // ── Public API ─────────────────────────────────────────────────────────────
@@ -174,7 +180,7 @@ export class SearchResults {
    */
   hide() {
     this._visible = false;
-    this._container.style.display = 'none';
+    this._container.style.display = "none";
     this._results = [];
     this._selectedIndex = -1;
     this._search.cancelPending();
@@ -201,7 +207,11 @@ export class SearchResults {
    * @returns {boolean} True if we handled the execution
    */
   executeSelected() {
-    if (!this._visible || this._selectedIndex < 0 || !this._results[this._selectedIndex]) {
+    if (
+      !this._visible ||
+      this._selectedIndex < 0 ||
+      !this._results[this._selectedIndex]
+    ) {
       return false;
     }
     this._executeResult(this._results[this._selectedIndex]);
@@ -236,8 +246,14 @@ export class SearchResults {
    */
   destroy() {
     this._search.destroy();
-    document.removeEventListener('command-palette:global-search', this._onGlobalSearch);
-    document.removeEventListener('command-palette:global-search-clear', this._onGlobalSearchClear);
+    document.removeEventListener(
+      "command-palette:global-search",
+      this._onGlobalSearch,
+    );
+    document.removeEventListener(
+      "command-palette:global-search-clear",
+      this._onGlobalSearchClear,
+    );
     if (this._container && this._container.parentNode) {
       this._container.parentNode.removeChild(this._container);
     }
@@ -247,7 +263,7 @@ export class SearchResults {
 
   _show() {
     this._visible = true;
-    this._container.style.display = 'block';
+    this._container.style.display = "block";
   }
 
   _setLoading(val) {
@@ -282,7 +298,7 @@ export class SearchResults {
     // Group results by zone type
     const grouped = new Map();
     for (const r of this._results) {
-      const key = r.type || 'unknown';
+      const key = r.type || "unknown";
       if (!grouped.has(key)) grouped.set(key, []);
       grouped.get(key).push(r);
     }
@@ -292,12 +308,12 @@ export class SearchResults {
 
     for (const [type, items] of grouped) {
       const meta = GlobalSearch.getZoneMeta(type);
-      const icon = meta ? meta.emoji : '\u{1F4CB}';
+      const icon = meta ? meta.emoji : "\u{1F4CB}";
       const label = TYPE_LABELS[type] || type;
 
       // Category header
-      const header = document.createElement('div');
-      header.className = 'sr-category-header';
+      const header = document.createElement("div");
+      header.className = "sr-category-header";
       header.innerHTML = `
         <span class="sr-category-icon">${icon}</span>
         <span class="sr-category-label">${escapeHtml(meta ? meta.label : label)}</span>
@@ -310,30 +326,30 @@ export class SearchResults {
         const idx = flatIndex++;
         const isSelected = idx === this._selectedIndex;
 
-        const row = document.createElement('div');
-        row.className = 'sr-row' + (isSelected ? ' sr-row--selected' : '');
-        row.setAttribute('role', 'option');
-        row.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        const row = document.createElement("div");
+        row.className = "sr-row" + (isSelected ? " sr-row--selected" : "");
+        row.setAttribute("role", "option");
+        row.setAttribute("aria-selected", isSelected ? "true" : "false");
         row.dataset.index = idx;
 
         // Type badge
-        const badge = document.createElement('span');
-        badge.className = 'sr-type-badge';
+        const badge = document.createElement("span");
+        badge.className = "sr-type-badge";
         badge.textContent = label;
         row.appendChild(badge);
 
         // Content (title + snippet)
-        const contentEl = document.createElement('div');
-        contentEl.className = 'sr-row-content';
+        const contentEl = document.createElement("div");
+        contentEl.className = "sr-row-content";
 
-        const titleEl = document.createElement('span');
-        titleEl.className = 'sr-row-title';
-        titleEl.textContent = result.title || 'Untitled';
+        const titleEl = document.createElement("span");
+        titleEl.className = "sr-row-title";
+        titleEl.textContent = result.title || "Untitled";
         contentEl.appendChild(titleEl);
 
         if (result.snippet) {
-          const snippetEl = document.createElement('span');
-          snippetEl.className = 'sr-row-snippet';
+          const snippetEl = document.createElement("span");
+          snippetEl.className = "sr-row-snippet";
           snippetEl.innerHTML = result.snippet; // already has <mark> tags
           contentEl.appendChild(snippetEl);
         }
@@ -341,29 +357,29 @@ export class SearchResults {
         row.appendChild(contentEl);
 
         // Right: enter hint
-        const rightEl = document.createElement('span');
-        rightEl.className = 'sr-row-right';
-        rightEl.innerHTML = '<kbd>\u21B5</kbd>';
+        const rightEl = document.createElement("span");
+        rightEl.className = "sr-row-right";
+        rightEl.innerHTML = "<kbd>\u21B5</kbd>";
         row.appendChild(rightEl);
 
         fragment.appendChild(row);
       }
     }
 
-    this._listEl.innerHTML = '';
+    this._listEl.innerHTML = "";
     this._listEl.appendChild(fragment);
   }
 
   _updateSelection() {
-    const rows = this._listEl.querySelectorAll('.sr-row');
+    const rows = this._listEl.querySelectorAll(".sr-row");
     rows.forEach((row, i) => {
       const idx = parseInt(row.dataset.index, 10);
       const isSelected = idx === this._selectedIndex;
-      row.classList.toggle('sr-row--selected', isSelected);
-      row.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+      row.classList.toggle("sr-row--selected", isSelected);
+      row.setAttribute("aria-selected", isSelected ? "true" : "false");
 
       if (isSelected) {
-        row.scrollIntoView({ block: 'nearest' });
+        row.scrollIntoView({ block: "nearest" });
       }
     });
   }
@@ -375,21 +391,25 @@ export class SearchResults {
     const zoneMeta = GlobalSearch.getZoneMeta(result.type);
 
     // Dispatch navigation event (same pattern as command palette)
-    document.dispatchEvent(new CustomEvent('command-palette:navigate', {
-      detail: {
-        zoneId: zoneId || (zoneMeta ? zoneMeta.zoneId : null),
-        zoneName: zoneMeta ? zoneMeta.label : result.type,
-        searchResultId: result.id,
-        searchResultType: result.type,
-      },
-      bubbles: true,
-    }));
+    document.dispatchEvent(
+      new CustomEvent("command-palette:navigate", {
+        detail: {
+          zoneId: zoneId || (zoneMeta ? zoneMeta.zoneId : null),
+          zoneName: zoneMeta ? zoneMeta.label : result.type,
+          searchResultId: result.id,
+          searchResultType: result.type,
+        },
+        bubbles: true,
+      }),
+    );
 
     // Also dispatch a specific search result event for zone panels to handle
-    document.dispatchEvent(new CustomEvent('search:result-selected', {
-      detail: { ...result },
-      bubbles: true,
-    }));
+    document.dispatchEvent(
+      new CustomEvent("search:result-selected", {
+        detail: { ...result },
+        bubbles: true,
+      }),
+    );
 
     // Hide after selection
     this.hide();

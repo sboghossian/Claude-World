@@ -281,7 +281,9 @@
   height: 14px;
   background: var(--text-secondary);
   border-radius: 50%;
-  transition: transform var(--transition-fast), background var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast);
 }
 
 /* Hidden native checkbox drives the toggle state */
@@ -301,12 +303,16 @@
   background: rgba(74, 255, 138, 0.25);
 }
 
-.knowledge-toggle input[type="checkbox"]:checked + .knowledge-toggle__switch::after {
+.knowledge-toggle
+  input[type="checkbox"]:checked
+  + .knowledge-toggle__switch::after {
   transform: translateX(16px);
   background: var(--accent-green);
 }
 
-.knowledge-toggle input[type="checkbox"]:focus-visible + .knowledge-toggle__switch {
+.knowledge-toggle
+  input[type="checkbox"]:focus-visible
+  + .knowledge-toggle__switch {
   outline: 2px solid var(--accent-blue);
   outline-offset: 2px;
 }

@@ -66,7 +66,8 @@
 }
 
 @keyframes tut-pulse-ring {
-  0%, 100% {
+  0%,
+  100% {
     stroke-opacity: 0.3;
     stroke-width: 2;
   }
@@ -169,7 +170,7 @@
 
 .tut-tooltip__text {
   margin: 0 0 16px 0;
-  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-family: var(--font-sans, "Inter", sans-serif);
   font-size: 14px;
   line-height: 1.6;
   color: var(--text-primary, #e8e8f0);
@@ -221,7 +222,7 @@
 .tut-tooltip__counter {
   flex: 1;
   text-align: center;
-  font-family: var(--font-mono, 'SF Mono', monospace);
+  font-family: var(--font-mono, "SF Mono", monospace);
   font-size: 11px;
   color: var(--text-secondary, #8888a0);
   user-select: none;
@@ -237,7 +238,7 @@
   justify-content: center;
   padding: 7px 16px;
   border-radius: var(--radius-sm, 6px);
-  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-family: var(--font-sans, "Inter", sans-serif);
   font-size: 13px;
   font-weight: 500;
   line-height: 1;
@@ -305,7 +306,8 @@
 
 /* Glow shimmer on the spotlight border */
 @keyframes tut-glow-shimmer {
-  0%, 100% {
+  0%,
+  100% {
     stroke: rgba(74, 158, 255, 0.4);
   }
   50% {
@@ -319,20 +321,36 @@
 
 /* Dot pop-in */
 @keyframes tut-dot-pop {
-  0%   { transform: scale(0); }
-  60%  { transform: scale(1.2); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .tut-dot {
   animation: tut-dot-pop 300ms ease-out both;
 }
 
-.tut-dot:nth-child(1)  { animation-delay:  0ms; }
-.tut-dot:nth-child(2)  { animation-delay: 40ms; }
-.tut-dot:nth-child(3)  { animation-delay: 80ms; }
-.tut-dot:nth-child(4)  { animation-delay: 120ms; }
-.tut-dot:nth-child(5)  { animation-delay: 160ms; }
+.tut-dot:nth-child(1) {
+  animation-delay: 0ms;
+}
+.tut-dot:nth-child(2) {
+  animation-delay: 40ms;
+}
+.tut-dot:nth-child(3) {
+  animation-delay: 80ms;
+}
+.tut-dot:nth-child(4) {
+  animation-delay: 120ms;
+}
+.tut-dot:nth-child(5) {
+  animation-delay: 160ms;
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    10. Responsive

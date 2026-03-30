@@ -16,42 +16,42 @@
 
 // ── Storage key ──────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = 'claude-world:quality';
+const STORAGE_KEY = "claude-world:quality";
 
 // ── Preset definitions ───────────────────────────────────────────────────────
 
 const PRESETS = {
   high: {
-    weather:        true,
-    particles:      true,
-    particleMax:    2000,
-    vfx:            true,
-    cityLife:       true,
-    agentSprites:   true,
-    dataFlows:      true,
-    targetFPS:      60,
+    weather: true,
+    particles: true,
+    particleMax: 2000,
+    vfx: true,
+    cityLife: true,
+    agentSprites: true,
+    dataFlows: true,
+    targetFPS: 60,
     resolutionScale: 1.0,
   },
   medium: {
-    weather:        false,
-    particles:      true,
-    particleMax:    500,
-    vfx:            true,
-    cityLife:       true,
-    agentSprites:   true,
-    dataFlows:      true,
-    targetFPS:      30,
+    weather: false,
+    particles: true,
+    particleMax: 500,
+    vfx: true,
+    cityLife: true,
+    agentSprites: true,
+    dataFlows: true,
+    targetFPS: 30,
     resolutionScale: 0.75,
   },
   low: {
-    weather:        false,
-    particles:      false,
-    particleMax:    100,
-    vfx:            false,
-    cityLife:       true,
-    agentSprites:   true,
-    dataFlows:      false,
-    targetFPS:      15,
+    weather: false,
+    particles: false,
+    particleMax: 100,
+    vfx: false,
+    cityLife: true,
+    agentSprites: true,
+    dataFlows: false,
+    targetFPS: 15,
     resolutionScale: 0.5,
   },
 };
@@ -85,7 +85,7 @@ function merge(target, source) {
 export class QualityManager {
   constructor() {
     /** @type {string} Current preset name ('high' | 'medium' | 'low' | 'custom') */
-    this._preset = 'medium';
+    this._preset = "medium";
 
     /** @type {object} Active settings object */
     this._settings = { ...DEFAULT_SETTINGS };
@@ -96,7 +96,9 @@ export class QualityManager {
     // Load persisted settings (if any)
     this._load();
 
-    console.log(`[Quality] Initialized — preset: ${this._preset}, FPS: ${this._settings.targetFPS}`);
+    console.log(
+      `[Quality] Initialized — preset: ${this._preset}, FPS: ${this._settings.targetFPS}`,
+    );
   }
 
   // ── Persistence ──────────────────────────────────────────────────────────
@@ -107,8 +109,8 @@ export class QualityManager {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return; // first run — will auto-detect later
       const saved = JSON.parse(raw);
-      if (saved && typeof saved === 'object') {
-        this._preset = saved._preset || 'custom';
+      if (saved && typeof saved === "object") {
+        this._preset = saved._preset || "custom";
         this._settings = merge(DEFAULT_SETTINGS, saved.settings || {});
       }
     } catch {
@@ -119,10 +121,13 @@ export class QualityManager {
   /** @private */
   _save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        _preset: this._preset,
-        settings: this._settings,
-      }));
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          _preset: this._preset,
+          settings: this._settings,
+        }),
+      );
     } catch {
       // localStorage may be unavailable in some contexts
     }
@@ -175,7 +180,7 @@ export class QualityManager {
       return;
     }
     this._settings[key] = value;
-    this._preset = this._matchPreset() || 'custom';
+    this._preset = this._matchPreset() || "custom";
     this._save();
     this._apply();
     this._dispatch();
@@ -201,16 +206,16 @@ export class QualityManager {
 
     // ── CPU cores ──────────────────────────────────────────────────
     const cores = navigator.hardwareConcurrency || 4;
-    if (cores >= 8)       score += 3;
-    else if (cores >= 4)  score += 2;
-    else                  score += 1;
+    if (cores >= 8) score += 3;
+    else if (cores >= 4) score += 2;
+    else score += 1;
 
     // ── Device memory (GB, Chrome-only) ────────────────────────────
     const mem = /** @type {any} */ (navigator).deviceMemory;
     if (mem !== undefined) {
-      if (mem >= 8)       score += 3;
-      else if (mem >= 4)  score += 2;
-      else                score += 1;
+      if (mem >= 8) score += 3;
+      else if (mem >= 4) score += 2;
+      else score += 1;
     } else {
       // Assume mid-range if API unavailable
       score += 2;
@@ -218,19 +223,19 @@ export class QualityManager {
 
     // ── FPS probe: measure requestAnimationFrame throughput ────────
     const probeFPS = await this._measureFPS(500); // 500ms sample
-    if (probeFPS >= 55)       score += 3;
-    else if (probeFPS >= 35)  score += 2;
-    else                      score += 1;
+    if (probeFPS >= 55) score += 3;
+    else if (probeFPS >= 35) score += 2;
+    else score += 1;
 
     // ── Map score to preset ────────────────────────────────────────
     let preset;
-    if (score >= 8)       preset = 'high';
-    else if (score >= 5)  preset = 'medium';
-    else                  preset = 'low';
+    if (score >= 8) preset = "high";
+    else if (score >= 5) preset = "medium";
+    else preset = "low";
 
     console.log(
-      `[Quality] Auto-detect — cores: ${cores}, mem: ${mem ?? '?'}GB, ` +
-      `probeFPS: ${Math.round(probeFPS)}, score: ${score} → ${preset}`
+      `[Quality] Auto-detect — cores: ${cores}, mem: ${mem ?? "?"}GB, ` +
+        `probeFPS: ${Math.round(probeFPS)}, score: ${score} → ${preset}`,
     );
 
     this.setPreset(preset);
@@ -285,9 +290,11 @@ export class QualityManager {
     const weatherEffects = window.__weatherEffects;
     if (weatherEffects) {
       if (this._settings.weather) {
-        weatherEffects.container?.parent && (weatherEffects._container.visible = true);
+        weatherEffects.container?.parent &&
+          (weatherEffects._container.visible = true);
       } else {
-        if (weatherEffects._container) weatherEffects._container.visible = false;
+        if (weatherEffects._container)
+          weatherEffects._container.visible = false;
       }
     }
 
@@ -296,7 +303,7 @@ export class QualityManager {
     if (particles) {
       if (this._settings.particles) {
         particles._container && (particles._container.visible = true);
-        if (typeof particles.setMaxParticles === 'function') {
+        if (typeof particles.setMaxParticles === "function") {
           particles.setMaxParticles(this._settings.particleMax);
         }
       } else {
@@ -366,7 +373,7 @@ export class QualityManager {
 
   /** @private */
   _dispatch() {
-    const event = new CustomEvent('quality:changed', {
+    const event = new CustomEvent("quality:changed", {
       detail: {
         preset: this._preset,
         settings: { ...this._settings },
@@ -416,7 +423,7 @@ export function getQualityManager(options = {}) {
     // Auto-detect on first run when no persisted settings exist
     if (options.firstRun && !localStorage.getItem(STORAGE_KEY)) {
       _instance.autoDetect().catch((err) => {
-        console.warn('[Quality] Auto-detect failed:', err);
+        console.warn("[Quality] Auto-detect failed:", err);
       });
     }
   }

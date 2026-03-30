@@ -141,8 +141,13 @@
 }
 
 @keyframes mcp-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .mcp-hub__server-info {
@@ -161,7 +166,7 @@
 .mcp-hub__server-command {
   font-size: 10px;
   color: var(--text-dim, #888);
-  font-family: var(--font-mono, 'SF Mono', 'Fira Code', monospace);
+  font-family: var(--font-mono, "SF Mono", "Fira Code", monospace);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -312,14 +317,14 @@
 }
 
 .mcp-hub__form-input--mono {
-  font-family: var(--font-mono, 'SF Mono', 'Fira Code', monospace);
+  font-family: var(--font-mono, "SF Mono", "Fira Code", monospace);
   font-size: 12px;
 }
 
 .mcp-hub__form-textarea {
   resize: vertical;
   min-height: 60px;
-  font-family: var(--font-mono, 'SF Mono', 'Fira Code', monospace);
+  font-family: var(--font-mono, "SF Mono", "Fira Code", monospace);
   font-size: 12px;
 }
 
@@ -394,7 +399,7 @@
 .mcp-hub__tool-name {
   font-size: 13px;
   font-weight: 600;
-  font-family: var(--font-mono, 'SF Mono', 'Fira Code', monospace);
+  font-family: var(--font-mono, "SF Mono", "Fira Code", monospace);
 }
 
 .mcp-hub__tool-server-tag {
@@ -416,7 +421,7 @@
   margin-top: 6px;
   font-size: 10px;
   color: var(--text-dim, #777);
-  font-family: var(--font-mono, 'SF Mono', 'Fira Code', monospace);
+  font-family: var(--font-mono, "SF Mono", "Fira Code", monospace);
 }
 
 /* ── Test tool panel ───────────────────────────────────────────── */
@@ -443,7 +448,7 @@
   padding: 10px;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 8px;
-  font-family: var(--font-mono, 'SF Mono', 'Fira Code', monospace);
+  font-family: var(--font-mono, "SF Mono", "Fira Code", monospace);
   font-size: 11px;
   line-height: 1.5;
   max-height: 200px;
@@ -520,7 +525,7 @@
 
 .mcp-hub__log-entry {
   padding: 4px 8px;
-  font-family: var(--font-mono, 'SF Mono', 'Fira Code', monospace);
+  font-family: var(--font-mono, "SF Mono", "Fira Code", monospace);
   font-size: 10px;
   line-height: 1.5;
   border-radius: 4px;

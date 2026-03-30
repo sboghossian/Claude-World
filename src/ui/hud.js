@@ -14,70 +14,82 @@
 
 // ── Zone positions for minimap (simplified) ─────────────────────
 const MINIMAP_ZONES = [
-  { id: 'dispatch',   x: 22, y: 22, active: true,  district: 'core' },
-  { id: 'brain',      x: 17, y: 21, active: true,  district: 'core' },
-  { id: 'chat',       x: 15, y: 17, active: false, district: 'core' },
-  { id: 'memory',     x: 25, y: 17, active: true,  district: 'core' },
-  { id: 'skills',     x: 15, y: 25, active: true,  district: 'core' },
-  { id: 'minions',    x: 25, y: 25, active: false, district: 'core' },
-  { id: 'treasury',   x: 29, y: 21, active: false, district: 'business' },
-  { id: 'sales',      x: 29, y: 27, active: false, district: 'business' },
-  { id: 'marketing',  x: 23, y: 31, active: false, district: 'business' },
-  { id: 'exchange',   x: 33, y: 19, active: false, district: 'business' },
-  { id: 'market',     x: 33, y: 25, active: false, district: 'business' },
-  { id: 'council',    x: 11, y: 15, active: false, district: 'advanced' },
-  { id: 'rnd',        x: 11, y: 21, active: false, district: 'advanced' },
-  { id: 'legal',      x: 17, y: 13, active: false, district: 'advanced' },
-  { id: 'archive',    x: 11, y: 27, active: false, district: 'advanced' },
-  { id: 'docks',      x: 10, y: 31, active: true,  district: 'edge' },
-  { id: 'airport',    x: 36, y: 12, active: false, district: 'edge' },
-  { id: 'globe',      x: 29, y: 11, active: false, district: 'edge' },
-  { id: 'broadcast',  x: 21, y:  9, active: false, district: 'edge' },
+  { id: "dispatch", x: 22, y: 22, active: true, district: "core" },
+  { id: "brain", x: 17, y: 21, active: true, district: "core" },
+  { id: "chat", x: 15, y: 17, active: false, district: "core" },
+  { id: "memory", x: 25, y: 17, active: true, district: "core" },
+  { id: "skills", x: 15, y: 25, active: true, district: "core" },
+  { id: "minions", x: 25, y: 25, active: false, district: "core" },
+  { id: "treasury", x: 29, y: 21, active: false, district: "business" },
+  { id: "sales", x: 29, y: 27, active: false, district: "business" },
+  { id: "marketing", x: 23, y: 31, active: false, district: "business" },
+  { id: "exchange", x: 33, y: 19, active: false, district: "business" },
+  { id: "market", x: 33, y: 25, active: false, district: "business" },
+  { id: "council", x: 11, y: 15, active: false, district: "advanced" },
+  { id: "rnd", x: 11, y: 21, active: false, district: "advanced" },
+  { id: "legal", x: 17, y: 13, active: false, district: "advanced" },
+  { id: "archive", x: 11, y: 27, active: false, district: "advanced" },
+  { id: "docks", x: 10, y: 31, active: true, district: "edge" },
+  { id: "airport", x: 36, y: 12, active: false, district: "edge" },
+  { id: "globe", x: 29, y: 11, active: false, district: "edge" },
+  { id: "broadcast", x: 21, y: 9, active: false, district: "edge" },
 ];
 
 const DISTRICT_COLORS = {
-  core:     '#4a9eff',
-  business: '#4aff8a',
-  advanced: '#a855f7',
-  edge:     '#ffb84a',
+  core: "#4a9eff",
+  business: "#4aff8a",
+  advanced: "#a855f7",
+  edge: "#ffb84a",
 };
 
 const MINIMAP_CONNECTIONS = [
-  ['dispatch', 'brain'],   ['dispatch', 'chat'],   ['dispatch', 'memory'],
-  ['dispatch', 'skills'],  ['dispatch', 'minions'], ['memory', 'treasury'],
-  ['minions',  'sales'],   ['minions',  'marketing'], ['treasury', 'exchange'],
-  ['treasury', 'market'],  ['chat',     'council'], ['chat',    'legal'],
-  ['skills',   'rnd'],     ['skills',   'archive'], ['archive', 'docks'],
-  ['dispatch', 'broadcast'], ['memory', 'globe'],  ['exchange', 'airport'],
+  ["dispatch", "brain"],
+  ["dispatch", "chat"],
+  ["dispatch", "memory"],
+  ["dispatch", "skills"],
+  ["dispatch", "minions"],
+  ["memory", "treasury"],
+  ["minions", "sales"],
+  ["minions", "marketing"],
+  ["treasury", "exchange"],
+  ["treasury", "market"],
+  ["chat", "council"],
+  ["chat", "legal"],
+  ["skills", "rnd"],
+  ["skills", "archive"],
+  ["archive", "docks"],
+  ["dispatch", "broadcast"],
+  ["memory", "globe"],
+  ["exchange", "airport"],
 ];
 
 // Default agent data (replaced by setWorldState)
 const DEFAULT_AGENTS = [
-  { id: 'alpha',   emoji: '🤖', name: 'Alpha',   mood: 'idle',    working: false },
-  { id: 'bravo',   emoji: '🧠', name: 'Bravo',   mood: 'active',  working: true  },
-  { id: 'charlie', emoji: '⚡', name: 'Charlie', mood: 'idle',    working: false },
+  { id: "alpha", emoji: "🤖", name: "Alpha", mood: "idle", working: false },
+  { id: "bravo", emoji: "🧠", name: "Bravo", mood: "active", working: true },
+  { id: "charlie", emoji: "⚡", name: "Charlie", mood: "idle", working: false },
 ];
 
 // Mood → color mapping
 const MOOD_COLORS = {
-  idle:     '#4aff8a',
-  active:   '#4a9eff',
-  busy:     '#ffb84a',
-  overload: '#ff4a6a',
-  error:    '#ff4a6a',
+  idle: "#4aff8a",
+  active: "#4a9eff",
+  busy: "#ffb84a",
+  overload: "#ff4a6a",
+  error: "#ff4a6a",
 };
 
 // ── Utility helpers ──────────────────────────────────────────────
 
 /** Format a number with commas: 2450 → "2,450" */
 function fmtNum(n) {
-  return n.toLocaleString('en-US');
+  return n.toLocaleString("en-US");
 }
 
 /** Format seconds elapsed to "Xm ago" / "Xs ago" etc. */
 function timeAgo(timestamp) {
   const diff = Math.floor((Date.now() - timestamp) / 1000);
-  if (diff < 60)  return `${diff}s ago`;
+  if (diff < 60) return `${diff}s ago`;
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   return `${Math.floor(diff / 3600)}h ago`;
 }
@@ -85,11 +97,10 @@ function timeAgo(timestamp) {
 /** Create a DOM element with optional class and innerHTML. */
 function el(tag, cls, html) {
   const e = document.createElement(tag);
-  if (cls)  e.className = cls;
+  if (cls) e.className = cls;
   if (html) e.innerHTML = html;
   return e;
 }
-
 
 // ── Main HUD class ───────────────────────────────────────────────
 
@@ -97,27 +108,27 @@ export class HUD {
   constructor() {
     // ── State ──────────────────────────────────────────────────
     this._identity = {
-      emoji:      '👤',
-      color:      '#4a9eff',
-      worldName:  'Claude World',
-      level:      1,
+      emoji: "👤",
+      color: "#4a9eff",
+      worldName: "Claude World",
+      level: 1,
     };
 
     this._xp = { xp: 0, xpMax: 100, level: 1 };
-    this._budget = { spent: 0.0234, budget: 5.00 };
-    this._currentZone = 'dispatch';
-    this._activeZoneName = 'Dispatch Tower';
+    this._budget = { spent: 0.0234, budget: 5.0 };
+    this._currentZone = "dispatch";
+    this._activeZoneName = "Dispatch Tower";
 
-    this._agents = DEFAULT_AGENTS.map(a => ({ ...a }));
+    this._agents = DEFAULT_AGENTS.map((a) => ({ ...a }));
 
     this._notifications = [];
-    this._notifUnread   = 0;
-    this._notifOpen     = false;
+    this._notifUnread = 0;
+    this._notifOpen = false;
 
     this._minimapVisible = true;
-    this._clockInterval  = null;
+    this._clockInterval = null;
     this._minimapPulsePhase = 0;
-    this._minimapAnimFrame  = null;
+    this._minimapAnimFrame = null;
 
     this._levelUpAnimating = false;
 
@@ -142,30 +153,31 @@ export class HUD {
     this._tickMinimapPulse();
   }
 
-
   // ══════════════════════════════════════════════════════════════
   // 1. TOP-LEFT: Commander Identity Bar
   // ══════════════════════════════════════════════════════════════
 
   _createTopLeft() {
-    this._topLeft = el('div', 'hud-tl');
-    this._topLeft.setAttribute('aria-label', 'Commander identity');
+    this._topLeft = el("div", "hud-tl");
+    this._topLeft.setAttribute("aria-label", "Commander identity");
 
     // Avatar button
-    this._avatarBtn = el('button', 'hud-avatar');
-    this._avatarBtn.setAttribute('aria-label', 'Open identity panel');
-    this._avatarBtn.addEventListener('click', () => {
-      document.dispatchEvent(new CustomEvent('hud:avatar-click', { bubbles: true }));
+    this._avatarBtn = el("button", "hud-avatar");
+    this._avatarBtn.setAttribute("aria-label", "Open identity panel");
+    this._avatarBtn.addEventListener("click", () => {
+      document.dispatchEvent(
+        new CustomEvent("hud:avatar-click", { bubbles: true }),
+      );
     });
 
-    this._avatarEmoji = el('span', 'hud-avatar__emoji');
+    this._avatarEmoji = el("span", "hud-avatar__emoji");
     this._avatarBtn.appendChild(this._avatarEmoji);
 
     // Identity text
-    const idText = el('div', 'hud-identity');
+    const idText = el("div", "hud-identity");
 
-    this._worldNameEl = el('span', 'hud-identity__name');
-    this._levelBadge  = el('span', 'hud-identity__level');
+    this._worldNameEl = el("span", "hud-identity__name");
+    this._levelBadge = el("span", "hud-identity__level");
 
     idText.appendChild(this._worldNameEl);
     idText.appendChild(this._levelBadge);
@@ -178,27 +190,26 @@ export class HUD {
 
   _updateIdentity() {
     this._avatarEmoji.textContent = this._identity.emoji;
-    this._avatarBtn.style.setProperty('--avatar-bg', this._identity.color);
+    this._avatarBtn.style.setProperty("--avatar-bg", this._identity.color);
     this._worldNameEl.textContent = this._identity.worldName;
-    this._levelBadge.textContent  = `Level ${this._xp.level}`;
+    this._levelBadge.textContent = `Level ${this._xp.level}`;
   }
-
 
   // ══════════════════════════════════════════════════════════════
   // 2. TOP-CENTER: World Name + Clock + Active Zone
   // ══════════════════════════════════════════════════════════════
 
   _createTopCenter() {
-    this._topCenter = el('div', 'hud-tc');
-    this._topCenter.setAttribute('aria-label', 'World status');
+    this._topCenter = el("div", "hud-tc");
+    this._topCenter.setAttribute("aria-label", "World status");
 
-    this._tcWorldName = el('span', 'hud-tc__world');
+    this._tcWorldName = el("span", "hud-tc__world");
     this._tcWorldName.textContent = this._identity.worldName;
 
-    this._tcClock = el('span', 'hud-tc__clock');
-    this._tcClock.setAttribute('aria-live', 'off');
+    this._tcClock = el("span", "hud-tc__clock");
+    this._tcClock.setAttribute("aria-live", "off");
 
-    this._tcZone = el('span', 'hud-tc__zone');
+    this._tcZone = el("span", "hud-tc__zone");
     this._tcZone.textContent = this._activeZoneName;
 
     this._topCenter.appendChild(this._tcWorldName);
@@ -211,9 +222,9 @@ export class HUD {
   _startClock() {
     const tick = () => {
       const now = new Date();
-      const hh  = String(now.getHours()).padStart(2, '0');
-      const mm  = String(now.getMinutes()).padStart(2, '0');
-      const ss  = String(now.getSeconds()).padStart(2, '0');
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+      const ss = String(now.getSeconds()).padStart(2, "0");
       this._tcClock.textContent = `${hh}:${mm}:${ss}`;
     };
     tick();
@@ -224,49 +235,50 @@ export class HUD {
     this._activeZoneName = zoneName;
     this._tcZone.textContent = zoneName;
     // Brief flash animation
-    this._tcZone.classList.remove('hud-tc__zone--flash');
+    this._tcZone.classList.remove("hud-tc__zone--flash");
     void this._tcZone.offsetWidth; // reflow
-    this._tcZone.classList.add('hud-tc__zone--flash');
+    this._tcZone.classList.add("hud-tc__zone--flash");
   }
-
 
   // ══════════════════════════════════════════════════════════════
   // 3. TOP-RIGHT: XP Bar + Budget + ⌘K
   // ══════════════════════════════════════════════════════════════
 
   _createTopRight() {
-    this._topRight = el('div', 'hud-tr');
-    this._topRight.setAttribute('aria-label', 'Resources');
+    this._topRight = el("div", "hud-tr");
+    this._topRight.setAttribute("aria-label", "Resources");
 
     // ── XP row ──────────────────────────────────────────────
-    const xpRow = el('div', 'hud-xp-row');
+    const xpRow = el("div", "hud-xp-row");
 
-    const xpLabelEl = el('span', 'hud-xp-row__label', 'XP');
+    const xpLabelEl = el("span", "hud-xp-row__label", "XP");
     xpRow.appendChild(xpLabelEl);
 
-    const barWrap = el('div', 'hud-xp-row__bar-wrap');
-    barWrap.setAttribute('role', 'progressbar');
-    barWrap.setAttribute('aria-label', 'Experience');
+    const barWrap = el("div", "hud-xp-row__bar-wrap");
+    barWrap.setAttribute("role", "progressbar");
+    barWrap.setAttribute("aria-label", "Experience");
 
-    this._xpFill = el('div', 'hud-xp-row__bar-fill');
+    this._xpFill = el("div", "hud-xp-row__bar-fill");
     barWrap.appendChild(this._xpFill);
     xpRow.appendChild(barWrap);
 
-    this._xpText = el('span', 'hud-xp-row__text');
+    this._xpText = el("span", "hud-xp-row__text");
     xpRow.appendChild(this._xpText);
 
     this._topRight.appendChild(xpRow);
 
     // ── Budget + ⌘K row ─────────────────────────────────────
-    const miscRow = el('div', 'hud-misc-row');
+    const miscRow = el("div", "hud-misc-row");
 
-    this._budgetEl = el('span', 'hud-budget');
+    this._budgetEl = el("span", "hud-budget");
     miscRow.appendChild(this._budgetEl);
 
-    const cmdK = el('button', 'hud-cmdk', '⌘K');
-    cmdK.setAttribute('aria-label', 'Open command palette');
-    cmdK.addEventListener('click', () => {
-      document.dispatchEvent(new CustomEvent('command-palette:open', { bubbles: true }));
+    const cmdK = el("button", "hud-cmdk", "⌘K");
+    cmdK.setAttribute("aria-label", "Open command palette");
+    cmdK.addEventListener("click", () => {
+      document.dispatchEvent(
+        new CustomEvent("command-palette:open", { bubbles: true }),
+      );
     });
     miscRow.appendChild(cmdK);
 
@@ -287,98 +299,101 @@ export class HUD {
 
   _updateBudget() {
     const ratio = this._budget.spent / this._budget.budget;
-    let colorVar = 'var(--accent-green)';
-    if (ratio >= 0.8)      colorVar = 'var(--accent-red)';
-    else if (ratio >= 0.5) colorVar = 'var(--accent-amber)';
+    let colorVar = "var(--accent-green)";
+    if (ratio >= 0.8) colorVar = "var(--accent-red)";
+    else if (ratio >= 0.5) colorVar = "var(--accent-amber)";
 
     this._budgetEl.textContent = `💰 $${this._budget.spent.toFixed(4)}`;
     this._budgetEl.style.color = colorVar;
-    this._budgetEl.setAttribute('title', `$${this._budget.spent.toFixed(4)} of $${this._budget.budget.toFixed(2)} daily budget`);
+    this._budgetEl.setAttribute(
+      "title",
+      `$${this._budget.spent.toFixed(4)} of $${this._budget.budget.toFixed(2)} daily budget`,
+    );
   }
-
 
   // ══════════════════════════════════════════════════════════════
   // 4. BOTTOM-LEFT: Active Agent Widgets
   // ══════════════════════════════════════════════════════════════
 
   _createBottomLeft() {
-    this._bottomLeft = el('div', 'hud-bl');
-    this._bottomLeft.setAttribute('aria-label', 'Active agents');
+    this._bottomLeft = el("div", "hud-bl");
+    this._bottomLeft.setAttribute("aria-label", "Active agents");
     document.body.appendChild(this._bottomLeft);
   }
 
   _updateAgents() {
-    this._bottomLeft.innerHTML = '';
+    this._bottomLeft.innerHTML = "";
 
     this._agents.forEach((agent, idx) => {
-      const pill = el('button', 'hud-agent-pill');
-      pill.setAttribute('aria-label', `Agent ${agent.name}: ${agent.mood}`);
+      const pill = el("button", "hud-agent-pill");
+      pill.setAttribute("aria-label", `Agent ${agent.name}: ${agent.mood}`);
       pill.style.animationDelay = `${idx * 60}ms`;
 
       if (agent.working) {
-        pill.classList.add('hud-agent-pill--working');
+        pill.classList.add("hud-agent-pill--working");
       }
 
       // Mood dot
-      const dot = el('span', 'hud-agent-pill__dot');
-      dot.style.background  = MOOD_COLORS[agent.mood] || MOOD_COLORS.idle;
-      dot.style.boxShadow   = `0 0 6px ${MOOD_COLORS[agent.mood] || MOOD_COLORS.idle}`;
+      const dot = el("span", "hud-agent-pill__dot");
+      dot.style.background = MOOD_COLORS[agent.mood] || MOOD_COLORS.idle;
+      dot.style.boxShadow = `0 0 6px ${MOOD_COLORS[agent.mood] || MOOD_COLORS.idle}`;
 
-      const emojiEl  = el('span', 'hud-agent-pill__emoji', agent.emoji);
-      const nameEl   = el('span', 'hud-agent-pill__name',  agent.name);
+      const emojiEl = el("span", "hud-agent-pill__emoji", agent.emoji);
+      const nameEl = el("span", "hud-agent-pill__name", agent.name);
 
       pill.appendChild(dot);
       pill.appendChild(emojiEl);
       pill.appendChild(nameEl);
 
       if (agent.working) {
-        const working = el('span', 'hud-agent-pill__working', 'working...');
+        const working = el("span", "hud-agent-pill__working", "working...");
         pill.appendChild(working);
       }
 
-      pill.addEventListener('click', () => {
-        document.dispatchEvent(new CustomEvent('hud:agent-click', {
-          detail: { agentId: agent.id },
-          bubbles: true,
-        }));
+      pill.addEventListener("click", () => {
+        document.dispatchEvent(
+          new CustomEvent("hud:agent-click", {
+            detail: { agentId: agent.id },
+            bubbles: true,
+          }),
+        );
       });
 
       this._bottomLeft.appendChild(pill);
     });
   }
 
-
   // ══════════════════════════════════════════════════════════════
   // 5. BOTTOM-RIGHT: Notification Center Bell
   // ══════════════════════════════════════════════════════════════
 
   _createBottomRight() {
-    this._bottomRight = el('div', 'hud-br');
-    this._bottomRight.setAttribute('aria-label', 'Notifications');
+    this._bottomRight = el("div", "hud-br");
+    this._bottomRight.setAttribute("aria-label", "Notifications");
 
     // Bell button
-    this._bellBtn = el('button', 'hud-bell');
-    this._bellBtn.setAttribute('aria-label', 'Toggle notifications');
+    this._bellBtn = el("button", "hud-bell");
+    this._bellBtn.setAttribute("aria-label", "Toggle notifications");
     this._bellBtn.innerHTML = `<span class="hud-bell__icon">🔔</span>`;
 
-    this._bellBadge = el('span', 'hud-bell__badge', '0');
+    this._bellBadge = el("span", "hud-bell__badge", "0");
     this._bellBtn.appendChild(this._bellBadge);
 
-    this._bellBtn.addEventListener('click', (e) => {
+    this._bellBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       this._toggleNotifications();
     });
 
     // Notification dropdown
-    this._notifDropdown = el('div', 'hud-notif-dropdown');
-    this._notifDropdown.setAttribute('role', 'dialog');
-    this._notifDropdown.setAttribute('aria-label', 'Notifications panel');
+    this._notifDropdown = el("div", "hud-notif-dropdown");
+    this._notifDropdown.setAttribute("role", "dialog");
+    this._notifDropdown.setAttribute("aria-label", "Notifications panel");
 
-    const notifHeader = el('div', 'hud-notif-dropdown__header');
-    const notifTitle  = el('span', 'hud-notif-dropdown__title', 'Notifications');
+    const notifHeader = el("div", "hud-notif-dropdown__header");
+    const notifTitle = el("span", "hud-notif-dropdown__title", "Notifications");
 
-    this._clearAllBtn = el('button', 'hud-notif-dropdown__clear', 'Clear all');
-    this._clearAllBtn.addEventListener('click', (e) => {
+    this._clearAllBtn = el("button", "hud-notif-dropdown__clear", "Clear all");
+    this._clearAllBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       this._clearNotifications();
     });
@@ -386,8 +401,8 @@ export class HUD {
     notifHeader.appendChild(notifTitle);
     notifHeader.appendChild(this._clearAllBtn);
 
-    this._notifList = el('ul', 'hud-notif-list');
-    this._notifList.setAttribute('role', 'list');
+    this._notifList = el("ul", "hud-notif-list");
+    this._notifList.setAttribute("role", "list");
 
     this._notifDropdown.appendChild(notifHeader);
     this._notifDropdown.appendChild(this._notifList);
@@ -407,43 +422,47 @@ export class HUD {
       this._notifUnread = 0;
       this._updateBell();
       this._renderNotifications();
-      this._notifDropdown.classList.add('hud-notif-dropdown--open');
+      this._notifDropdown.classList.add("hud-notif-dropdown--open");
     } else {
-      this._notifDropdown.classList.remove('hud-notif-dropdown--open');
+      this._notifDropdown.classList.remove("hud-notif-dropdown--open");
     }
   }
 
   _closeNotifications() {
     if (this._notifOpen) {
       this._notifOpen = false;
-      this._notifDropdown.classList.remove('hud-notif-dropdown--open');
+      this._notifDropdown.classList.remove("hud-notif-dropdown--open");
     }
   }
 
   _updateBell() {
     const count = this._notifUnread;
-    this._bellBadge.textContent = count > 9 ? '9+' : String(count);
-    this._bellBadge.classList.toggle('hud-bell__badge--hidden', count === 0);
+    this._bellBadge.textContent = count > 9 ? "9+" : String(count);
+    this._bellBadge.classList.toggle("hud-bell__badge--hidden", count === 0);
   }
 
   _renderNotifications() {
-    this._notifList.innerHTML = '';
+    this._notifList.innerHTML = "";
     const items = this._notifications.slice(0, 10);
 
     if (items.length === 0) {
-      const empty = el('li', 'hud-notif-empty', 'No notifications yet');
+      const empty = el("li", "hud-notif-empty", "No notifications yet");
       this._notifList.appendChild(empty);
       return;
     }
 
     for (const notif of items) {
-      const li = el('li', 'hud-notif-item');
-      li.setAttribute('role', 'listitem');
+      const li = el("li", "hud-notif-item");
+      li.setAttribute("role", "listitem");
 
-      const iconEl = el('span', 'hud-notif-item__icon', notif.icon || '📌');
-      const bodyEl  = el('div', 'hud-notif-item__body');
-      const titleEl = el('span', 'hud-notif-item__title', notif.title);
-      const timeEl  = el('span', 'hud-notif-item__time', timeAgo(notif.timestamp));
+      const iconEl = el("span", "hud-notif-item__icon", notif.icon || "📌");
+      const bodyEl = el("div", "hud-notif-item__body");
+      const titleEl = el("span", "hud-notif-item__title", notif.title);
+      const timeEl = el(
+        "span",
+        "hud-notif-item__time",
+        timeAgo(notif.timestamp),
+      );
 
       bodyEl.appendChild(titleEl);
       bodyEl.appendChild(timeEl);
@@ -456,10 +475,10 @@ export class HUD {
 
   _clearNotifications() {
     this._notifications = [];
-    this._notifUnread   = 0;
-    this._notifOpen     = false;
+    this._notifUnread = 0;
+    this._notifOpen = false;
     this._updateBell();
-    this._notifDropdown.classList.remove('hud-notif-dropdown--open');
+    this._notifDropdown.classList.remove("hud-notif-dropdown--open");
   }
 
   /**
@@ -468,8 +487,8 @@ export class HUD {
    */
   pushNotification(notif) {
     this._notifications.unshift({
-      icon:      notif.icon || '📌',
-      title:     notif.title,
+      icon: notif.icon || "📌",
+      title: notif.title,
       timestamp: Date.now(),
     });
 
@@ -482,9 +501,9 @@ export class HUD {
     this._updateBell();
 
     // Ring the bell
-    this._bellBtn.classList.remove('hud-bell--ring');
+    this._bellBtn.classList.remove("hud-bell--ring");
     void this._bellBtn.offsetWidth;
-    this._bellBtn.classList.add('hud-bell--ring');
+    this._bellBtn.classList.add("hud-bell--ring");
 
     // If dropdown open, refresh list
     if (this._notifOpen) {
@@ -492,22 +511,21 @@ export class HUD {
     }
   }
 
-
   // ══════════════════════════════════════════════════════════════
   // Minimap
   // ══════════════════════════════════════════════════════════════
 
   _createMinimap() {
-    this._minimapContainer = el('div', 'hud-minimap');
-    this._minimapContainer.setAttribute('role', 'navigation');
-    this._minimapContainer.setAttribute('aria-label', 'World minimap');
+    this._minimapContainer = el("div", "hud-minimap");
+    this._minimapContainer.setAttribute("role", "navigation");
+    this._minimapContainer.setAttribute("aria-label", "World minimap");
 
-    this._minimapCanvas = document.createElement('canvas');
-    this._minimapCanvas.className = 'hud-minimap__canvas';
-    this._minimapCanvas.width  = 180;
+    this._minimapCanvas = document.createElement("canvas");
+    this._minimapCanvas.className = "hud-minimap__canvas";
+    this._minimapCanvas.width = 180;
     this._minimapCanvas.height = 180;
 
-    this._minimapCanvas.addEventListener('click', (e) => {
+    this._minimapCanvas.addEventListener("click", (e) => {
       const rect = this._minimapCanvas.getBoundingClientRect();
       this._handleMinimapClick(e.clientX - rect.left, e.clientY - rect.top);
     });
@@ -517,20 +535,28 @@ export class HUD {
   }
 
   _renderMinimap() {
-    const ctx = this._minimapCanvas.getContext('2d');
-    const W = 180, H = 180;
+    const ctx = this._minimapCanvas.getContext("2d");
+    const W = 180,
+      H = 180;
 
     ctx.clearRect(0, 0, W, H);
 
     // Grid lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.strokeStyle = "rgba(255,255,255,0.03)";
     ctx.lineWidth = 0.5;
     for (let i = 0; i < W; i += 12) {
-      ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, H); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(W, i); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, H);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(W, i);
+      ctx.stroke();
     }
 
-    const MIN_TILE = 6, MAX_TILE = 40;
+    const MIN_TILE = 6,
+      MAX_TILE = 40;
     const range = MAX_TILE - MIN_TILE;
     const sc = (v) => ((v - MIN_TILE) / range) * (W - 20) + 10;
 
@@ -539,10 +565,11 @@ export class HUD {
     for (const z of MINIMAP_ZONES) zoneMap[z.id] = z;
 
     // Connection lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.strokeStyle = "rgba(255,255,255,0.06)";
     ctx.lineWidth = 1;
     for (const [a, b] of MINIMAP_CONNECTIONS) {
-      const za = zoneMap[a], zb = zoneMap[b];
+      const za = zoneMap[a],
+        zb = zoneMap[b];
       if (!za || !zb) continue;
       ctx.beginPath();
       ctx.moveTo(sc(za.x), sc(za.y));
@@ -552,7 +579,8 @@ export class HUD {
 
     // Zone dots
     for (const z of MINIMAP_ZONES) {
-      const cx = sc(z.x), cy = sc(z.y);
+      const cx = sc(z.x),
+        cy = sc(z.y);
       const isCurrent = z.id === this._currentZone;
       const radius = isCurrent ? 5 : 3;
 
@@ -575,16 +603,16 @@ export class HUD {
 
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffd700';
-        ctx.shadowColor = '#ffd700';
+        ctx.fillStyle = "#ffd700";
+        ctx.shadowColor = "#ffd700";
         ctx.shadowBlur = 10;
       } else if (z.active) {
-        const color = DISTRICT_COLORS[z.district] || '#4a9eff';
+        const color = DISTRICT_COLORS[z.district] || "#4a9eff";
         ctx.fillStyle = color;
         ctx.shadowColor = color;
         ctx.shadowBlur = 4;
       } else {
-        ctx.fillStyle = 'rgba(100,100,120,0.5)';
+        ctx.fillStyle = "rgba(100,100,120,0.5)";
         ctx.shadowBlur = 0;
       }
 
@@ -596,37 +624,50 @@ export class HUD {
   _tickMinimapPulse() {
     this._minimapPulsePhase += 0.06;
     this._renderMinimap();
-    this._minimapAnimFrame = requestAnimationFrame(() => this._tickMinimapPulse());
+    this._minimapAnimFrame = requestAnimationFrame(() =>
+      this._tickMinimapPulse(),
+    );
   }
 
   _handleMinimapClick(canvasX, canvasY) {
-    const W = 180, MIN_TILE = 6, MAX_TILE = 40;
-    const range  = MAX_TILE - MIN_TILE;
+    const W = 180,
+      MIN_TILE = 6,
+      MAX_TILE = 40;
+    const range = MAX_TILE - MIN_TILE;
     const toTile = (px) => ((px - 10) / (W - 20)) * range + MIN_TILE;
 
     const tx = toTile(canvasX);
     const ty = toTile(canvasY);
 
-    let nearest = null, nearestDist = Infinity;
+    let nearest = null,
+      nearestDist = Infinity;
     for (const z of MINIMAP_ZONES) {
-      const dx = z.x - tx, dy = z.y - ty;
-      const d  = dx * dx + dy * dy;
-      if (d < nearestDist) { nearestDist = d; nearest = z; }
+      const dx = z.x - tx,
+        dy = z.y - ty;
+      const d = dx * dx + dy * dy;
+      if (d < nearestDist) {
+        nearestDist = d;
+        nearest = z;
+      }
     }
 
     if (nearest && nearestDist < 16) {
-      document.dispatchEvent(new CustomEvent('hud:navigate', {
-        detail: { zoneId: nearest.id },
-        bubbles: true,
-      }));
+      document.dispatchEvent(
+        new CustomEvent("hud:navigate", {
+          detail: { zoneId: nearest.id },
+          bubbles: true,
+        }),
+      );
     }
   }
 
   _toggleMinimap() {
     this._minimapVisible = !this._minimapVisible;
-    this._minimapContainer.classList.toggle('hud-minimap--hidden', !this._minimapVisible);
+    this._minimapContainer.classList.toggle(
+      "hud-minimap--hidden",
+      !this._minimapVisible,
+    );
   }
-
 
   // ══════════════════════════════════════════════════════════════
   // Event Binding
@@ -634,39 +675,39 @@ export class HUD {
 
   _bindEvents() {
     // world:xp-gained → smooth XP fill
-    document.addEventListener('world:xp-gained', (e) => {
+    document.addEventListener("world:xp-gained", (e) => {
       const { xp, xpMax, level } = e.detail || {};
       if (level !== undefined && level > this._xp.level) {
         this._animateLevelUp(xp ?? 0, xpMax ?? 100, level);
       } else {
-        if (xp    !== undefined) this._xp.xp    = xp;
+        if (xp !== undefined) this._xp.xp = xp;
         if (xpMax !== undefined) this._xp.xpMax = xpMax;
-        if (level !== undefined) this._xp.level  = level;
+        if (level !== undefined) this._xp.level = level;
         this._updateXP();
         this._updateIdentity();
       }
     });
 
     // zone panel open → update active zone name
-    document.addEventListener('zone-panel:open', (e) => {
-      const name = e.detail?.zoneName || e.detail?.zoneId || 'Unknown Zone';
+    document.addEventListener("zone-panel:open", (e) => {
+      const name = e.detail?.zoneName || e.detail?.zoneId || "Unknown Zone";
       this._updateActiveZone(name);
     });
 
     // Cmd+M → toggle minimap
-    document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'm') {
+    document.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "m") {
         e.preventDefault();
         this._toggleMinimap();
       }
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         // ⌘K handled by command palette; HUD just closes notifs
         this._closeNotifications();
       }
     });
 
     // Close notif dropdown on outside click
-    document.addEventListener('click', (e) => {
+    document.addEventListener("click", (e) => {
       if (this._notifOpen && !this._bottomRight.contains(e.target)) {
         this._closeNotifications();
       }
@@ -678,24 +719,23 @@ export class HUD {
     if (this._levelUpAnimating) return;
     this._levelUpAnimating = true;
 
-    this._xpFill.classList.add('hud-xp-row__bar-fill--levelup');
+    this._xpFill.classList.add("hud-xp-row__bar-fill--levelup");
 
     setTimeout(() => {
       // Empty the bar
-      this._xpFill.style.transition = 'none';
-      this._xpFill.style.width = '0%';
+      this._xpFill.style.transition = "none";
+      this._xpFill.style.width = "0%";
 
       setTimeout(() => {
-        this._xpFill.classList.remove('hud-xp-row__bar-fill--levelup');
+        this._xpFill.classList.remove("hud-xp-row__bar-fill--levelup");
         this._xp = { xp: newXP, xpMax: newXPMax, level: newLevel };
-        this._xpFill.style.transition = '';
+        this._xpFill.style.transition = "";
         this._updateXP();
         this._updateIdentity();
         this._levelUpAnimating = false;
       }, 300);
     }, 700);
   }
-
 
   // ══════════════════════════════════════════════════════════════
   // Public API
@@ -721,17 +761,17 @@ export class HUD {
       this._identity.worldName = state.worldName;
       this._tcWorldName.textContent = state.worldName;
     }
-    if (state.level   !== undefined) this._xp.level  = state.level;
-    if (state.xp      !== undefined) this._xp.xp     = state.xp;
+    if (state.level !== undefined) this._xp.level = state.level;
+    if (state.xp !== undefined) this._xp.xp = state.xp;
     if (state.xpToNext !== undefined) this._xp.xpMax = state.xpToNext;
-    if (state.budget  !== undefined) this._budget.budget = state.budget;
-    if (state.spent   !== undefined) this._budget.spent  = state.spent;
+    if (state.budget !== undefined) this._budget.budget = state.budget;
+    if (state.spent !== undefined) this._budget.spent = state.spent;
     if (state.identity) {
       if (state.identity.emoji) this._identity.emoji = state.identity.emoji;
       if (state.identity.color) this._identity.color = state.identity.color;
     }
     if (Array.isArray(state.agents)) {
-      this._agents = state.agents.map(a => ({ ...a }));
+      this._agents = state.agents.map((a) => ({ ...a }));
     }
 
     this._updateIdentity();
@@ -767,7 +807,7 @@ export class HUD {
    * @param {Array<{ id: string, emoji: string, name: string, mood: string, working: boolean }>} agents
    */
   setAgents(agents) {
-    this._agents = agents.map(a => ({ ...a }));
+    this._agents = agents.map((a) => ({ ...a }));
     this._updateAgents();
   }
 
@@ -777,10 +817,10 @@ export class HUD {
    * @param {boolean} working
    */
   setAgentWorking(agentId, working) {
-    const agent = this._agents.find(a => a.id === agentId);
+    const agent = this._agents.find((a) => a.id === agentId);
     if (agent) {
       agent.working = working;
-      if (working) agent.mood = 'active';
+      if (working) agent.mood = "active";
       this._updateAgents();
     }
   }
@@ -800,8 +840,8 @@ export class HUD {
    * @param {{ emoji: string, color: string, worldName?: string }} identity
    */
   setIdentity(identity) {
-    if (identity.emoji)     this._identity.emoji     = identity.emoji;
-    if (identity.color)     this._identity.color     = identity.color;
+    if (identity.emoji) this._identity.emoji = identity.emoji;
+    if (identity.color) this._identity.color = identity.color;
     if (identity.worldName) this._identity.worldName = identity.worldName;
     this._updateIdentity();
   }

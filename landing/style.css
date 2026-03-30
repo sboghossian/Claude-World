@@ -4,35 +4,38 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ─── Reset & Base ──────────────────────────────────────────────────── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 :root {
-  --bg:          #0a0a14;
-  --bg-alt:      #0d0d1a;
-  --card:        #0d1117;
-  --card-hover:  #111827;
-  --border:      #1e2432;
-  --border-light:#2a3347;
-  --text:        #e2e8f0;
-  --text-muted:  #64748b;
-  --text-dim:    #94a3b8;
-  --purple:      #7c3aed;
-  --purple-light:#9f5cf7;
-  --blue:        #2563eb;
-  --blue-light:  #3b82f6;
-  --gradient:    linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+  --bg: #0a0a14;
+  --bg-alt: #0d0d1a;
+  --card: #0d1117;
+  --card-hover: #111827;
+  --border: #1e2432;
+  --border-light: #2a3347;
+  --text: #e2e8f0;
+  --text-muted: #64748b;
+  --text-dim: #94a3b8;
+  --purple: #7c3aed;
+  --purple-light: #9f5cf7;
+  --blue: #2563eb;
+  --blue-light: #3b82f6;
+  --gradient: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
   --gradient-text: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
-  --radius:      12px;
-  --radius-lg:   20px;
-  --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --font:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
-  --shadow:      0 4px 24px rgba(0,0,0,0.4);
-  --shadow-lg:   0 8px 48px rgba(0,0,0,0.6);
-  --glow:        0 0 40px rgba(124,58,237,0.15);
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 48px rgba(0, 0, 0, 0.6);
+  --glow: 0 0 40px rgba(124, 58, 237, 0.15);
 }
 
 html {
@@ -67,23 +70,44 @@ a {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-12px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
 @keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
 }
 
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(124,58,237,0.3); }
-  50%       { box-shadow: 0 0 40px rgba(124,58,237,0.6), 0 0 60px rgba(37,99,235,0.2); }
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 40px rgba(124, 58, 237, 0.6),
+      0 0 60px rgba(37, 99, 235, 0.2);
+  }
 }
 
 @keyframes borderPulse {
-  0%, 100% { border-color: var(--border); }
-  50%       { border-color: var(--purple); }
+  0%,
+  100% {
+    border-color: var(--border);
+  }
+  50% {
+    border-color: var(--purple);
+  }
 }
 
 /* ─── Layout Utilities ──────────────────────────────────────────────── */
@@ -171,7 +195,7 @@ a {
 .btn-primary:hover {
   opacity: 0.88;
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(124,58,237,0.4);
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.4);
 }
 
 .btn-outline {
@@ -181,7 +205,7 @@ a {
 }
 
 .btn-outline:hover {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   border-color: var(--purple);
   color: var(--text);
   transform: translateY(-1px);
@@ -194,13 +218,13 @@ a {
 }
 
 .btn-shimmer::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
     105deg,
     transparent 30%,
-    rgba(255,255,255,0.18) 50%,
+    rgba(255, 255, 255, 0.18) 50%,
     transparent 70%
   );
   background-size: 200% 100%;
@@ -220,7 +244,7 @@ a {
   right: 0;
   z-index: 100;
   border-bottom: 1px solid var(--border);
-  background: rgba(10,10,20,0.85);
+  background: rgba(10, 10, 20, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
@@ -282,7 +306,10 @@ a {
 .hero-bg-grid {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(124,58,237,0.12) 1px, transparent 1px);
+  background-image: radial-gradient(
+    rgba(124, 58, 237, 0.12) 1px,
+    transparent 1px
+  );
   background-size: 32px 32px;
   mask-image: radial-gradient(ellipse at 50% 50%, black 40%, transparent 80%);
   pointer-events: none;
@@ -302,8 +329,8 @@ a {
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--purple-light);
-  background: rgba(124,58,237,0.12);
-  border: 1px solid rgba(124,58,237,0.25);
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.25);
   margin-bottom: 24px;
   letter-spacing: 0.02em;
 }
@@ -384,7 +411,7 @@ a {
   justify-content: center;
   width: 72px;
   height: 72px;
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   transition: all 0.2s;
@@ -392,10 +419,10 @@ a {
 }
 
 .bldg:hover {
-  background: rgba(124,58,237,0.1);
+  background: rgba(124, 58, 237, 0.1);
   border-color: var(--purple);
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(124,58,237,0.25);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.25);
 }
 
 .city-label {
@@ -425,7 +452,7 @@ a {
 }
 
 .zone-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -473,9 +500,9 @@ a {
   font-weight: 500;
   padding: 3px 10px;
   border-radius: 999px;
-  background: rgba(124,58,237,0.1);
+  background: rgba(124, 58, 237, 0.1);
   color: var(--purple-light);
-  border: 1px solid rgba(124,58,237,0.2);
+  border: 1px solid rgba(124, 58, 237, 0.2);
 }
 
 /* ─── Steps / How It Works ──────────────────────────────────────────── */
@@ -696,8 +723,8 @@ a {
   color: var(--text-dim);
   margin-bottom: 32px;
   padding: 12px 16px;
-  background: rgba(124,58,237,0.08);
-  border: 1px solid rgba(124,58,237,0.2);
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.2);
   border-radius: var(--radius);
 }
 
@@ -768,7 +795,7 @@ a {
 }
 
 .faq-question::after {
-  content: '+';
+  content: "+";
   font-size: 1.25rem;
   color: var(--purple-light);
   font-weight: 300;

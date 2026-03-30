@@ -21,13 +21,21 @@
 }
 
 @keyframes achievements-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes achievements-fade-out {
-  from { opacity: 1; }
-  to   { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 /* ── Panel container ─────────────────────────────────────── */
@@ -47,8 +55,14 @@
 }
 
 @keyframes achievements-slide-up {
-  from { opacity: 0; transform: translateY(24px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* ── Header ──────────────────────────────────────────────── */
@@ -80,7 +94,9 @@
   cursor: pointer;
   padding: 4px 8px;
   border-radius: var(--radius-sm);
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .achievements-header__close:hover {
@@ -155,7 +171,9 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   white-space: nowrap;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .achievements-tab:hover {
@@ -201,9 +219,10 @@
   border: 1px solid var(--border);
   background: var(--bg-secondary);
   cursor: pointer;
-  transition: transform var(--transition-fast),
-              border-color var(--transition-fast),
-              box-shadow var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
   position: relative;
   overflow: hidden;
 }
@@ -262,8 +281,13 @@
 }
 
 @keyframes legendary-pulse {
-  0%, 100% { box-shadow: 0 0 12px rgba(255, 215, 0, 0.2); }
-  50%      { box-shadow: 0 0 20px rgba(255, 215, 0, 0.35); }
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.35);
+  }
 }
 
 /* Badge icon */
@@ -359,10 +383,18 @@
   margin-bottom: 12px;
 }
 
-.achievement-detail__rarity--common    { color: #888899; }
-.achievement-detail__rarity--rare      { color: #4a9eff; }
-.achievement-detail__rarity--epic      { color: #a855f7; }
-.achievement-detail__rarity--legendary { color: #ffd700; }
+.achievement-detail__rarity--common {
+  color: #888899;
+}
+.achievement-detail__rarity--rare {
+  color: #4a9eff;
+}
+.achievement-detail__rarity--epic {
+  color: #a855f7;
+}
+.achievement-detail__rarity--legendary {
+  color: #ffd700;
+}
 
 .achievement-detail__desc {
   font-family: var(--font-sans);
@@ -388,10 +420,18 @@
   transition: width var(--transition-slow);
 }
 
-.achievement-detail__progress-fill--common    { background: #888899; }
-.achievement-detail__progress-fill--rare      { background: #4a9eff; }
-.achievement-detail__progress-fill--epic      { background: #a855f7; }
-.achievement-detail__progress-fill--legendary { background: linear-gradient(90deg, #ffd700, #ffb84a); }
+.achievement-detail__progress-fill--common {
+  background: #888899;
+}
+.achievement-detail__progress-fill--rare {
+  background: #4a9eff;
+}
+.achievement-detail__progress-fill--epic {
+  background: #a855f7;
+}
+.achievement-detail__progress-fill--legendary {
+  background: linear-gradient(90deg, #ffd700, #ffb84a);
+}
 
 .achievement-detail__progress-text {
   font-family: var(--font-mono);

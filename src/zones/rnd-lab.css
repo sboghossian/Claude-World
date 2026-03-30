@@ -9,20 +9,20 @@
 /* ── Variables & reset ────────────────────────────────────────── */
 
 .rnd-lab {
-  --rnd-bg:          #0a1a0f;
-  --rnd-surface:     #0d2118;
-  --rnd-surface-2:   #112a1e;
-  --rnd-border:      #1a3a28;
-  --rnd-text:        #d1fae5;
-  --rnd-text-dim:    #6ee7b7;
-  --rnd-text-muted:  #4a6b5a;
-  --rnd-accent:      #10b981;
+  --rnd-bg: #0a1a0f;
+  --rnd-surface: #0d2118;
+  --rnd-surface-2: #112a1e;
+  --rnd-border: #1a3a28;
+  --rnd-text: #d1fae5;
+  --rnd-text-dim: #6ee7b7;
+  --rnd-text-muted: #4a6b5a;
+  --rnd-accent: #10b981;
   --rnd-accent-glow: #10b98144;
-  --rnd-error:       #ef4444;
-  --rnd-font-mono:   'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-  --rnd-radius-sm:   4px;
-  --rnd-radius-md:   8px;
-  --rnd-radius-lg:   12px;
+  --rnd-error: #ef4444;
+  --rnd-font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  --rnd-radius-sm: 4px;
+  --rnd-radius-md: 8px;
+  --rnd-radius-lg: 12px;
 
   display: flex;
   flex-direction: column;
@@ -96,7 +96,9 @@
   margin: 12px;
   padding: 9px 12px;
   text-align: center;
-  transition: background 0.15s, box-shadow 0.15s;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
   outline: none;
 }
 
@@ -135,7 +137,9 @@
   border-radius: var(--rnd-radius-md);
   cursor: pointer;
   padding: 8px 10px;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
   outline: none;
 }
 
@@ -212,8 +216,13 @@
 }
 
 @keyframes rnd-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* ── Right panel: editor ──────────────────────────────────────── */
@@ -333,7 +342,10 @@
   font-weight: 700;
   margin-bottom: 16px;
   padding: 10px 20px;
-  transition: background 0.15s, box-shadow 0.15s, opacity 0.15s;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s,
+    opacity 0.15s;
   outline: none;
 }
 
@@ -430,7 +442,10 @@
   font-size: 12px;
   font-weight: 600;
   padding: 7px 14px;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
   outline: none;
   flex: 1;
   min-width: 120px;

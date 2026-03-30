@@ -15,9 +15,9 @@
  */
 
 // Load styles
-const _styleLink = document.createElement('link');
-_styleLink.rel = 'stylesheet';
-_styleLink.href = '../zones/dispatch.css';
+const _styleLink = document.createElement("link");
+_styleLink.rel = "stylesheet";
+_styleLink.href = "../zones/dispatch.css";
 if (!document.querySelector('link[href*="dispatch.css"]')) {
   document.head.appendChild(_styleLink);
 }
@@ -25,25 +25,52 @@ if (!document.querySelector('link[href*="dispatch.css"]')) {
 // ── Constants ────────────────────────────────────────────────────
 
 const MODELS = [
-  { group: 'Anthropic', id: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4' },
-  { group: 'Anthropic', id: 'claude-haiku-4-20250414', label: 'Claude Haiku 4' },
-  { group: 'OpenAI', id: 'gpt-4o', label: 'GPT-4o' },
-  { group: 'OpenAI', id: 'gpt-4o-mini', label: 'GPT-4o Mini' },
+  {
+    group: "Anthropic",
+    id: "claude-sonnet-4-20250514",
+    label: "Claude Sonnet 4",
+  },
+  {
+    group: "Anthropic",
+    id: "claude-haiku-4-20250414",
+    label: "Claude Haiku 4",
+  },
+  { group: "OpenAI", id: "gpt-4o", label: "GPT-4o" },
+  { group: "OpenAI", id: "gpt-4o-mini", label: "GPT-4o Mini" },
 ];
 
 const TEMPLATES = [
-  { label: 'Summarize', prompt: 'Summarize the following content concisely, highlighting the key points:\n\n' },
-  { label: 'Analyze', prompt: 'Analyze the following in depth. Identify patterns, strengths, weaknesses, and opportunities:\n\n' },
-  { label: 'Draft email', prompt: 'Draft a professional email for the following context:\n\nTo: \nSubject: \nContext: ' },
-  { label: 'Code review', prompt: 'Review the following code for bugs, performance issues, and best practices. Suggest improvements:\n\n```\n\n```' },
-  { label: 'Brainstorm', prompt: 'Brainstorm 10 creative ideas for the following:\n\n' },
+  {
+    label: "Summarize",
+    prompt:
+      "Summarize the following content concisely, highlighting the key points:\n\n",
+  },
+  {
+    label: "Analyze",
+    prompt:
+      "Analyze the following in depth. Identify patterns, strengths, weaknesses, and opportunities:\n\n",
+  },
+  {
+    label: "Draft email",
+    prompt:
+      "Draft a professional email for the following context:\n\nTo: \nSubject: \nContext: ",
+  },
+  {
+    label: "Code review",
+    prompt:
+      "Review the following code for bugs, performance issues, and best practices. Suggest improvements:\n\n```\n\n```",
+  },
+  {
+    label: "Brainstorm",
+    prompt: "Brainstorm 10 creative ideas for the following:\n\n",
+  },
 ];
 
 const STATUS_LABELS = {
-  success: 'Success',
-  fail: 'Failed',
-  cancelled: 'Cancelled',
-  pending: 'Pending',
+  success: "Success",
+  fail: "Failed",
+  cancelled: "Cancelled",
+  pending: "Pending",
 };
 
 // ── Utility functions ────────────────────────────────────────────
@@ -56,10 +83,15 @@ function formatTime(date) {
   const d = new Date(date);
   const now = new Date();
   const diff = now - d;
-  if (diff < 60000) return 'just now';
+  if (diff < 60000) return "just now";
   if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
   if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function formatElapsed(ms) {
@@ -69,13 +101,13 @@ function formatElapsed(ms) {
 }
 
 function formatTokens(n) {
-  if (!n) return '0';
+  if (!n) return "0";
   if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
   return String(n);
 }
 
 function formatCost(usd) {
-  if (!usd || usd === 0) return '$0.00';
+  if (!usd || usd === 0) return "$0.00";
   if (usd < 0.01) return `$${usd.toFixed(4)}`;
   return `$${usd.toFixed(3)}`;
 }
@@ -85,13 +117,13 @@ function formatCost(usd) {
  * Handles: headers, code blocks, inline code, bold, italic, lists.
  */
 function formatResponse(text) {
-  if (!text) return '';
+  if (!text) return "";
 
   // Escape HTML
   let html = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 
   // Code blocks: ```lang\n...\n```
   html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
@@ -99,32 +131,35 @@ function formatResponse(text) {
   });
 
   // Inline code: `...`
-  html = html.replace(/`([^`]+)`/g, '<span class="dispatch-inline-code">$1</span>');
+  html = html.replace(
+    /`([^`]+)`/g,
+    '<span class="dispatch-inline-code">$1</span>',
+  );
 
   // Headers: ### / ## / #
-  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  html = html.replace(/^### (.+)$/gm, "<h3>$1</h3>");
+  html = html.replace(/^## (.+)$/gm, "<h2>$1</h2>");
+  html = html.replace(/^# (.+)$/gm, "<h1>$1</h1>");
 
   // Bold: **...**
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
 
   // Italic: *...*
-  html = html.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+  html = html.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, "<em>$1</em>");
 
   // Unordered lists: - item
-  html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+  html = html.replace(/^- (.+)$/gm, "<li>$1</li>");
   html = html.replace(/(<li>.*<\/li>\n?)+/g, (match) => `<ul>${match}</ul>`);
 
   // Ordered lists: 1. item
-  html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+  html = html.replace(/^\d+\. (.+)$/gm, "<li>$1</li>");
 
   // Line breaks (outside of code blocks and HTML tags)
-  html = html.replace(/\n/g, '<br>');
+  html = html.replace(/\n/g, "<br>");
 
   // Clean up extra <br> around block elements
-  html = html.replace(/<br><(h[123]|ul|ol|div|li)/g, '<$1');
-  html = html.replace(/<\/(h[123]|ul|ol|div|li)><br>/g, '</$1>');
+  html = html.replace(/<br><(h[123]|ul|ol|div|li)/g, "<$1");
+  html = html.replace(/<\/(h[123]|ul|ol|div|li)><br>/g, "</$1>");
 
   return html;
 }
@@ -159,7 +194,7 @@ export class Dispatch {
     };
 
     /** @type {string} Currently active tab */
-    this._activeTab = 'active';
+    this._activeTab = "active";
 
     /** @type {Map<string, number>} Interval IDs for elapsed time updates */
     this._timerIntervals = new Map();
@@ -172,10 +207,10 @@ export class Dispatch {
    * @returns {HTMLElement}
    */
   render() {
-    const el = document.createElement('div');
-    el.className = 'dispatch-tower';
-    el.setAttribute('role', 'region');
-    el.setAttribute('aria-label', 'Dispatch Tower');
+    const el = document.createElement("div");
+    el.className = "dispatch-tower";
+    el.setAttribute("role", "region");
+    el.setAttribute("aria-label", "Dispatch Tower");
 
     el.innerHTML = `
       <!-- Top: Task Input Area -->
@@ -188,7 +223,7 @@ export class Dispatch {
         </div>
 
         <div class="dispatch-templates" role="toolbar" aria-label="Quick templates">
-          ${TEMPLATES.map(t => `<button class="dispatch-templates__btn" data-template="${t.label}" type="button">${t.label}</button>`).join('')}
+          ${TEMPLATES.map((t) => `<button class="dispatch-templates__btn" data-template="${t.label}" type="button">${t.label}</button>`).join("")}
         </div>
 
         <div class="dispatch-textarea-wrap">
@@ -273,35 +308,40 @@ export class Dispatch {
     if (!this.container) return;
 
     // Template buttons
-    this.container.querySelectorAll('.dispatch-templates__btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const label = btn.dataset.template;
-        const template = TEMPLATES.find(t => t.label === label);
-        if (template) {
-          const textarea = this.container.querySelector('.dispatch-textarea');
-          textarea.value = template.prompt;
-          textarea.focus();
-          // Place cursor at end
-          textarea.setSelectionRange(textarea.value.length, textarea.value.length);
-        }
+    this.container
+      .querySelectorAll(".dispatch-templates__btn")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const label = btn.dataset.template;
+          const template = TEMPLATES.find((t) => t.label === label);
+          if (template) {
+            const textarea = this.container.querySelector(".dispatch-textarea");
+            textarea.value = template.prompt;
+            textarea.focus();
+            // Place cursor at end
+            textarea.setSelectionRange(
+              textarea.value.length,
+              textarea.value.length,
+            );
+          }
+        });
       });
-    });
 
     // Temperature slider
-    const slider = this.container.querySelector('.dispatch-temp-slider');
-    const tempValue = this.container.querySelector('.dispatch-temp-value');
-    slider.addEventListener('input', () => {
+    const slider = this.container.querySelector(".dispatch-temp-slider");
+    const tempValue = this.container.querySelector(".dispatch-temp-value");
+    slider.addEventListener("input", () => {
       tempValue.textContent = parseFloat(slider.value).toFixed(1);
     });
 
     // Dispatch button
-    const sendBtn = this.container.querySelector('.dispatch-send-btn');
-    sendBtn.addEventListener('click', () => this._handleDispatch());
+    const sendBtn = this.container.querySelector(".dispatch-send-btn");
+    sendBtn.addEventListener("click", () => this._handleDispatch());
 
     // Cmd+Enter shortcut on textarea
-    const textarea = this.container.querySelector('.dispatch-textarea');
-    textarea.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    const textarea = this.container.querySelector(".dispatch-textarea");
+    textarea.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
         e.preventDefault();
         e.stopPropagation();
         this._handleDispatch();
@@ -309,8 +349,8 @@ export class Dispatch {
     });
 
     // Tab switching
-    this.container.querySelectorAll('.dispatch-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
+    this.container.querySelectorAll(".dispatch-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
         const tabId = tab.dataset.tab;
         this._switchTab(tabId);
       });
@@ -323,15 +363,15 @@ export class Dispatch {
     this._activeTab = tabId;
 
     // Update tab buttons
-    this.container.querySelectorAll('.dispatch-tab').forEach(t => {
+    this.container.querySelectorAll(".dispatch-tab").forEach((t) => {
       const isActive = t.dataset.tab === tabId;
-      t.classList.toggle('dispatch-tab--active', isActive);
-      t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      t.classList.toggle("dispatch-tab--active", isActive);
+      t.setAttribute("aria-selected", isActive ? "true" : "false");
     });
 
     // Update panes
-    this.container.querySelectorAll('.dispatch-tab-pane').forEach(p => {
-      p.classList.toggle('dispatch-tab-pane--active', p.dataset.pane === tabId);
+    this.container.querySelectorAll(".dispatch-tab-pane").forEach((p) => {
+      p.classList.toggle("dispatch-tab-pane--active", p.dataset.pane === tabId);
     });
 
     // If switching to history and we're in detail view, stay in detail view
@@ -341,20 +381,24 @@ export class Dispatch {
   // ── Dispatch handler ───────────────────────────────────────────
 
   async _handleDispatch() {
-    const textarea = this.container.querySelector('.dispatch-textarea');
+    const textarea = this.container.querySelector(".dispatch-textarea");
     const prompt = textarea.value.trim();
     if (!prompt) return;
 
-    const modelSelect = this.container.querySelector('.dispatch-model-select');
-    const tempSlider = this.container.querySelector('.dispatch-temp-slider');
-    const sendBtn = this.container.querySelector('.dispatch-send-btn');
+    const modelSelect = this.container.querySelector(".dispatch-model-select");
+    const tempSlider = this.container.querySelector(".dispatch-temp-slider");
+    const sendBtn = this.container.querySelector(".dispatch-send-btn");
 
     const model = modelSelect.value;
     const temperature = parseFloat(tempSlider.value);
 
     // Determine provider from model
-    const modelInfo = MODELS.find(m => m.id === model);
-    const provider = modelInfo ? (modelInfo.group === 'Anthropic' ? 'anthropic' : 'openai') : null;
+    const modelInfo = MODELS.find((m) => m.id === model);
+    const provider = modelInfo
+      ? modelInfo.group === "Anthropic"
+        ? "anthropic"
+        : "openai"
+      : null;
 
     // Create task object
     const task = {
@@ -363,24 +407,24 @@ export class Dispatch {
       model,
       provider,
       temperature,
-      status: 'running',
+      status: "running",
       startTime: Date.now(),
       elapsedMs: 0,
       inputTokens: 0,
       outputTokens: 0,
       costUsd: 0,
-      response: '',
+      response: "",
     };
 
     // Add to active tasks
     this.activeTasks.set(task.id, task);
 
     // Clear textarea and disable button
-    textarea.value = '';
+    textarea.value = "";
     sendBtn.disabled = true;
 
     // Switch to active tab and render
-    this._switchTab('active');
+    this._switchTab("active");
     this._renderActiveList();
     this._updateActiveBadge();
 
@@ -392,56 +436,63 @@ export class Dispatch {
     this._timerIntervals.set(task.id, timerId);
 
     // Notify TaskStream that a stream is starting
-    window.dispatchEvent(new CustomEvent('task:stream-start', {
-      detail: { id: task.id, model, provider },
-    }));
+    window.dispatchEvent(
+      new CustomEvent("task:stream-start", {
+        detail: { id: task.id, model, provider },
+      }),
+    );
 
     // Execute the dispatch
     try {
       const result = await window.api.ai.dispatch({
         worldId: this.worldId,
-        zoneId: 'dispatch',
+        zoneId: "dispatch",
         provider: provider,
         model: model,
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: "user", content: prompt }],
         systemPrompt: null,
         maxTokens: 4096,
       });
 
       // Mark success
-      task.status = 'success';
-      task.response = result.text || '';
+      task.status = "success";
+      task.response = result.text || "";
       task.inputTokens = result.inputTokens || 0;
       task.outputTokens = result.outputTokens || 0;
       task.costUsd = result.costUsd || 0;
-      task.elapsedMs = result.latencyMs || (Date.now() - task.startTime);
+      task.elapsedMs = result.latencyMs || Date.now() - task.startTime;
       task.model = result.model || model;
 
       // Send response as a stream chunk so TaskStream can display it
-      window.dispatchEvent(new CustomEvent('task:stream-chunk', {
-        detail: { id: task.id, text: task.response },
-      }));
+      window.dispatchEvent(
+        new CustomEvent("task:stream-chunk", {
+          detail: { id: task.id, text: task.response },
+        }),
+      );
 
       // Signal stream complete
-      window.dispatchEvent(new CustomEvent('task:stream-end', {
-        detail: {
-          id: task.id,
-          inputTokens: task.inputTokens,
-          outputTokens: task.outputTokens,
-          costUsd: task.costUsd,
-          latencyMs: task.elapsedMs,
-        },
-      }));
-
+      window.dispatchEvent(
+        new CustomEvent("task:stream-end", {
+          detail: {
+            id: task.id,
+            inputTokens: task.inputTokens,
+            outputTokens: task.outputTokens,
+            costUsd: task.costUsd,
+            latencyMs: task.elapsedMs,
+          },
+        }),
+      );
     } catch (err) {
-      task.status = 'fail';
-      task.response = `Error: ${err.message || 'Unknown error'}`;
+      task.status = "fail";
+      task.response = `Error: ${err.message || "Unknown error"}`;
       task.elapsedMs = Date.now() - task.startTime;
 
       // Signal stream error
-      window.dispatchEvent(new CustomEvent('task:stream-end', {
-        detail: { id: task.id, error: err.message || 'Unknown error' },
-      }));
+      window.dispatchEvent(
+        new CustomEvent("task:stream-end", {
+          detail: { id: task.id, error: err.message || "Unknown error" },
+        }),
+      );
     }
 
     // Stop timer
@@ -469,16 +520,18 @@ export class Dispatch {
     this._persistTask(task);
 
     // Dispatch completion event
-    document.dispatchEvent(new CustomEvent('dispatch:task-complete', {
-      detail: {
-        taskId: task.id,
-        status: task.status,
-        model: task.model,
-        tokens: task.inputTokens + task.outputTokens,
-        costUsd: task.costUsd,
-      },
-      bubbles: true,
-    }));
+    document.dispatchEvent(
+      new CustomEvent("dispatch:task-complete", {
+        detail: {
+          taskId: task.id,
+          status: task.status,
+          model: task.model,
+          tokens: task.inputTokens + task.outputTokens,
+          costUsd: task.costUsd,
+        },
+        bubbles: true,
+      }),
+    );
   }
 
   // ── Cancel handler ─────────────────────────────────────────────
@@ -492,8 +545,8 @@ export class Dispatch {
     this._timerIntervals.delete(taskId);
 
     // Mark cancelled
-    task.status = 'cancelled';
-    task.response = 'Task was cancelled by user.';
+    task.status = "cancelled";
+    task.response = "Task was cancelled by user.";
     task.elapsedMs = Date.now() - task.startTime;
     task.completedAt = Date.now();
 
@@ -518,25 +571,29 @@ export class Dispatch {
       if (window.api && window.api.db && window.api.db.getRecentTasks) {
         const tasks = await window.api.db.getRecentTasks(this.worldId, 100);
         if (Array.isArray(tasks)) {
-          this.history = tasks.map(t => ({
+          this.history = tasks.map((t) => ({
             id: t.id || generateId(),
-            prompt: t.prompt || t.input || '',
-            model: t.model || 'unknown',
+            prompt: t.prompt || t.input || "",
+            model: t.model || "unknown",
             provider: t.provider || null,
-            status: t.status || 'success',
-            response: t.response || t.output || '',
+            status: t.status || "success",
+            response: t.response || t.output || "",
             inputTokens: t.input_tokens || t.inputTokens || 0,
             outputTokens: t.output_tokens || t.outputTokens || 0,
             costUsd: t.cost_usd || t.costUsd || 0,
             elapsedMs: t.latency_ms || t.latencyMs || 0,
-            startTime: t.created_at ? new Date(t.created_at).getTime() : Date.now(),
-            completedAt: t.completed_at ? new Date(t.completed_at).getTime() : Date.now(),
+            startTime: t.created_at
+              ? new Date(t.created_at).getTime()
+              : Date.now(),
+            completedAt: t.completed_at
+              ? new Date(t.completed_at).getTime()
+              : Date.now(),
             temperature: t.temperature || 0.7,
           }));
         }
       }
     } catch (err) {
-      console.warn('[dispatch] Failed to load history:', err.message);
+      console.warn("[dispatch] Failed to load history:", err.message);
     }
   }
 
@@ -552,11 +609,13 @@ export class Dispatch {
           tokens_in: task.inputTokens || 0,
           tokens_out: task.outputTokens || 0,
           cost: task.costUsd || 0,
-          completed_at: task.completedAt ? new Date(task.completedAt).toISOString() : null,
+          completed_at: task.completedAt
+            ? new Date(task.completedAt).toISOString()
+            : null,
         });
       }
     } catch (err) {
-      console.warn('[dispatch] Failed to persist task:', err.message);
+      console.warn("[dispatch] Failed to persist task:", err.message);
     }
   }
 
@@ -580,13 +639,14 @@ export class Dispatch {
       const taskTime = task.completedAt || task.startTime;
       if (taskTime >= todayMs) {
         this.stats.tasksToday++;
-        this.stats.tokensToday += (task.inputTokens || 0) + (task.outputTokens || 0);
+        this.stats.tokensToday +=
+          (task.inputTokens || 0) + (task.outputTokens || 0);
         this.stats.costToday += task.costUsd || 0;
       }
-      if (task.status === 'success') this.stats.successCount++;
-      if (task.status === 'fail') this.stats.failCount++;
+      if (task.status === "success") this.stats.successCount++;
+      if (task.status === "fail") this.stats.failCount++;
 
-      const m = task.model || 'unknown';
+      const m = task.model || "unknown";
       this.stats.modelUsage[m] = (this.stats.modelUsage[m] || 0) + 1;
     }
   }
@@ -598,30 +658,31 @@ export class Dispatch {
 
     if (taskTime >= todayStart.getTime()) {
       this.stats.tasksToday++;
-      this.stats.tokensToday += (task.inputTokens || 0) + (task.outputTokens || 0);
+      this.stats.tokensToday +=
+        (task.inputTokens || 0) + (task.outputTokens || 0);
       this.stats.costToday += task.costUsd || 0;
     }
-    if (task.status === 'success') this.stats.successCount++;
-    if (task.status === 'fail') this.stats.failCount++;
+    if (task.status === "success") this.stats.successCount++;
+    if (task.status === "fail") this.stats.failCount++;
 
-    const m = task.model || 'unknown';
+    const m = task.model || "unknown";
     this.stats.modelUsage[m] = (this.stats.modelUsage[m] || 0) + 1;
   }
 
   // ── Rendering: Model options ───────────────────────────────────
 
   _renderModelOptions() {
-    let html = '';
-    let currentGroup = '';
+    let html = "";
+    let currentGroup = "";
     for (const m of MODELS) {
       if (m.group !== currentGroup) {
-        if (currentGroup) html += '</optgroup>';
+        if (currentGroup) html += "</optgroup>";
         html += `<optgroup label="${m.group}">`;
         currentGroup = m.group;
       }
       html += `<option value="${m.id}">${m.label}</option>`;
     }
-    if (currentGroup) html += '</optgroup>';
+    if (currentGroup) html += "</optgroup>";
     return html;
   }
 
@@ -637,7 +698,7 @@ export class Dispatch {
   }
 
   _renderActiveList() {
-    const listEl = this.container.querySelector('.dispatch-active-list');
+    const listEl = this.container.querySelector(".dispatch-active-list");
     if (!listEl) return;
 
     if (this.activeTasks.size === 0) {
@@ -645,7 +706,7 @@ export class Dispatch {
       return;
     }
 
-    let html = '';
+    let html = "";
     for (const [id, task] of this.activeTasks) {
       html += `
         <div class="dispatch-active-task" data-task-id="${id}">
@@ -662,15 +723,15 @@ export class Dispatch {
             <span class="dispatch-active-task__elapsed" data-elapsed="${id}">${formatElapsed(task.elapsedMs)}</span>
             <span class="dispatch-active-task__tokens" data-tokens="${id}">${formatTokens(task.outputTokens)} tokens</span>
           </div>
-          ${task.response ? `<div class="dispatch-active-task__stream-preview">${this._escapeHtml(task.response.slice(-200))}</div>` : ''}
+          ${task.response ? `<div class="dispatch-active-task__stream-preview">${this._escapeHtml(task.response.slice(-200))}</div>` : ""}
         </div>
       `;
     }
     listEl.innerHTML = html;
 
     // Bind cancel buttons
-    listEl.querySelectorAll('.dispatch-active-task__cancel').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+    listEl.querySelectorAll(".dispatch-active-task__cancel").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
         e.stopPropagation();
         this._cancelTask(btn.dataset.cancel);
       });
@@ -690,7 +751,7 @@ export class Dispatch {
     if (!badge) return;
     const count = this.activeTasks.size;
     badge.textContent = String(count);
-    badge.style.display = count > 0 ? 'inline-flex' : 'none';
+    badge.style.display = count > 0 ? "inline-flex" : "none";
   }
 
   // ── Rendering: History ─────────────────────────────────────────
@@ -705,7 +766,7 @@ export class Dispatch {
   }
 
   _renderHistoryList() {
-    const listEl = this.container.querySelector('.dispatch-history-list');
+    const listEl = this.container.querySelector(".dispatch-history-list");
     if (!listEl) return;
 
     // If we're in detail view, don't overwrite
@@ -716,11 +777,13 @@ export class Dispatch {
       return;
     }
 
-    let html = '';
+    let html = "";
     for (const task of this.history) {
-      const statusClass = task.status || 'pending';
+      const statusClass = task.status || "pending";
       const totalTokens = (task.inputTokens || 0) + (task.outputTokens || 0);
-      const responsePreview = (task.response || '').replace(/\n/g, ' ').slice(0, 80);
+      const responsePreview = (task.response || "")
+        .replace(/\n/g, " ")
+        .slice(0, 80);
 
       html += `
         <div class="dispatch-history-card dispatch-history-card--${statusClass}" data-history-id="${task.id}">
@@ -732,22 +795,22 @@ export class Dispatch {
           </div>
           <div class="dispatch-history-card__prompt">${this._escapeHtml(task.prompt)}</div>
           <div class="dispatch-history-card__meta">
-            <span>${task.model || 'unknown'}</span>
+            <span>${task.model || "unknown"}</span>
             <span>${formatTokens(totalTokens)} tok</span>
             <span>${formatCost(task.costUsd)}</span>
             <span>${formatElapsed(task.elapsedMs)}</span>
           </div>
-          ${responsePreview ? `<div class="dispatch-history-card__response-preview">${this._escapeHtml(responsePreview)}</div>` : ''}
+          ${responsePreview ? `<div class="dispatch-history-card__response-preview">${this._escapeHtml(responsePreview)}</div>` : ""}
         </div>
       `;
     }
     listEl.innerHTML = html;
 
     // Bind click for detail view
-    listEl.querySelectorAll('.dispatch-history-card').forEach(card => {
-      card.addEventListener('click', () => {
+    listEl.querySelectorAll(".dispatch-history-card").forEach((card) => {
+      card.addEventListener("click", () => {
         const id = card.dataset.historyId;
-        const task = this.history.find(t => t.id === id);
+        const task = this.history.find((t) => t.id === id);
         if (task) this._showDetail(task);
       });
     });
@@ -757,7 +820,7 @@ export class Dispatch {
 
   _showDetail(task) {
     this.detailTask = task;
-    this._switchTab('history');
+    this._switchTab("history");
 
     const pane = this.container.querySelector('[data-pane="history"]');
     if (!pane) return;
@@ -772,7 +835,7 @@ export class Dispatch {
         <div class="dispatch-detail__prompt-text">${this._escapeHtml(task.prompt)}</div>
 
         <div class="dispatch-detail__meta-row">
-          <span class="dispatch-detail__meta-item">Model: <span>${task.model || 'unknown'}</span></span>
+          <span class="dispatch-detail__meta-item">Model: <span>${task.model || "unknown"}</span></span>
           <span class="dispatch-detail__meta-item">Status: <span>${STATUS_LABELS[task.status] || task.status}</span></span>
           <span class="dispatch-detail__meta-item">Tokens: <span>${formatTokens(task.inputTokens)} in / ${formatTokens(task.outputTokens)} out</span></span>
           <span class="dispatch-detail__meta-item">Cost: <span>${formatCost(task.costUsd)}</span></span>
@@ -797,21 +860,21 @@ export class Dispatch {
     `;
 
     // Bind detail actions
-    const backBtn = pane.querySelector('.dispatch-detail__back');
-    backBtn.addEventListener('click', () => {
+    const backBtn = pane.querySelector(".dispatch-detail__back");
+    backBtn.addEventListener("click", () => {
       this.detailTask = null;
       // Restore the history list container
       pane.innerHTML = '<div class="dispatch-history-list"></div>';
       this._renderHistoryList();
     });
 
-    pane.querySelectorAll('.dispatch-detail__action-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+    pane.querySelectorAll(".dispatch-detail__action-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const action = btn.dataset.action;
-        if (action === 'copy') this._copyResponse(task);
-        if (action === 'retry') this._retryTask(task);
-        if (action === 'save-brain') this._saveToBrain(task);
+        if (action === "copy") this._copyResponse(task);
+        if (action === "retry") this._retryTask(task);
+        if (action === "save-brain") this._saveToBrain(task);
       });
     });
   }
@@ -820,11 +883,14 @@ export class Dispatch {
 
   _copyResponse(task) {
     if (!task.response) return;
-    navigator.clipboard.writeText(task.response).then(() => {
-      this._showToast('Response copied to clipboard');
-    }).catch(() => {
-      this._showToast('Failed to copy');
-    });
+    navigator.clipboard
+      .writeText(task.response)
+      .then(() => {
+        this._showToast("Response copied to clipboard");
+      })
+      .catch(() => {
+        this._showToast("Failed to copy");
+      });
   }
 
   _retryTask(task) {
@@ -836,20 +902,20 @@ export class Dispatch {
       this._renderHistoryList();
     }
 
-    const textarea = this.container.querySelector('.dispatch-textarea');
+    const textarea = this.container.querySelector(".dispatch-textarea");
     if (textarea) {
       textarea.value = task.prompt;
       textarea.focus();
     }
 
     // Try to set the same model
-    const modelSelect = this.container.querySelector('.dispatch-model-select');
+    const modelSelect = this.container.querySelector(".dispatch-model-select");
     if (modelSelect && task.model) {
       const option = modelSelect.querySelector(`option[value="${task.model}"]`);
       if (option) modelSelect.value = task.model;
     }
 
-    this._switchTab('active');
+    this._switchTab("active");
   }
 
   async _saveToBrain(task) {
@@ -863,17 +929,17 @@ export class Dispatch {
             this.worldId,
             task.prompt.slice(0, 80),
             task.response,
-            'dispatch',
+            "dispatch",
             new Date().toISOString(),
-          ]
+          ],
         );
-        this._showToast('Saved to Brain Library');
+        this._showToast("Saved to Brain Library");
       } else {
-        this._showToast('Brain Library not available');
+        this._showToast("Brain Library not available");
       }
     } catch (err) {
-      console.warn('[dispatch] Failed to save to brain:', err.message);
-      this._showToast('Failed to save');
+      console.warn("[dispatch] Failed to save to brain:", err.message);
+      this._showToast("Failed to save");
     }
   }
 
@@ -881,16 +947,20 @@ export class Dispatch {
 
   _renderStats() {
     const total = this.stats.successCount + this.stats.failCount;
-    const rate = total > 0 ? Math.round((this.stats.successCount / total) * 100) : 0;
+    const rate =
+      total > 0 ? Math.round((this.stats.successCount / total) * 100) : 0;
 
     // Find favorite model
-    let favModel = 'None';
+    let favModel = "None";
     let maxCount = 0;
     for (const [model, count] of Object.entries(this.stats.modelUsage)) {
-      if (count > maxCount) { maxCount = count; favModel = model; }
+      if (count > maxCount) {
+        maxCount = count;
+        favModel = model;
+      }
     }
     // Shorten model name for display
-    const modelInfo = MODELS.find(m => m.id === favModel);
+    const modelInfo = MODELS.find((m) => m.id === favModel);
     const favModelLabel = modelInfo ? modelInfo.label : favModel;
 
     return `
@@ -928,7 +998,7 @@ export class Dispatch {
   }
 
   _renderStatsView() {
-    const container = this.container.querySelector('.dispatch-stats-container');
+    const container = this.container.querySelector(".dispatch-stats-container");
     if (container) {
       container.innerHTML = this._renderStats();
     }
@@ -937,8 +1007,8 @@ export class Dispatch {
   // ── Toast notification ─────────────────────────────────────────
 
   _showToast(message) {
-    const toast = document.createElement('div');
-    toast.className = 'dispatch-toast';
+    const toast = document.createElement("div");
+    toast.className = "dispatch-toast";
     toast.textContent = message;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 2000);
@@ -947,11 +1017,11 @@ export class Dispatch {
   // ── Helpers ────────────────────────────────────────────────────
 
   _escapeHtml(str) {
-    if (!str) return '';
+    if (!str) return "";
     return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
 }

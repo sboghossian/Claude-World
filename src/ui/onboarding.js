@@ -409,12 +409,12 @@ const STYLES = `
 
 function createStars(container, count = 40) {
   for (let i = 0; i < count; i++) {
-    const star = document.createElement('div');
-    star.className = 'cw-star';
+    const star = document.createElement("div");
+    star.className = "cw-star";
 
-    const size    = Math.random() * 2.5 + 1;
-    const delay   = Math.random() * 18;
-    const dur     = Math.random() * 12 + 8;
+    const size = Math.random() * 2.5 + 1;
+    const delay = Math.random() * 18;
+    const dur = Math.random() * 12 + 8;
     const leftPct = Math.random() * 100;
 
     star.style.cssText = `
@@ -433,8 +433,8 @@ function createStars(container, count = 40) {
 
 function typewrite(el, text, cursorEl, { speed = 32, onDone } = {}) {
   let i = 0;
-  el.textContent = '';
-  if (cursorEl) cursorEl.classList.remove('cw-hidden');
+  el.textContent = "";
+  if (cursorEl) cursorEl.classList.remove("cw-hidden");
 
   function tick() {
     if (i < text.length) {
@@ -450,30 +450,30 @@ function typewrite(el, text, cursorEl, { speed = 32, onDone } = {}) {
 // ─── Overlay builder ──────────────────────────────────────────────────────────
 
 let _overlay = null;
-let _system  = null;
+let _system = null;
 
 function buildOverlay() {
   // Inject styles once
-  if (!document.getElementById('cw-onboarding-styles')) {
-    const tag = document.createElement('style');
-    tag.id = 'cw-onboarding-styles';
+  if (!document.getElementById("cw-onboarding-styles")) {
+    const tag = document.createElement("style");
+    tag.id = "cw-onboarding-styles";
     tag.textContent = STYLES;
     document.head.appendChild(tag);
   }
 
-  const overlay = document.createElement('div');
-  overlay.className = 'cw-onboarding-overlay cw-hidden';
+  const overlay = document.createElement("div");
+  overlay.className = "cw-onboarding-overlay cw-hidden";
 
   // Stars
-  const stars = document.createElement('div');
-  stars.className = 'cw-stars';
+  const stars = document.createElement("div");
+  stars.className = "cw-stars";
   createStars(stars);
   overlay.appendChild(stars);
 
   // ── Step 1: Name your world ──────────────────────────────────────────────
-  const step1 = document.createElement('div');
-  step1.className = 'cw-step cw-hidden';
-  step1.dataset.step = '1';
+  const step1 = document.createElement("div");
+  step1.className = "cw-step cw-hidden";
+  step1.dataset.step = "1";
   step1.innerHTML = `
     <div class="cw-wordmark">Claude World</div>
     <div class="cw-progress">
@@ -497,64 +497,66 @@ function buildOverlay() {
     <button class="cw-btn-primary" disabled>Name My World &rarr;</button>
   `;
 
-  const nameInput = step1.querySelector('.cw-input');
-  const nameBtn   = step1.querySelector('.cw-btn-primary');
-  const validHint = step1.querySelector('.cw-validation-hint');
+  const nameInput = step1.querySelector(".cw-input");
+  const nameBtn = step1.querySelector(".cw-btn-primary");
+  const validHint = step1.querySelector(".cw-validation-hint");
 
-  nameInput.addEventListener('input', () => {
+  nameInput.addEventListener("input", () => {
     const val = nameInput.value.trim();
     nameBtn.disabled = val.length < 2;
     if (val.length > 0 && val.length < 2) {
-      validHint.textContent = 'Name must be at least 2 characters';
-      validHint.classList.add('cw-visible');
+      validHint.textContent = "Name must be at least 2 characters";
+      validHint.classList.add("cw-visible");
     } else {
-      validHint.classList.remove('cw-visible');
+      validHint.classList.remove("cw-visible");
     }
   });
 
-  nameInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !nameBtn.disabled) nameBtn.click();
+  nameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !nameBtn.disabled) nameBtn.click();
   });
 
-  nameBtn.addEventListener('click', () => {
+  nameBtn.addEventListener("click", () => {
     goToStep(2);
   });
 
   overlay.appendChild(step1);
 
   // ── Step 2: Choose template ──────────────────────────────────────────────
-  const step2 = document.createElement('div');
-  step2.className = 'cw-step cw-hidden';
-  step2.dataset.step = '2';
+  const step2 = document.createElement("div");
+  step2.className = "cw-step cw-hidden";
+  step2.dataset.step = "2";
 
   const TEMPLATES = [
     {
-      id:    'startup_founder',
-      emoji: '🚀',
-      name:  'Startup Founder',
-      desc:  'Dispatch + Brain Library + Legal Tower\nPerfect for founders.',
+      id: "startup_founder",
+      emoji: "🚀",
+      name: "Startup Founder",
+      desc: "Dispatch + Brain Library + Legal Tower\nPerfect for founders.",
     },
     {
-      id:    'developer',
-      emoji: '💻',
-      name:  'Developer',
-      desc:  'Dispatch + Brain Library + Connector Docks\nBuild and integrate.',
+      id: "developer",
+      emoji: "💻",
+      name: "Developer",
+      desc: "Dispatch + Brain Library + Connector Docks\nBuild and integrate.",
     },
     {
-      id:    'freelancer',
-      emoji: '🎨',
-      name:  'Freelancer',
-      desc:  'Dispatch + Brain Library + Skills Academy\nCreate and deliver.',
+      id: "freelancer",
+      emoji: "🎨",
+      name: "Freelancer",
+      desc: "Dispatch + Brain Library + Skills Academy\nCreate and deliver.",
     },
   ];
 
-  const cardsHTML = TEMPLATES.map(t => `
+  const cardsHTML = TEMPLATES.map(
+    (t) => `
     <div class="cw-card" data-template="${t.id}" tabindex="0" role="button" aria-pressed="false">
       <div class="cw-card-emoji">${t.emoji}</div>
       <div class="cw-card-name">${t.name}</div>
-      <div class="cw-card-desc">${t.desc.replace(/\n/g, '<br>')}</div>
+      <div class="cw-card-desc">${t.desc.replace(/\n/g, "<br>")}</div>
     </div>
-  `).join('');
+  `,
+  ).join("");
 
   step2.innerHTML = `
     <div class="cw-wordmark">Claude World</div>
@@ -573,69 +575,72 @@ function buildOverlay() {
     </div>
   `;
 
-  const buildBtn = step2.querySelector('.cw-btn-primary');
-  const backBtn  = step2.querySelector('.cw-btn-back');
+  const buildBtn = step2.querySelector(".cw-btn-primary");
+  const backBtn = step2.querySelector(".cw-btn-back");
   let selectedTemplate = null;
 
-  backBtn.addEventListener('click', () => {
+  backBtn.addEventListener("click", () => {
     goToStep(1);
   });
 
-  step2.querySelectorAll('.cw-card').forEach(card => {
+  step2.querySelectorAll(".cw-card").forEach((card) => {
     const activate = () => {
-      step2.querySelectorAll('.cw-card').forEach(c => {
-        c.classList.remove('cw-selected');
-        c.setAttribute('aria-pressed', 'false');
+      step2.querySelectorAll(".cw-card").forEach((c) => {
+        c.classList.remove("cw-selected");
+        c.setAttribute("aria-pressed", "false");
       });
-      card.classList.add('cw-selected');
-      card.setAttribute('aria-pressed', 'true');
+      card.classList.add("cw-selected");
+      card.setAttribute("aria-pressed", "true");
       selectedTemplate = card.dataset.template;
       buildBtn.disabled = false;
     };
 
-    card.addEventListener('click', activate);
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+    card.addEventListener("click", activate);
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        activate();
+      }
     });
   });
 
-  buildBtn.addEventListener('click', async () => {
+  buildBtn.addEventListener("click", async () => {
     if (!selectedTemplate) return;
     buildBtn.disabled = true;
-    buildBtn.textContent = 'Creating…';
+    buildBtn.textContent = "Creating…";
     try {
       await _system.createWorld(nameInput.value.trim(), selectedTemplate);
       goToStep(3);
     } catch (err) {
-      console.error('[OnboardingUI] createWorld failed:', err);
+      console.error("[OnboardingUI] createWorld failed:", err);
       buildBtn.disabled = false;
-      buildBtn.innerHTML = 'Build My World &rarr;';
+      buildBtn.innerHTML = "Build My World &rarr;";
       // Show error toast below the button row
-      let toast = step2.querySelector('.cw-error-toast');
+      let toast = step2.querySelector(".cw-error-toast");
       if (!toast) {
-        toast = document.createElement('div');
-        toast.className = 'cw-error-toast';
+        toast = document.createElement("div");
+        toast.className = "cw-error-toast";
         step2.appendChild(toast);
       }
       // Distinguish network errors from other failures
-      const isNetworkError = err.message && (
-        err.message.includes('fetch') ||
-        err.message.includes('network') ||
-        err.message.includes('ECONNREFUSED') ||
-        err.message.includes('Failed to fetch')
-      );
+      const isNetworkError =
+        err.message &&
+        (err.message.includes("fetch") ||
+          err.message.includes("network") ||
+          err.message.includes("ECONNREFUSED") ||
+          err.message.includes("Failed to fetch"));
       toast.textContent = isNetworkError
-        ? 'Network error — world creation works offline, but the database may not be ready. Please restart the app.'
-        : `Something went wrong: ${err.message || 'Unknown error'}. Please try again.`;
+        ? "Network error — world creation works offline, but the database may not be ready. Please restart the app."
+        : `Something went wrong: ${err.message || "Unknown error"}. Please try again.`;
     }
   });
 
   overlay.appendChild(step2);
 
   // ── Step 3: Meet your Commander ──────────────────────────────────────────
-  const step3 = document.createElement('div');
-  step3.className = 'cw-step cw-hidden';
-  step3.dataset.step = '3';
+  const step3 = document.createElement("div");
+  step3.className = "cw-step cw-hidden";
+  step3.dataset.step = "3";
   step3.innerHTML = `
     <div class="cw-wordmark">Claude World</div>
     <div class="cw-progress">
@@ -656,11 +661,11 @@ function buildOverlay() {
     </button>
   `;
 
-  const letsGoBtn   = step3.querySelector('.cw-btn-primary');
-  const twText      = step3.querySelector('.cw-typewriter-text');
-  const cursorSpan  = step3.querySelector('.cw-cursor');
+  const letsGoBtn = step3.querySelector(".cw-btn-primary");
+  const twText = step3.querySelector(".cw-typewriter-text");
+  const cursorSpan = step3.querySelector(".cw-cursor");
 
-  letsGoBtn.addEventListener('click', () => {
+  letsGoBtn.addEventListener("click", () => {
     hideOverlay();
     if (_system) _system.complete();
   });
@@ -669,25 +674,27 @@ function buildOverlay() {
 
   // ── Navigation helpers ──────────────────────────────────────────────────
   function goToStep(n) {
-    overlay.querySelectorAll('.cw-step').forEach(s => s.classList.add('cw-hidden'));
+    overlay
+      .querySelectorAll(".cw-step")
+      .forEach((s) => s.classList.add("cw-hidden"));
     const target = overlay.querySelector(`.cw-step[data-step="${n}"]`);
     if (!target) return;
-    target.classList.remove('cw-hidden');
+    target.classList.remove("cw-hidden");
 
     if (n === 1) {
       setTimeout(() => nameInput.focus(), 80);
     }
 
     if (n === 3) {
-      const worldName = nameInput.value.trim() || 'Commander';
+      const worldName = nameInput.value.trim() || "Commander";
       const msg = `Hello ${worldName}. I'm your Commander. I'll route every task you give me to the right agent in your world. Ready to begin?`;
       setTimeout(() => {
         typewrite(twText, msg, cursorSpan, {
           speed: 28,
           onDone: () => {
-            cursorSpan.classList.add('cw-hidden');
-            letsGoBtn.style.opacity = '1';
-            letsGoBtn.style.pointerEvents = 'auto';
+            cursorSpan.classList.add("cw-hidden");
+            letsGoBtn.style.opacity = "1";
+            letsGoBtn.style.pointerEvents = "auto";
           },
         });
       }, 350);
@@ -704,21 +711,23 @@ function buildOverlay() {
 
 function showOverlay() {
   if (!_overlay) return;
-  _overlay.classList.remove('cw-hidden');
+  _overlay.classList.remove("cw-hidden");
   // Start at step 1
-  _overlay.querySelectorAll('.cw-step').forEach(s => s.classList.add('cw-hidden'));
+  _overlay
+    .querySelectorAll(".cw-step")
+    .forEach((s) => s.classList.add("cw-hidden"));
   const step1 = _overlay.querySelector('.cw-step[data-step="1"]');
   if (step1) {
-    step1.classList.remove('cw-hidden');
+    step1.classList.remove("cw-hidden");
     setTimeout(() => {
-      const inp = step1.querySelector('.cw-input');
+      const inp = step1.querySelector(".cw-input");
       if (inp) inp.focus();
     }, 80);
   }
 }
 
 function hideOverlay() {
-  if (_overlay) _overlay.classList.add('cw-hidden');
+  if (_overlay) _overlay.classList.add("cw-hidden");
 }
 
 // ─── Public exports ───────────────────────────────────────────────────────────
@@ -734,7 +743,7 @@ export function initOnboarding(onboardingSystem) {
   _system = onboardingSystem;
   buildOverlay();
 
-  document.addEventListener('onboarding:start', () => {
+  document.addEventListener("onboarding:start", () => {
     showOverlay();
   });
 }
@@ -745,7 +754,9 @@ export function initOnboarding(onboardingSystem) {
  */
 export function showOnboarding() {
   if (!_overlay) {
-    console.warn('[OnboardingUI] showOnboarding() called before initOnboarding().');
+    console.warn(
+      "[OnboardingUI] showOnboarding() called before initOnboarding().",
+    );
     return;
   }
   showOverlay();

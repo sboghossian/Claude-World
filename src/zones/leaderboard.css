@@ -6,40 +6,40 @@
 
 /* ── CSS custom properties ─────────────────────────────────────────────── */
 .lb-dashboard {
-  --lb-bg:            #06080e;
-  --lb-surface:       rgba(15, 20, 35, 0.85);
-  --lb-surface-2:     rgba(25, 32, 55, 0.75);
-  --lb-border:        rgba(168, 85, 247, 0.12);
-  --lb-border-hover:  rgba(168, 85, 247, 0.3);
+  --lb-bg: #06080e;
+  --lb-surface: rgba(15, 20, 35, 0.85);
+  --lb-surface-2: rgba(25, 32, 55, 0.75);
+  --lb-border: rgba(168, 85, 247, 0.12);
+  --lb-border-hover: rgba(168, 85, 247, 0.3);
 
-  --lb-purple:        #a855f7;
-  --lb-purple-dim:    rgba(168, 85, 247, 0.15);
-  --lb-purple-glow:   rgba(168, 85, 247, 0.35);
-  --lb-purple-faint:  rgba(168, 85, 247, 0.07);
+  --lb-purple: #a855f7;
+  --lb-purple-dim: rgba(168, 85, 247, 0.15);
+  --lb-purple-glow: rgba(168, 85, 247, 0.35);
+  --lb-purple-faint: rgba(168, 85, 247, 0.07);
 
-  --lb-blue:          #3b82f6;
-  --lb-blue-dim:      rgba(59, 130, 246, 0.15);
-  --lb-green:         #22c55e;
-  --lb-green-dim:     rgba(34, 197, 94, 0.15);
-  --lb-amber:         #f59e0b;
-  --lb-amber-dim:     rgba(245, 158, 11, 0.15);
-  --lb-red:           #ef4444;
-  --lb-cyan:          #22d3ee;
-  --lb-pink:          #f472b6;
+  --lb-blue: #3b82f6;
+  --lb-blue-dim: rgba(59, 130, 246, 0.15);
+  --lb-green: #22c55e;
+  --lb-green-dim: rgba(34, 197, 94, 0.15);
+  --lb-amber: #f59e0b;
+  --lb-amber-dim: rgba(245, 158, 11, 0.15);
+  --lb-red: #ef4444;
+  --lb-cyan: #22d3ee;
+  --lb-pink: #f472b6;
 
-  --lb-gold:          #eab308;
-  --lb-silver:        #94a3b8;
-  --lb-bronze:        #d97706;
+  --lb-gold: #eab308;
+  --lb-silver: #94a3b8;
+  --lb-bronze: #d97706;
 
-  --lb-text:          #c8d0e0;
-  --lb-text-muted:    #6b7a99;
-  --lb-text-dim:      #3a4560;
+  --lb-text: #c8d0e0;
+  --lb-text-muted: #6b7a99;
+  --lb-text-dim: #3a4560;
 
-  --lb-font:          'SF Mono', 'Fira Code', 'Consolas', monospace;
-  --lb-font-sans:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --lb-radius:        12px;
-  --lb-radius-sm:     8px;
-  --lb-transition:    200ms ease;
+  --lb-font: "SF Mono", "Fira Code", "Consolas", monospace;
+  --lb-font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --lb-radius: 12px;
+  --lb-radius-sm: 8px;
+  --lb-transition: 200ms ease;
 
   position: relative;
   display: flex;
@@ -56,29 +56,56 @@
 
 /* ── Keyframes ─────────────────────────────────────────────────────────── */
 @keyframes lb-gradient-border {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @keyframes lb-count-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes lb-fade-in {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes lb-shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes lb-pulse-gold {
-  0%, 100% { box-shadow: 0 0 8px rgba(234, 179, 8, 0.2); }
-  50%      { box-shadow: 0 0 20px rgba(234, 179, 8, 0.5); }
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(234, 179, 8, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(234, 179, 8, 0.5);
+  }
 }
 
 /* ── Header ────────────────────────────────────────────────────────────── */
@@ -121,8 +148,12 @@
   scrollbar-color: var(--lb-purple-dim) transparent;
 }
 
-.lb-body::-webkit-scrollbar { width: 5px; }
-.lb-body::-webkit-scrollbar-track { background: transparent; }
+.lb-body::-webkit-scrollbar {
+  width: 5px;
+}
+.lb-body::-webkit-scrollbar-track {
+  background: transparent;
+}
 .lb-body::-webkit-scrollbar-thumb {
   background: var(--lb-purple-dim);
   border-radius: 4px;
@@ -142,7 +173,9 @@
   gap: 6px;
 }
 
-.lb-section-title:first-child { margin-top: 4px; }
+.lb-section-title:first-child {
+  margin-top: 4px;
+}
 
 .lb-section-title__icon {
   font-size: 13px;
@@ -155,7 +188,9 @@
   border-radius: var(--lb-radius);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  transition: border-color var(--lb-transition), box-shadow var(--lb-transition);
+  transition:
+    border-color var(--lb-transition),
+    box-shadow var(--lb-transition);
   animation: lb-fade-in 0.4s ease both;
 }
 
@@ -182,20 +217,36 @@
 }
 
 .lb-stat-card::before {
-  content: '';
+  content: "";
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 3px;
   border-radius: var(--lb-radius) var(--lb-radius) 0 0;
 }
 
-.lb-stat-card--tasks::before    { background: linear-gradient(90deg, var(--lb-blue), var(--lb-cyan)); }
-.lb-stat-card--tokens::before   { background: linear-gradient(90deg, var(--lb-amber), #f97316); }
-.lb-stat-card--xp::before       { background: linear-gradient(90deg, var(--lb-purple), var(--lb-pink)); }
-.lb-stat-card--age::before      { background: linear-gradient(90deg, var(--lb-green), #14b8a6); }
-.lb-stat-card--zones::before    { background: linear-gradient(90deg, var(--lb-cyan), var(--lb-blue)); }
-.lb-stat-card--achieve::before  { background: linear-gradient(90deg, var(--lb-gold), var(--lb-amber)); }
-.lb-stat-card--streak::before   { background: linear-gradient(90deg, var(--lb-red), var(--lb-pink)); }
+.lb-stat-card--tasks::before {
+  background: linear-gradient(90deg, var(--lb-blue), var(--lb-cyan));
+}
+.lb-stat-card--tokens::before {
+  background: linear-gradient(90deg, var(--lb-amber), #f97316);
+}
+.lb-stat-card--xp::before {
+  background: linear-gradient(90deg, var(--lb-purple), var(--lb-pink));
+}
+.lb-stat-card--age::before {
+  background: linear-gradient(90deg, var(--lb-green), #14b8a6);
+}
+.lb-stat-card--zones::before {
+  background: linear-gradient(90deg, var(--lb-cyan), var(--lb-blue));
+}
+.lb-stat-card--achieve::before {
+  background: linear-gradient(90deg, var(--lb-gold), var(--lb-amber));
+}
+.lb-stat-card--streak::before {
+  background: linear-gradient(90deg, var(--lb-red), var(--lb-pink));
+}
 
 .lb-stat-card__label {
   font-size: 10px;
@@ -237,7 +288,10 @@
   border-bottom: 1px solid var(--lb-border);
 }
 
-.lb-agent-table th:first-child { width: 28px; text-align: center; }
+.lb-agent-table th:first-child {
+  width: 28px;
+  text-align: center;
+}
 
 .lb-agent-table td {
   font-size: 11px;
@@ -246,7 +300,9 @@
   color: var(--lb-text);
 }
 
-.lb-agent-table tr:last-child td { border-bottom: none; }
+.lb-agent-table tr:last-child td {
+  border-bottom: none;
+}
 
 .lb-agent-table tr:hover td {
   background: var(--lb-purple-faint);
@@ -293,7 +349,9 @@
   font-weight: 500;
 }
 
-.lb-agent-name__icon { font-size: 14px; }
+.lb-agent-name__icon {
+  font-size: 14px;
+}
 
 .lb-agent-stat {
   font-family: var(--lb-font);
@@ -464,7 +522,8 @@
 
 /* ── Loading state ─────────────────────────────────────────────────────── */
 .lb-loading {
-  background: linear-gradient(90deg,
+  background: linear-gradient(
+    90deg,
     var(--lb-surface) 25%,
     var(--lb-surface-2) 50%,
     var(--lb-surface) 75%
@@ -474,10 +533,24 @@
 }
 
 /* ── Animation delays for staggered entrance ───────────────────────────── */
-.lb-stat-card:nth-child(1) { animation-delay: 0.05s; }
-.lb-stat-card:nth-child(2) { animation-delay: 0.1s; }
-.lb-stat-card:nth-child(3) { animation-delay: 0.15s; }
-.lb-stat-card:nth-child(4) { animation-delay: 0.2s; }
-.lb-stat-card:nth-child(5) { animation-delay: 0.25s; }
-.lb-stat-card:nth-child(6) { animation-delay: 0.3s; }
-.lb-stat-card:nth-child(7) { animation-delay: 0.35s; }
+.lb-stat-card:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.lb-stat-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.lb-stat-card:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.lb-stat-card:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.lb-stat-card:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.lb-stat-card:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.lb-stat-card:nth-child(7) {
+  animation-delay: 0.35s;
+}

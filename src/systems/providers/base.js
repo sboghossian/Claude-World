@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Abstract base class for AI provider adapters.
@@ -12,7 +12,9 @@ class ProviderAdapter {
    */
   constructor(name, keyStore) {
     if (new.target === ProviderAdapter) {
-      throw new Error('ProviderAdapter is abstract and cannot be instantiated directly');
+      throw new Error(
+        "ProviderAdapter is abstract and cannot be instantiated directly",
+      );
     }
     this.name = name;
     this.keyStore = keyStore;
@@ -36,13 +38,13 @@ class ProviderAdapter {
    */
   _getApiKey() {
     if (!this.keyStore) {
-      throw new ProviderError(this.name, 'Key store not available');
+      throw new ProviderError(this.name, "Key store not available");
     }
     const key = this.keyStore.get(this.name);
     if (!key) {
       throw new ProviderError(
         this.name,
-        `No API key configured for provider "${this.name}". Add one in Settings > API Keys.`
+        `No API key configured for provider "${this.name}". Add one in Settings > API Keys.`,
       );
     }
     return key;
@@ -106,7 +108,7 @@ class ProviderError extends Error {
    */
   constructor(provider, message, meta = {}) {
     super(`[${provider}] ${message}`);
-    this.name = 'ProviderError';
+    this.name = "ProviderError";
     this.provider = provider;
     this.status = meta.status || null;
     this.retryable = meta.retryable || false;
@@ -119,11 +121,11 @@ class RateLimitError extends ProviderError {
    * @param {number} [retryAfterMs]
    */
   constructor(provider, retryAfterMs) {
-    super(provider, 'Rate limit exceeded. Please wait before retrying.', {
+    super(provider, "Rate limit exceeded. Please wait before retrying.", {
       status: 429,
       retryable: true,
     });
-    this.name = 'RateLimitError';
+    this.name = "RateLimitError";
     this.retryAfterMs = retryAfterMs || null;
   }
 }
@@ -131,11 +133,11 @@ class RateLimitError extends ProviderError {
 class AuthenticationError extends ProviderError {
   /** @param {string} provider */
   constructor(provider) {
-    super(provider, 'Invalid or expired API key. Check your key in Settings.', {
+    super(provider, "Invalid or expired API key. Check your key in Settings.", {
       status: 401,
       retryable: false,
     });
-    this.name = 'AuthenticationError';
+    this.name = "AuthenticationError";
   }
 }
 

@@ -40,11 +40,12 @@ export class AgentRelationshipSystem {
     }
 
     // Load all agent_relationships for this world.
-    this._relationships = await window.api.db.getAgentRelationships(worldId) || [];
+    this._relationships =
+      (await window.api.db.getAgentRelationships(worldId)) || [];
 
     console.log(
       `[agent-relationships] Loaded ${this._relationships.length} relationships` +
-      ` and ${this._agents.size} agents for world ${worldId}`
+        ` and ${this._agents.size} agents for world ${worldId}`,
     );
   }
 
@@ -74,7 +75,7 @@ export class AgentRelationshipSystem {
     const briefingAgentIds = new Set();
 
     for (const rel of this._relationships) {
-      if (rel.briefing_direction === 'to_commander') {
+      if (rel.briefing_direction === "to_commander") {
         // The agent who delivers the briefing is agent_a.
         briefingAgentIds.add(rel.agent_a_id);
       }
@@ -104,22 +105,24 @@ export class AgentRelationshipSystem {
     }
 
     // Fetch recent tasks for this agent's zone to give the AI context.
-    const recentTasks = await window.api.db.getRecentTasks({
-      worldId: this._worldId,
-      zoneId: agent.zone_id ?? undefined,
-      limit: 10,
-    }) || [];
+    const recentTasks =
+      (await window.api.db.getRecentTasks({
+        worldId: this._worldId,
+        zoneId: agent.zone_id ?? undefined,
+        limit: 10,
+      })) || [];
 
-    const taskSummary = recentTasks.length > 0
-      ? recentTasks
-          .map(
-            (t, i) =>
-              `${i + 1}. [${t.status}] ${t.prompt.slice(0, 120)}${
-                t.prompt.length > 120 ? '...' : ''
-              }`
-          )
-          .join('\n')
-      : 'No recent tasks recorded.';
+    const taskSummary =
+      recentTasks.length > 0
+        ? recentTasks
+            .map(
+              (t, i) =>
+                `${i + 1}. [${t.status}] ${t.prompt.slice(0, 120)}${
+                  t.prompt.length > 120 ? "..." : ""
+                }`,
+            )
+            .join("\n")
+        : "No recent tasks recorded.";
 
     const systemPrompt =
       `You are ${agent.name}, a ${agent.role} in an AI-native city. ` +
@@ -134,7 +137,7 @@ export class AgentRelationshipSystem {
       systemPrompt,
       messages: [
         {
-          role: 'user',
+          role: "user",
           content:
             `Here is recent activity in my zone:\n\n${taskSummary}\n\n` +
             `Please give your morning briefing.`,
@@ -143,7 +146,7 @@ export class AgentRelationshipSystem {
       maxTokens: 256,
     });
 
-    return result.text ?? '';
+    return result.text ?? "";
   }
 
   // ── Incidents ────────────────────────────────────────────────────────
@@ -162,7 +165,10 @@ export class AgentRelationshipSystem {
    * }} opts
    * @returns {Promise<object>} the created incident row
    */
-  async fileIncident(worldId, { title, description, severity = 'info', reporterAgentId, zoneId }) {
+  async fileIncident(
+    worldId,
+    { title, description, severity = "info", reporterAgentId, zoneId },
+  ) {
     const incident = await window.api.db.createIncident({
       worldId,
       title,
@@ -173,7 +179,7 @@ export class AgentRelationshipSystem {
     });
 
     window.dispatchEvent(
-      new CustomEvent('incident:filed', { detail: incident })
+      new CustomEvent("incident:filed", { detail: incident }),
     );
 
     // If a reporting agent is specified, animate them walking to the
@@ -206,7 +212,7 @@ export class AgentRelationshipSystem {
    */
   triggerIncidentWalk(agentId) {
     window.dispatchEvent(
-      new CustomEvent('agent:walk-to-dispatch', { detail: { agentId } })
+      new CustomEvent("agent:walk-to-dispatch", { detail: { agentId } }),
     );
   }
 }

@@ -4,12 +4,12 @@ This directory contains static assets used by electron-builder during packaging.
 
 ## Required files
 
-| File | Description |
-|---|---|
-| `icon.icns` | macOS app icon (1024x1024 base, icns format) |
-| `icon.png` | PNG version for Linux (1024x1024) |
-| `icon.ico` | Windows icon (multi-resolution ICO) |
-| `dmg-background.png` | DMG installer background (540x380px, dark themed) |
+| File                     | Description                                           |
+| ------------------------ | ----------------------------------------------------- |
+| `icon.icns`              | macOS app icon (1024x1024 base, icns format)          |
+| `icon.png`               | PNG version for Linux (1024x1024)                     |
+| `icon.ico`               | Windows icon (multi-resolution ICO)                   |
+| `dmg-background.png`     | DMG installer background (540x380px, dark themed)     |
 | `entitlements.mac.plist` | macOS hardened runtime entitlements (already present) |
 
 ## Generating icon.icns from a 1024x1024 PNG

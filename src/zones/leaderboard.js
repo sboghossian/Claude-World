@@ -22,54 +22,62 @@
 // ── Constants ──────────────────────────────────────────────────────────
 
 const AGENT_ICONS = {
-  commander:  '\u{1F451}',
-  librarian:  '\u{1F4DA}',
-  archivist:  '\u{1F4DC}',
-  instructor: '\u{1F393}',
-  dockmaster: '\u{2693}',
+  commander: "\u{1F451}",
+  librarian: "\u{1F4DA}",
+  archivist: "\u{1F4DC}",
+  instructor: "\u{1F393}",
+  dockmaster: "\u{2693}",
 };
 
-const AGENT_COLORS = ['#a855f7', '#3b82f6', '#22c55e', '#f59e0b', '#ec4899'];
+const AGENT_COLORS = ["#a855f7", "#3b82f6", "#22c55e", "#f59e0b", "#ec4899"];
 
 const HEATMAP_COLORS = [
-  'rgba(168, 85, 247, 0.05)',  // level 0 — empty
-  'rgba(168, 85, 247, 0.2)',   // level 1
-  'rgba(168, 85, 247, 0.4)',   // level 2
-  'rgba(168, 85, 247, 0.6)',   // level 3
-  'rgba(168, 85, 247, 0.85)',  // level 4 — max
+  "rgba(168, 85, 247, 0.05)", // level 0 — empty
+  "rgba(168, 85, 247, 0.2)", // level 1
+  "rgba(168, 85, 247, 0.4)", // level 2
+  "rgba(168, 85, 247, 0.6)", // level 3
+  "rgba(168, 85, 247, 0.85)", // level 4 — max
 ];
 
 const ZONE_COLORS = [
-  '#a855f7', '#3b82f6', '#22c55e', '#f59e0b', '#ec4899',
-  '#22d3ee', '#ef4444', '#6366f1', '#14b8a6', '#f97316',
+  "#a855f7",
+  "#3b82f6",
+  "#22c55e",
+  "#f59e0b",
+  "#ec4899",
+  "#22d3ee",
+  "#ef4444",
+  "#6366f1",
+  "#14b8a6",
+  "#f97316",
 ];
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
 function escHtml(str) {
-  if (!str) return '';
-  const d = document.createElement('div');
+  if (!str) return "";
+  const d = document.createElement("div");
   d.textContent = str;
   return d.innerHTML;
 }
 
 function fmtNumber(n) {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
-  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + "K";
   return String(Math.round(n));
 }
 
 function fmtDuration(ms) {
-  if (ms >= 3_600_000) return (ms / 3_600_000).toFixed(1) + 'h';
-  if (ms >= 60_000) return (ms / 60_000).toFixed(1) + 'm';
-  if (ms >= 1000) return (ms / 1000).toFixed(1) + 's';
-  return Math.round(ms) + 'ms';
+  if (ms >= 3_600_000) return (ms / 3_600_000).toFixed(1) + "h";
+  if (ms >= 60_000) return (ms / 60_000).toFixed(1) + "m";
+  if (ms >= 1000) return (ms / 1000).toFixed(1) + "s";
+  return Math.round(ms) + "ms";
 }
 
 function fmtMs(ms) {
-  if (ms >= 60_000) return (ms / 60_000).toFixed(1) + 'm';
-  if (ms >= 1000) return (ms / 1000).toFixed(1) + 's';
-  return Math.round(ms) + 'ms';
+  if (ms >= 60_000) return (ms / 60_000).toFixed(1) + "m";
+  if (ms >= 1000) return (ms / 1000).toFixed(1) + "s";
+  return Math.round(ms) + "ms";
 }
 
 /** Return an array of date strings for the last N days. */
@@ -94,27 +102,27 @@ function setupCanvas(canvas, w, h) {
   const ratio = dpr();
   canvas.width = w * ratio;
   canvas.height = h * ratio;
-  canvas.style.width = w + 'px';
-  canvas.style.height = h + 'px';
-  const ctx = canvas.getContext('2d');
+  canvas.style.width = w + "px";
+  canvas.style.height = h + "px";
+  const ctx = canvas.getContext("2d");
   ctx.scale(ratio, ratio);
   return ctx;
 }
 
 /** Determine hour-of-day label from 0-23. */
 function fmtHour(h) {
-  if (h === 0) return '12am';
-  if (h < 12) return h + 'am';
-  if (h === 12) return '12pm';
-  return (h - 12) + 'pm';
+  if (h === 0) return "12am";
+  if (h < 12) return h + "am";
+  if (h === 12) return "12pm";
+  return h - 12 + "pm";
 }
 
 /** Medal emoji for position. */
 function medalFor(pos) {
-  if (pos === 1) return '\u{1F947}';
-  if (pos === 2) return '\u{1F948}';
-  if (pos === 3) return '\u{1F949}';
-  return '';
+  if (pos === 1) return "\u{1F947}";
+  if (pos === 2) return "\u{1F948}";
+  if (pos === 3) return "\u{1F949}";
+  return "";
 }
 
 // ── Leaderboard class ──────────────────────────────────────────────────
@@ -148,10 +156,10 @@ export class Leaderboard {
   render() {
     this._injectCSS();
 
-    const el = document.createElement('div');
-    el.className = 'lb-dashboard';
-    el.setAttribute('role', 'region');
-    el.setAttribute('aria-label', 'World Stats & Leaderboard');
+    const el = document.createElement("div");
+    el.className = "lb-dashboard";
+    el.setAttribute("role", "region");
+    el.setAttribute("aria-label", "World Stats & Leaderboard");
     this._el = el;
 
     el.innerHTML = this._buildShellHTML();
@@ -188,12 +196,12 @@ export class Leaderboard {
   // ═══════════════════════════════════════════════════════════════════════
 
   _injectCSS() {
-    const id = 'leaderboard-styles';
+    const id = "leaderboard-styles";
     if (document.getElementById(id)) return;
-    const link = document.createElement('link');
+    const link = document.createElement("link");
     link.id = id;
-    link.rel = 'stylesheet';
-    link.href = 'src/zones/leaderboard.css';
+    link.rel = "stylesheet";
+    link.href = "src/zones/leaderboard.css";
     document.head.appendChild(link);
   }
 
@@ -232,7 +240,7 @@ export class Leaderboard {
       this._loaded = true;
       this._renderAll();
     } catch (err) {
-      console.warn('[Leaderboard] Failed to fetch data:', err);
+      console.warn("[Leaderboard] Failed to fetch data:", err);
       this._data = this._emptyData();
       this._loaded = true;
       this._renderAll();
@@ -246,23 +254,16 @@ export class Leaderboard {
     const wid = this._worldId;
 
     // Fetch everything in parallel where possible
-    const [
-      analytics,
-      world,
-      agents,
-      zones,
-      achievements,
-      tasks,
-      heatmapData,
-    ] = await Promise.all([
-      db.getAnalytics?.(wid, 'all').catch(() => null),
-      db.getWorld?.(wid).catch(() => null),
-      db.getAgents?.(wid).catch(() => []),
-      db.getZones?.(wid).catch(() => []),
-      db.getAchievements?.(wid).catch(() => []),
-      db.getTasks?.(wid).catch(() => []),
-      db.getActivityHeatmap?.(wid).catch(() => []),
-    ]);
+    const [analytics, world, agents, zones, achievements, tasks, heatmapData] =
+      await Promise.all([
+        db.getAnalytics?.(wid, "all").catch(() => null),
+        db.getWorld?.(wid).catch(() => null),
+        db.getAgents?.(wid).catch(() => []),
+        db.getZones?.(wid).catch(() => []),
+        db.getAchievements?.(wid).catch(() => []),
+        db.getTasks?.(wid).catch(() => []),
+        db.getActivityHeatmap?.(wid).catch(() => []),
+      ]);
 
     // Compute world age
     const createdAt = world?.created_at || world?.createdAt;
@@ -271,9 +272,7 @@ export class Leaderboard {
       : 0;
 
     // Compute total stats
-    const totalTasks = analytics?.summary?.totalTasks
-      || tasks?.length
-      || 0;
+    const totalTasks = analytics?.summary?.totalTasks || tasks?.length || 0;
     const totalTokens = analytics?.summary?.totalTokens || 0;
 
     // Compute XP from agents
@@ -283,12 +282,15 @@ export class Leaderboard {
     // Zones unlocked
     const zoneList = Array.isArray(zones) ? zones : [];
     const totalZones = Object.keys(ZONE_COLORS).length || 20;
-    const unlockedZones = zoneList.filter(z => z.unlocked !== false).length || zoneList.length;
+    const unlockedZones =
+      zoneList.filter((z) => z.unlocked !== false).length || zoneList.length;
 
     // Achievements
     const achieveList = Array.isArray(achievements) ? achievements : [];
     const totalAchievements = achieveList.length;
-    const unlockedAchievements = achieveList.filter(a => a.unlocked || a.earned).length;
+    const unlockedAchievements = achieveList.filter(
+      (a) => a.unlocked || a.earned,
+    ).length;
 
     // Streak calculation from tasks
     const taskList = Array.isArray(tasks) ? tasks : [];
@@ -296,10 +298,10 @@ export class Leaderboard {
 
     // Agent leaderboard data
     const agentLeaderboard = agentList
-      .map(a => ({
+      .map((a) => ({
         id: a.id || a.role,
-        name: a.name || a.role || 'Unknown',
-        role: a.role || a.id || 'agent',
+        name: a.name || a.role || "Unknown",
+        role: a.role || a.id || "agent",
         tasks: a.tasks_completed || a.tasksCompleted || 0,
         xp: a.xp || 0,
         skills: a.skills_unlocked || a.skillsUnlocked || 0,
@@ -317,9 +319,10 @@ export class Leaderboard {
     const records = await this._computeRecords(taskList, db, wid);
 
     // Activity heatmap (365 days)
-    const heatmap = Array.isArray(heatmapData) && heatmapData.length > 0
-      ? heatmapData
-      : this._buildHeatmapFromTasks(taskList);
+    const heatmap =
+      Array.isArray(heatmapData) && heatmapData.length > 0
+        ? heatmapData
+        : this._buildHeatmapFromTasks(taskList);
 
     return {
       totalTasks,
@@ -351,7 +354,12 @@ export class Leaderboard {
       longestStreak: 0,
       agentLeaderboard: [],
       zoneUsage: [],
-      records: { fastestTask: 0, mostTokens: 0, longestSession: 0, mostTasksInDay: 0 },
+      records: {
+        fastestTask: 0,
+        mostTokens: 0,
+        longestSession: 0,
+        mostTasksInDay: 0,
+      },
       heatmap: [],
     };
   }
@@ -365,8 +373,9 @@ export class Leaderboard {
 
     // Get unique active days
     const days = new Set();
-    tasks.forEach(t => {
-      const d = (t.completed_at || t.completedAt || t.created_at || t.createdAt || '');
+    tasks.forEach((t) => {
+      const d =
+        t.completed_at || t.completedAt || t.created_at || t.createdAt || "";
       if (d) days.add(d.slice(0, 10));
     });
 
@@ -395,42 +404,49 @@ export class Leaderboard {
   async _computeRecords(tasks, db, wid) {
     const records = {
       fastestTask: 0,
-      fastestTaskName: '',
+      fastestTaskName: "",
       mostTokens: 0,
-      mostTokensTask: '',
+      mostTokensTask: "",
       longestSession: 0,
-      longestSessionDate: '',
+      longestSessionDate: "",
       mostTasksInDay: 0,
-      mostTasksDate: '',
+      mostTasksDate: "",
     };
 
     if (!tasks || tasks.length === 0) return records;
 
     // Fastest task completion
     let fastest = Infinity;
-    tasks.forEach(t => {
+    tasks.forEach((t) => {
       const dur = t.duration || t.elapsed_ms || t.elapsedMs || 0;
       if (dur > 0 && dur < fastest) {
         fastest = dur;
         records.fastestTask = dur;
-        records.fastestTaskName = t.name || t.title || t.zone || 'task';
+        records.fastestTaskName = t.name || t.title || t.zone || "task";
       }
     });
     if (fastest === Infinity) records.fastestTask = 0;
 
     // Most tokens in single task
-    tasks.forEach(t => {
-      const tokens = (t.input_tokens || 0) + (t.output_tokens || 0) + (t.tokens || 0);
+    tasks.forEach((t) => {
+      const tokens =
+        (t.input_tokens || 0) + (t.output_tokens || 0) + (t.tokens || 0);
       if (tokens > records.mostTokens) {
         records.mostTokens = tokens;
-        records.mostTokensTask = t.name || t.title || t.zone || 'task';
+        records.mostTokensTask = t.name || t.title || t.zone || "task";
       }
     });
 
     // Most tasks in one day
     const dayBuckets = {};
-    tasks.forEach(t => {
-      const d = (t.completed_at || t.completedAt || t.created_at || t.createdAt || '').slice(0, 10);
+    tasks.forEach((t) => {
+      const d = (
+        t.completed_at ||
+        t.completedAt ||
+        t.created_at ||
+        t.createdAt ||
+        ""
+      ).slice(0, 10);
       if (d) dayBuckets[d] = (dayBuckets[d] || 0) + 1;
     });
     for (const [day, count] of Object.entries(dayBuckets)) {
@@ -442,8 +458,12 @@ export class Leaderboard {
 
     // Longest session — approximate from consecutive task timestamps
     const sorted = tasks
-      .map(t => new Date(t.completed_at || t.completedAt || t.created_at || t.createdAt || 0).getTime())
-      .filter(ts => ts > 0)
+      .map((t) =>
+        new Date(
+          t.completed_at || t.completedAt || t.created_at || t.createdAt || 0,
+        ).getTime(),
+      )
+      .filter((ts) => ts > 0)
       .sort((a, b) => a - b);
 
     if (sorted.length >= 2) {
@@ -459,7 +479,9 @@ export class Leaderboard {
           const dur = sessionEnd - sessionStart;
           if (dur > maxSession) {
             maxSession = dur;
-            records.longestSessionDate = new Date(sessionStart).toISOString().slice(0, 10);
+            records.longestSessionDate = new Date(sessionStart)
+              .toISOString()
+              .slice(0, 10);
           }
           sessionStart = sorted[i];
           sessionEnd = sorted[i];
@@ -468,7 +490,9 @@ export class Leaderboard {
       const finalDur = sessionEnd - sessionStart;
       if (finalDur > maxSession) {
         maxSession = finalDur;
-        records.longestSessionDate = new Date(sessionStart).toISOString().slice(0, 10);
+        records.longestSessionDate = new Date(sessionStart)
+          .toISOString()
+          .slice(0, 10);
       }
       records.longestSession = maxSession;
     }
@@ -478,13 +502,19 @@ export class Leaderboard {
 
   _buildHeatmapFromTasks(tasks) {
     const dayMap = {};
-    (tasks || []).forEach(t => {
-      const d = (t.completed_at || t.completedAt || t.created_at || t.createdAt || '').slice(0, 10);
+    (tasks || []).forEach((t) => {
+      const d = (
+        t.completed_at ||
+        t.completedAt ||
+        t.created_at ||
+        t.createdAt ||
+        ""
+      ).slice(0, 10);
       if (d) dayMap[d] = (dayMap[d] || 0) + 1;
     });
 
     const dates = dateRange(365);
-    return dates.map(d => ({ date: d, count: dayMap[d] || 0 }));
+    return dates.map((d) => ({ date: d, count: dayMap[d] || 0 }));
   }
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -506,7 +536,7 @@ export class Leaderboard {
   // ═══════════════════════════════════════════════════════════════════════
 
   _renderWorldStats() {
-    const section = this._el.querySelector('#lb-stats-section');
+    const section = this._el.querySelector("#lb-stats-section");
     if (!section) return;
 
     const d = this._data;
@@ -543,12 +573,12 @@ export class Leaderboard {
         </div>
         <div class="lb-card lb-stat-card lb-stat-card--achieve">
           <span class="lb-stat-card__label">Achievements</span>
-          <span class="lb-stat-card__value">${d.unlockedAchievements} / ${d.totalAchievements || '?'}</span>
+          <span class="lb-stat-card__value">${d.unlockedAchievements} / ${d.totalAchievements || "?"}</span>
           <span class="lb-stat-card__sub">unlocked</span>
         </div>
         <div class="lb-card lb-stat-card lb-stat-card--streak" style="grid-column: 1 / -1;">
           <span class="lb-stat-card__label">Longest Streak</span>
-          <span class="lb-stat-card__value">${d.longestStreak} day${d.longestStreak !== 1 ? 's' : ''}</span>
+          <span class="lb-stat-card__value">${d.longestStreak} day${d.longestStreak !== 1 ? "s" : ""}</span>
           <span class="lb-stat-card__sub">consecutive days active</span>
         </div>
       </div>
@@ -560,19 +590,19 @@ export class Leaderboard {
   // ═══════════════════════════════════════════════════════════════════════
 
   _renderAgentLeaderboard() {
-    const section = this._el.querySelector('#lb-agents-section');
+    const section = this._el.querySelector("#lb-agents-section");
     if (!section) return;
 
     const agents = this._data.agentLeaderboard || [];
 
-    let tableRows = '';
+    let tableRows = "";
     if (agents.length === 0) {
       tableRows = `<tr><td colspan="6" style="text-align:center;color:var(--lb-text-dim);padding:16px;">No agent data yet</td></tr>`;
     } else {
       agents.forEach((a, i) => {
         const pos = i + 1;
-        const posClass = pos <= 3 ? `lb-pos--${pos}` : 'lb-pos--other';
-        const icon = AGENT_ICONS[a.role] || '\u{1F916}';
+        const posClass = pos <= 3 ? `lb-pos--${pos}` : "lb-pos--other";
+        const icon = AGENT_ICONS[a.role] || "\u{1F916}";
         const medal = medalFor(pos);
 
         tableRows += `
@@ -582,7 +612,7 @@ export class Leaderboard {
             <td class="lb-agent-stat">${fmtNumber(a.tasks)}</td>
             <td class="lb-agent-stat">${fmtNumber(a.xp)}</td>
             <td class="lb-agent-stat">${a.skills}</td>
-            <td class="lb-agent-stat">${a.avgResponseTime ? fmtMs(a.avgResponseTime) : '-'}</td>
+            <td class="lb-agent-stat">${a.avgResponseTime ? fmtMs(a.avgResponseTime) : "-"}</td>
           </tr>
         `;
       });
@@ -616,7 +646,7 @@ export class Leaderboard {
 
     // Draw the bar chart
     if (agents.length > 0) {
-      const canvas = section.querySelector('#lb-agent-chart');
+      const canvas = section.querySelector("#lb-agent-chart");
       if (canvas) {
         requestAnimationFrame(() => this._drawAgentBarChart(canvas, agents));
       }
@@ -629,18 +659,18 @@ export class Leaderboard {
     const ctx = setupCanvas(canvas, w, h);
 
     if (agents.length === 0) {
-      ctx.fillStyle = '#3a4560';
-      ctx.font = '11px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('No agent data', w / 2, h / 2);
+      ctx.fillStyle = "#3a4560";
+      ctx.font = "11px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("No agent data", w / 2, h / 2);
       return;
     }
 
     const padding = { top: 12, right: 12, bottom: 24, left: 72 };
     const plotW = w - padding.left - padding.right;
     const plotH = h - padding.top - padding.bottom;
-    const maxVal = Math.max(...agents.map(a => a.xp), 1);
-    const barH = Math.min(18, (plotH / agents.length) - 4);
+    const maxVal = Math.max(...agents.map((a) => a.xp), 1);
+    const barH = Math.min(18, plotH / agents.length - 4);
     const gap = (plotH - barH * agents.length) / (agents.length + 1);
 
     agents.forEach((a, i) => {
@@ -648,16 +678,21 @@ export class Leaderboard {
       const barW = (a.xp / maxVal) * plotW;
 
       // Agent name label
-      ctx.fillStyle = '#c8d0e0';
-      ctx.font = '10px Inter, sans-serif';
-      ctx.textAlign = 'right';
+      ctx.fillStyle = "#c8d0e0";
+      ctx.font = "10px Inter, sans-serif";
+      ctx.textAlign = "right";
       ctx.fillText(a.name, padding.left - 8, y + barH / 2 + 3);
 
       // Bar gradient
       const color = AGENT_COLORS[i % AGENT_COLORS.length];
-      const grad = ctx.createLinearGradient(padding.left, y, padding.left + barW, y);
+      const grad = ctx.createLinearGradient(
+        padding.left,
+        y,
+        padding.left + barW,
+        y,
+      );
       grad.addColorStop(0, color);
-      grad.addColorStop(1, color + '66');
+      grad.addColorStop(1, color + "66");
       ctx.fillStyle = grad;
 
       // Rounded bar
@@ -665,21 +700,43 @@ export class Leaderboard {
       ctx.beginPath();
       ctx.moveTo(padding.left + radius, y);
       ctx.lineTo(padding.left + barW - radius, y);
-      ctx.arcTo(padding.left + barW, y, padding.left + barW, y + radius, radius);
+      ctx.arcTo(
+        padding.left + barW,
+        y,
+        padding.left + barW,
+        y + radius,
+        radius,
+      );
       ctx.lineTo(padding.left + barW, y + barH - radius);
-      ctx.arcTo(padding.left + barW, y + barH, padding.left + barW - radius, y + barH, radius);
+      ctx.arcTo(
+        padding.left + barW,
+        y + barH,
+        padding.left + barW - radius,
+        y + barH,
+        radius,
+      );
       ctx.lineTo(padding.left + radius, y + barH);
-      ctx.arcTo(padding.left, y + barH, padding.left, y + barH - radius, radius);
+      ctx.arcTo(
+        padding.left,
+        y + barH,
+        padding.left,
+        y + barH - radius,
+        radius,
+      );
       ctx.lineTo(padding.left, y + radius);
       ctx.arcTo(padding.left, y, padding.left + radius, y, radius);
       ctx.closePath();
       ctx.fill();
 
       // Value label
-      ctx.fillStyle = '#c8d0e0';
-      ctx.font = '9px SF Mono, Consolas, monospace';
-      ctx.textAlign = 'left';
-      ctx.fillText(fmtNumber(a.xp) + ' XP', padding.left + barW + 6, y + barH / 2 + 3);
+      ctx.fillStyle = "#c8d0e0";
+      ctx.font = "9px SF Mono, Consolas, monospace";
+      ctx.textAlign = "left";
+      ctx.fillText(
+        fmtNumber(a.xp) + " XP",
+        padding.left + barW + 6,
+        y + barH / 2 + 3,
+      );
     });
   }
 
@@ -688,24 +745,29 @@ export class Leaderboard {
   // ═══════════════════════════════════════════════════════════════════════
 
   _renderZoneLeaderboard() {
-    const section = this._el.querySelector('#lb-zones-section');
+    const section = this._el.querySelector("#lb-zones-section");
     if (!section) return;
 
     const zones = this._data.zoneUsage || [];
-    const maxCount = Math.max(...zones.map(z => z.count || 0), 1);
+    const maxCount = Math.max(...zones.map((z) => z.count || 0), 1);
 
-    let items = '';
+    let items = "";
     if (zones.length === 0) {
       items = `<li class="lb-zone-item" style="justify-content:center;color:var(--lb-text-dim);">No zone usage data</li>`;
     } else {
       zones.forEach((z, i) => {
-        const pct = ((z.count || 0) / maxCount * 100).toFixed(1);
-        const peakHour = z.peak_hour != null ? fmtHour(z.peak_hour) : (z.peakHour != null ? fmtHour(z.peakHour) : '-');
+        const pct = (((z.count || 0) / maxCount) * 100).toFixed(1);
+        const peakHour =
+          z.peak_hour != null
+            ? fmtHour(z.peak_hour)
+            : z.peakHour != null
+              ? fmtHour(z.peakHour)
+              : "-";
 
         items += `
           <li class="lb-zone-item">
             <span class="lb-zone-item__rank">${i + 1}</span>
-            <span class="lb-zone-item__name">${escHtml(z.zone || z.name || 'Unknown')}</span>
+            <span class="lb-zone-item__name">${escHtml(z.zone || z.name || "Unknown")}</span>
             <span class="lb-zone-item__bar-wrap">
               <span class="lb-zone-item__bar" style="width:${pct}%;background:linear-gradient(90deg,${ZONE_COLORS[i % ZONE_COLORS.length]},${ZONE_COLORS[i % ZONE_COLORS.length]}66);"></span>
             </span>
@@ -740,7 +802,7 @@ export class Leaderboard {
   // ═══════════════════════════════════════════════════════════════════════
 
   _renderPersonalRecords() {
-    const section = this._el.querySelector('#lb-records-section');
+    const section = this._el.querySelector("#lb-records-section");
     if (!section) return;
 
     const r = this._data.records || {};
@@ -753,26 +815,26 @@ export class Leaderboard {
         <div class="lb-card lb-record-card">
           <span class="lb-record-card__icon">\u{1F3CE}</span>
           <span class="lb-record-card__label">Fastest Task</span>
-          <span class="lb-record-card__value">${r.fastestTask ? fmtDuration(r.fastestTask) : '-'}</span>
-          <span class="lb-record-card__detail">${escHtml(r.fastestTaskName) || 'no records yet'}</span>
+          <span class="lb-record-card__value">${r.fastestTask ? fmtDuration(r.fastestTask) : "-"}</span>
+          <span class="lb-record-card__detail">${escHtml(r.fastestTaskName) || "no records yet"}</span>
         </div>
         <div class="lb-card lb-record-card">
           <span class="lb-record-card__icon">\u{1F4A0}</span>
           <span class="lb-record-card__label">Most Tokens (single)</span>
-          <span class="lb-record-card__value">${r.mostTokens ? fmtNumber(r.mostTokens) : '-'}</span>
-          <span class="lb-record-card__detail">${escHtml(r.mostTokensTask) || 'no records yet'}</span>
+          <span class="lb-record-card__value">${r.mostTokens ? fmtNumber(r.mostTokens) : "-"}</span>
+          <span class="lb-record-card__detail">${escHtml(r.mostTokensTask) || "no records yet"}</span>
         </div>
         <div class="lb-card lb-record-card">
           <span class="lb-record-card__icon">\u{23F1}</span>
           <span class="lb-record-card__label">Longest Session</span>
-          <span class="lb-record-card__value">${r.longestSession ? fmtDuration(r.longestSession) : '-'}</span>
-          <span class="lb-record-card__detail">${r.longestSessionDate || 'no records yet'}</span>
+          <span class="lb-record-card__value">${r.longestSession ? fmtDuration(r.longestSession) : "-"}</span>
+          <span class="lb-record-card__detail">${r.longestSessionDate || "no records yet"}</span>
         </div>
         <div class="lb-card lb-record-card">
           <span class="lb-record-card__icon">\u{1F525}</span>
           <span class="lb-record-card__label">Most Tasks in a Day</span>
-          <span class="lb-record-card__value">${r.mostTasksInDay || '-'}</span>
-          <span class="lb-record-card__detail">${r.mostTasksDate || 'no records yet'}</span>
+          <span class="lb-record-card__value">${r.mostTasksInDay || "-"}</span>
+          <span class="lb-record-card__detail">${r.mostTasksDate || "no records yet"}</span>
         </div>
       </div>
     `;
@@ -783,7 +845,7 @@ export class Leaderboard {
   // ═══════════════════════════════════════════════════════════════════════
 
   _renderActivityHeatmap() {
-    const section = this._el.querySelector('#lb-heatmap-section');
+    const section = this._el.querySelector("#lb-heatmap-section");
     if (!section) return;
 
     const heatmap = this._data.heatmap || [];
@@ -811,7 +873,7 @@ export class Leaderboard {
       </div>
     `;
 
-    const canvas = section.querySelector('#lb-heatmap-canvas');
+    const canvas = section.querySelector("#lb-heatmap-canvas");
     if (canvas) {
       requestAnimationFrame(() => this._drawHeatmap(canvas, heatmap));
     }
@@ -834,12 +896,12 @@ export class Leaderboard {
     const ctx = setupCanvas(canvas, Math.max(w, totalW), totalH);
 
     // Determine max count for color scaling
-    const maxCount = Math.max(...data.map(d => d.count || 0), 1);
+    const maxCount = Math.max(...data.map((d) => d.count || 0), 1);
 
     // Month labels along top
-    ctx.fillStyle = '#6b7a99';
-    ctx.font = '8px Inter, sans-serif';
-    ctx.textAlign = 'center';
+    ctx.fillStyle = "#6b7a99";
+    ctx.font = "8px Inter, sans-serif";
+    ctx.textAlign = "center";
 
     let lastMonth = -1;
     for (let col = 0; col < cols; col++) {
@@ -850,21 +912,42 @@ export class Leaderboard {
           const month = new Date(dateStr).getMonth();
           if (month !== lastMonth) {
             lastMonth = month;
-            const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-            ctx.fillText(monthNames[month], labelW + col * cellTotal + cellSize / 2, 10);
+            const monthNames = [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec",
+            ];
+            ctx.fillText(
+              monthNames[month],
+              labelW + col * cellTotal + cellSize / 2,
+              10,
+            );
           }
         }
       }
     }
 
     // Day labels (Mon, Wed, Fri)
-    ctx.fillStyle = '#6b7a99';
-    ctx.font = '8px Inter, sans-serif';
-    ctx.textAlign = 'right';
-    const dayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+    ctx.fillStyle = "#6b7a99";
+    ctx.font = "8px Inter, sans-serif";
+    ctx.textAlign = "right";
+    const dayLabels = ["", "Mon", "", "Wed", "", "Fri", ""];
     for (let row = 0; row < rows; row++) {
       if (dayLabels[row]) {
-        ctx.fillText(dayLabels[row], labelW - 4, 18 + row * cellTotal + cellSize - 1);
+        ctx.fillText(
+          dayLabels[row],
+          labelW - 4,
+          18 + row * cellTotal + cellSize - 1,
+        );
       }
     }
 

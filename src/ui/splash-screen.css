@@ -15,8 +15,9 @@
   justify-content: center;
   background: #0a0a14;
   overflow: hidden;
-  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #splash.splash--hidden {
@@ -45,8 +46,15 @@
 }
 
 @keyframes splash-glow-pulse {
-  0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-  50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.15); }
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
 }
 
 /* ── Isometric city silhouette ─────────────────────────────────────── */
@@ -69,17 +77,37 @@
   animation: splash-building-rise 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.splash__building:nth-child(1) { animation-delay: 0.1s; }
-.splash__building:nth-child(2) { animation-delay: 0.2s; }
-.splash__building:nth-child(3) { animation-delay: 0.05s; }
-.splash__building:nth-child(4) { animation-delay: 0.25s; }
-.splash__building:nth-child(5) { animation-delay: 0.15s; }
-.splash__building:nth-child(6) { animation-delay: 0.3s; }
-.splash__building:nth-child(7) { animation-delay: 0.08s; }
+.splash__building:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.splash__building:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.splash__building:nth-child(3) {
+  animation-delay: 0.05s;
+}
+.splash__building:nth-child(4) {
+  animation-delay: 0.25s;
+}
+.splash__building:nth-child(5) {
+  animation-delay: 0.15s;
+}
+.splash__building:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.splash__building:nth-child(7) {
+  animation-delay: 0.08s;
+}
 
 @keyframes splash-building-rise {
-  from { transform: translateY(60px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from {
+    transform: translateY(60px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .splash__building-body {
@@ -90,7 +118,7 @@
 
 /* Window grid inside buildings */
 .splash__building-body::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 4px;
   background:
@@ -112,17 +140,45 @@
 }
 
 /* Individual building colors (purple/blue palette) */
-.splash__building:nth-child(1) .splash__building-body { width: 32px; height: 70px;  background: linear-gradient(180deg, #3b82f6, #1d4ed8); }
-.splash__building:nth-child(2) .splash__building-body { width: 28px; height: 90px;  background: linear-gradient(180deg, #8b5cf6, #5b21b6); }
-.splash__building:nth-child(3) .splash__building-body { width: 38px; height: 110px; background: linear-gradient(180deg, #6d28d9, #4c1d95); }
-.splash__building:nth-child(4) .splash__building-body { width: 50px; height: 160px; background: linear-gradient(180deg, #a855f7, #7c3aed); }
-.splash__building:nth-child(5) .splash__building-body { width: 36px; height: 100px; background: linear-gradient(180deg, #7c3aed, #5b21b6); }
-.splash__building:nth-child(6) .splash__building-body { width: 30px; height: 80px;  background: linear-gradient(180deg, #4a9eff, #2563eb); }
-.splash__building:nth-child(7) .splash__building-body { width: 26px; height: 55px;  background: linear-gradient(180deg, #6366f1, #4338ca); }
+.splash__building:nth-child(1) .splash__building-body {
+  width: 32px;
+  height: 70px;
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+}
+.splash__building:nth-child(2) .splash__building-body {
+  width: 28px;
+  height: 90px;
+  background: linear-gradient(180deg, #8b5cf6, #5b21b6);
+}
+.splash__building:nth-child(3) .splash__building-body {
+  width: 38px;
+  height: 110px;
+  background: linear-gradient(180deg, #6d28d9, #4c1d95);
+}
+.splash__building:nth-child(4) .splash__building-body {
+  width: 50px;
+  height: 160px;
+  background: linear-gradient(180deg, #a855f7, #7c3aed);
+}
+.splash__building:nth-child(5) .splash__building-body {
+  width: 36px;
+  height: 100px;
+  background: linear-gradient(180deg, #7c3aed, #5b21b6);
+}
+.splash__building:nth-child(6) .splash__building-body {
+  width: 30px;
+  height: 80px;
+  background: linear-gradient(180deg, #4a9eff, #2563eb);
+}
+.splash__building:nth-child(7) .splash__building-body {
+  width: 26px;
+  height: 55px;
+  background: linear-gradient(180deg, #6366f1, #4338ca);
+}
 
 /* Spire on the tallest building */
 .splash__building:nth-child(4) .splash__building-body::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -18px;
   left: 50%;
@@ -135,7 +191,7 @@
 
 /* Beacon on spire */
 .splash__building:nth-child(4)::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -22px;
   left: 50%;
@@ -150,8 +206,15 @@
 }
 
 @keyframes splash-beacon {
-  0%, 100% { opacity: 0.7; box-shadow: 0 0 8px 2px rgba(245, 158, 11, 0.4); }
-  50%      { opacity: 1;   box-shadow: 0 0 16px 6px rgba(245, 158, 11, 0.7); }
+  0%,
+  100% {
+    opacity: 0.7;
+    box-shadow: 0 0 8px 2px rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 16px 6px rgba(245, 158, 11, 0.7);
+  }
 }
 
 /* Ground line */
@@ -162,12 +225,21 @@
   transform: translateX(-50%);
   width: 380px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.4), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(124, 58, 237, 0.4),
+    transparent
+  );
 }
 
 /* ── Title with typewriter animation ───────────────────────────────── */
 .splash__title {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-size: 42px;
   font-weight: 700;
   color: #e8e8f0;
@@ -183,13 +255,22 @@
 }
 
 @keyframes splash-typewriter {
-  from { width: 0; }
-  to   { width: 11.5ch; }
+  from {
+    width: 0;
+  }
+  to {
+    width: 11.5ch;
+  }
 }
 
 @keyframes splash-blink-caret {
-  0%, 100% { border-color: #a855f7; }
-  50%      { border-color: transparent; }
+  0%,
+  100% {
+    border-color: #a855f7;
+  }
+  50% {
+    border-color: transparent;
+  }
 }
 
 .splash__title--done {
@@ -200,7 +281,7 @@
 
 /* ── Subtitle ──────────────────────────────────────────────────────── */
 .splash__subtitle {
-  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
   font-size: 14px;
   color: #8888a0;
   margin-bottom: 36px;
@@ -219,13 +300,24 @@
 }
 
 @keyframes splash-blink-cursor {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 @keyframes splash-fade-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Progress bar ──────────────────────────────────────────────────── */
@@ -250,13 +342,17 @@
 }
 
 @keyframes splash-gradient-shift {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
 }
 
 /* ── Progress label ────────────────────────────────────────────────── */
 .splash__progress-label {
-  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
   font-size: 11px;
   color: #555570;
   margin-top: 12px;

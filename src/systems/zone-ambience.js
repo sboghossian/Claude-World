@@ -41,7 +41,7 @@ function jitter(center, range) {
 function scheduleOneShot(ctx, dest, opts) {
   const {
     freq,
-    type = 'sine',
+    type = "sine",
     duration = 0.08,
     gain = 0.12,
     detune = 0,
@@ -83,7 +83,7 @@ function scheduleNoiseBurst(ctx, dest, opts) {
   src.buffer = buf;
 
   const bp = ctx.createBiquadFilter();
-  bp.type = 'bandpass';
+  bp.type = "bandpass";
   bp.frequency.setValueAtTime(centerFreq, startTime);
   bp.Q.setValueAtTime(Q, startTime);
 
@@ -108,7 +108,6 @@ function scheduleNoiseBurst(ctx, dest, opts) {
  * Layers are continuous sounds; timers schedule occasional one-shots.
  */
 const ZONE_PROFILES = {
-
   // ── Dispatch Tower ────────────────────────────────────────
   // Low pulsing hum (50 Hz) + occasional beep sequences
   dispatch_tower(ctx, out) {
@@ -119,19 +118,19 @@ const ZONE_PROFILES = {
     const humGain = ctx.createGain();
     humGain.gain.value = 0.04;
     const lfo = ctx.createOscillator();
-    lfo.type = 'sine';
+    lfo.type = "sine";
     lfo.frequency.value = 2.5; // pulse rate
     const lfoGain = ctx.createGain();
     lfoGain.gain.value = 0.025;
     lfo.connect(lfoGain);
 
     const hum = ctx.createOscillator();
-    hum.type = 'sine';
+    hum.type = "sine";
     hum.frequency.value = 50;
     lfoGain.connect(hum.frequency);
 
     const humFilter = ctx.createBiquadFilter();
-    humFilter.type = 'lowpass';
+    humFilter.type = "lowpass";
     humFilter.frequency.value = 120;
 
     hum.connect(humFilter);
@@ -148,7 +147,7 @@ const ZONE_PROFILES = {
     const subGain = ctx.createGain();
     subGain.gain.value = 0.02;
     const sub = ctx.createOscillator();
-    sub.type = 'sine';
+    sub.type = "sine";
     sub.frequency.value = 25;
     sub.detune.value = jitter(0, 3);
     sub.connect(subGain);
@@ -165,7 +164,7 @@ const ZONE_PROFILES = {
         for (let i = 0; i < count; i++) {
           scheduleOneShot(ctx, out, {
             freq: jitter(1200, 200),
-            type: 'square',
+            type: "square",
             duration: 0.06,
             gain: 0.04,
             startTime: now + i * 0.12,
@@ -192,7 +191,7 @@ const ZONE_PROFILES = {
       const g = ctx.createGain();
       g.gain.value = 0.018;
       const osc = ctx.createOscillator();
-      osc.type = 'sine';
+      osc.type = "sine";
       osc.frequency.value = freq;
       osc.detune.value = jitter(0, 4); // slight random detuning
       osc.connect(g);
@@ -202,11 +201,14 @@ const ZONE_PROFILES = {
 
       // Slowly drift detune for living feel
       function drift() {
-        const t = setTimeout(() => {
-          const target = jitter(0, 6);
-          osc.detune.linearRampToValueAtTime(target, ctx.currentTime + 3);
-          drift();
-        }, 3000 + Math.random() * 4000);
+        const t = setTimeout(
+          () => {
+            const target = jitter(0, 6);
+            osc.detune.linearRampToValueAtTime(target, ctx.currentTime + 3);
+            drift();
+          },
+          3000 + Math.random() * 4000,
+        );
         timers.push(t);
       }
       drift();
@@ -241,10 +243,10 @@ const ZONE_PROFILES = {
     const shimGain = ctx.createGain();
     shimGain.gain.value = 0.012;
     const shimmer = ctx.createOscillator();
-    shimmer.type = 'sine';
+    shimmer.type = "sine";
     shimmer.frequency.value = 2093; // C7
     const shimLfo = ctx.createOscillator();
-    shimLfo.type = 'sine';
+    shimLfo.type = "sine";
     shimLfo.frequency.value = 0.3;
     const shimLfoG = ctx.createGain();
     shimLfoG.gain.value = 15;
@@ -270,9 +272,9 @@ const ZONE_PROFILES = {
         const envGain = ctx.createGain();
 
         const baseFreq = jitter(3000, 500);
-        carrier.type = 'sine';
+        carrier.type = "sine";
         carrier.frequency.value = baseFreq;
-        modulator.type = 'sine';
+        modulator.type = "sine";
         modulator.frequency.value = baseFreq * 1.414; // inharmonic ratio for metallic timbre
         modGain.gain.value = baseFreq * 0.8;
 
@@ -312,7 +314,7 @@ const ZONE_PROFILES = {
         // Bell ring
         scheduleOneShot(ctx, out, {
           freq: jitter(4186, 200),
-          type: 'sine',
+          type: "sine",
           duration: 0.5,
           gain: 0.04,
           startTime: now + 0.05,
@@ -336,17 +338,22 @@ const ZONE_PROFILES = {
     const droneGain = ctx.createGain();
     droneGain.gain.value = 0.02;
     const drone = ctx.createOscillator();
-    drone.type = 'sine';
+    drone.type = "sine";
     drone.frequency.value = 82.4; // E2
     drone.detune.value = jitter(0, 5);
     const droneFilt = ctx.createBiquadFilter();
-    droneFilt.type = 'lowpass';
+    droneFilt.type = "lowpass";
     droneFilt.frequency.value = 150;
     drone.connect(droneFilt);
     droneFilt.connect(droneGain);
     droneGain.connect(out);
     drone.start();
-    layers.push({ source: drone, gain: droneGain, filter: droneFilt, timer: null });
+    layers.push({
+      source: drone,
+      gain: droneGain,
+      filter: droneFilt,
+      timer: null,
+    });
 
     // Gavel thuds
     function scheduleGavel() {
@@ -355,7 +362,7 @@ const ZONE_PROFILES = {
         const now = ctx.currentTime;
         const osc = ctx.createOscillator();
         const g = ctx.createGain();
-        osc.type = 'sine';
+        osc.type = "sine";
         osc.frequency.setValueAtTime(120, now);
         osc.frequency.exponentialRampToValueAtTime(40, now + 0.12);
         g.gain.setValueAtTime(0.0001, now);
@@ -408,13 +415,13 @@ const ZONE_PROFILES = {
     noiseSrc.loop = true;
 
     const bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
+    bp.type = "bandpass";
     bp.frequency.value = 300;
     bp.Q.value = 1.2;
 
     // Slow LFO on filter frequency for organic mumble
     const murmurLfo = ctx.createOscillator();
-    murmurLfo.type = 'sine';
+    murmurLfo.type = "sine";
     murmurLfo.frequency.value = 0.4;
     const murmurLfoG = ctx.createGain();
     murmurLfoG.gain.value = 80;
@@ -438,7 +445,7 @@ const ZONE_PROFILES = {
     const dGain = ctx.createGain();
     dGain.gain.value = 0.015;
     const dOsc = ctx.createOscillator();
-    dOsc.type = 'sine';
+    dOsc.type = "sine";
     dOsc.frequency.value = 65.4; // C2
     dOsc.connect(dGain);
     dGain.connect(out);
@@ -455,7 +462,7 @@ const ZONE_PROFILES = {
         // Fundamental
         scheduleOneShot(ctx, out, {
           freq: gongFreq,
-          type: 'sine',
+          type: "sine",
           duration: 2.5,
           gain: 0.06,
           attack: 0.01,
@@ -464,7 +471,7 @@ const ZONE_PROFILES = {
         // Inharmonic partial
         scheduleOneShot(ctx, out, {
           freq: gongFreq * 2.42,
-          type: 'sine',
+          type: "sine",
           duration: 1.5,
           gain: 0.025,
           attack: 0.01,
@@ -473,7 +480,7 @@ const ZONE_PROFILES = {
         // High partial
         scheduleOneShot(ctx, out, {
           freq: gongFreq * 5.14,
-          type: 'sine',
+          type: "sine",
           duration: 0.8,
           gain: 0.012,
           attack: 0.005,
@@ -499,7 +506,7 @@ const ZONE_PROFILES = {
     const humGain = ctx.createGain();
     humGain.gain.value = 0.012;
     const hum = ctx.createOscillator();
-    hum.type = 'triangle';
+    hum.type = "triangle";
     hum.frequency.value = 180;
     hum.connect(humGain);
     humGain.connect(out);
@@ -517,8 +524,20 @@ const ZONE_PROFILES = {
           const freqLo = jitter(440, 20);
           const freqHi = jitter(480, 20);
 
-          scheduleOneShot(ctx, out, { freq: freqLo, type: 'sine', duration: 0.3, gain: 0.04, startTime: t0 });
-          scheduleOneShot(ctx, out, { freq: freqHi, type: 'sine', duration: 0.3, gain: 0.04, startTime: t0 });
+          scheduleOneShot(ctx, out, {
+            freq: freqLo,
+            type: "sine",
+            duration: 0.3,
+            gain: 0.04,
+            startTime: t0,
+          });
+          scheduleOneShot(ctx, out, {
+            freq: freqHi,
+            type: "sine",
+            duration: 0.3,
+            gain: 0.04,
+            startTime: t0,
+          });
         }
         schedulePhoneRing();
       }, delay);
@@ -532,7 +551,7 @@ const ZONE_PROFILES = {
       const t = setTimeout(() => {
         scheduleOneShot(ctx, out, {
           freq: jitter(2637, 150),
-          type: 'sine',
+          type: "sine",
           duration: 0.4,
           gain: 0.05,
           attack: 0.002,
@@ -556,7 +575,7 @@ const ZONE_PROFILES = {
     const padGain = ctx.createGain();
     padGain.gain.value = 0.012;
     const pad = ctx.createOscillator();
-    pad.type = 'sine';
+    pad.type = "sine";
     pad.frequency.value = 523.25; // C5
     pad.detune.value = jitter(0, 5);
     pad.connect(padGain);
@@ -572,7 +591,7 @@ const ZONE_PROFILES = {
         const freq = pingFreqs[Math.floor(Math.random() * pingFreqs.length)];
         scheduleOneShot(ctx, out, {
           freq: jitter(freq, 20),
-          type: 'sine',
+          type: "sine",
           duration: 0.12,
           gain: 0.04,
           attack: 0.002,
@@ -617,13 +636,13 @@ const ZONE_PROFILES = {
     const humGain = ctx.createGain();
     humGain.gain.value = 0.015;
     const h1 = ctx.createOscillator();
-    h1.type = 'sawtooth';
+    h1.type = "sawtooth";
     h1.frequency.value = 110;
     const h2 = ctx.createOscillator();
-    h2.type = 'sawtooth';
+    h2.type = "sawtooth";
     h2.frequency.value = 110.5;
     const hFilt = ctx.createBiquadFilter();
-    hFilt.type = 'lowpass';
+    hFilt.type = "lowpass";
     hFilt.frequency.value = 250;
     h1.connect(hFilt);
     h2.connect(hFilt);
@@ -647,7 +666,7 @@ const ZONE_PROFILES = {
         src.buffer = buf;
 
         const sweep = ctx.createBiquadFilter();
-        sweep.type = 'bandpass';
+        sweep.type = "bandpass";
         sweep.Q.value = 3;
         sweep.frequency.setValueAtTime(300, now);
         sweep.frequency.exponentialRampToValueAtTime(4000, now + dur);
@@ -674,8 +693,20 @@ const ZONE_PROFILES = {
       const delay = 3000 + Math.random() * 6000;
       const t = setTimeout(() => {
         const now = ctx.currentTime;
-        scheduleOneShot(ctx, out, { freq: jitter(800, 50), type: 'square', duration: 0.04, gain: 0.03, startTime: now });
-        scheduleOneShot(ctx, out, { freq: jitter(1200, 50), type: 'square', duration: 0.04, gain: 0.03, startTime: now + 0.08 });
+        scheduleOneShot(ctx, out, {
+          freq: jitter(800, 50),
+          type: "square",
+          duration: 0.04,
+          gain: 0.03,
+          startTime: now,
+        });
+        scheduleOneShot(ctx, out, {
+          freq: jitter(1200, 50),
+          type: "square",
+          duration: 0.04,
+          gain: 0.03,
+          startTime: now + 0.08,
+        });
         scheduleBeep();
       }, delay);
       timers.push(t);
@@ -698,7 +729,7 @@ const ZONE_PROFILES = {
     noiseSrc.loop = true;
 
     const lp = ctx.createBiquadFilter();
-    lp.type = 'lowpass';
+    lp.type = "lowpass";
     lp.frequency.value = 200;
     lp.Q.value = 0.5;
 
@@ -709,13 +740,18 @@ const ZONE_PROFILES = {
     lp.connect(turbineGain);
     turbineGain.connect(out);
     noiseSrc.start();
-    layers.push({ source: noiseSrc, gain: turbineGain, filter: lp, timer: null });
+    layers.push({
+      source: noiseSrc,
+      gain: turbineGain,
+      filter: lp,
+      timer: null,
+    });
 
     // Layer 2: sub-bass rumble
     const rumbleGain = ctx.createGain();
     rumbleGain.gain.value = 0.02;
     const rumble = ctx.createOscillator();
-    rumble.type = 'sine';
+    rumble.type = "sine";
     rumble.frequency.value = 40;
     rumble.detune.value = jitter(0, 3);
     rumble.connect(rumbleGain);
@@ -733,7 +769,7 @@ const ZONE_PROFILES = {
         notes.forEach((freq, i) => {
           scheduleOneShot(ctx, out, {
             freq,
-            type: 'sine',
+            type: "sine",
             duration: 0.35,
             gain: 0.06,
             attack: 0.005,
@@ -759,10 +795,10 @@ const ZONE_PROFILES = {
     const beatGain = ctx.createGain();
     beatGain.gain.value = 0.03;
     const beatOsc = ctx.createOscillator();
-    beatOsc.type = 'sine';
+    beatOsc.type = "sine";
     beatOsc.frequency.value = 55;
     const beatLfo = ctx.createOscillator();
-    beatLfo.type = 'sine';
+    beatLfo.type = "sine";
     beatLfo.frequency.value = 1.1; // ~66 bpm heartbeat
     const beatLfoG = ctx.createGain();
     beatLfoG.gain.value = 0.025;
@@ -783,7 +819,7 @@ const ZONE_PROFILES = {
     crackSrc.buffer = crackBuf;
     crackSrc.loop = true;
     const crackHp = ctx.createBiquadFilter();
-    crackHp.type = 'highpass';
+    crackHp.type = "highpass";
     crackHp.frequency.value = 6000;
     const crackGain = ctx.createGain();
     crackGain.gain.value = 0.008;
@@ -791,7 +827,12 @@ const ZONE_PROFILES = {
     crackHp.connect(crackGain);
     crackGain.connect(out);
     crackSrc.start();
-    layers.push({ source: crackSrc, gain: crackGain, filter: crackHp, timer: null });
+    layers.push({
+      source: crackSrc,
+      gain: crackGain,
+      filter: crackHp,
+      timer: null,
+    });
 
     // Occasional alert tones
     function scheduleAlert() {
@@ -800,14 +841,14 @@ const ZONE_PROFILES = {
         const now = ctx.currentTime;
         scheduleOneShot(ctx, out, {
           freq: jitter(660, 40),
-          type: 'triangle',
+          type: "triangle",
           duration: 0.15,
           gain: 0.04,
           startTime: now,
         });
         scheduleOneShot(ctx, out, {
           freq: jitter(880, 40),
-          type: 'triangle',
+          type: "triangle",
           duration: 0.15,
           gain: 0.03,
           startTime: now + 0.18,
@@ -867,7 +908,7 @@ export class ZoneAmbience {
     if (zoneId === this._currentZone) return;
 
     // Resume context if suspended (e.g. autoplay policy)
-    if (this._ctx.state === 'suspended') {
+    if (this._ctx.state === "suspended") {
       this._ctx.resume().catch(() => {});
     }
 
@@ -902,7 +943,11 @@ export class ZoneAmbience {
   setVolume(v) {
     this._volume = Math.max(0, Math.min(1, v));
     if (this._master && !this._muted) {
-      this._master.gain.setTargetAtTime(this._volume, this._ctx.currentTime, 0.1);
+      this._master.gain.setTargetAtTime(
+        this._volume,
+        this._ctx.currentTime,
+        0.1,
+      );
     }
   }
 
@@ -922,7 +967,11 @@ export class ZoneAmbience {
   unmute() {
     this._muted = false;
     if (this._master) {
-      this._master.gain.setTargetAtTime(this._volume, this._ctx.currentTime, 0.15);
+      this._master.gain.setTargetAtTime(
+        this._volume,
+        this._ctx.currentTime,
+        0.15,
+      );
     }
   }
 
@@ -956,10 +1005,15 @@ export class ZoneAmbience {
     oldGain.gain.setTargetAtTime(0.0001, now, CROSSFADE_DURATION / 3);
 
     // After the fade, disconnect and clean up
-    setTimeout(() => {
-      this._teardownProfile(oldProfile);
-      try { oldGain.disconnect(); } catch (_) {}
-    }, CROSSFADE_DURATION * 1000 + 200);
+    setTimeout(
+      () => {
+        this._teardownProfile(oldProfile);
+        try {
+          oldGain.disconnect();
+        } catch (_) {}
+      },
+      CROSSFADE_DURATION * 1000 + 200,
+    );
 
     this._activeGain = null;
     this._activeProfile = null;
@@ -979,7 +1033,7 @@ export class ZoneAmbience {
     for (const layer of profile.layers) {
       if (layer.timer) clearTimeout(layer.timer);
       try {
-        if (layer.source && typeof layer.source.stop === 'function') {
+        if (layer.source && typeof layer.source.stop === "function") {
           layer.source.stop();
         }
       } catch (_) {}
@@ -1009,6 +1063,6 @@ export class ZoneAmbience {
         this.setZone(zoneId);
       }
     };
-    document.addEventListener('zone-click', this._onZoneClick);
+    document.addEventListener("zone-click", this._onZoneClick);
   }
 }

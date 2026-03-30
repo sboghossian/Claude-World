@@ -8,21 +8,21 @@
 /* ── Variables ────────────────────────────────────────────────── */
 
 .backups {
-  --bk-bg:          #0f1117;
-  --bk-surface:     #161b22;
-  --bk-surface-2:   #1c2128;
-  --bk-border:      #21262d;
-  --bk-text:        #c9d1d9;
-  --bk-text-dim:    #6e7681;
-  --bk-accent:      #58a6ff;
-  --bk-accent-dim:  #1f6feb;
-  --bk-success:     #3fb950;
-  --bk-warning:     #d29922;
-  --bk-danger:      #f85149;
-  --bk-radius-sm:   4px;
-  --bk-radius-md:   8px;
-  --bk-radius-lg:   12px;
-  --bk-glass:       rgba(22, 27, 34, 0.75);
+  --bk-bg: #0f1117;
+  --bk-surface: #161b22;
+  --bk-surface-2: #1c2128;
+  --bk-border: #21262d;
+  --bk-text: #c9d1d9;
+  --bk-text-dim: #6e7681;
+  --bk-accent: #58a6ff;
+  --bk-accent-dim: #1f6feb;
+  --bk-success: #3fb950;
+  --bk-warning: #d29922;
+  --bk-danger: #f85149;
+  --bk-radius-sm: 4px;
+  --bk-radius-md: 8px;
+  --bk-radius-lg: 12px;
+  --bk-glass: rgba(22, 27, 34, 0.75);
   --bk-glass-border: rgba(255, 255, 255, 0.06);
 
   display: flex;
@@ -266,7 +266,7 @@
 }
 
 .backups__toggle-slider::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 2px;
   top: 2px;
@@ -346,7 +346,9 @@
   border: 1px solid var(--bk-glass-border);
   border-radius: var(--bk-radius-md);
   padding: 12px 14px;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -378,7 +380,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
 }
 
 .backups__card-meta {
@@ -542,7 +544,7 @@
 .backups__modal-value {
   color: var(--bk-text);
   font-weight: 600;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 11px;
 }
 
@@ -573,7 +575,9 @@
   font-size: 13px;
   font-weight: 600;
   opacity: 0;
-  transition: opacity 0.3s, transform 0.3s;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
   pointer-events: none;
   z-index: 200;
   white-space: nowrap;

@@ -11,12 +11,12 @@
   right: 12px;
   width: 250px;
   max-height: 360px;
-  background: rgba(10, 10, 20, 0.80);
+  background: rgba(10, 10, 20, 0.8);
   backdrop-filter: var(--blur-light, blur(12px));
   border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
   border-radius: var(--radius-md, 10px);
   box-shadow: var(--shadow, 0 8px 32px rgba(0, 0, 0, 0.4));
-  font-family: var(--font-mono, 'SF Mono', 'Fira Code', monospace);
+  font-family: var(--font-mono, "SF Mono", "Fira Code", monospace);
   font-size: 11px;
   color: var(--text-primary, #e8e8f0);
   z-index: 99999;
@@ -162,8 +162,9 @@
   font-family: var(--font-mono, monospace);
   font-size: 10px;
   cursor: pointer;
-  transition: background var(--transition-fast, 150ms ease),
-              color var(--transition-fast, 150ms ease);
+  transition:
+    background var(--transition-fast, 150ms ease),
+    color var(--transition-fast, 150ms ease);
 }
 
 .perf-monitor__copy-btn:hover {

@@ -165,8 +165,13 @@
 
 /* subtle pulse animation on cursor line */
 @keyframes ce-line-pulse {
-  0%, 100% { background: rgba(255, 255, 255, 0.04); }
-  50% { background: rgba(255, 255, 255, 0.06); }
+  0%,
+  100% {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  50% {
+    background: rgba(255, 255, 255, 0.06);
+  }
 }
 
 .ce-current-line--animated {
@@ -175,14 +180,31 @@
 
 /* ── Syntax token colors ─────────────────────────────────────────────── */
 
-.ce-tok-keyword  { color: var(--accent-blue); }
-.ce-tok-string   { color: var(--accent-green); }
-.ce-tok-comment  { color: var(--text-dim); font-style: italic; }
-.ce-tok-number   { color: var(--accent-amber); }
-.ce-tok-function { color: var(--accent-purple); }
-.ce-tok-operator { color: var(--accent-red); }
-.ce-tok-bracket  { color: var(--text-primary); }
-.ce-tok-regex    { color: var(--accent-amber); }
+.ce-tok-keyword {
+  color: var(--accent-blue);
+}
+.ce-tok-string {
+  color: var(--accent-green);
+}
+.ce-tok-comment {
+  color: var(--text-dim);
+  font-style: italic;
+}
+.ce-tok-number {
+  color: var(--accent-amber);
+}
+.ce-tok-function {
+  color: var(--accent-purple);
+}
+.ce-tok-operator {
+  color: var(--accent-red);
+}
+.ce-tok-bracket {
+  color: var(--text-primary);
+}
+.ce-tok-regex {
+  color: var(--accent-amber);
+}
 
 /* ── Find bar ────────────────────────────────────────────────────────── */
 
@@ -239,7 +261,9 @@
   font-size: 12px;
   padding: 3px 8px;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .ce-find-bar__btn:hover {
@@ -268,7 +292,7 @@
 }
 
 .ce-match--active {
-  background: rgba(255, 184, 74, 0.50);
+  background: rgba(255, 184, 74, 0.5);
   outline: 1px solid var(--accent-amber);
 }
 
@@ -301,7 +325,9 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 2px;
   pointer-events: none;
-  transition: top 50ms ease, height 50ms ease;
+  transition:
+    top 50ms ease,
+    height 50ms ease;
 }
 
 /* ── Status bar ──────────────────────────────────────────────────────── */
@@ -343,7 +369,7 @@
 }
 
 .ce-resize-handle::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 50%;
   top: 50%;

@@ -81,8 +81,15 @@
 }
 
 @keyframes agent-chat-ring-pulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50%      { opacity: 0.6; transform: scale(1.04); }
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.04);
+  }
 }
 
 .agent-chat__info {
@@ -151,7 +158,9 @@
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
   flex-shrink: 0;
 }
 
@@ -276,7 +285,7 @@
 
 /* Colored top accent bar on agent bubbles */
 .agent-chat__bubble--agent::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 12px;
@@ -343,7 +352,9 @@
 }
 
 @keyframes agent-chat-bounce {
-  0%, 60%, 100% {
+  0%,
+  60%,
+  100% {
     transform: translateY(0);
     opacity: 0.4;
   }
@@ -373,7 +384,10 @@
   font-size: 12px;
   font-family: var(--font-sans);
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
   white-space: nowrap;
 }
 
@@ -442,7 +456,10 @@
   color: #fff;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background var(--transition-fast), opacity var(--transition-fast), transform var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .agent-chat__send-btn:hover:not(:disabled) {

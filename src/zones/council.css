@@ -67,7 +67,9 @@
   border-radius: 20px;
   padding: 3px 10px;
   white-space: nowrap;
-  transition: color 0.2s, border-color 0.2s;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
 }
 
 /* ── Prompt area ────────────────────────────────────────────────── */
@@ -94,7 +96,9 @@
   resize: vertical;
   min-height: 90px;
   font-family: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   box-sizing: border-box;
 }
 
@@ -126,7 +130,10 @@
   border-radius: 20px;
   cursor: pointer;
   user-select: none;
-  transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    opacity 0.2s;
   font-size: 13px;
   color: #c4b5fd;
 }
@@ -177,7 +184,10 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.15s,
+    box-shadow 0.2s;
   box-shadow: 0 2px 12px #7c3aed44;
   letter-spacing: 0.3px;
 }
@@ -244,7 +254,7 @@
 }
 
 .council__seat-card--thinking::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -1px;
   border-radius: 13px;
@@ -261,7 +271,7 @@
 }
 
 .council__seat-card--thinking::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 1px;
   border-radius: 12px;
@@ -275,7 +285,9 @@
 }
 
 @keyframes council-border-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .council__seat-card--complete {
@@ -342,7 +354,9 @@
 }
 
 @keyframes council-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .council__thinking-label {
@@ -352,8 +366,13 @@
 }
 
 @keyframes council-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
 }
 
 /* ── Response body ──────────────────────────────────────────────── */
@@ -372,8 +391,14 @@
 }
 
 @keyframes council-fade-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .council__seat-body--error {
@@ -402,7 +427,9 @@
   color: #9d8bd4;
   font-size: 11px;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .council__copy-btn:hover {
@@ -428,7 +455,9 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .council__compare-toggle:hover {
@@ -503,7 +532,9 @@
   font-weight: 600;
   cursor: pointer;
   text-align: left;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
   width: 100%;
 }
 

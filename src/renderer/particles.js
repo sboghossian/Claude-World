@@ -6,21 +6,25 @@
  * All rendering uses PixiJS Graphics primitives (no textures required).
  */
 
-import { Container, Graphics, Text, TextStyle } from 'pixi.js';
+import { Container, Graphics, Text, TextStyle } from "pixi.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const lerp  = (a, b, t) => a + (b - a) * t;
+const lerp = (a, b, t) => a + (b - a) * t;
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-const rand  = (lo, hi) => lo + Math.random() * (hi - lo);
+const rand = (lo, hi) => lo + Math.random() * (hi - lo);
 const randInt = (lo, hi) => Math.floor(rand(lo, hi + 1));
 const TAU = Math.PI * 2;
 
 /** Ease-out cubic for smooth deceleration. */
-function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+function easeOutCubic(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
 
 /** Ease-in quad for acceleration. */
-function easeInQuad(t) { return t * t; }
+function easeInQuad(t) {
+  return t * t;
+}
 
 /**
  * Interpolate two 0xRRGGBB hex colors.
@@ -30,8 +34,12 @@ function easeInQuad(t) { return t * t; }
  * @returns {number}
  */
 function lerpColor(c1, c2, t) {
-  const r1 = (c1 >> 16) & 0xff, g1 = (c1 >> 8) & 0xff, b1 = c1 & 0xff;
-  const r2 = (c2 >> 16) & 0xff, g2 = (c2 >> 8) & 0xff, b2 = c2 & 0xff;
+  const r1 = (c1 >> 16) & 0xff,
+    g1 = (c1 >> 8) & 0xff,
+    b1 = c1 & 0xff;
+  const r2 = (c2 >> 16) & 0xff,
+    g2 = (c2 >> 8) & 0xff,
+    b2 = c2 & 0xff;
   const r = Math.round(lerp(r1, r2, t));
   const g = Math.round(lerp(g1, g2, t));
   const b = Math.round(lerp(b1, b2, t));
@@ -39,21 +47,23 @@ function lerpColor(c1, c2, t) {
 }
 
 /** Pick a random element from an array. */
-function pick(arr) { return arr[randInt(0, arr.length - 1)]; }
+function pick(arr) {
+  return arr[randInt(0, arr.length - 1)];
+}
 
 // ── Palette (matches design tokens) ──────────────────────────────────────────
 
 const PALETTE = {
-  purple:  0xa855f7,
-  blue:    0x4a9eff,
-  gold:    0xffd700,
-  amber:   0xffb84a,
-  green:   0x4aff8a,
-  red:     0xff4a6a,
-  white:   0xffffff,
-  pink:    0xec4899,
-  cyan:    0x22d3ee,
-  orange:  0xff6b35,
+  purple: 0xa855f7,
+  blue: 0x4a9eff,
+  gold: 0xffd700,
+  amber: 0xffb84a,
+  green: 0x4aff8a,
+  red: 0xff4a6a,
+  white: 0xffffff,
+  pink: 0xec4899,
+  cyan: 0x22d3ee,
+  orange: 0xff6b35,
 };
 
 // ── Particle struct ──────────────────────────────────────────────────────────
@@ -69,30 +79,30 @@ class Particle {
   }
 
   reset() {
-    this.alive     = false;
-    this.x         = 0;
-    this.y         = 0;
-    this.vx        = 0;
-    this.vy        = 0;
-    this.ax        = 0;
-    this.ay        = 0;
-    this.life      = 0;
-    this.maxLife   = 1;
-    this.size      = 4;
-    this.sizeEnd   = 0;
-    this.rotation  = 0;
-    this.spin      = 0;
+    this.alive = false;
+    this.x = 0;
+    this.y = 0;
+    this.vx = 0;
+    this.vy = 0;
+    this.ax = 0;
+    this.ay = 0;
+    this.life = 0;
+    this.maxLife = 1;
+    this.size = 4;
+    this.sizeEnd = 0;
+    this.rotation = 0;
+    this.spin = 0;
     this.colorStart = 0xffffff;
-    this.colorEnd   = 0xffffff;
-    this.alpha     = 1;
-    this.fadeStart = 0.6;   // fraction of life when fade-out begins
-    this.shape     = 'circle'; // 'circle' | 'rect' | 'star' | 'line' | 'text'
-    this.width     = 4;     // for rect shape
-    this.height    = 4;
-    this.text      = '';    // for text shape
-    this.gravity   = 0;
-    this.drag      = 0;     // 0..1 per second
-    this.custom    = null;  // arbitrary per-preset data
+    this.colorEnd = 0xffffff;
+    this.alpha = 1;
+    this.fadeStart = 0.6; // fraction of life when fade-out begins
+    this.shape = "circle"; // 'circle' | 'rect' | 'star' | 'line' | 'text'
+    this.width = 4; // for rect shape
+    this.height = 4;
+    this.text = ""; // for text shape
+    this.gravity = 0;
+    this.drag = 0; // 0..1 per second
+    this.custom = null; // arbitrary per-preset data
     this.gfx.visible = false;
     this.gfx.alpha = 0;
   }
@@ -160,7 +170,9 @@ class ParticlePool {
     }
   }
 
-  get activeCount() { return this._active.length; }
+  get activeCount() {
+    return this._active.length;
+  }
 
   destroy() {
     for (const p of this._active) {
@@ -185,18 +197,23 @@ class Emitter {
     this._pool = pool;
     this.x = config.x ?? 0;
     this.y = config.y ?? 0;
-    this.areaWidth  = config.areaWidth  ?? 0;
+    this.areaWidth = config.areaWidth ?? 0;
     this.areaHeight = config.areaHeight ?? 0;
-    this.direction  = config.direction  ?? -Math.PI / 2; // upward
-    this.spread     = config.spread     ?? TAU;          // full circle
-    this.rate       = config.rate       ?? 30;           // particles/sec
-    this.config     = config;
-    this._accum     = 0;
-    this.active     = false;
+    this.direction = config.direction ?? -Math.PI / 2; // upward
+    this.spread = config.spread ?? TAU; // full circle
+    this.rate = config.rate ?? 30; // particles/sec
+    this.config = config;
+    this._accum = 0;
+    this.active = false;
   }
 
-  start() { this.active = true; this._accum = 0; }
-  stop()  { this.active = false; }
+  start() {
+    this.active = true;
+    this._accum = 0;
+  }
+  stop() {
+    this.active = false;
+  }
 
   update(dt) {
     if (!this.active) return;
@@ -213,8 +230,12 @@ class Emitter {
     const c = this.config;
 
     // Position (point or area)
-    p.x = this.x + (this.areaWidth  ? rand(-this.areaWidth / 2, this.areaWidth / 2) : 0);
-    p.y = this.y + (this.areaHeight ? rand(-this.areaHeight / 2, this.areaHeight / 2) : 0);
+    p.x =
+      this.x +
+      (this.areaWidth ? rand(-this.areaWidth / 2, this.areaWidth / 2) : 0);
+    p.y =
+      this.y +
+      (this.areaHeight ? rand(-this.areaHeight / 2, this.areaHeight / 2) : 0);
 
     // Direction + spread
     const angle = this.direction + rand(-this.spread / 2, this.spread / 2);
@@ -229,33 +250,33 @@ class Emitter {
     p.drag = c.drag ?? 0;
 
     // Lifetime
-    p.life    = rand(c.lifeMin ?? 0.5, c.lifeMax ?? 1.5);
+    p.life = rand(c.lifeMin ?? 0.5, c.lifeMax ?? 1.5);
     p.maxLife = p.life;
 
     // Size
-    p.size    = rand(c.sizeMin ?? 2, c.sizeMax ?? 6);
+    p.size = rand(c.sizeMin ?? 2, c.sizeMax ?? 6);
     p.sizeEnd = c.sizeEnd ?? 0;
-    p.width   = c.width ?? p.size;
-    p.height  = c.height ?? p.size;
+    p.width = c.width ?? p.size;
+    p.height = c.height ?? p.size;
 
     // Color
     p.colorStart = c.colorStart ?? 0xffffff;
-    p.colorEnd   = c.colorEnd   ?? c.colorStart ?? 0xffffff;
+    p.colorEnd = c.colorEnd ?? c.colorStart ?? 0xffffff;
     if (c.colors) {
       p.colorStart = pick(c.colors);
-      p.colorEnd   = c.colorEnd ?? p.colorStart;
+      p.colorEnd = c.colorEnd ?? p.colorStart;
     }
 
     // Rotation
     p.rotation = rand(c.rotationMin ?? 0, c.rotationMax ?? TAU);
-    p.spin     = rand(c.spinMin ?? 0, c.spinMax ?? 0);
+    p.spin = rand(c.spinMin ?? 0, c.spinMax ?? 0);
 
     // Fade
     p.fadeStart = c.fadeStart ?? 0.6;
 
     // Shape
-    p.shape = c.shape ?? 'circle';
-    p.text  = c.text ?? '';
+    p.shape = c.shape ?? "circle";
+    p.text = c.text ?? "";
     if (c.texts) p.text = pick(c.texts);
 
     // Custom data
@@ -276,11 +297,10 @@ PRESETS.fireworks = {
     const count = opts.count ?? 3;
     for (let i = 0; i < count; i++) {
       const delay = i * rand(150, 400);
-      setTimeout(() => system._launchFirework(
-        x + rand(-80, 80),
-        y,
-        opts
-      ), delay);
+      setTimeout(
+        () => system._launchFirework(x + rand(-80, 80), y, opts),
+        delay,
+      );
     }
   },
 };
@@ -290,7 +310,15 @@ PRESETS.confetti = {
   emit(system, x, y, opts = {}) {
     const count = opts.count ?? 200;
     const spread = opts.spread ?? 400;
-    const colors = [PALETTE.purple, PALETTE.blue, PALETTE.gold, PALETTE.pink, PALETTE.green, PALETTE.red, PALETTE.cyan];
+    const colors = [
+      PALETTE.purple,
+      PALETTE.blue,
+      PALETTE.gold,
+      PALETTE.pink,
+      PALETTE.green,
+      PALETTE.red,
+      PALETTE.cyan,
+    ];
     for (let i = 0; i < count; i++) {
       const p = system._pool.acquire();
       if (!p) break;
@@ -306,7 +334,7 @@ PRESETS.confetti = {
       p.spin = rand(-4, 4);
       p.colorStart = pick(colors);
       p.colorEnd = p.colorStart;
-      p.shape = Math.random() < 0.3 ? 'circle' : 'rect';
+      p.shape = Math.random() < 0.3 ? "circle" : "rect";
       p.size = rand(3, 8);
       p.sizeEnd = p.size;
       p.width = rand(4, 12);
@@ -335,7 +363,7 @@ PRESETS.sparkle = {
       p.sizeEnd = 0;
       p.colorStart = pick([PALETTE.gold, PALETTE.white, PALETTE.amber]);
       p.colorEnd = 0xffffff;
-      p.shape = 'star';
+      p.shape = "star";
       p.drag = 0.05;
       p.fadeStart = 0.3;
     }
@@ -359,7 +387,7 @@ PRESETS.smoke = {
       p.sizeEnd = rand(20, 40);
       p.colorStart = 0x888888;
       p.colorEnd = 0x444444;
-      p.shape = 'circle';
+      p.shape = "circle";
       p.drag = 0.03;
       p.fadeStart = 0.3;
       p.gravity = -10;
@@ -386,7 +414,7 @@ PRESETS.fire = {
       const isCore = Math.random() < 0.3;
       p.colorStart = isCore ? 0xffee44 : pick([0xff4500, 0xff6b35, 0xff8c00]);
       p.colorEnd = 0x330000;
-      p.shape = 'circle';
+      p.shape = "circle";
       p.drag = 0.02;
       p.fadeStart = 0.4;
     }
@@ -411,9 +439,14 @@ PRESETS.magicDust = {
       p.maxLife = p.life;
       p.size = rand(2, 5);
       p.sizeEnd = 0;
-      p.colorStart = pick([PALETTE.purple, 0x7c3aed, PALETTE.blue, PALETTE.cyan]);
+      p.colorStart = pick([
+        PALETTE.purple,
+        0x7c3aed,
+        PALETTE.blue,
+        PALETTE.cyan,
+      ]);
       p.colorEnd = 0x1a1a2e;
-      p.shape = 'circle';
+      p.shape = "circle";
       p.drag = 0.04;
       p.fadeStart = 0.4;
       p.gravity = -20;
@@ -441,9 +474,14 @@ PRESETS.levelUp = {
       p.maxLife = p.life;
       p.size = rand(3, 7);
       p.sizeEnd = 1;
-      p.colorStart = pick([PALETTE.gold, PALETTE.amber, PALETTE.white, 0xffe066]);
+      p.colorStart = pick([
+        PALETTE.gold,
+        PALETTE.amber,
+        PALETTE.white,
+        0xffe066,
+      ]);
       p.colorEnd = PALETTE.amber;
-      p.shape = Math.random() < 0.4 ? 'star' : 'circle';
+      p.shape = Math.random() < 0.4 ? "star" : "circle";
       p.drag = 0.01;
       p.fadeStart = 0.7;
       p.spin = rand(-3, 3);
@@ -472,7 +510,7 @@ PRESETS.zoneComplete = {
       p.sizeEnd = 0;
       p.colorStart = color;
       p.colorEnd = PALETTE.white;
-      p.shape = 'circle';
+      p.shape = "circle";
       p.drag = 0.03;
       p.fadeStart = 0.5;
     }
@@ -483,7 +521,7 @@ PRESETS.zoneComplete = {
 PRESETS.emojiRain = {
   emit(system, x, y, opts = {}) {
     const count = opts.count ?? 30;
-    const emojis = opts.emojis ?? ['🎉', '🏆', '⭐', '🎊', '✨', '🔥', '💎'];
+    const emojis = opts.emojis ?? ["🎉", "🏆", "⭐", "🎊", "✨", "🔥", "💎"];
     const spreadX = opts.spread ?? 600;
     for (let i = 0; i < count; i++) {
       const p = system._pool.acquire();
@@ -499,7 +537,7 @@ PRESETS.emojiRain = {
       p.sizeEnd = p.size;
       p.rotation = rand(-0.3, 0.3);
       p.spin = rand(-1.5, 1.5);
-      p.shape = 'text';
+      p.shape = "text";
       p.text = pick(emojis);
       p.colorStart = 0xffffff;
       p.colorEnd = 0xffffff;
@@ -513,7 +551,7 @@ PRESETS.matrix = {
   emit(system, x, y, opts = {}) {
     const count = opts.count ?? 80;
     const spreadX = opts.spread ?? 500;
-    const chars = '01アイウエオカキクケコ日月火水木金土ABCDEF<>/{}[]'.split('');
+    const chars = "01アイウエオカキクケコ日月火水木金土ABCDEF<>/{}[]".split("");
     for (let i = 0; i < count; i++) {
       const p = system._pool.acquire();
       if (!p) break;
@@ -525,7 +563,7 @@ PRESETS.matrix = {
       p.maxLife = p.life;
       p.size = rand(10, 18);
       p.sizeEnd = p.size;
-      p.shape = 'text';
+      p.shape = "text";
       p.text = pick(chars);
       p.colorStart = 0x00ff41;
       p.colorEnd = 0x003300;
@@ -625,7 +663,7 @@ export class ParticleSystem {
       p.life -= dt;
       if (p.life <= 0) return false; // release
 
-      const t = 1 - (p.life / p.maxLife); // 0..1 normalized age
+      const t = 1 - p.life / p.maxLife; // 0..1 normalized age
 
       // Physics
       p.vx += p.ax * dt;
@@ -642,9 +680,11 @@ export class ParticleSystem {
       // Magic dust spiral update
       if (p.custom && p.custom.angularSpeed !== undefined) {
         p.custom.angle += p.custom.angularSpeed * dt;
-        p.custom.radius *= (1 - 0.3 * dt); // slowly spiral inward
-        const spiralX = p.custom.cx + Math.cos(p.custom.angle) * p.custom.radius;
-        const spiralY = p.custom.cy + Math.sin(p.custom.angle) * p.custom.radius;
+        p.custom.radius *= 1 - 0.3 * dt; // slowly spiral inward
+        const spiralX =
+          p.custom.cx + Math.cos(p.custom.angle) * p.custom.radius;
+        const spiralY =
+          p.custom.cy + Math.sin(p.custom.angle) * p.custom.radius;
         p.x = lerp(p.x, spiralX, 0.05);
         p.y = lerp(p.y, spiralY, 0.05);
       }
@@ -711,25 +751,40 @@ export class ParticleSystem {
     g.alpha = alpha;
 
     switch (p.shape) {
-      case 'circle':
+      case "circle":
         g.circle(0, 0, Math.max(0.5, size));
         g.fill({ color, alpha: 1 });
         break;
 
-      case 'rect': {
-        const w = lerp(p.width, p.width * (p.sizeEnd / Math.max(p.size, 0.01)), 1 - p.life / p.maxLife);
-        const h = lerp(p.height, p.height * (p.sizeEnd / Math.max(p.size, 0.01)), 1 - p.life / p.maxLife);
+      case "rect": {
+        const w = lerp(
+          p.width,
+          p.width * (p.sizeEnd / Math.max(p.size, 0.01)),
+          1 - p.life / p.maxLife,
+        );
+        const h = lerp(
+          p.height,
+          p.height * (p.sizeEnd / Math.max(p.size, 0.01)),
+          1 - p.life / p.maxLife,
+        );
         g.rect(-w / 2, -h / 2, Math.max(1, w), Math.max(1, h));
         g.fill({ color, alpha: 1 });
         break;
       }
 
-      case 'star':
-        this._drawStar(g, 0, 0, Math.max(0.5, size), Math.max(0.25, size * 0.4), 5);
+      case "star":
+        this._drawStar(
+          g,
+          0,
+          0,
+          Math.max(0.5, size),
+          Math.max(0.25, size * 0.4),
+          5,
+        );
         g.fill({ color, alpha: 1 });
         break;
 
-      case 'line': {
+      case "line": {
         const len = Math.max(1, size * 2);
         g.moveTo(0, -len / 2);
         g.lineTo(0, len / 2);
@@ -737,7 +792,7 @@ export class ParticleSystem {
         break;
       }
 
-      case 'text':
+      case "text":
         // Use a Text child — cache the text object on the Graphics node
         this._renderTextParticle(p, g, size, color, alpha);
         return; // skip default graphics rendering
@@ -748,7 +803,7 @@ export class ParticleSystem {
     // We store a Text child on the gfx object for reuse
     if (!g.__textChild) {
       const style = new TextStyle({
-        fontFamily: 'system-ui, -apple-system, sans-serif',
+        fontFamily: "system-ui, -apple-system, sans-serif",
         fontSize: 24,
         fill: 0xffffff,
       });
@@ -810,7 +865,7 @@ export class ParticleSystem {
         tp.sizeEnd = 0;
         tp.colorStart = PALETTE.amber;
         tp.colorEnd = 0x331100;
-        tp.shape = 'circle';
+        tp.shape = "circle";
         tp.fadeStart = 0.2;
       }, delay);
     }
@@ -823,10 +878,17 @@ export class ParticleSystem {
 
   _fireworkBurst(x, y, opts = {}) {
     const count = opts.burstCount ?? randInt(40, 70);
-    const burstColor = opts.color ?? pick([
-      PALETTE.purple, PALETTE.blue, PALETTE.gold, PALETTE.red,
-      PALETTE.green, PALETTE.pink, PALETTE.cyan,
-    ]);
+    const burstColor =
+      opts.color ??
+      pick([
+        PALETTE.purple,
+        PALETTE.blue,
+        PALETTE.gold,
+        PALETTE.red,
+        PALETTE.green,
+        PALETTE.pink,
+        PALETTE.cyan,
+      ]);
     const secondaryColor = lerpColor(burstColor, PALETTE.white, 0.4);
 
     for (let i = 0; i < count; i++) {
@@ -846,7 +908,7 @@ export class ParticleSystem {
       p.sizeEnd = 0;
       p.colorStart = Math.random() < 0.3 ? secondaryColor : burstColor;
       p.colorEnd = 0x110000;
-      p.shape = Math.random() < 0.2 ? 'star' : 'circle';
+      p.shape = Math.random() < 0.2 ? "star" : "circle";
       p.fadeStart = 0.4;
       p.spin = rand(-2, 2);
       p.rotation = rand(0, TAU);
@@ -868,7 +930,7 @@ export class ParticleSystem {
       p.sizeEnd = 0;
       p.colorStart = PALETTE.white;
       p.colorEnd = burstColor;
-      p.shape = 'circle';
+      p.shape = "circle";
       p.fadeStart = 0.1;
     }
   }
@@ -879,58 +941,78 @@ export class ParticleSystem {
     this._onAchievement = (e) => {
       const x = e.detail?.screenX ?? this._app.screen.width / 2;
       const y = e.detail?.screenY ?? this._app.screen.height / 2;
-      this.emit('fireworks', x, y, { count: 2 });
-      this.emit('sparkle', x, y, { count: 20 });
+      this.emit("fireworks", x, y, { count: 2 });
+      this.emit("sparkle", x, y, { count: 20 });
     };
 
     this._onLevelUp = (e) => {
       const cx = this._app.screen.width / 2;
       const cy = this._app.screen.height / 2;
-      this.emit('levelUp', cx, cy);
-      setTimeout(() => this.emit('confetti', cx, 0, {
-        count: 150,
-        spread: this._app.screen.width,
-      }), 300);
+      this.emit("levelUp", cx, cy);
+      setTimeout(
+        () =>
+          this.emit("confetti", cx, 0, {
+            count: 150,
+            spread: this._app.screen.width,
+          }),
+        300,
+      );
     };
 
     this._onQuestComplete = (e) => {
       const cx = this._app.screen.width / 2;
       const cy = this._app.screen.height / 2;
-      this.emit('fireworks', cx, cy, { count: 2 });
-      this.emit('magicDust', cx, cy, { count: 30 });
+      this.emit("fireworks", cx, cy, { count: 2 });
+      this.emit("magicDust", cx, cy, { count: 30 });
     };
 
     this._onZoneComplete = (e) => {
       const x = e.detail?.screenX ?? this._app.screen.width / 2;
       const y = e.detail?.screenY ?? this._app.screen.height / 2;
       const color = e.detail?.color ?? PALETTE.purple;
-      this.emit('zoneComplete', x, y, { color, count: 80 });
-      setTimeout(() => this.emit('emojiRain', this._app.screen.width / 2, 0, {
-        count: 20,
-        spread: this._app.screen.width,
-        emojis: ['🏆', '⭐', '🎉', '✨'],
-      }), 500);
+      this.emit("zoneComplete", x, y, { color, count: 80 });
+      setTimeout(
+        () =>
+          this.emit("emojiRain", this._app.screen.width / 2, 0, {
+            count: 20,
+            spread: this._app.screen.width,
+            emojis: ["🏆", "⭐", "🎉", "✨"],
+          }),
+        500,
+      );
     };
 
     this._onOnboardingComplete = () => {
       const cx = this._app.screen.width / 2;
-      this.emit('confetti', cx, 0, { count: 250, spread: this._app.screen.width });
-      setTimeout(() => this.emit('fireworks', cx, this._app.screen.height * 0.6, { count: 3 }), 400);
+      this.emit("confetti", cx, 0, {
+        count: 250,
+        spread: this._app.screen.width,
+      });
+      setTimeout(
+        () =>
+          this.emit("fireworks", cx, this._app.screen.height * 0.6, {
+            count: 3,
+          }),
+        400,
+      );
     };
 
-    window.addEventListener('achievement:unlocked', this._onAchievement);
-    window.addEventListener('world:level-up', this._onLevelUp);
-    window.addEventListener('quest:complete', this._onQuestComplete);
-    window.addEventListener('zone:complete', this._onZoneComplete);
-    window.addEventListener('onboarding:complete', this._onOnboardingComplete);
+    window.addEventListener("achievement:unlocked", this._onAchievement);
+    window.addEventListener("world:level-up", this._onLevelUp);
+    window.addEventListener("quest:complete", this._onQuestComplete);
+    window.addEventListener("zone:complete", this._onZoneComplete);
+    window.addEventListener("onboarding:complete", this._onOnboardingComplete);
   }
 
   _unbindEvents() {
-    window.removeEventListener('achievement:unlocked', this._onAchievement);
-    window.removeEventListener('world:level-up', this._onLevelUp);
-    window.removeEventListener('quest:complete', this._onQuestComplete);
-    window.removeEventListener('zone:complete', this._onZoneComplete);
-    window.removeEventListener('onboarding:complete', this._onOnboardingComplete);
+    window.removeEventListener("achievement:unlocked", this._onAchievement);
+    window.removeEventListener("world:level-up", this._onLevelUp);
+    window.removeEventListener("quest:complete", this._onQuestComplete);
+    window.removeEventListener("zone:complete", this._onZoneComplete);
+    window.removeEventListener(
+      "onboarding:complete",
+      this._onOnboardingComplete,
+    );
   }
 }
 

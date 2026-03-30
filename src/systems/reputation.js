@@ -7,63 +7,69 @@
 
 // Point values per event type
 const POINTS = {
-  task_complete:  5,
-  skill_create:   20,
+  task_complete: 5,
+  skill_create: 20,
   quest_complete: 50,
-  zone_unlock:    30,
-  minion_run:     3,
-  api_connect:    25,
+  zone_unlock: 30,
+  minion_run: 3,
+  api_connect: 25,
 };
 
 // Titles unlocked at each reputation threshold (ascending)
 const TITLES = [
-  [0,    'World Builder'],
-  [100,  'Task Runner'],
-  [300,  'Skill Crafter'],
-  [600,  'Agent Commander'],
-  [1000, 'World Architect'],
-  [2000, 'AI Orchestrator'],
-  [5000, 'Claude Master'],
+  [0, "World Builder"],
+  [100, "Task Runner"],
+  [300, "Skill Crafter"],
+  [600, "Agent Commander"],
+  [1000, "World Architect"],
+  [2000, "AI Orchestrator"],
+  [5000, "Claude Master"],
 ];
 
 // Badge definitions — each badge has an id, label, icon, and a predicate
 // that receives the identity row and the full reputation_events array.
 const BADGE_DEFS = [
   {
-    id:    'first_task',
-    icon:  '🚀',
-    label: 'First Task',
-    check: (identity, events) => events.some(e => e.event_type === 'task_complete'),
+    id: "first_task",
+    icon: "🚀",
+    label: "First Task",
+    check: (identity, events) =>
+      events.some((e) => e.event_type === "task_complete"),
   },
   {
-    id:    'connected',
-    icon:  '🔌',
-    label: 'Connected',
-    check: (identity, events) => events.some(e => e.event_type === 'api_connect'),
+    id: "connected",
+    icon: "🔌",
+    label: "Connected",
+    check: (identity, events) =>
+      events.some((e) => e.event_type === "api_connect"),
   },
   {
-    id:    'skill_master',
-    icon:  '🎓',
-    label: 'Skill Master',
-    check: (identity, events) => events.filter(e => e.event_type === 'skill_create').length >= 3,
+    id: "skill_master",
+    icon: "🎓",
+    label: "Skill Master",
+    check: (identity, events) =>
+      events.filter((e) => e.event_type === "skill_create").length >= 3,
   },
   {
-    id:    'commander',
-    icon:  '🤖',
-    label: 'Commander',
-    check: (identity, events) => events.filter(e => e.event_type === 'minion_run').length >= 5,
+    id: "commander",
+    icon: "🤖",
+    label: "Commander",
+    check: (identity, events) =>
+      events.filter((e) => e.event_type === "minion_run").length >= 5,
   },
   {
-    id:    'quest_hero',
-    icon:  '⚔️',
-    label: 'Quest Hero',
-    check: (identity, events) => events.some(e => e.event_type === 'quest_complete'),
+    id: "quest_hero",
+    icon: "⚔️",
+    label: "Quest Hero",
+    check: (identity, events) =>
+      events.some((e) => e.event_type === "quest_complete"),
   },
   {
-    id:    'explorer',
-    icon:  '🗺️',
-    label: 'Explorer',
-    check: (identity, events) => events.filter(e => e.event_type === 'zone_unlock').length >= 2,
+    id: "explorer",
+    icon: "🗺️",
+    label: "Explorer",
+    check: (identity, events) =>
+      events.filter((e) => e.event_type === "zone_unlock").length >= 2,
   },
 ];
 
@@ -106,33 +112,55 @@ export class ReputationSystem {
 
     // Insert reputation event
     const eventId = uid();
-    this._db.prepare(`
+    this._db
+      .prepare(
+        `
       INSERT INTO reputation_events (id, world_id, event_type, points, description)
       VALUES (?, ?, ?, ?, ?)
-    `).run(eventId, worldId, eventType, points, description);
+    `,
+      )
+      .run(eventId, worldId, eventType, points, description);
 
     // Accumulate reputation
     const newRep = (identity.reputation || 0) + points;
     const newTitle = this.getTitle(newRep);
 
     // Re-derive badges from full history
-    const allEvents = this._db.prepare(
-      'SELECT * FROM reputation_events WHERE world_id = ?'
-    ).all(worldId);
-    const updatedIdentity = { ...identity, reputation: newRep, title: newTitle };
+    const allEvents = this._db
+      .prepare("SELECT * FROM reputation_events WHERE world_id = ?")
+      .all(worldId);
+    const updatedIdentity = {
+      ...identity,
+      reputation: newRep,
+      title: newTitle,
+    };
     const badges = this.getBadges(updatedIdentity, allEvents);
 
-    this._db.prepare(`
+    this._db
+      .prepare(
+        `
       UPDATE identity
       SET reputation = ?, title = ?, badges_json = ?, updated_at = datetime('now')
       WHERE world_id = ?
-    `).run(newRep, newTitle, JSON.stringify(badges), worldId);
+    `,
+      )
+      .run(newRep, newTitle, JSON.stringify(badges), worldId);
 
     const saved = await this.getIdentity(worldId);
 
-    this._emit('reputation:awarded', { worldId, eventType, points, description, identity: saved });
+    this._emit("reputation:awarded", {
+      worldId,
+      eventType,
+      points,
+      description,
+      identity: saved,
+    });
 
-    return { identity: saved, points, event: { id: eventId, eventType, points, description } };
+    return {
+      identity: saved,
+      points,
+      event: { id: eventId, eventType, points, description },
+    };
   }
 
   /**
@@ -141,22 +169,28 @@ export class ReputationSystem {
    * @returns {Promise<object>}
    */
   async getIdentity(worldId) {
-    let row = this._db.prepare(
-      'SELECT * FROM identity WHERE world_id = ?'
-    ).get(worldId);
+    let row = this._db
+      .prepare("SELECT * FROM identity WHERE world_id = ?")
+      .get(worldId);
 
     if (!row) {
       const id = uid();
-      this._db.prepare(`
+      this._db
+        .prepare(
+          `
         INSERT INTO identity (id, world_id, display_name, avatar_emoji, avatar_color, title, bio, reputation, badges_json)
         VALUES (?, ?, 'Commander', '🧠', '#7c3aed', 'World Builder', '', 0, '[]')
-      `).run(id, worldId);
-      row = this._db.prepare('SELECT * FROM identity WHERE world_id = ?').get(worldId);
+      `,
+        )
+        .run(id, worldId);
+      row = this._db
+        .prepare("SELECT * FROM identity WHERE world_id = ?")
+        .get(worldId);
     }
 
     // Parse badges_json
     try {
-      row.badges = JSON.parse(row.badges_json || '[]');
+      row.badges = JSON.parse(row.badges_json || "[]");
     } catch {
       row.badges = [];
     }
@@ -174,21 +208,23 @@ export class ReputationSystem {
     // Ensure row exists
     await this.getIdentity(worldId);
 
-    const allowed = ['display_name', 'avatar_emoji', 'avatar_color', 'bio'];
-    const fields = Object.keys(updates).filter(k => allowed.includes(k));
+    const allowed = ["display_name", "avatar_emoji", "avatar_color", "bio"];
+    const fields = Object.keys(updates).filter((k) => allowed.includes(k));
 
     if (fields.length === 0) return this.getIdentity(worldId);
 
-    const setClauses = fields.map(f => `${f} = ?`).join(', ');
-    const values = fields.map(f => updates[f]);
+    const setClauses = fields.map((f) => `${f} = ?`).join(", ");
+    const values = fields.map((f) => updates[f]);
     values.push(worldId);
 
-    this._db.prepare(
-      `UPDATE identity SET ${setClauses}, updated_at = datetime('now') WHERE world_id = ?`
-    ).run(...values);
+    this._db
+      .prepare(
+        `UPDATE identity SET ${setClauses}, updated_at = datetime('now') WHERE world_id = ?`,
+      )
+      .run(...values);
 
     const updated = await this.getIdentity(worldId);
-    this._emit('identity:updated', { worldId, identity: updated });
+    this._emit("identity:updated", { worldId, identity: updated });
     return updated;
   }
 
@@ -199,12 +235,16 @@ export class ReputationSystem {
    * @returns {Promise<Array<object>>}
    */
   async getHistory(worldId, limit = 20) {
-    const rows = this._db.prepare(`
+    const rows = this._db
+      .prepare(
+        `
       SELECT * FROM reputation_events
       WHERE world_id = ?
       ORDER BY created_at DESC
       LIMIT ?
-    `).all(worldId, limit);
+    `,
+      )
+      .all(worldId, limit);
     return rows;
   }
 
@@ -232,13 +272,15 @@ export class ReputationSystem {
    * @returns {Array<{ id: string, icon: string, label: string }>}
    */
   getBadges(identity, events) {
-    const evts = events || this._db.prepare(
-      'SELECT * FROM reputation_events WHERE world_id = ?'
-    ).all(identity.world_id);
+    const evts =
+      events ||
+      this._db
+        .prepare("SELECT * FROM reputation_events WHERE world_id = ?")
+        .all(identity.world_id);
 
-    return BADGE_DEFS
-      .filter(b => b.check(identity, evts))
-      .map(({ id, icon, label }) => ({ id, icon, label }));
+    return BADGE_DEFS.filter((b) => b.check(identity, evts)).map(
+      ({ id, icon, label }) => ({ id, icon, label }),
+    );
   }
 
   /**
@@ -257,39 +299,60 @@ export class ReputationSystem {
         const worldId = e.detail && e.detail.worldId;
         if (!worldId) return;
         const description = descFn(e.detail);
-        this.award(worldId, eventType.replace('dispatch:', '').replace('skills-academy:', 'skill_').replace('quest:', 'quest_').replace('zone:', 'zone_'), description).catch(console.error);
+        this.award(
+          worldId,
+          eventType
+            .replace("dispatch:", "")
+            .replace("skills-academy:", "skill_")
+            .replace("quest:", "quest_")
+            .replace("zone:", "zone_"),
+          description,
+        ).catch(console.error);
       });
     };
 
     // task completed
-    document.addEventListener('dispatch:task-complete', (e) => {
+    document.addEventListener("dispatch:task-complete", (e) => {
       const worldId = e.detail && e.detail.worldId;
       if (!worldId) return;
-      this.award(worldId, 'task_complete', e.detail.description || 'Task completed').catch(console.error);
+      this.award(
+        worldId,
+        "task_complete",
+        e.detail.description || "Task completed",
+      ).catch(console.error);
     });
 
     // skill created
-    document.addEventListener('skills-academy:create', (e) => {
+    document.addEventListener("skills-academy:create", (e) => {
       const worldId = e.detail && e.detail.worldId;
       if (!worldId) return;
-      const name = (e.detail && e.detail.name) ? `Skill "${e.detail.name}" created` : 'Skill created';
-      this.award(worldId, 'skill_create', name).catch(console.error);
+      const name =
+        e.detail && e.detail.name
+          ? `Skill "${e.detail.name}" created`
+          : "Skill created";
+      this.award(worldId, "skill_create", name).catch(console.error);
     });
 
     // quest completed
-    document.addEventListener('quest:complete', (e) => {
+    document.addEventListener("quest:complete", (e) => {
       const worldId = e.detail && e.detail.worldId;
       if (!worldId) return;
-      const name = (e.detail && e.detail.name) ? `Quest "${e.detail.name}" completed` : 'Quest completed';
-      this.award(worldId, 'quest_complete', name).catch(console.error);
+      const name =
+        e.detail && e.detail.name
+          ? `Quest "${e.detail.name}" completed`
+          : "Quest completed";
+      this.award(worldId, "quest_complete", name).catch(console.error);
     });
 
     // zone unlocked
-    document.addEventListener('zone:unlock', (e) => {
+    document.addEventListener("zone:unlock", (e) => {
       const worldId = e.detail && e.detail.worldId;
       if (!worldId) return;
-      const name = (e.detail && e.detail.zone) ? `Zone "${e.detail.zone}" unlocked` : 'New zone unlocked';
-      this.award(worldId, 'zone_unlock', name).catch(console.error);
+      const name =
+        e.detail && e.detail.zone
+          ? `Zone "${e.detail.zone}" unlocked`
+          : "New zone unlocked";
+      this.award(worldId, "zone_unlock", name).catch(console.error);
     });
   }
 

@@ -67,9 +67,10 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: opacity var(--transition-fast),
-              border-color var(--transition-fast),
-              box-shadow var(--transition-fast);
+  transition:
+    opacity var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .connector-docks__card--connected {
@@ -252,9 +253,10 @@
   font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: background var(--transition-fast),
-              color var(--transition-fast),
-              border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
   text-align: center;
 }
 
@@ -341,7 +343,9 @@
   font-size: 16px;
   cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
   padding: 0;
   flex-shrink: 0;
 }
@@ -483,7 +487,9 @@
 }
 
 @keyframes connector-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Modal buttons */
@@ -500,9 +506,10 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity var(--transition-fast),
-              background var(--transition-fast),
-              border-color var(--transition-fast);
+  transition:
+    opacity var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast);
   border: 1px solid transparent;
   white-space: nowrap;
 }

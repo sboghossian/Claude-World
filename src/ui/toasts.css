@@ -33,8 +33,9 @@ body.panel-open .toast-container {
   pointer-events: auto;
   transform: translateX(calc(100% + 20px));
   opacity: 0;
-  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
-              opacity 300ms ease;
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 300ms ease;
 }
 
 .toast--visible {
@@ -48,11 +49,21 @@ body.panel-open .toast-container {
 }
 
 /* ── Type-specific border accents ────────────────────────────────── */
-.toast--success { border-left: 3px solid var(--accent-green); }
-.toast--info    { border-left: 3px solid var(--accent-blue); }
-.toast--warning { border-left: 3px solid var(--accent-amber); }
-.toast--error   { border-left: 3px solid var(--accent-red); }
-.toast--achievement { border-left: 3px solid var(--accent-gold); }
+.toast--success {
+  border-left: 3px solid var(--accent-green);
+}
+.toast--info {
+  border-left: 3px solid var(--accent-blue);
+}
+.toast--warning {
+  border-left: 3px solid var(--accent-amber);
+}
+.toast--error {
+  border-left: 3px solid var(--accent-red);
+}
+.toast--achievement {
+  border-left: 3px solid var(--accent-gold);
+}
 
 /* ── Icon ────────────────────────────────────────────────────────── */
 .toast__icon {
@@ -68,11 +79,26 @@ body.panel-open .toast-container {
   margin-top: 1px;
 }
 
-.toast--success .toast__icon { color: var(--accent-green); background: rgba(74, 255, 138, 0.12); }
-.toast--info .toast__icon    { color: var(--accent-blue); background: rgba(74, 158, 255, 0.12); }
-.toast--warning .toast__icon { color: var(--accent-amber); background: rgba(255, 184, 74, 0.12); }
-.toast--error .toast__icon   { color: var(--accent-red); background: rgba(255, 74, 106, 0.12); }
-.toast--achievement .toast__icon { color: var(--accent-gold); background: rgba(255, 215, 0, 0.15); }
+.toast--success .toast__icon {
+  color: var(--accent-green);
+  background: rgba(74, 255, 138, 0.12);
+}
+.toast--info .toast__icon {
+  color: var(--accent-blue);
+  background: rgba(74, 158, 255, 0.12);
+}
+.toast--warning .toast__icon {
+  color: var(--accent-amber);
+  background: rgba(255, 184, 74, 0.12);
+}
+.toast--error .toast__icon {
+  color: var(--accent-red);
+  background: rgba(255, 74, 106, 0.12);
+}
+.toast--achievement .toast__icon {
+  color: var(--accent-gold);
+  background: rgba(255, 215, 0, 0.15);
+}
 
 /* ── Content ─────────────────────────────────────────────────────── */
 .toast__content {
@@ -110,7 +136,9 @@ body.panel-open .toast-container {
   font-size: 16px;
   cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
   padding: 0;
   margin: -2px -4px 0 0;
 }

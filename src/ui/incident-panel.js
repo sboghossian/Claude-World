@@ -12,17 +12,17 @@
 
 /** Map severity value -> display label + dot character */
 const SEVERITY_META = {
-  critical: { label: 'CRIT', dot: '🔴' },
-  high:     { label: 'HIGH', dot: '🟠' },
-  warning:  { label: 'WARN', dot: '🟡' },
-  info:     { label: 'INFO', dot: '🔵' },
+  critical: { label: "CRIT", dot: "🔴" },
+  high: { label: "HIGH", dot: "🟠" },
+  warning: { label: "WARN", dot: "🟡" },
+  info: { label: "INFO", dot: "🔵" },
 };
 
 /** Human-friendly relative time (e.g. "2m ago", "just now") */
 function relativeTime(isoString) {
   const diff = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
-  if (diff < 10)  return 'just now';
-  if (diff < 60)  return `${diff}s ago`;
+  if (diff < 10) return "just now";
+  if (diff < 60) return `${diff}s ago`;
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
   return `${Math.floor(diff / 86400)}d ago`;
@@ -71,12 +71,12 @@ export class IncidentPanel {
     parent.appendChild(this._toggleBtn);
 
     // Listen for newly filed incidents from any source.
-    window.addEventListener('incident:filed', this._onIncidentFiled);
+    window.addEventListener("incident:filed", this._onIncidentFiled);
   }
 
   /** Remove all DOM nodes and event listeners. */
   destroy() {
-    window.removeEventListener('incident:filed', this._onIncidentFiled);
+    window.removeEventListener("incident:filed", this._onIncidentFiled);
     this._el?.remove();
     this._toggleBtn?.remove();
     this._el = null;
@@ -93,23 +93,24 @@ export class IncidentPanel {
    */
   async loadIncidents(worldId, limit = 20) {
     this._worldId = worldId;
-    this._incidents = await window.api.db.getIncidents({ worldId, limit }) || [];
+    this._incidents =
+      (await window.api.db.getIncidents({ worldId, limit })) || [];
     this._render();
   }
 
   /** Show the panel. */
   show() {
-    this._el?.classList.add('incident-panel--visible');
+    this._el?.classList.add("incident-panel--visible");
   }
 
   /** Hide the panel. */
   hide() {
-    this._el?.classList.remove('incident-panel--visible');
+    this._el?.classList.remove("incident-panel--visible");
   }
 
   /** Toggle visibility. */
   toggle() {
-    if (this._el?.classList.contains('incident-panel--visible')) {
+    if (this._el?.classList.contains("incident-panel--visible")) {
       this.hide();
     } else {
       this.show();
@@ -123,7 +124,7 @@ export class IncidentPanel {
    */
   async resolve(incidentId) {
     await window.api.db.updateIncident(incidentId, {
-      status: 'resolved',
+      status: "resolved",
       resolved_at: new Date().toISOString(),
     });
 
@@ -132,7 +133,7 @@ export class IncidentPanel {
     if (idx !== -1) {
       this._incidents[idx] = {
         ...this._incidents[idx],
-        status: 'resolved',
+        status: "resolved",
         resolved_at: new Date().toISOString(),
       };
     }
@@ -163,17 +164,24 @@ export class IncidentPanel {
   _render() {
     if (!this._el || !this._body) return;
 
-    const openCount = this._incidents.filter((i) => i.status !== 'resolved').length;
+    const openCount = this._incidents.filter(
+      (i) => i.status !== "resolved",
+    ).length;
 
     // Update badge.
     if (this._badge) {
       this._badge.textContent = String(openCount);
-      this._badge.classList.toggle('incident-panel__badge--zero', openCount === 0);
+      this._badge.classList.toggle(
+        "incident-panel__badge--zero",
+        openCount === 0,
+      );
     }
 
     // Update toggle button text.
     if (this._toggleBtn) {
-      const span = this._toggleBtn.querySelector('.incident-panel-toggle__label');
+      const span = this._toggleBtn.querySelector(
+        ".incident-panel-toggle__label",
+      );
       if (span) span.textContent = `Incidents (${openCount} open)`;
     }
 
@@ -184,7 +192,7 @@ export class IncidentPanel {
       return;
     }
 
-    this._body.innerHTML = '';
+    this._body.innerHTML = "";
     for (const incident of this._incidents) {
       this._body.appendChild(this._buildRow(incident));
     }
@@ -194,47 +202,47 @@ export class IncidentPanel {
 
   /** @returns {HTMLElement} */
   _buildPanel() {
-    const panel = document.createElement('div');
-    panel.className = 'incident-panel';
-    panel.setAttribute('role', 'region');
-    panel.setAttribute('aria-label', 'Incident Reports');
+    const panel = document.createElement("div");
+    panel.className = "incident-panel";
+    panel.setAttribute("role", "region");
+    panel.setAttribute("aria-label", "Incident Reports");
 
     // Header
-    const header = document.createElement('div');
-    header.className = 'incident-panel__header';
-    header.setAttribute('role', 'button');
-    header.setAttribute('tabindex', '0');
-    header.setAttribute('aria-label', 'Toggle incident panel');
+    const header = document.createElement("div");
+    header.className = "incident-panel__header";
+    header.setAttribute("role", "button");
+    header.setAttribute("tabindex", "0");
+    header.setAttribute("aria-label", "Toggle incident panel");
 
-    const title = document.createElement('div');
-    title.className = 'incident-panel__title';
-    title.textContent = '\u26A0\uFE0F Incidents ';
+    const title = document.createElement("div");
+    title.className = "incident-panel__title";
+    title.textContent = "\u26A0\uFE0F Incidents ";
 
-    this._badge = document.createElement('span');
-    this._badge.className = 'incident-panel__badge incident-panel__badge--zero';
-    this._badge.textContent = '0';
+    this._badge = document.createElement("span");
+    this._badge.className = "incident-panel__badge incident-panel__badge--zero";
+    this._badge.textContent = "0";
     title.appendChild(this._badge);
 
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'incident-panel__close';
-    closeBtn.setAttribute('aria-label', 'Close incident panel');
-    closeBtn.textContent = '\u00D7';
-    closeBtn.addEventListener('click', (e) => {
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "incident-panel__close";
+    closeBtn.setAttribute("aria-label", "Close incident panel");
+    closeBtn.textContent = "\u00D7";
+    closeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       this.hide();
     });
 
     header.appendChild(title);
     header.appendChild(closeBtn);
-    header.addEventListener('click', () => this.toggle());
-    header.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') this.toggle();
+    header.addEventListener("click", () => this.toggle());
+    header.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") this.toggle();
     });
 
     // Body
-    this._body = document.createElement('div');
-    this._body.className = 'incident-panel__body';
-    this._body.setAttribute('role', 'list');
+    this._body = document.createElement("div");
+    this._body.className = "incident-panel__body";
+    this._body.setAttribute("role", "list");
 
     panel.appendChild(header);
     panel.appendChild(this._body);
@@ -247,12 +255,12 @@ export class IncidentPanel {
    * @returns {HTMLElement}
    */
   _buildToggleButton() {
-    const btn = document.createElement('button');
-    btn.className = 'incident-panel-toggle';
-    btn.setAttribute('aria-label', 'Show incident panel');
+    const btn = document.createElement("button");
+    btn.className = "incident-panel-toggle";
+    btn.setAttribute("aria-label", "Show incident panel");
     btn.innerHTML =
       '\u26A0\uFE0F <span class="incident-panel-toggle__label">Incidents (0 open)</span>';
-    btn.addEventListener('click', () => this.show());
+    btn.addEventListener("click", () => this.show());
     return btn;
   }
 
@@ -263,52 +271,52 @@ export class IncidentPanel {
    * @returns {HTMLElement}
    */
   _buildRow(incident) {
-    const severity = (incident.severity ?? 'info').toLowerCase();
+    const severity = (incident.severity ?? "info").toLowerCase();
     const meta = SEVERITY_META[severity] ?? SEVERITY_META.info;
-    const isResolved = incident.status === 'resolved';
+    const isResolved = incident.status === "resolved";
 
-    const row = document.createElement('div');
+    const row = document.createElement("div");
     row.className = [
-      'incident-row',
+      "incident-row",
       `incident-row--${severity}`,
-      isResolved ? 'incident-row--resolved' : '',
+      isResolved ? "incident-row--resolved" : "",
     ]
       .filter(Boolean)
-      .join(' ');
-    row.setAttribute('role', 'listitem');
+      .join(" ");
+    row.setAttribute("role", "listitem");
     row.dataset.incidentId = incident.id;
 
     // Severity pill
-    const pill = document.createElement('span');
-    pill.className = 'incident-row__severity';
+    const pill = document.createElement("span");
+    pill.className = "incident-row__severity";
     pill.textContent = `${meta.dot} ${meta.label}`;
 
     // Content
-    const content = document.createElement('div');
-    content.className = 'incident-row__content';
+    const content = document.createElement("div");
+    content.className = "incident-row__content";
 
-    const titleEl = document.createElement('div');
-    titleEl.className = 'incident-row__title';
+    const titleEl = document.createElement("div");
+    titleEl.className = "incident-row__title";
     titleEl.textContent = incident.title;
 
-    const metaEl = document.createElement('div');
-    metaEl.className = 'incident-row__meta';
+    const metaEl = document.createElement("div");
+    metaEl.className = "incident-row__meta";
     metaEl.textContent = relativeTime(incident.created_at);
 
     content.appendChild(titleEl);
     content.appendChild(metaEl);
 
     // Action button
-    const actionBtn = document.createElement('button');
-    actionBtn.className = 'incident-row__action';
+    const actionBtn = document.createElement("button");
+    actionBtn.className = "incident-row__action";
 
     if (isResolved) {
-      actionBtn.textContent = 'Resolved';
+      actionBtn.textContent = "Resolved";
       actionBtn.disabled = true;
     } else {
-      const actionLabel = severity === 'info' ? 'Dismiss' : 'Resolve';
+      const actionLabel = severity === "info" ? "Dismiss" : "Resolve";
       actionBtn.textContent = actionLabel;
-      actionBtn.addEventListener('click', (e) => {
+      actionBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         this.resolve(incident.id);
       });

@@ -68,7 +68,9 @@
   font-family: var(--font-sans);
   font-size: 12px;
   font-weight: 500;
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
   border-bottom: 3px solid transparent;
   position: relative;
 }
@@ -95,11 +97,26 @@
 }
 
 /* Agent-specific colored underlines */
-.st-tab--commander.st-tab--active { border-bottom-color: #7c3aed; color: #c4a6ff; }
-.st-tab--librarian.st-tab--active { border-bottom-color: #2563eb; color: #93b8ff; }
-.st-tab--archivist.st-tab--active { border-bottom-color: #0891b2; color: #7dddf0; }
-.st-tab--instructor.st-tab--active { border-bottom-color: #16a34a; color: #7ddf9d; }
-.st-tab--dockmaster.st-tab--active { border-bottom-color: #d97706; color: #f5c97a; }
+.st-tab--commander.st-tab--active {
+  border-bottom-color: #7c3aed;
+  color: #c4a6ff;
+}
+.st-tab--librarian.st-tab--active {
+  border-bottom-color: #2563eb;
+  color: #93b8ff;
+}
+.st-tab--archivist.st-tab--active {
+  border-bottom-color: #0891b2;
+  color: #7dddf0;
+}
+.st-tab--instructor.st-tab--active {
+  border-bottom-color: #16a34a;
+  color: #7ddf9d;
+}
+.st-tab--dockmaster.st-tab--active {
+  border-bottom-color: #d97706;
+  color: #f5c97a;
+}
 
 /* ── XP Bar Section ─────────────────────────────────────────────── */
 .st-xp-section {
@@ -140,7 +157,7 @@
 }
 
 .st-xp-bar-inner::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -156,8 +173,12 @@
 }
 
 @keyframes st-xp-shimmer {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .st-xp-count {
@@ -174,8 +195,11 @@
   flex: 1;
   position: relative;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(30, 35, 55, 0.8) 0%, rgba(10, 10, 20, 0.95) 70%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(30, 35, 55, 0.8) 0%,
+    rgba(10, 10, 20, 0.95) 70%
+  );
 }
 
 .st-canvas {
@@ -367,7 +391,9 @@
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
   color: #fff;
   position: relative;
   overflow: hidden;
@@ -388,11 +414,21 @@
 }
 
 /* Agent-specific gradients */
-.st-unlock-btn--commander { background: linear-gradient(135deg, #7c3aed, #a855f7); }
-.st-unlock-btn--librarian { background: linear-gradient(135deg, #2563eb, #60a5fa); }
-.st-unlock-btn--archivist { background: linear-gradient(135deg, #0891b2, #22d3ee); }
-.st-unlock-btn--instructor { background: linear-gradient(135deg, #16a34a, #4ade80); }
-.st-unlock-btn--dockmaster { background: linear-gradient(135deg, #d97706, #fbbf24); }
+.st-unlock-btn--commander {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+}
+.st-unlock-btn--librarian {
+  background: linear-gradient(135deg, #2563eb, #60a5fa);
+}
+.st-unlock-btn--archivist {
+  background: linear-gradient(135deg, #0891b2, #22d3ee);
+}
+.st-unlock-btn--instructor {
+  background: linear-gradient(135deg, #16a34a, #4ade80);
+}
+.st-unlock-btn--dockmaster {
+  background: linear-gradient(135deg, #d97706, #fbbf24);
+}
 
 /* ── Tooltip (canvas hover) ─────────────────────────────────────── */
 .st-tooltip {
@@ -417,14 +453,29 @@
 
 /* ── Unlock celebration ─────────────────────────────────────────── */
 @keyframes st-celebrate-pop {
-  0%   { transform: scale(0.5); opacity: 0; }
-  50%  { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes st-particle-fly {
-  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
-  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0);
+    opacity: 0;
+  }
 }
 
 .st-celebration {

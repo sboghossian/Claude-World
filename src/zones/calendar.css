@@ -260,7 +260,7 @@
 }
 
 .cal-mini__day--has-events::after {
-  content: '';
+  content: "";
   display: block;
   width: 3px;
   height: 3px;
@@ -416,11 +416,26 @@
   opacity: 0.6;
 }
 
-.cal-month__event-chip--task       { background: rgba(74, 158, 255, 0.2); color: var(--accent-blue); }
-.cal-month__event-chip--quest      { background: rgba(255, 184, 74, 0.2); color: var(--accent-amber); }
-.cal-month__event-chip--snapshot   { background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); }
-.cal-month__event-chip--automation { background: rgba(74, 255, 138, 0.2); color: var(--accent-green); }
-.cal-month__event-chip--milestone  { background: rgba(255, 215, 0, 0.2);  color: var(--accent-gold); }
+.cal-month__event-chip--task {
+  background: rgba(74, 158, 255, 0.2);
+  color: var(--accent-blue);
+}
+.cal-month__event-chip--quest {
+  background: rgba(255, 184, 74, 0.2);
+  color: var(--accent-amber);
+}
+.cal-month__event-chip--snapshot {
+  background: rgba(168, 85, 247, 0.2);
+  color: var(--accent-purple);
+}
+.cal-month__event-chip--automation {
+  background: rgba(74, 255, 138, 0.2);
+  color: var(--accent-green);
+}
+.cal-month__event-chip--milestone {
+  background: rgba(255, 215, 0, 0.2);
+  color: var(--accent-gold);
+}
 
 .cal-month__more {
   font-size: 10px;
@@ -441,11 +456,21 @@
   border-radius: 50%;
 }
 
-.cal-month__dot--task       { background: var(--accent-blue); }
-.cal-month__dot--quest      { background: var(--accent-amber); }
-.cal-month__dot--snapshot   { background: var(--accent-purple); }
-.cal-month__dot--automation { background: var(--accent-green); }
-.cal-month__dot--milestone  { background: var(--accent-gold); }
+.cal-month__dot--task {
+  background: var(--accent-blue);
+}
+.cal-month__dot--quest {
+  background: var(--accent-amber);
+}
+.cal-month__dot--snapshot {
+  background: var(--accent-purple);
+}
+.cal-month__dot--automation {
+  background: var(--accent-green);
+}
+.cal-month__dot--milestone {
+  background: var(--accent-gold);
+}
 
 /* ── Week view ───────────────────────────────────────────────────── */
 
@@ -550,11 +575,31 @@
   opacity: 0.85;
 }
 
-.cal-week__event-block--task       { background: rgba(74, 158, 255, 0.3); color: var(--accent-blue); border-left: 3px solid var(--accent-blue); }
-.cal-week__event-block--quest      { background: rgba(255, 184, 74, 0.3); color: var(--accent-amber); border-left: 3px solid var(--accent-amber); }
-.cal-week__event-block--snapshot   { background: rgba(168, 85, 247, 0.3); color: var(--accent-purple); border-left: 3px solid var(--accent-purple); }
-.cal-week__event-block--automation { background: rgba(74, 255, 138, 0.3); color: var(--accent-green); border-left: 3px solid var(--accent-green); }
-.cal-week__event-block--milestone  { background: rgba(255, 215, 0, 0.3);  color: var(--accent-gold); border-left: 3px solid var(--accent-gold); }
+.cal-week__event-block--task {
+  background: rgba(74, 158, 255, 0.3);
+  color: var(--accent-blue);
+  border-left: 3px solid var(--accent-blue);
+}
+.cal-week__event-block--quest {
+  background: rgba(255, 184, 74, 0.3);
+  color: var(--accent-amber);
+  border-left: 3px solid var(--accent-amber);
+}
+.cal-week__event-block--snapshot {
+  background: rgba(168, 85, 247, 0.3);
+  color: var(--accent-purple);
+  border-left: 3px solid var(--accent-purple);
+}
+.cal-week__event-block--automation {
+  background: rgba(74, 255, 138, 0.3);
+  color: var(--accent-green);
+  border-left: 3px solid var(--accent-green);
+}
+.cal-week__event-block--milestone {
+  background: rgba(255, 215, 0, 0.3);
+  color: var(--accent-gold);
+  border-left: 3px solid var(--accent-gold);
+}
 
 /* ── Day view ────────────────────────────────────────────────────── */
 
@@ -626,11 +671,31 @@
   z-index: 1;
 }
 
-.cal-day__event-block--task       { background: rgba(74, 158, 255, 0.3); color: var(--accent-blue); border-left: 3px solid var(--accent-blue); }
-.cal-day__event-block--quest      { background: rgba(255, 184, 74, 0.3); color: var(--accent-amber); border-left: 3px solid var(--accent-amber); }
-.cal-day__event-block--snapshot   { background: rgba(168, 85, 247, 0.3); color: var(--accent-purple); border-left: 3px solid var(--accent-purple); }
-.cal-day__event-block--automation { background: rgba(74, 255, 138, 0.3); color: var(--accent-green); border-left: 3px solid var(--accent-green); }
-.cal-day__event-block--milestone  { background: rgba(255, 215, 0, 0.3);  color: var(--accent-gold); border-left: 3px solid var(--accent-gold); }
+.cal-day__event-block--task {
+  background: rgba(74, 158, 255, 0.3);
+  color: var(--accent-blue);
+  border-left: 3px solid var(--accent-blue);
+}
+.cal-day__event-block--quest {
+  background: rgba(255, 184, 74, 0.3);
+  color: var(--accent-amber);
+  border-left: 3px solid var(--accent-amber);
+}
+.cal-day__event-block--snapshot {
+  background: rgba(168, 85, 247, 0.3);
+  color: var(--accent-purple);
+  border-left: 3px solid var(--accent-purple);
+}
+.cal-day__event-block--automation {
+  background: rgba(74, 255, 138, 0.3);
+  color: var(--accent-green);
+  border-left: 3px solid var(--accent-green);
+}
+.cal-day__event-block--milestone {
+  background: rgba(255, 215, 0, 0.3);
+  color: var(--accent-gold);
+  border-left: 3px solid var(--accent-gold);
+}
 
 /* ── Side panel (day detail) ─────────────────────────────────────── */
 

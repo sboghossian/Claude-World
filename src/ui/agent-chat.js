@@ -14,101 +14,128 @@
  *   chat.destroy();
  */
 
-import { AGENT_PERSONALITIES } from '../systems/agent-personalities.js';
+import { AGENT_PERSONALITIES } from "../systems/agent-personalities.js";
 
 // ── Constants ────────────────────────────────────────────────────
 
-const STORAGE_PREFIX = 'claude-world:agent-chat:';
+const STORAGE_PREFIX = "claude-world:agent-chat:";
 const MAX_STORED_MESSAGES = 100;
 const MAX_CONTEXT_MESSAGES = 20;
 
 /** Mood emoji mapping */
 const MOOD_EMOJI = {
-  focused:  '🎯',
-  happy:    '😊',
-  excited:  '🔥',
-  tired:    '😴',
-  worried:  '😟',
+  focused: "🎯",
+  happy: "😊",
+  excited: "🔥",
+  tired: "😴",
+  worried: "😟",
 };
 
 /** Agent color mapping (matches agent-personalities.js) */
 const AGENT_COLORS = {
-  commander:  '#7c3aed',
-  librarian:  '#2563eb',
-  archivist:  '#0891b2',
-  instructor: '#16a34a',
-  dockmaster: '#d97706',
+  commander: "#7c3aed",
+  librarian: "#2563eb",
+  archivist: "#0891b2",
+  instructor: "#16a34a",
+  dockmaster: "#d97706",
 };
 
 /** Quick replies per agent role */
 const QUICK_REPLIES = {
   commander: [
-    { label: 'Status report',  text: 'Give me a status report on the city.' },
-    { label: 'Dispatch task',  text: 'Dispatch a new task to the best available agent.' },
-    { label: 'Priority list',  text: 'What are the current top priorities?' },
+    { label: "Status report", text: "Give me a status report on the city." },
+    {
+      label: "Dispatch task",
+      text: "Dispatch a new task to the best available agent.",
+    },
+    { label: "Priority list", text: "What are the current top priorities?" },
   ],
   librarian: [
-    { label: 'Search knowledge', text: 'Search the knowledge base for recent entries.' },
-    { label: 'Recent findings',  text: 'What are the most recent findings you\'ve catalogued?' },
-    { label: 'Recommend reading', text: 'Recommend something interesting to read.' },
+    {
+      label: "Search knowledge",
+      text: "Search the knowledge base for recent entries.",
+    },
+    {
+      label: "Recent findings",
+      text: "What are the most recent findings you've catalogued?",
+    },
+    {
+      label: "Recommend reading",
+      text: "Recommend something interesting to read.",
+    },
   ],
   archivist: [
-    { label: 'Last snapshot',    text: 'Show me the last snapshot of the city state.' },
-    { label: 'Compare versions', text: 'Compare the current state with the previous version.' },
-    { label: 'Archive status',   text: 'What is the current status of the archives?' },
+    {
+      label: "Last snapshot",
+      text: "Show me the last snapshot of the city state.",
+    },
+    {
+      label: "Compare versions",
+      text: "Compare the current state with the previous version.",
+    },
+    {
+      label: "Archive status",
+      text: "What is the current status of the archives?",
+    },
   ],
   instructor: [
-    { label: 'Teach me',        text: 'Teach me something new.' },
-    { label: 'Skill progress',  text: 'Show me my current skill progress.' },
-    { label: 'Practice session', text: 'Let\'s start a practice session.' },
+    { label: "Teach me", text: "Teach me something new." },
+    { label: "Skill progress", text: "Show me my current skill progress." },
+    { label: "Practice session", text: "Let's start a practice session." },
   ],
   dockmaster: [
-    { label: 'Connected APIs',  text: 'List all currently connected APIs and integrations.' },
-    { label: 'Check health',    text: 'Run a health check on all active connections.' },
-    { label: 'New integration', text: 'I want to set up a new integration.' },
+    {
+      label: "Connected APIs",
+      text: "List all currently connected APIs and integrations.",
+    },
+    {
+      label: "Check health",
+      text: "Run a health check on all active connections.",
+    },
+    { label: "New integration", text: "I want to set up a new integration." },
   ],
 };
 
 /** Fallback responses when no AI key is configured, keyed by agent */
 const FALLBACK_RESPONSES = {
   commander: [
-    'Operations nominal. All sectors reporting green.',
-    'Acknowledged. Routing to the appropriate division.',
-    'The city runs at 94% efficiency. Acceptable, but I want 100%.',
-    'Consider it done. Next?',
-    'Three priorities in the queue. I\'ll handle them in order.',
-    'Negative on that approach. I have a better strategy.',
+    "Operations nominal. All sectors reporting green.",
+    "Acknowledged. Routing to the appropriate division.",
+    "The city runs at 94% efficiency. Acceptable, but I want 100%.",
+    "Consider it done. Next?",
+    "Three priorities in the queue. I'll handle them in order.",
+    "Negative on that approach. I have a better strategy.",
   ],
   librarian: [
-    'Ah, what a fascinating question! Let me consult the archives... I found seventeen relevant entries, three of which are particularly illuminating. The first dates back to our earliest records and suggests a pattern that I find quite compelling when cross-referenced with more recent data.',
-    'I just catalogued something remarkably relevant to your query. It connects to at least four other knowledge domains, which is unusual and rather exciting from a taxonomic perspective.',
-    'The archives contain extensive material on this topic. Shall I prepare a comprehensive summary with full citations? I do love a good bibliography.',
+    "Ah, what a fascinating question! Let me consult the archives... I found seventeen relevant entries, three of which are particularly illuminating. The first dates back to our earliest records and suggests a pattern that I find quite compelling when cross-referenced with more recent data.",
+    "I just catalogued something remarkably relevant to your query. It connects to at least four other knowledge domains, which is unusual and rather exciting from a taxonomic perspective.",
+    "The archives contain extensive material on this topic. Shall I prepare a comprehensive summary with full citations? I do love a good bibliography.",
     'Oh, this reminds me of an entry I filed last week under "Emergent Patterns." The connections are quite elegant when you see them mapped out.',
-    'I\'ve been organizing the eastern wing and found three previously uncategorized documents that might interest you. Shall I cross-reference them?',
+    "I've been organizing the eastern wing and found three previously uncategorized documents that might interest you. Shall I cross-reference them?",
   ],
   archivist: [
-    'The record shows the last change at 14:32 today.',
-    'I have the full history. Every event, timestamped.',
-    'Comparing now... three differences between versions.',
-    'Archived and sealed. The record is complete.',
-    'I remember when this section was first built. The logs confirm it.',
-    'The timeline is consistent. No anomalies detected.',
+    "The record shows the last change at 14:32 today.",
+    "I have the full history. Every event, timestamped.",
+    "Comparing now... three differences between versions.",
+    "Archived and sealed. The record is complete.",
+    "I remember when this section was first built. The logs confirm it.",
+    "The timeline is consistent. No anomalies detected.",
   ],
   instructor: [
-    'Great energy! Let\'s channel that into something productive!',
-    'You\'re making real progress! Each session builds on the last!',
-    'Here\'s a challenge for you — try approaching it from a different angle!',
-    'That\'s the spirit! Consistency is the key to mastery!',
-    'I\'ve got a drill that\'ll level up that skill. Ready?',
-    'Rest is part of training too. But when you\'re ready — we go again!',
+    "Great energy! Let's channel that into something productive!",
+    "You're making real progress! Each session builds on the last!",
+    "Here's a challenge for you — try approaching it from a different angle!",
+    "That's the spirit! Consistency is the key to mastery!",
+    "I've got a drill that'll level up that skill. Ready?",
+    "Rest is part of training too. But when you're ready — we go again!",
   ],
   dockmaster: [
-    'All ports clear.',
-    'Connection stable. Latency nominal.',
-    'Manifest checked. Ready to proceed.',
-    'Routing established.',
-    'Three active connections. All healthy.',
-    'Done.',
+    "All ports clear.",
+    "Connection stable. Latency nominal.",
+    "Manifest checked. Ready to proceed.",
+    "Routing established.",
+    "Three active connections. All healthy.",
+    "Done.",
   ],
 };
 
@@ -132,8 +159,14 @@ function el(tag, cls, attrs) {
   if (cls) e.className = cls;
   if (attrs) {
     for (const [k, v] of Object.entries(attrs)) {
-      if (k === 'textContent') { e.textContent = v; continue; }
-      if (k === 'innerHTML') { e.innerHTML = v; continue; }
+      if (k === "textContent") {
+        e.textContent = v;
+        continue;
+      }
+      if (k === "innerHTML") {
+        e.innerHTML = v;
+        continue;
+      }
       e.setAttribute(k, v);
     }
   }
@@ -141,12 +174,12 @@ function el(tag, cls, attrs) {
 }
 
 function formatTime(date) {
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 function escapeHtml(str) {
-  if (!str) return '';
-  const div = document.createElement('div');
+  if (!str) return "";
+  const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
 }
@@ -192,18 +225,25 @@ export class AgentChat {
    *   `id` should match a key in AGENT_PERSONALITIES (e.g. 'commander').
    */
   open(agentData) {
-    const personalityKey = agentData.id || 'commander';
-    const personality = AGENT_PERSONALITIES[personalityKey] || AGENT_PERSONALITIES.commander;
+    const personalityKey = agentData.id || "commander";
+    const personality =
+      AGENT_PERSONALITIES[personalityKey] || AGENT_PERSONALITIES.commander;
 
     this._agent = {
-      id:          personalityKey,
-      name:        agentData.name || personality.name,
-      role:        agentData.role || personality.role,
-      emoji:       agentData.emoji || personality.emoji,
-      color:       agentData.color || personality.color || AGENT_COLORS[personalityKey] || '#7c3aed',
-      level:       agentData.level ?? 1,
-      mood:        agentData.mood || 'focused',
-      personality: agentData.personality || (personality.traits ? personality.traits[0] : 'adaptive'),
+      id: personalityKey,
+      name: agentData.name || personality.name,
+      role: agentData.role || personality.role,
+      emoji: agentData.emoji || personality.emoji,
+      color:
+        agentData.color ||
+        personality.color ||
+        AGENT_COLORS[personalityKey] ||
+        "#7c3aed",
+      level: agentData.level ?? 1,
+      mood: agentData.mood || "focused",
+      personality:
+        agentData.personality ||
+        (personality.traits ? personality.traits[0] : "adaptive"),
     };
 
     // Load persisted messages
@@ -216,8 +256,8 @@ export class AgentChat {
     this._updateInputPlaceholder();
 
     // Show
-    this._overlay.classList.add('agent-chat-overlay--visible');
-    this._panel.classList.add('agent-chat--open');
+    this._overlay.classList.add("agent-chat-overlay--visible");
+    this._panel.classList.add("agent-chat--open");
     this._isOpen = true;
 
     // Focus input after animation
@@ -229,7 +269,7 @@ export class AgentChat {
 
     // If no messages yet, show a greeting
     if (this._messages.length === 0) {
-      const greetings = personality.greetings || ['Hello. How can I help you?'];
+      const greetings = personality.greetings || ["Hello. How can I help you?"];
       this._addAgentMessageLocally(pick(greetings));
     }
   }
@@ -237,8 +277,8 @@ export class AgentChat {
   /** Close the chat panel. */
   close() {
     if (!this._isOpen) return;
-    this._panel.classList.remove('agent-chat--open');
-    this._overlay.classList.remove('agent-chat-overlay--visible');
+    this._panel.classList.remove("agent-chat--open");
+    this._overlay.classList.remove("agent-chat-overlay--visible");
     this._isOpen = false;
     this._agent = null;
   }
@@ -265,63 +305,63 @@ export class AgentChat {
    */
   _buildShell() {
     // Overlay
-    const overlay = el('div', 'agent-chat-overlay');
-    overlay.addEventListener('click', () => this.close());
+    const overlay = el("div", "agent-chat-overlay");
+    overlay.addEventListener("click", () => this.close());
     this._overlay = overlay;
 
     // Panel
-    const panel = el('div', 'agent-chat');
-    panel.setAttribute('role', 'dialog');
-    panel.setAttribute('aria-label', 'Agent Chat');
+    const panel = el("div", "agent-chat");
+    panel.setAttribute("role", "dialog");
+    panel.setAttribute("aria-label", "Agent Chat");
     this._panel = panel;
 
     // Header (populated on open)
-    const header = el('div', 'agent-chat__header');
-    header.setAttribute('data-region', 'header');
+    const header = el("div", "agent-chat__header");
+    header.setAttribute("data-region", "header");
     panel.appendChild(header);
 
     // Messages area
-    const messages = el('div', 'agent-chat__messages');
-    messages.setAttribute('role', 'log');
-    messages.setAttribute('aria-live', 'polite');
-    messages.setAttribute('aria-label', 'Chat messages');
+    const messages = el("div", "agent-chat__messages");
+    messages.setAttribute("role", "log");
+    messages.setAttribute("aria-live", "polite");
+    messages.setAttribute("aria-label", "Chat messages");
     this._messagesEl = messages;
     panel.appendChild(messages);
 
     // Typing indicator (hidden by default)
-    const typing = el('div', 'agent-chat__typing');
+    const typing = el("div", "agent-chat__typing");
     typing.hidden = true;
-    typing.setAttribute('aria-hidden', 'true');
-    const typingAvatar = el('div', 'agent-chat__msg-avatar');
-    typingAvatar.setAttribute('aria-hidden', 'true');
-    const typingDots = el('div', 'agent-chat__typing-dots');
-    typingDots.appendChild(el('span', 'agent-chat__typing-dot'));
-    typingDots.appendChild(el('span', 'agent-chat__typing-dot'));
-    typingDots.appendChild(el('span', 'agent-chat__typing-dot'));
+    typing.setAttribute("aria-hidden", "true");
+    const typingAvatar = el("div", "agent-chat__msg-avatar");
+    typingAvatar.setAttribute("aria-hidden", "true");
+    const typingDots = el("div", "agent-chat__typing-dots");
+    typingDots.appendChild(el("span", "agent-chat__typing-dot"));
+    typingDots.appendChild(el("span", "agent-chat__typing-dot"));
+    typingDots.appendChild(el("span", "agent-chat__typing-dot"));
     typing.appendChild(typingAvatar);
     typing.appendChild(typingDots);
     this._typingEl = typing;
     panel.appendChild(typing);
 
     // Quick replies
-    const quickReplies = el('div', 'agent-chat__quick-replies');
-    quickReplies.setAttribute('role', 'toolbar');
-    quickReplies.setAttribute('aria-label', 'Quick replies');
+    const quickReplies = el("div", "agent-chat__quick-replies");
+    quickReplies.setAttribute("role", "toolbar");
+    quickReplies.setAttribute("aria-label", "Quick replies");
     this._quickRepliesEl = quickReplies;
     panel.appendChild(quickReplies);
 
     // Input area
-    const inputArea = el('div', 'agent-chat__input-area');
+    const inputArea = el("div", "agent-chat__input-area");
 
-    const input = el('textarea', 'agent-chat__input', {
-      rows: '1',
-      autocomplete: 'off',
-      'aria-label': 'Message input',
+    const input = el("textarea", "agent-chat__input", {
+      rows: "1",
+      autocomplete: "off",
+      "aria-label": "Message input",
     });
     this._inputEl = input;
 
-    const sendBtn = el('button', 'agent-chat__send-btn', {
-      'aria-label': 'Send message',
+    const sendBtn = el("button", "agent-chat__send-btn", {
+      "aria-label": "Send message",
     });
     sendBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
       <path d="M9 15V3M3 9l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -346,30 +386,30 @@ export class AgentChat {
    */
   _bindEvents() {
     // Send button
-    this._sendBtn.addEventListener('click', () => this._handleSend());
+    this._sendBtn.addEventListener("click", () => this._handleSend());
 
     // Textarea: Enter to send, Shift+Enter for newline, auto-resize
-    this._inputEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+    this._inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         this._handleSend();
       }
     });
 
-    this._inputEl.addEventListener('input', () => {
+    this._inputEl.addEventListener("input", () => {
       this._autoResize(this._inputEl);
     });
 
     // Escape to close
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this._isOpen) {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && this._isOpen) {
         this.close();
       }
     });
 
     // Quick reply delegation
-    this._quickRepliesEl.addEventListener('click', (e) => {
-      const btn = e.target.closest('.agent-chat__quick-btn');
+    this._quickRepliesEl.addEventListener("click", (e) => {
+      const btn = e.target.closest(".agent-chat__quick-btn");
       if (!btn) return;
       const text = btn.dataset.text;
       if (text) {
@@ -391,27 +431,29 @@ export class AgentChat {
     if (!header || !this._agent) return;
     const a = this._agent;
 
-    header.innerHTML = '';
+    header.innerHTML = "";
 
     // Avatar
-    const avatar = el('div', 'agent-chat__avatar');
+    const avatar = el("div", "agent-chat__avatar");
     avatar.style.background = a.color;
     avatar.textContent = a.name.charAt(0).toUpperCase();
-    const ring = el('div', 'agent-chat__avatar-ring');
+    const ring = el("div", "agent-chat__avatar-ring");
     ring.style.color = a.color;
     avatar.appendChild(ring);
 
     // Info block
-    const info = el('div', 'agent-chat__info');
-    const name = el('div', 'agent-chat__name', { textContent: a.name });
-    const meta = el('div', 'agent-chat__meta');
+    const info = el("div", "agent-chat__info");
+    const name = el("div", "agent-chat__name", { textContent: a.name });
+    const meta = el("div", "agent-chat__meta");
 
-    const role = el('span', 'agent-chat__role', { textContent: a.role });
+    const role = el("span", "agent-chat__role", { textContent: a.role });
     meta.appendChild(role);
 
-    const moodEl = el('span', 'agent-chat__mood');
-    const moodEmoji = el('span', 'agent-chat__mood-emoji', { textContent: MOOD_EMOJI[a.mood] || MOOD_EMOJI.focused });
-    const moodLabel = el('span', null, { textContent: a.mood });
+    const moodEl = el("span", "agent-chat__mood");
+    const moodEmoji = el("span", "agent-chat__mood-emoji", {
+      textContent: MOOD_EMOJI[a.mood] || MOOD_EMOJI.focused,
+    });
+    const moodLabel = el("span", null, { textContent: a.mood });
     moodEl.appendChild(moodEmoji);
     moodEl.appendChild(moodLabel);
     meta.appendChild(moodEl);
@@ -420,14 +462,18 @@ export class AgentChat {
     info.appendChild(meta);
 
     // Level badge
-    const level = el('span', 'agent-chat__level', { textContent: `Lv.${a.level}` });
+    const level = el("span", "agent-chat__level", {
+      textContent: `Lv.${a.level}`,
+    });
 
     // Close button
-    const closeBtn = el('button', 'agent-chat__close', { 'aria-label': 'Close chat' });
+    const closeBtn = el("button", "agent-chat__close", {
+      "aria-label": "Close chat",
+    });
     closeBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
     </svg>`;
-    closeBtn.addEventListener('click', () => this.close());
+    closeBtn.addEventListener("click", () => this.close());
 
     header.appendChild(avatar);
     header.appendChild(info);
@@ -435,7 +481,7 @@ export class AgentChat {
     header.appendChild(closeBtn);
 
     // Set agent color as CSS variable for bubble accents
-    this._panel.style.setProperty('--agent-chat-color', a.color);
+    this._panel.style.setProperty("--agent-chat-color", a.color);
   }
 
   // ── Quick replies rendering ────────────────────────────────────
@@ -447,14 +493,14 @@ export class AgentChat {
   _renderQuickReplies() {
     if (!this._quickRepliesEl || !this._agent) return;
 
-    this._quickRepliesEl.innerHTML = '';
+    this._quickRepliesEl.innerHTML = "";
     const replies = QUICK_REPLIES[this._agent.id] || QUICK_REPLIES.commander;
 
     for (const reply of replies) {
-      const btn = el('button', 'agent-chat__quick-btn', {
+      const btn = el("button", "agent-chat__quick-btn", {
         textContent: reply.label,
-        'data-text': reply.text,
-        'aria-label': reply.label,
+        "data-text": reply.text,
+        "aria-label": reply.label,
       });
       this._quickRepliesEl.appendChild(btn);
     }
@@ -468,15 +514,15 @@ export class AgentChat {
    */
   _renderMessages() {
     if (!this._messagesEl) return;
-    this._messagesEl.innerHTML = '';
+    this._messagesEl.innerHTML = "";
 
     if (this._messages.length === 0) {
-      const empty = el('div', 'agent-chat__empty');
-      const icon = el('div', 'agent-chat__empty-icon', {
-        textContent: this._agent?.emoji || '✦',
+      const empty = el("div", "agent-chat__empty");
+      const icon = el("div", "agent-chat__empty-icon", {
+        textContent: this._agent?.emoji || "✦",
       });
-      const text = el('div', 'agent-chat__empty-text', {
-        textContent: `Start a conversation with ${this._agent?.name || 'this agent'}.`,
+      const text = el("div", "agent-chat__empty-text", {
+        textContent: `Start a conversation with ${this._agent?.name || "this agent"}.`,
       });
       empty.appendChild(icon);
       empty.appendChild(text);
@@ -500,32 +546,38 @@ export class AgentChat {
     if (!this._messagesEl) return;
 
     // Remove empty state if present
-    const emptyState = this._messagesEl.querySelector('.agent-chat__empty');
+    const emptyState = this._messagesEl.querySelector(".agent-chat__empty");
     if (emptyState) emptyState.remove();
 
-    const isUser = msg.role === 'user';
-    const wrap = el('div', `agent-chat__msg agent-chat__msg--${isUser ? 'user' : 'agent'}`);
+    const isUser = msg.role === "user";
+    const wrap = el(
+      "div",
+      `agent-chat__msg agent-chat__msg--${isUser ? "user" : "agent"}`,
+    );
 
     if (!animate) {
-      wrap.style.animation = 'none';
+      wrap.style.animation = "none";
     }
 
     // Agent avatar (not for user messages)
     if (!isUser && this._agent) {
-      const avatar = el('div', 'agent-chat__msg-avatar');
+      const avatar = el("div", "agent-chat__msg-avatar");
       avatar.style.background = this._agent.color;
       avatar.textContent = this._agent.name.charAt(0).toUpperCase();
       wrap.appendChild(avatar);
     }
 
     // Bubble + timestamp wrapper
-    const bubbleWrap = document.createElement('div');
+    const bubbleWrap = document.createElement("div");
 
-    const bubble = el('div', `agent-chat__bubble agent-chat__bubble--${isUser ? 'user' : 'agent'}`);
+    const bubble = el(
+      "div",
+      `agent-chat__bubble agent-chat__bubble--${isUser ? "user" : "agent"}`,
+    );
     bubble.textContent = msg.content;
     bubbleWrap.appendChild(bubble);
 
-    const ts = el('div', 'agent-chat__msg-time', {
+    const ts = el("div", "agent-chat__msg-time", {
       textContent: formatTime(new Date(msg.timestamp)),
     });
     bubbleWrap.appendChild(ts);
@@ -545,14 +597,14 @@ export class AgentChat {
   _showTyping() {
     if (!this._typingEl || !this._agent) return;
     // Update avatar color
-    const avatar = this._typingEl.querySelector('.agent-chat__msg-avatar');
+    const avatar = this._typingEl.querySelector(".agent-chat__msg-avatar");
     if (avatar) {
       avatar.style.background = this._agent.color;
       avatar.textContent = this._agent.name.charAt(0).toUpperCase();
     }
     this._typingEl.hidden = false;
-    this._typingEl.setAttribute('aria-hidden', 'false');
-    this._typingEl.setAttribute('aria-label', `${this._agent.name} is typing`);
+    this._typingEl.setAttribute("aria-hidden", "false");
+    this._typingEl.setAttribute("aria-label", `${this._agent.name} is typing`);
     this._scrollToBottom();
   }
 
@@ -563,7 +615,7 @@ export class AgentChat {
   _hideTyping() {
     if (!this._typingEl) return;
     this._typingEl.hidden = true;
-    this._typingEl.setAttribute('aria-hidden', 'true');
+    this._typingEl.setAttribute("aria-hidden", "true");
   }
 
   /**
@@ -596,8 +648,8 @@ export class AgentChat {
    * @private
    */
   _autoResize(textarea) {
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    textarea.style.height = "auto";
+    textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
   }
 
   /**
@@ -621,12 +673,12 @@ export class AgentChat {
     if (!content) return;
 
     // Clear input
-    this._inputEl.value = '';
+    this._inputEl.value = "";
     this._autoResize(this._inputEl);
 
     // Add user message
     const userMsg = {
-      role: 'user',
+      role: "user",
       content,
       timestamp: new Date().toISOString(),
     };
@@ -657,22 +709,25 @@ export class AgentChat {
     const systemPrompt = SYSTEM_PROMPTS[agentId] || SYSTEM_PROMPTS.commander;
 
     // Build conversation history (last N messages)
-    const history = this._messages.slice(-MAX_CONTEXT_MESSAGES).map(m => ({
-      role: m.role === 'user' ? 'user' : 'assistant',
+    const history = this._messages.slice(-MAX_CONTEXT_MESSAGES).map((m) => ({
+      role: m.role === "user" ? "user" : "assistant",
       content: m.content,
     }));
 
     try {
       // Attempt AI dispatch
-      if (typeof window?.api?.ai?.dispatch === 'function') {
+      if (typeof window?.api?.ai?.dispatch === "function") {
         const response = await window.api.ai.dispatch({
           messages: history,
           system: systemPrompt,
         });
 
-        const content = (typeof response === 'string')
-          ? response
-          : (response?.content ?? response?.message ?? JSON.stringify(response));
+        const content =
+          typeof response === "string"
+            ? response
+            : (response?.content ??
+              response?.message ??
+              JSON.stringify(response));
 
         this._hideTyping();
         this._addAgentMessageLocally(content);
@@ -683,7 +738,7 @@ export class AgentChat {
         this._addAgentMessageLocally(this._getFallbackResponse(agentId));
       }
     } catch (err) {
-      console.error('[AgentChat] dispatch error:', err);
+      console.error("[AgentChat] dispatch error:", err);
       this._hideTyping();
 
       // On error, try fallback
@@ -704,7 +759,7 @@ export class AgentChat {
     if (!this._agent) return;
 
     const msg = {
-      role: 'agent',
+      role: "agent",
       content,
       timestamp: new Date().toISOString(),
     };
@@ -713,14 +768,16 @@ export class AgentChat {
     this._saveMessages(this._agent.id);
 
     // Emit event for other systems
-    document.dispatchEvent(new CustomEvent('agent-chat:message', {
-      detail: {
-        agentId: this._agent.id,
-        role: 'agent',
-        content,
-      },
-      bubbles: true,
-    }));
+    document.dispatchEvent(
+      new CustomEvent("agent-chat:message", {
+        detail: {
+          agentId: this._agent.id,
+          role: "agent",
+          content,
+        },
+        bubbles: true,
+      }),
+    );
   }
 
   /**
@@ -741,7 +798,7 @@ export class AgentChat {
    */
   _simulateThinkingDelay() {
     const delay = 600 + Math.random() * 800;
-    return new Promise(resolve => setTimeout(resolve, delay));
+    return new Promise((resolve) => setTimeout(resolve, delay));
   }
 
   // ── Persistence (localStorage) ─────────────────────────────────
@@ -773,7 +830,7 @@ export class AgentChat {
       const trimmed = this._messages.slice(-MAX_STORED_MESSAGES);
       localStorage.setItem(STORAGE_PREFIX + agentId, JSON.stringify(trimmed));
     } catch (err) {
-      console.warn('[AgentChat] Could not save messages:', err);
+      console.warn("[AgentChat] Could not save messages:", err);
     }
   }
 }

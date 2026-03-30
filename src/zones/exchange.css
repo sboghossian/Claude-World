@@ -84,7 +84,7 @@
 }
 
 .exchange-zone__section-title::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--border);
@@ -110,8 +110,9 @@
   display: flex;
   flex-direction: column;
   gap: 7px;
-  transition: border-color var(--transition-fast),
-              box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .exchange-zone__card--connected {
@@ -231,9 +232,10 @@
   font-family: var(--font-sans);
   font-weight: 500;
   cursor: pointer;
-  transition: background var(--transition-fast),
-              border-color var(--transition-fast),
-              opacity var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    opacity var(--transition-fast);
   text-align: center;
 }
 
@@ -252,8 +254,13 @@
 }
 
 @keyframes exchange-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
 }
 
 /* ── Webhook log ──────────────────────────────────────────────── */
@@ -273,7 +280,7 @@
   justify-content: space-between;
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
-  background: var(--bg-tertiary, rgba(255,255,255,0.03));
+  background: var(--bg-tertiary, rgba(255, 255, 255, 0.03));
 }
 
 .exchange-zone__webhook-log-title {
@@ -292,7 +299,9 @@
   color: var(--text-dim);
   font-size: 10px;
   cursor: pointer;
-  transition: color var(--transition-fast), border-color var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .exchange-zone__webhook-log-clear:hover {
@@ -485,8 +494,9 @@
   font-weight: 600;
   font-family: var(--font-sans);
   cursor: pointer;
-  transition: background var(--transition-fast),
-              border-color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
   align-self: flex-start;
 }
 
@@ -513,7 +523,7 @@
   color: var(--text-primary);
   font-size: 12px;
   font-family: var(--font-sans);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -522,12 +532,22 @@
 }
 
 @keyframes exchange-toast-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.exchange-zone__toast--success { border-color: #22c55e; }
-.exchange-zone__toast--error   { border-color: #ef4444; }
+.exchange-zone__toast--success {
+  border-color: #22c55e;
+}
+.exchange-zone__toast--error {
+  border-color: #ef4444;
+}
 
 /* ── Loading skeleton ─────────────────────────────────────────── */
 
@@ -541,7 +561,8 @@
 
 .exchange-zone__skeleton-row {
   height: 60px;
-  background: linear-gradient(90deg,
+  background: linear-gradient(
+    90deg,
     var(--bg-secondary) 25%,
     rgba(6, 182, 212, 0.05) 50%,
     var(--bg-secondary) 75%
@@ -552,8 +573,12 @@
 }
 
 @keyframes exchange-shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ── Node graph decoration ────────────────────────────────────── */
@@ -604,7 +629,9 @@
 }
 
 @keyframes exchange-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── Latency badge ────────────────────────────────────────────── */
@@ -617,7 +644,15 @@
   font-size: 11px;
 }
 
-.exchange-zone__latency--good    { color: #22c55e; }
-.exchange-zone__latency--ok      { color: #f59e0b; }
-.exchange-zone__latency--slow    { color: #ef4444; }
-.exchange-zone__latency--unknown { color: var(--text-dim); }
+.exchange-zone__latency--good {
+  color: #22c55e;
+}
+.exchange-zone__latency--ok {
+  color: #f59e0b;
+}
+.exchange-zone__latency--slow {
+  color: #ef4444;
+}
+.exchange-zone__latency--unknown {
+  color: var(--text-dim);
+}

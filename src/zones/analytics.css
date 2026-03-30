@@ -6,35 +6,35 @@
 
 /* ── CSS custom properties ─────────────────────────────────────────────── */
 .analytics-dashboard {
-  --an-bg:            #06080e;
-  --an-surface:       rgba(15, 20, 35, 0.85);
-  --an-surface-2:     rgba(25, 32, 55, 0.75);
-  --an-border:        rgba(59, 130, 246, 0.12);
-  --an-border-hover:  rgba(59, 130, 246, 0.3);
+  --an-bg: #06080e;
+  --an-surface: rgba(15, 20, 35, 0.85);
+  --an-surface-2: rgba(25, 32, 55, 0.75);
+  --an-border: rgba(59, 130, 246, 0.12);
+  --an-border-hover: rgba(59, 130, 246, 0.3);
 
-  --an-blue:          #3b82f6;
-  --an-blue-dim:      rgba(59, 130, 246, 0.15);
-  --an-blue-glow:     rgba(59, 130, 246, 0.35);
-  --an-blue-faint:    rgba(59, 130, 246, 0.07);
+  --an-blue: #3b82f6;
+  --an-blue-dim: rgba(59, 130, 246, 0.15);
+  --an-blue-glow: rgba(59, 130, 246, 0.35);
+  --an-blue-faint: rgba(59, 130, 246, 0.07);
 
-  --an-green:         #22c55e;
-  --an-green-dim:     rgba(34, 197, 94, 0.15);
-  --an-amber:         #f59e0b;
-  --an-amber-dim:     rgba(245, 158, 11, 0.15);
-  --an-red:           #ef4444;
-  --an-purple:        #a78bfa;
-  --an-cyan:          #22d3ee;
-  --an-pink:          #f472b6;
+  --an-green: #22c55e;
+  --an-green-dim: rgba(34, 197, 94, 0.15);
+  --an-amber: #f59e0b;
+  --an-amber-dim: rgba(245, 158, 11, 0.15);
+  --an-red: #ef4444;
+  --an-purple: #a78bfa;
+  --an-cyan: #22d3ee;
+  --an-pink: #f472b6;
 
-  --an-text:          #c8d0e0;
-  --an-text-muted:    #6b7a99;
-  --an-text-dim:      #3a4560;
+  --an-text: #c8d0e0;
+  --an-text-muted: #6b7a99;
+  --an-text-dim: #3a4560;
 
-  --an-font:          'SF Mono', 'Fira Code', 'Consolas', monospace;
-  --an-font-sans:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --an-radius:        12px;
-  --an-radius-sm:     8px;
-  --an-transition:    200ms ease;
+  --an-font: "SF Mono", "Fira Code", "Consolas", monospace;
+  --an-font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --an-radius: 12px;
+  --an-radius-sm: 8px;
+  --an-transition: 200ms ease;
 
   position: relative;
   display: flex;
@@ -51,29 +51,56 @@
 
 /* ── Animated gradient border keyframes ────────────────────────────────── */
 @keyframes an-gradient-border {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @keyframes an-count-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes an-fade-in {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes an-pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.1); }
-  50%      { box-shadow: 0 0 40px rgba(59, 130, 246, 0.2); }
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.2);
+  }
 }
 
 @keyframes an-shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* ── Header ────────────────────────────────────────────────────────────── */
@@ -83,7 +110,11 @@
   gap: 12px;
   padding: 14px 20px 12px;
   border-bottom: 1px solid var(--an-border);
-  background: linear-gradient(180deg, var(--an-blue-faint) 0%, transparent 100%);
+  background: linear-gradient(
+    180deg,
+    var(--an-blue-faint) 0%,
+    transparent 100%
+  );
   flex-shrink: 0;
 }
 
@@ -194,7 +225,9 @@
   border-radius: var(--an-radius);
   padding: 16px;
   overflow: hidden;
-  transition: border-color var(--an-transition), box-shadow var(--an-transition);
+  transition:
+    border-color var(--an-transition),
+    box-shadow var(--an-transition);
   animation: an-fade-in 400ms ease both;
 }
 
@@ -205,7 +238,7 @@
 
 /* Animated gradient border overlay */
 .an-card::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -1px;
   border-radius: inherit;
@@ -235,12 +268,24 @@
 }
 
 /* Staggered animation delays */
-.an-card:nth-child(1) { animation-delay: 0ms; }
-.an-card:nth-child(2) { animation-delay: 60ms; }
-.an-card:nth-child(3) { animation-delay: 120ms; }
-.an-card:nth-child(4) { animation-delay: 180ms; }
-.an-card:nth-child(5) { animation-delay: 240ms; }
-.an-card:nth-child(6) { animation-delay: 300ms; }
+.an-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+.an-card:nth-child(2) {
+  animation-delay: 60ms;
+}
+.an-card:nth-child(3) {
+  animation-delay: 120ms;
+}
+.an-card:nth-child(4) {
+  animation-delay: 180ms;
+}
+.an-card:nth-child(5) {
+  animation-delay: 240ms;
+}
+.an-card:nth-child(6) {
+  animation-delay: 300ms;
+}
 
 /* ── Card header ───────────────────────────────────────────────────────── */
 .an-card__header {
@@ -380,7 +425,9 @@
   border-radius: var(--an-radius-sm);
   background: rgba(0, 0, 0, 0.15);
   border: 1px solid transparent;
-  transition: border-color var(--an-transition), background var(--an-transition);
+  transition:
+    border-color var(--an-transition),
+    background var(--an-transition);
 }
 
 .an-leader-row:hover {

@@ -9,27 +9,27 @@
 /* ── Variables & root ────────────────────────────────────────────── */
 
 .marketing-plaza {
-  --mp-bg:           #0d1117;
-  --mp-surface:      #161b22;
-  --mp-surface-2:    #1c2128;
-  --mp-surface-3:    #21262d;
-  --mp-border:       #30363d;
+  --mp-bg: #0d1117;
+  --mp-surface: #161b22;
+  --mp-surface-2: #1c2128;
+  --mp-surface-3: #21262d;
+  --mp-border: #30363d;
   --mp-border-light: #484f58;
-  --mp-text:         #e6edf3;
-  --mp-text-dim:     #b1bac4;
-  --mp-text-muted:   #656d76;
-  --mp-accent:       #8b5cf6;
-  --mp-accent-dim:   #7c3aed;
-  --mp-accent-glow:  #8b5cf640;
-  --mp-accent-bg:    #8b5cf615;
-  --mp-success:      #3fb950;
-  --mp-warning:      #d29922;
-  --mp-error:        #f85149;
-  --mp-font-mono:    'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-  --mp-radius-sm:    4px;
-  --mp-radius-md:    8px;
-  --mp-radius-lg:    12px;
-  --mp-radius-xl:    16px;
+  --mp-text: #e6edf3;
+  --mp-text-dim: #b1bac4;
+  --mp-text-muted: #656d76;
+  --mp-accent: #8b5cf6;
+  --mp-accent-dim: #7c3aed;
+  --mp-accent-glow: #8b5cf640;
+  --mp-accent-bg: #8b5cf615;
+  --mp-success: #3fb950;
+  --mp-warning: #d29922;
+  --mp-error: #f85149;
+  --mp-font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  --mp-radius-sm: 4px;
+  --mp-radius-md: 8px;
+  --mp-radius-lg: 12px;
+  --mp-radius-xl: 16px;
 
   display: flex;
   flex-direction: column;
@@ -192,13 +192,17 @@
   gap: 8px;
   outline: none;
   padding: 12px 14px;
-  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s,
+    transform 0.1s;
   position: relative;
   overflow: hidden;
 }
 
 .mp-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -407,7 +411,11 @@
   font-weight: 500;
   outline: none;
   padding: 5px 12px;
-  transition: background 0.12s, border-color 0.12s, color 0.12s, box-shadow 0.12s;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s,
+    box-shadow 0.12s;
   white-space: nowrap;
 }
 
@@ -447,7 +455,9 @@
   line-height: 1.5;
   outline: none;
   padding: 9px 12px;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
   width: 100%;
   box-sizing: border-box;
 }
@@ -482,7 +492,11 @@
   font-weight: 700;
   letter-spacing: 0.01em;
   padding: 11px 20px;
-  transition: background 0.15s, box-shadow 0.15s, opacity 0.15s, transform 0.1s;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s,
+    opacity 0.15s,
+    transform 0.1s;
   outline: none;
 }
 
@@ -523,8 +537,14 @@
 }
 
 @keyframes mp-slide-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .mp-output__head {
@@ -557,7 +577,10 @@
   font-weight: 600;
   outline: none;
   padding: 4px 10px;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
 }
 
 .mp-copy-btn:hover:not(:disabled) {
@@ -618,8 +641,13 @@
 }
 
 @keyframes mp-blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 .mp-stream-meta {
@@ -649,15 +677,21 @@
 }
 
 @keyframes mp-overlay-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .mp-modal {
   background: var(--mp-surface);
   border: 1px solid var(--mp-border);
   border-radius: var(--mp-radius-xl);
-  box-shadow: 0 24px 80px #00000080, 0 0 0 1px #8b5cf620;
+  box-shadow:
+    0 24px 80px #00000080,
+    0 0 0 1px #8b5cf620;
   display: flex;
   flex-direction: column;
   max-height: 80vh;
@@ -668,8 +702,14 @@
 }
 
 @keyframes mp-modal-in {
-  from { opacity: 0; transform: scale(0.97) translateY(8px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 /* Modal header */
@@ -717,7 +757,10 @@
   line-height: 1;
   outline: none;
   padding: 5px 8px;
-  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s,
+    border-color 0.12s;
 }
 
 .mp-modal__close:hover {

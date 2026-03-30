@@ -18,27 +18,43 @@
 // ── Zone metadata for mapping table results to zones ─────────────────────────
 
 const ZONE_MAP = {
-  tasks:            { zoneId: 'dispatch',   label: 'Dispatch Tower',   emoji: '\u{1F5FC}' },
-  legal_docs:       { zoneId: 'legal',      label: 'Legal Tower',      emoji: '\u2696\uFE0F' },
-  council_sessions: { zoneId: 'council',    label: 'The Council',      emoji: '\u{1F3DB}\uFE0F' },
-  leads:            { zoneId: 'sales',      label: 'Sales District',   emoji: '\u{1F4C8}' },
-  content_pieces:   { zoneId: 'marketing',  label: 'Marketing Plaza',  emoji: '\u{1F4E3}' },
-  research_queries: { zoneId: 'globe',      label: 'Globe Room',       emoji: '\u{1F310}' },
-  broadcast_log:    { zoneId: 'broadcast',  label: 'Broadcast Tower',  emoji: '\u{1F4E1}' },
-  experiments:      { zoneId: 'rnd',        label: 'R&D Lab',          emoji: '\u{1F52C}' },
-  skills:           { zoneId: 'skills',     label: 'Skills Academy',   emoji: '\u{1F393}' },
-  messages:         { zoneId: 'chat',       label: 'Chat Rooms',       emoji: '\u{1F4AC}' },
+  tasks: { zoneId: "dispatch", label: "Dispatch Tower", emoji: "\u{1F5FC}" },
+  legal_docs: { zoneId: "legal", label: "Legal Tower", emoji: "\u2696\uFE0F" },
+  council_sessions: {
+    zoneId: "council",
+    label: "The Council",
+    emoji: "\u{1F3DB}\uFE0F",
+  },
+  leads: { zoneId: "sales", label: "Sales District", emoji: "\u{1F4C8}" },
+  content_pieces: {
+    zoneId: "marketing",
+    label: "Marketing Plaza",
+    emoji: "\u{1F4E3}",
+  },
+  research_queries: {
+    zoneId: "globe",
+    label: "Globe Room",
+    emoji: "\u{1F310}",
+  },
+  broadcast_log: {
+    zoneId: "broadcast",
+    label: "Broadcast Tower",
+    emoji: "\u{1F4E1}",
+  },
+  experiments: { zoneId: "rnd", label: "R&D Lab", emoji: "\u{1F52C}" },
+  skills: { zoneId: "skills", label: "Skills Academy", emoji: "\u{1F393}" },
+  messages: { zoneId: "chat", label: "Chat Rooms", emoji: "\u{1F4AC}" },
 };
 
 // ── Score constants ──────────────────────────────────────────────────────────
 
-const SCORE_FTS = 100;       // FTS match base score
+const SCORE_FTS = 100; // FTS match base score
 const SCORE_LIKE_TITLE = 80; // LIKE match in title/name field
-const SCORE_LIKE_BODY = 50;  // LIKE match in body/content field
+const SCORE_LIKE_BODY = 50; // LIKE match in body/content field
 const MAX_RESULTS = 50;
 const DEBOUNCE_MS = 200;
 const SNIPPET_LENGTH = 120;
-const RECENT_SEARCHES_KEY = 'claude-world:recent-searches';
+const RECENT_SEARCHES_KEY = "claude-world:recent-searches";
 const MAX_RECENT = 10;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -48,29 +64,32 @@ const MAX_RECENT = 10;
  * Returns the snippet with the matched portion wrapped in <mark> tags.
  */
 function extractSnippet(text, query) {
-  if (!text || !query) return text ? text.slice(0, SNIPPET_LENGTH) : '';
+  if (!text || !query) return text ? text.slice(0, SNIPPET_LENGTH) : "";
   const lower = text.toLowerCase();
   const qLower = query.toLowerCase();
   const idx = lower.indexOf(qLower);
 
   if (idx === -1) {
-    return text.slice(0, SNIPPET_LENGTH) + (text.length > SNIPPET_LENGTH ? '...' : '');
+    return (
+      text.slice(0, SNIPPET_LENGTH) +
+      (text.length > SNIPPET_LENGTH ? "..." : "")
+    );
   }
 
   const start = Math.max(0, idx - 40);
   const end = Math.min(text.length, idx + query.length + 80);
-  let snippet = '';
+  let snippet = "";
 
-  if (start > 0) snippet += '...';
+  if (start > 0) snippet += "...";
   const raw = text.slice(start, end);
 
   // Highlight match within the snippet
   const matchStart = idx - start;
   const matchEnd = matchStart + query.length;
   snippet += raw.slice(0, matchStart);
-  snippet += '<mark>' + raw.slice(matchStart, matchEnd) + '</mark>';
+  snippet += "<mark>" + raw.slice(matchStart, matchEnd) + "</mark>";
   snippet += raw.slice(matchEnd);
-  if (end < text.length) snippet += '...';
+  if (end < text.length) snippet += "...";
 
   return snippet;
 }
@@ -79,7 +98,7 @@ function extractSnippet(text, query) {
  * Sanitize a query string for safe use in LIKE patterns and FTS MATCH.
  */
 function sanitizeQuery(query) {
-  return query.replace(/['"\\%;]/g, '').trim();
+  return query.replace(/['"\\%;]/g, "").trim();
 }
 
 // ── GlobalSearch class ───────────────────────────────────────────────────────
@@ -112,7 +131,7 @@ export class GlobalSearch {
     const api = window.api;
 
     if (!api || !api.db || !api.db.globalSearch) {
-      console.warn('[GlobalSearch] api.db.globalSearch not available');
+      console.warn("[GlobalSearch] api.db.globalSearch not available");
       return { results: [], total: 0 };
     }
 
@@ -124,7 +143,7 @@ export class GlobalSearch {
 
       return result;
     } catch (err) {
-      console.error('[GlobalSearch] Search failed:', err);
+      console.error("[GlobalSearch] Search failed:", err);
       return { results: [], total: 0 };
     }
   }
@@ -173,7 +192,9 @@ export class GlobalSearch {
     this._recentSearches = [];
     try {
       localStorage.removeItem(RECENT_SEARCHES_KEY);
-    } catch (_) { /* noop */ }
+    } catch (_) {
+      /* noop */
+    }
   }
 
   /**
@@ -210,7 +231,7 @@ export class GlobalSearch {
     if (!q || q.length < 2) return;
 
     // Remove duplicate if exists
-    this._recentSearches = this._recentSearches.filter(s => s !== q);
+    this._recentSearches = this._recentSearches.filter((s) => s !== q);
     // Add to front
     this._recentSearches.unshift(q);
     // Cap at max
@@ -228,14 +249,21 @@ export class GlobalSearch {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) return parsed.slice(0, MAX_RECENT);
       }
-    } catch (_) { /* noop */ }
+    } catch (_) {
+      /* noop */
+    }
     return [];
   }
 
   _saveRecent() {
     try {
-      localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(this._recentSearches));
-    } catch (_) { /* noop */ }
+      localStorage.setItem(
+        RECENT_SEARCHES_KEY,
+        JSON.stringify(this._recentSearches),
+      );
+    } catch (_) {
+      /* noop */
+    }
   }
 
   /**
