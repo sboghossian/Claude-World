@@ -6,53 +6,49 @@
  * Body gets class "panel-open" so HUD elements can shift.
  */
 
-import { buildTreasuryContent, loadTreasuryStyles } from "../zones/treasury.js";
-import {
-  buildConnectorDocksContent,
-  loadConnectorDocksStyles,
-} from "../zones/connector-docks.js";
-import { ChatRooms } from "../zones/chat-rooms.js";
-import { MinionTunnels } from "../zones/minion-tunnels.js";
-import { LegalTower } from "../zones/legal-tower.js";
-import { buildCouncilContent, loadCouncilStyles } from "../zones/council.js";
-import { Archive } from "../zones/archive.js";
-import { RndLab } from "../zones/rnd-lab.js";
-import { buildIdentityPanelContent } from "../zones/identity-panel.js";
-import { SalesDistrict } from "../zones/sales-district.js";
-import { MarketingPlaza } from "../zones/marketing-plaza.js";
-import { Exchange } from "../zones/exchange.js";
-import { Market } from "../zones/market.js";
-import { Airport } from "../zones/airport.js";
-import { GlobeRoom } from "../zones/globe-room.js";
-import { BroadcastTower } from "../zones/broadcast-tower.js";
-import { WorldVersions } from "../zones/world-versions.js";
-import { MissionControl } from "../zones/mission-control.js";
-import { Analytics } from "../zones/analytics.js";
-import { Settings, buildSettingsContent } from "../zones/settings.js";
-import { Reports } from "../zones/reports.js";
-import { AchievementsPanel } from "./achievements-panel.js";
-import { Timeline } from "../zones/timeline.js";
-import { HomeDashboard } from "../zones/home-dashboard.js";
-import { Kanban } from "../zones/kanban.js";
-import { KnowledgeGraph } from "../zones/knowledge-graph.js";
-import { AutomationBuilder } from "../zones/automation-builder.js";
-import { SkillTree } from "../zones/skill-tree.js";
-import { Calendar } from "../zones/calendar.js";
-import { Sharing } from "../zones/sharing.js";
-import { BrainLibrary } from "../zones/brain-library.js";
-import { MemoryVault } from "../zones/memory-vault.js";
-import { SkillsAcademy } from "../zones/skills-academy.js";
-import { Dispatch } from "../zones/dispatch.js";
-import { Leaderboard } from "../zones/leaderboard.js";
-import { PromptLibrary } from "../zones/prompt-library.js";
-import { ConversationHistory } from "../zones/conversation-history.js";
-import { WorldMap } from "../zones/world-map.js";
-import { PluginStore } from "../zones/plugin-store.js";
 import { getPluginManager } from "../systems/plugin-api.js";
-import { AgentProfile } from "../zones/agent-profile.js";
-import { Backups } from "../zones/backups.js";
-import { McpHub } from "../zones/mcp-hub.js";
-import { DailyDigest } from "../zones/daily-digest.js";
+
+// ── Lazy module cache ──────────────────────────────────────────
+// Caches dynamically imported zone modules so each is fetched only once.
+const _moduleCache = new Map();
+
+/**
+ * Lazy-load a zone module and cache it.
+ * @param {string} path - relative path to the module (e.g. "../zones/dispatch.js")
+ * @returns {Promise<Object>} the module namespace
+ */
+async function _loadZoneModule(path) {
+  if (_moduleCache.has(path)) return _moduleCache.get(path);
+  const mod = await import(path);
+  _moduleCache.set(path, mod);
+  return mod;
+}
+
+/**
+ * Create a small loading spinner element shown while a zone module loads.
+ * @returns {HTMLElement}
+ */
+function _createLoadingIndicator() {
+  const wrapper = document.createElement("div");
+  wrapper.className = "panel__loading";
+  wrapper.style.cssText =
+    "display:flex;align-items:center;justify-content:center;padding:48px 0;gap:10px;color:#aaa;font-size:14px;";
+  const spinner = document.createElement("div");
+  spinner.style.cssText =
+    "width:20px;height:20px;border:2px solid #555;border-top-color:#aaa;border-radius:50%;animation:panel-spin .6s linear infinite;";
+  // Inject keyframes once
+  if (!document.getElementById("panel-spin-style")) {
+    const style = document.createElement("style");
+    style.id = "panel-spin-style";
+    style.textContent = "@keyframes panel-spin{to{transform:rotate(360deg)}}";
+    document.head.appendChild(style);
+  }
+  const label = document.createElement("span");
+  label.textContent = "Loading zone\u2026";
+  wrapper.appendChild(spinner);
+  wrapper.appendChild(label);
+  return wrapper;
+}
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -274,26 +270,39 @@ const AGENT_INFO = {
 };
 
 /**
- * Build zone panel content.
+ * Build zone panel content (lazy-loads the zone module on demand).
  * @param {string} zoneId
- * @returns {HTMLElement}
+ * @returns {Promise<HTMLElement>}
  */
-function buildZoneContent(zoneId) {
-  // Zone-specific panel builders
+async function buildZoneContent(zoneId) {
+  const wid = window.__claudeWorldId || 1;
 
-  if (zoneId === "dispatch") {
-    const dispatch = new Dispatch();
-    const el = dispatch.render();
-    dispatch.init(window.__claudeWorldId || 1);
+  // Helper: instantiate a class-based zone (render + init pattern)
+  function initZone(Ctor, ...initArgs) {
+    const inst = new Ctor();
+    const el = inst.render();
+    inst.init(...initArgs);
     return el;
   }
 
+  // Zone-specific panel builders (lazy-loaded)
+
+  if (zoneId === "dispatch") {
+    const { Dispatch } = await _loadZoneModule("../zones/dispatch.js");
+    return initZone(Dispatch, wid);
+  }
+
   if (zoneId === "treasury") {
+    const { buildTreasuryContent, loadTreasuryStyles } = await _loadZoneModule(
+      "../zones/treasury.js",
+    );
     loadTreasuryStyles("../zones/");
     return buildTreasuryContent({ worldId: window.__claudeWorldId || null });
   }
 
   if (zoneId === "docks") {
+    const { buildConnectorDocksContent, loadConnectorDocksStyles } =
+      await _loadZoneModule("../zones/connector-docks.js");
     loadConnectorDocksStyles("../zones/");
     return buildConnectorDocksContent({
       worldId: window.__claudeWorldId || null,
@@ -301,279 +310,240 @@ function buildZoneContent(zoneId) {
   }
 
   if (zoneId === "chat") {
-    const chatRooms = new ChatRooms();
-    const el = chatRooms.render();
-    chatRooms.init(window.__claudeWorldId || 1);
-    return el;
+    const { ChatRooms } = await _loadZoneModule("../zones/chat-rooms.js");
+    return initZone(ChatRooms, wid);
   }
 
   if (zoneId === "minions") {
-    const minionTunnels = new MinionTunnels();
-    const el = minionTunnels.render();
-    minionTunnels.init(window.__claudeWorldId || 1);
-    return el;
+    const { MinionTunnels } = await _loadZoneModule(
+      "../zones/minion-tunnels.js",
+    );
+    return initZone(MinionTunnels, wid);
   }
 
   if (zoneId === "legal") {
-    const legal = new LegalTower();
-    const el = legal.render();
-    legal.init(window.__claudeWorldId || 1);
-    return el;
+    const { LegalTower } = await _loadZoneModule("../zones/legal-tower.js");
+    return initZone(LegalTower, wid);
   }
 
   if (zoneId === "council") {
+    const { buildCouncilContent, loadCouncilStyles } = await _loadZoneModule(
+      "../zones/council.js",
+    );
     loadCouncilStyles("../zones/");
-    return buildCouncilContent(window.__claudeWorldId || 1);
+    return buildCouncilContent(wid);
   }
 
   if (zoneId === "archive") {
-    const archive = new Archive();
-    const el = archive.render();
-    archive.init(window.__claudeWorldId || 1);
-    return el;
+    const { Archive } = await _loadZoneModule("../zones/archive.js");
+    return initZone(Archive, wid);
   }
 
   if (zoneId === "rnd") {
-    const rnd = new RndLab();
-    const el = rnd.render();
-    rnd.init(window.__claudeWorldId || 1);
-    return el;
+    const { RndLab } = await _loadZoneModule("../zones/rnd-lab.js");
+    return initZone(RndLab, wid);
   }
 
   if (zoneId === "identity") {
-    return buildIdentityPanelContent({ worldId: window.__claudeWorldId || 1 });
+    const { buildIdentityPanelContent } = await _loadZoneModule(
+      "../zones/identity-panel.js",
+    );
+    return buildIdentityPanelContent({ worldId: wid });
   }
 
   if (zoneId === "sales") {
-    const sales = new SalesDistrict();
-    const el = sales.render();
-    sales.init(window.__claudeWorldId || 1);
-    return el;
+    const { SalesDistrict } = await _loadZoneModule(
+      "../zones/sales-district.js",
+    );
+    return initZone(SalesDistrict, wid);
   }
 
   if (zoneId === "marketing") {
-    const marketing = new MarketingPlaza();
-    const el = marketing.render();
-    marketing.init(window.__claudeWorldId || 1);
-    return el;
+    const { MarketingPlaza } = await _loadZoneModule(
+      "../zones/marketing-plaza.js",
+    );
+    return initZone(MarketingPlaza, wid);
   }
 
   if (zoneId === "exchange") {
-    const exchange = new Exchange();
-    const el = exchange.render();
-    exchange.init(window.__claudeWorldId || 1);
-    return el;
+    const { Exchange } = await _loadZoneModule("../zones/exchange.js");
+    return initZone(Exchange, wid);
   }
 
   if (zoneId === "market") {
-    const market = new Market();
-    const el = market.render();
-    market.init(window.__claudeWorldId || 1);
-    return el;
+    const { Market } = await _loadZoneModule("../zones/market.js");
+    return initZone(Market, wid);
   }
 
   if (zoneId === "airport") {
-    const airport = new Airport();
-    const el = airport.render();
-    airport.init(window.__claudeWorldId || 1);
-    return el;
+    const { Airport } = await _loadZoneModule("../zones/airport.js");
+    return initZone(Airport, wid);
   }
 
   if (zoneId === "globe") {
-    const globe = new GlobeRoom();
-    const el = globe.render();
-    globe.init(window.__claudeWorldId || 1);
-    return el;
+    const { GlobeRoom } = await _loadZoneModule("../zones/globe-room.js");
+    return initZone(GlobeRoom, wid);
   }
 
   if (zoneId === "broadcast") {
-    const broadcast = new BroadcastTower();
-    const el = broadcast.render();
-    broadcast.init(window.__claudeWorldId || 1);
-    return el;
+    const { BroadcastTower } = await _loadZoneModule(
+      "../zones/broadcast-tower.js",
+    );
+    return initZone(BroadcastTower, wid);
   }
 
   if (zoneId === "versions") {
-    const versions = new WorldVersions();
-    const el = versions.render();
-    versions.init(window.__claudeWorldId || 1);
-    return el;
+    const { WorldVersions } = await _loadZoneModule(
+      "../zones/world-versions.js",
+    );
+    return initZone(WorldVersions, wid);
   }
 
   if (zoneId === "mission-control" || zoneId === "mission_control") {
-    const mc = new MissionControl();
-    const el = mc.render();
-    mc.init(window.__claudeWorldId || 1);
-    return el;
+    const { MissionControl } = await _loadZoneModule(
+      "../zones/mission-control.js",
+    );
+    return initZone(MissionControl, wid);
   }
 
   if (zoneId === "analytics") {
-    const analytics = new Analytics();
-    const el = analytics.render();
-    analytics.init(window.__claudeWorldId || 1);
-    return el;
+    const { Analytics } = await _loadZoneModule("../zones/analytics.js");
+    return initZone(Analytics, wid);
   }
 
   if (zoneId === "settings") {
-    return buildSettingsContent({ worldId: window.__claudeWorldId || 1 });
+    const { buildSettingsContent } = await _loadZoneModule(
+      "../zones/settings.js",
+    );
+    return buildSettingsContent({ worldId: wid });
   }
 
   if (zoneId === "reports") {
-    const reports = new Reports();
-    const el = reports.render();
-    reports.init(window.__claudeWorldId || 1);
-    return el;
+    const { Reports } = await _loadZoneModule("../zones/reports.js");
+    return initZone(Reports, wid);
   }
 
   if (zoneId === "achievements") {
-    const achievements = new AchievementsPanel();
-    const el = achievements.render();
-    achievements.init(window.__claudeWorldId || 1);
-    return el;
+    const { AchievementsPanel } = await _loadZoneModule(
+      "./achievements-panel.js",
+    );
+    return initZone(AchievementsPanel, wid);
   }
 
   if (zoneId === "timeline") {
-    const timeline = new Timeline();
-    const el = timeline.render();
-    timeline.init(window.__claudeWorldId || 1);
-    return el;
+    const { Timeline } = await _loadZoneModule("../zones/timeline.js");
+    return initZone(Timeline, wid);
   }
 
   if (zoneId === "home") {
-    const home = new HomeDashboard();
-    const el = home.render();
-    home.init(window.__claudeWorldId || 1);
-    return el;
+    const { HomeDashboard } = await _loadZoneModule(
+      "../zones/home-dashboard.js",
+    );
+    return initZone(HomeDashboard, wid);
   }
 
   if (zoneId === "kanban") {
-    const kanban = new Kanban();
-    const el = kanban.render();
-    kanban.init(window.__claudeWorldId || 1);
-    return el;
+    const { Kanban } = await _loadZoneModule("../zones/kanban.js");
+    return initZone(Kanban, wid);
   }
 
   if (zoneId === "knowledge-graph") {
-    const kg = new KnowledgeGraph();
-    const el = kg.render();
-    kg.init(window.__claudeWorldId || 1);
-    return el;
+    const { KnowledgeGraph } = await _loadZoneModule(
+      "../zones/knowledge-graph.js",
+    );
+    return initZone(KnowledgeGraph, wid);
   }
 
   if (zoneId === "automations") {
-    const ab = new AutomationBuilder();
-    const el = ab.render();
-    ab.init(window.__claudeWorldId || 1);
-    return el;
+    const { AutomationBuilder } = await _loadZoneModule(
+      "../zones/automation-builder.js",
+    );
+    return initZone(AutomationBuilder, wid);
   }
 
   if (zoneId === "skill-tree") {
-    const st = new SkillTree();
-    const el = st.render();
-    st.init(window.__claudeWorldId || 1);
-    return el;
+    const { SkillTree } = await _loadZoneModule("../zones/skill-tree.js");
+    return initZone(SkillTree, wid);
   }
 
   if (zoneId === "calendar") {
-    const cal = new Calendar();
-    const el = cal.render();
-    cal.init(window.__claudeWorldId || 1);
-    return el;
+    const { Calendar } = await _loadZoneModule("../zones/calendar.js");
+    return initZone(Calendar, wid);
   }
 
   if (zoneId === "sharing") {
-    const sharing = new Sharing();
-    const el = sharing.render();
-    sharing.init(window.__claudeWorldId || 1);
-    return el;
+    const { Sharing } = await _loadZoneModule("../zones/sharing.js");
+    return initZone(Sharing, wid);
   }
 
   if (zoneId === "leaderboard") {
-    const lb = new Leaderboard();
-    const el = lb.render();
-    lb.init(window.__claudeWorldId || 1);
-    return el;
+    const { Leaderboard } = await _loadZoneModule("../zones/leaderboard.js");
+    return initZone(Leaderboard, wid);
   }
 
   if (zoneId === "brain") {
-    const brain = new BrainLibrary();
-    const el = brain.render();
-    brain.init(window.__claudeWorldId || 1);
-    return el;
+    const { BrainLibrary } = await _loadZoneModule("../zones/brain-library.js");
+    return initZone(BrainLibrary, wid);
   }
 
   if (zoneId === "memory") {
-    const memory = new MemoryVault();
-    const el = memory.render();
-    memory.init(window.__claudeWorldId || 1);
-    return el;
+    const { MemoryVault } = await _loadZoneModule("../zones/memory-vault.js");
+    return initZone(MemoryVault, wid);
   }
 
   if (zoneId === "skills") {
-    const skills = new SkillsAcademy();
-    const el = skills.render();
-    skills.init(window.__claudeWorldId || 1);
-    return el;
+    const { SkillsAcademy } = await _loadZoneModule(
+      "../zones/skills-academy.js",
+    );
+    return initZone(SkillsAcademy, wid);
   }
 
   if (zoneId === "prompt-library" || zoneId === "prompt_library") {
-    const pl = new PromptLibrary();
-    const el = pl.render();
-    pl.init(window.__claudeWorldId || 1);
-    return el;
+    const { PromptLibrary } = await _loadZoneModule(
+      "../zones/prompt-library.js",
+    );
+    return initZone(PromptLibrary, wid);
   }
 
   if (zoneId === "conversations") {
-    const ch = new ConversationHistory();
-    const el = ch.render();
-    ch.init(window.__claudeWorldId || 1);
-    return el;
+    const { ConversationHistory } = await _loadZoneModule(
+      "../zones/conversation-history.js",
+    );
+    return initZone(ConversationHistory, wid);
   }
 
   if (zoneId === "world-map" || zoneId === "world_map") {
-    const wm = new WorldMap();
-    const el = wm.render();
-    wm.init(window.__claudeWorldId || 1);
-    return el;
+    const { WorldMap } = await _loadZoneModule("../zones/world-map.js");
+    return initZone(WorldMap, wid);
   }
 
   if (zoneId === "plugins") {
-    const ps = new PluginStore();
-    const el = ps.render();
-    ps.init(window.__claudeWorldId || 1);
-    return el;
+    const { PluginStore } = await _loadZoneModule("../zones/plugin-store.js");
+    return initZone(PluginStore, wid);
   }
 
   if (zoneId === "agent-profile") {
+    const { AgentProfile } = await _loadZoneModule("../zones/agent-profile.js");
     const ap = new AgentProfile();
     const el = ap.render();
-    ap.init(
-      window.__claudeWorldId || 1,
-      window.__agentProfileTarget || "commander",
-    );
+    ap.init(wid, window.__agentProfileTarget || "commander");
     window.__agentProfileTarget = null;
     return el;
   }
 
   if (zoneId === "backups") {
-    const backups = new Backups();
-    const el = backups.render();
-    backups.init(window.__claudeWorldId || 1);
-    return el;
+    const { Backups } = await _loadZoneModule("../zones/backups.js");
+    return initZone(Backups, wid);
   }
 
   if (zoneId === "mcp-hub" || zoneId === "mcp_hub") {
-    const mcp = new McpHub();
-    const el = mcp.render();
-    mcp.init(window.__claudeWorldId || 1);
-    return el;
+    const { McpHub } = await _loadZoneModule("../zones/mcp-hub.js");
+    return initZone(McpHub, wid);
   }
 
   if (zoneId === "daily-digest" || zoneId === "daily_digest") {
-    const dd = new DailyDigest();
-    const el = dd.render();
-    dd.init(window.__claudeWorldId || 1);
-    return el;
+    const { DailyDigest } = await _loadZoneModule("../zones/daily-digest.js");
+    return initZone(DailyDigest, wid);
   }
 
   // Check if this is a plugin-provided zone
@@ -582,7 +552,7 @@ function buildZoneContent(zoneId) {
     const pluginZone = pm.getZone(zoneId);
     if (pluginZone) {
       const el = pluginZone.render();
-      pluginZone.init(window.__claudeWorldId || 1);
+      pluginZone.init(wid);
       return el;
     }
   }
@@ -932,9 +902,25 @@ export class PanelManager {
    * @param {string} zoneId
    * @param {string} zoneName
    */
-  openZone(zoneId, zoneName) {
+  async openZone(zoneId, zoneName) {
     const info = ZONE_INFO[zoneId] || { icon: "\u{1F3D7}" };
-    this._show("zone", zoneId, info.icon, zoneName, buildZoneContent(zoneId));
+
+    // Show the panel immediately with a loading indicator
+    this._show("zone", zoneId, info.icon, zoneName, _createLoadingIndicator());
+
+    // Lazy-load the zone module and swap in the real content
+    const contentEl = await buildZoneContent(zoneId);
+
+    // Only replace if this zone is still the active panel (user may have
+    // navigated away or closed the panel while the module was loading)
+    if (
+      this._currentType === "zone" &&
+      this._currentId === zoneId &&
+      this.isOpen
+    ) {
+      this._body.innerHTML = "";
+      this._body.appendChild(contentEl);
+    }
   }
 
   /**
@@ -955,14 +941,29 @@ export class PanelManager {
   /**
    * Open the settings panel.
    */
-  openSettings() {
+  async openSettings() {
+    // Show loading indicator immediately
     this._show(
       "settings",
       "settings",
       "\u{2699}\uFE0F",
       "Settings",
-      buildSettingsContent(),
+      _createLoadingIndicator(),
     );
+
+    const { buildSettingsContent } = await _loadZoneModule(
+      "../zones/settings.js",
+    );
+    const contentEl = buildSettingsContent();
+
+    if (
+      this._currentType === "settings" &&
+      this._currentId === "settings" &&
+      this.isOpen
+    ) {
+      this._body.innerHTML = "";
+      this._body.appendChild(contentEl);
+    }
   }
 
   /**

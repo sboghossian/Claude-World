@@ -375,6 +375,165 @@ const TEMPLATE_UNLOCKS = {
 };
 
 // ---------------------------------------------------------------------------
+// Template-specific starter tasks (5 per template, all completed with mock responses)
+// ---------------------------------------------------------------------------
+
+/** @type {Record<string, Array<{prompt: string, response: string, zone_id: string}>>} */
+const TEMPLATE_TASKS = {
+  startup_founder: [
+    {
+      prompt:
+        "Summarize the key points of this Y Combinator essay on startup fundraising",
+      response:
+        "Here are the key points:\n\n1. **Raise money only when you need it** — Fundraising is a distraction from building.\n2. **Get the first commitment quickly** — Momentum matters; once one investor says yes, others follow.\n3. **Stay lean early** — Lower burn rate gives you more runway and negotiating power.\n4. **Focus on traction** — Revenue or user growth is the strongest signal to investors.\n5. **Know your numbers cold** — CAC, LTV, MRR, and runway should be at your fingertips.",
+      zone_id: "brain_library",
+    },
+    {
+      prompt:
+        "Write a professional email to a potential investor requesting a meeting",
+      response:
+        "Subject: Quick intro — [Your Company] Series Seed\n\nHi Sarah,\n\nI'm the founder of [Your Company], where we're building AI-powered workflow automation for SMBs. We've grown to $25K MRR in 4 months with zero paid acquisition.\n\nI'd love 20 minutes to share what we're working on and get your perspective. Would next Tuesday or Thursday work?\n\nBest,\n[Your Name]",
+      zone_id: "dispatch_tower",
+    },
+    {
+      prompt: "Draft a terms of service outline for our SaaS product",
+      response:
+        "**Terms of Service — Outline**\n\n1. **Acceptance of Terms** — By using the service, users agree to these terms.\n2. **Account Registration** — Users must provide accurate info; one account per person.\n3. **Subscription & Billing** — Monthly/annual plans; auto-renewal; refund policy.\n4. **Acceptable Use** — No illegal activity, no abuse, no reverse engineering.\n5. **Data & Privacy** — Reference privacy policy; GDPR/CCPA compliance.\n6. **Intellectual Property** — Users own their data; company owns the platform.\n7. **Limitation of Liability** — Service provided as-is; cap on damages.\n8. **Termination** — Either party can terminate; data export window.\n9. **Governing Law** — Jurisdiction and dispute resolution.",
+      zone_id: "brain_library",
+    },
+    {
+      prompt: "Brainstorm 10 ideas for our product launch campaign",
+      response:
+        '1. **Launch on Product Hunt** with a polished video demo\n2. **Founder story thread** on Twitter/X showing the 0-to-launch journey\n3. **Early-bird pricing** (40% off for first 100 users)\n4. **Partner cross-promotion** with complementary SaaS tools\n5. **Live demo webinar** with Q&A and a signup incentive\n6. **"Build in public" recap** — share metrics, lessons, and behind-the-scenes\n7. **Influencer seeding** — give 10 micro-influencers free accounts\n8. **Launch-day AMA** on relevant subreddits\n9. **Customer spotlight** — pre-launch beta user success story\n10. **Referral bonus** — give both referrer and referee an extra free month',
+      zone_id: "dispatch_tower",
+    },
+    {
+      prompt: "Create a project plan for launching our MVP in 6 weeks",
+      response:
+        "**6-Week MVP Launch Plan**\n\n**Week 1-2: Core Build**\n- Finalize feature scope (auth, dashboard, core workflow)\n- Set up CI/CD pipeline\n- Design system + key screens\n\n**Week 3: Integration**\n- Payment integration (Stripe)\n- Email notifications\n- API documentation\n\n**Week 4: Testing & Polish**\n- Internal QA + bug fixes\n- Performance optimization\n- Onboarding flow\n\n**Week 5: Beta**\n- Invite 20 beta users\n- Collect feedback daily\n- Iterate on top 3 pain points\n\n**Week 6: Launch**\n- Prepare launch assets (Product Hunt, landing page, social)\n- Final bug sweep\n- Launch day: monitor metrics, respond to feedback",
+      zone_id: "dispatch_tower",
+    },
+  ],
+  developer: [
+    {
+      prompt:
+        "Summarize the key points of this article on microservices vs monoliths",
+      response:
+        "Here are the key points:\n\n1. **Start monolith, extract later** — Premature microservices add complexity without benefit.\n2. **Team boundaries drive service boundaries** — Conway's Law applies; split services along team ownership.\n3. **Shared databases are the #1 anti-pattern** — Each service should own its data.\n4. **Observability is non-negotiable** — Distributed tracing, structured logging, and health checks are table stakes.\n5. **Network is unreliable** — Design for retries, timeouts, circuit breakers, and graceful degradation.",
+      zone_id: "brain_library",
+    },
+    {
+      prompt:
+        "Debug this JavaScript error: TypeError: Cannot read properties of undefined (reading 'map')",
+      response:
+        "**Root cause:** You're calling `.map()` on a variable that is `undefined` at the time of execution.\n\n**Common scenarios:**\n1. API response hasn't loaded yet — `data.items.map(...)` before `data` is set\n2. Optional chaining missing — use `data?.items?.map(...)` \n3. Default value missing — initialize with `const [items, setItems] = useState([])`\n\n**Fix:**\n```js\n// Before (broken)\nconst list = data.items.map(item => item.name);\n\n// After (safe)\nconst list = (data?.items ?? []).map(item => item.name);\n```\n\n**Prevention:** Enable the `no-unsafe-optional-chaining` ESLint rule and always provide default values for arrays.",
+      zone_id: "dispatch_tower",
+    },
+    {
+      prompt:
+        "Write a professional email to the team about the upcoming API migration",
+      response:
+        "Subject: API v2 Migration — Timeline & Action Items\n\nHi team,\n\nWe're migrating from REST API v1 to v2 starting next Monday. Here's what you need to know:\n\n**Timeline:**\n- Mon-Wed: v2 endpoints go live alongside v1\n- Thu-Fri: Integration testing window\n- Following Monday: v1 deprecated (30-day sunset)\n\n**Action items:**\n1. Update your service clients to point to `/api/v2/*`\n2. Replace `X-Auth-Token` header with `Authorization: Bearer`\n3. Run the migration test suite: `npm run test:v2-compat`\n\nI'll hold office hours Tuesday 2-4pm for questions. Docs are in the wiki under \"API v2 Migration Guide.\"\n\nThanks,\n[Your Name]",
+      zone_id: "dispatch_tower",
+    },
+    {
+      prompt: "Brainstorm 10 ideas for improving our CI/CD pipeline",
+      response:
+        "1. **Parallel test execution** — split test suites across workers\n2. **Docker layer caching** — cache base images and dependency layers\n3. **Preview environments** — spin up per-PR preview deploys\n4. **Flaky test quarantine** — auto-skip and report intermittent failures\n5. **Build time dashboard** — track and alert on build duration regressions\n6. **Dependency caching** — cache `node_modules` / pip wheels between runs\n7. **Canary deploys** — route 5% traffic to new version before full rollout\n8. **Security scanning** — add SAST/DAST in the pipeline\n9. **Commit-message linting** — enforce conventional commits for changelogs\n10. **Rollback automation** — one-click revert to last known good deploy",
+      zone_id: "dispatch_tower",
+    },
+    {
+      prompt: "Create a project plan for refactoring our authentication system",
+      response:
+        "**Auth Refactor Plan — 4 Sprints**\n\n**Sprint 1: Audit & Design**\n- Map all auth flows (login, signup, OAuth, API keys)\n- Identify tech debt (session handling, token rotation)\n- Design new architecture (JWT + refresh tokens, RBAC)\n\n**Sprint 2: Core Implementation**\n- Implement token service (issue, refresh, revoke)\n- Build RBAC middleware\n- Write migration scripts for existing sessions\n\n**Sprint 3: Integration & Testing**\n- Update all API routes to use new auth middleware\n- Add integration tests for every auth flow\n- Penetration testing (OWASP top 10)\n\n**Sprint 4: Migration & Cleanup**\n- Feature-flag rollout to 10% → 50% → 100%\n- Remove legacy auth code\n- Update API docs and developer guide",
+      zone_id: "dispatch_tower",
+    },
+  ],
+  freelancer: [
+    {
+      prompt:
+        "Summarize the key points of this article on freelance pricing strategies",
+      response:
+        "Here are the key points:\n\n1. **Value-based pricing beats hourly** — Charge for the outcome, not the time spent.\n2. **Package your services** — Offer 3 tiers (Basic, Standard, Premium) to anchor pricing.\n3. **Raise rates with every new client** — Your last rate is your floor, not your ceiling.\n4. **Scope creep kills margins** — Define deliverables precisely; charge for additions.\n5. **Show ROI in proposals** — Frame your fee against the revenue or savings you generate.",
+      zone_id: "brain_library",
+    },
+    {
+      prompt:
+        "Write a professional email to a client requesting project feedback",
+      response:
+        "Subject: Quick check-in — How's the new website working for you?\n\nHi Alex,\n\nIt's been two weeks since we launched the redesign and I'd love to hear how things are going. A few quick questions:\n\n1. Are you seeing the traffic improvements we discussed?\n2. Is the CMS easy to use for your team?\n3. Anything you'd tweak or add?\n\nIf you're happy with the results, I'd really appreciate a short testimonial I could feature on my portfolio. No pressure at all.\n\nLooking forward to hearing from you!\n\nBest,\n[Your Name]",
+      zone_id: "dispatch_tower",
+    },
+    {
+      prompt:
+        "Debug this CSS layout issue: flexbox items not wrapping on mobile",
+      response:
+        "**Root cause:** Missing `flex-wrap` property on the container.\n\n**Fix:**\n```css\n/* Before (broken) */\n.container {\n  display: flex;\n  gap: 1rem;\n}\n\n/* After (wraps on mobile) */\n.container {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 1rem;\n}\n\n.item {\n  flex: 1 1 300px; /* grow, shrink, min-width before wrapping */\n}\n```\n\n**Bonus tips:**\n- Use `min-width: 0` on flex children to prevent overflow\n- Consider `grid` with `auto-fit` for more control: `grid-template-columns: repeat(auto-fit, minmax(300px, 1fr))`",
+      zone_id: "dispatch_tower",
+    },
+    {
+      prompt: "Brainstorm 10 ideas for growing my freelance client base",
+      response:
+        '1. **Niche down** — Become the go-to person for one industry (e.g., "Shopify for DTC brands")\n2. **Case study portfolio** — Show before/after results, not just screenshots\n3. **Referral incentive** — Offer existing clients a discount for referrals\n4. **Weekly LinkedIn post** — Share a tip, insight, or behind-the-scenes from a project\n5. **Cold outreach with value** — Audit a prospect\'s site and send 3 free suggestions\n6. **Subcontract network** — Partner with agencies who need overflow help\n7. **Productized service** — Offer a fixed-scope, fixed-price package (e.g., "5-page website in 2 weeks")\n8. **Teach a workshop** — Host a free webinar to demonstrate expertise\n9. **Open source contribution** — Build a plugin or tool that drives inbound leads\n10. **Testimonial engine** — Ask every happy client for a video testimonial within 48 hours of delivery',
+      zone_id: "dispatch_tower",
+    },
+    {
+      prompt:
+        "Create a project plan for redesigning a client's e-commerce site",
+      response:
+        "**E-Commerce Redesign Plan — 5 Weeks**\n\n**Week 1: Discovery**\n- Stakeholder interviews + brand audit\n- Analytics review (top pages, drop-off points, conversion funnel)\n- Competitive analysis (3 competitors)\n\n**Week 2: Design**\n- Wireframes for key pages (home, PLP, PDP, cart, checkout)\n- Mobile-first responsive layouts\n- Client review + revision round\n\n**Week 3: Visual Design**\n- High-fidelity mockups with brand colors/typography\n- Component library (buttons, cards, forms)\n- Client sign-off\n\n**Week 4: Development**\n- Build responsive pages in Shopify/WooCommerce\n- Integrate payment and shipping\n- SEO setup (meta tags, schema, redirects)\n\n**Week 5: Launch**\n- QA across devices and browsers\n- Performance optimization (Core Web Vitals)\n- Launch + 48-hour monitoring",
+      zone_id: "dispatch_tower",
+    },
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// Starter prompt templates
+// ---------------------------------------------------------------------------
+
+/** @type {Array<{id: string, title: string, category: string, template: string, description: string, tags: string}>} */
+const STARTER_PROMPTS = [
+  {
+    id: "prompt_summarize",
+    title: "Summarize",
+    category: "Research",
+    template:
+      "Summarize the following text in clear, concise bullet points:\n\n{{text}}",
+    description: "Condense any text into key points",
+    tags: '["summarize","research","reading"]',
+  },
+  {
+    id: "prompt_email_draft",
+    title: "Email Draft",
+    category: "Writing",
+    template:
+      "Write a professional email to {{recipient}} about {{subject}}. Keep the tone friendly but professional. Include a clear call to action.",
+    description: "Draft a professional email with recipient and subject",
+    tags: '["email","writing","communication"]',
+  },
+  {
+    id: "prompt_code_review",
+    title: "Code Review",
+    category: "Development",
+    template:
+      "Review the following code for bugs, performance issues, and best-practice violations. Suggest improvements with code examples:\n\n```\n{{code}}\n```",
+    description: "Get a thorough code review with actionable suggestions",
+    tags: '["code","review","development"]',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Zones that should start with partial build progress (0.25) per template
+// ---------------------------------------------------------------------------
+
+/** @type {Record<string, string[]>} */
+const TEMPLATE_PARTIAL_ZONES = {
+  startup_founder: ["dispatch_tower", "brain_library", "legal_tower"],
+  developer: ["dispatch_tower", "brain_library", "minion_tunnels"],
+  freelancer: ["dispatch_tower", "brain_library", "chat_rooms"],
+};
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -491,6 +650,7 @@ function seedQuestChain(db, worldId) {
 function applyTemplate(db, worldId, template) {
   if (!template || !TEMPLATE_UNLOCKS[template]) return;
 
+  // 1. Unlock extra zones for this template
   const unlockStmt = db.db.prepare(`
     UPDATE zones
     SET unlocked = 1,
@@ -504,6 +664,76 @@ function applyTemplate(db, worldId, template) {
   for (const zoneId of TEMPLATE_UNLOCKS[template]) {
     unlockStmt.run(worldId, zoneId);
   }
+
+  // 2. Set partial build progress (0.25) on key zones so buildings look under construction
+  const partialZones = TEMPLATE_PARTIAL_ZONES[template];
+  if (partialZones) {
+    const progressStmt = db.db.prepare(`
+      UPDATE zones SET build_progress = 0.25
+      WHERE world_id = ? AND id = ?
+    `);
+    for (const zoneId of partialZones) {
+      progressStmt.run(worldId, zoneId);
+    }
+  }
+
+  // 3. Seed starter tasks (completed, with mock responses) for this template
+  const tasks = TEMPLATE_TASKS[template];
+  if (tasks) {
+    const insertTask = db.db.prepare(`
+      INSERT INTO tasks (world_id, zone_id, provider, model, status, prompt, response, input_tokens, output_tokens, cost_usd, latency_ms, completed_at, metadata_json)
+      VALUES (@world_id, @zone_id, @provider, @model, @status, @prompt, @response, @input_tokens, @output_tokens, @cost_usd, @latency_ms, datetime('now'), @metadata_json)
+    `);
+
+    for (const task of tasks) {
+      insertTask.run({
+        world_id: worldId,
+        zone_id: task.zone_id,
+        provider: "demo",
+        model: "claude-3-haiku",
+        status: "completed",
+        prompt: task.prompt,
+        response: task.response,
+        input_tokens: 120 + Math.floor(Math.random() * 80),
+        output_tokens: 250 + Math.floor(Math.random() * 200),
+        cost_usd: 0.0,
+        latency_ms: 800 + Math.floor(Math.random() * 1200),
+        metadata_json: JSON.stringify({ seed: true, template }),
+      });
+    }
+  }
+
+  // 4. Seed starter prompt templates
+  const insertPrompt = db.db.prepare(`
+    INSERT OR IGNORE INTO prompts (id, world_id, title, category, template, description, tags)
+    VALUES (@id, @world_id, @title, @category, @template, @description, @tags)
+  `);
+
+  for (const prompt of STARTER_PROMPTS) {
+    insertPrompt.run({ ...prompt, world_id: worldId });
+  }
+
+  // 5. Emit a welcome notification event
+  const insertEvent = db.db.prepare(`
+    INSERT INTO world_events (world_id, event_type, source_id, target_id, data_json)
+    VALUES (@world_id, @event_type, @source_id, @target_id, @data_json)
+  `);
+
+  insertEvent.run({
+    world_id: worldId,
+    event_type: "notification",
+    source_id: "system",
+    target_id: null,
+    data_json: JSON.stringify({
+      title: "Welcome to your world!",
+      message:
+        "Your AI city is ready. Explore the Dispatch Tower to send your first task, " +
+        "or visit the Brain Library to start researching. Check out the 5 example " +
+        "tasks we prepared to see what's possible.",
+      icon: "welcome",
+      seed: true,
+    }),
+  });
 }
 
 module.exports = {
@@ -515,4 +745,7 @@ module.exports = {
   AGENT_DEFS,
   QUEST_DEFS,
   TEMPLATE_UNLOCKS,
+  TEMPLATE_TASKS,
+  STARTER_PROMPTS,
+  TEMPLATE_PARTIAL_ZONES,
 };
