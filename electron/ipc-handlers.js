@@ -23,6 +23,17 @@ function assertPositiveInt(value, name) {
   }
 }
 
+// IDs in the DB schema are TEXT hex strings (e.g. "a1b2c3d4e5f6g7h8"),
+// but legacy callers may pass integers. Accept both.
+function assertId(value, name) {
+  if (value === undefined || value === null) {
+    throw new Error(`Invalid argument "${name}": expected an ID (string or number), got ${value}`);
+  }
+  if (typeof value !== 'string' && typeof value !== 'number') {
+    throw new Error(`Invalid argument "${name}": expected string or number, got ${typeof value}`);
+  }
+}
+
 // ── Mock data (used when database module is not yet available) ──────────
 const MOCK_WORLD = {
   id: 1,
@@ -62,10 +73,13 @@ function registerHandlers(ipcMain, db) {
   }
 
   // Helper: safely call a db function or return mock data
+  // NOTE: Handlers expect a raw better-sqlite3 instance (with .prepare()),
+  // but `db` is our Database wrapper. Pass `db.db` to get the raw instance.
   function dbCall(fn, fallback) {
     if (db) {
       try {
-        return fn(db);
+        const rawDb = db.db || db;
+        return fn(rawDb);
       } catch (err) {
         console.error('[ipc] Database error:', err.message);
         throw err;
@@ -77,13 +91,17 @@ function registerHandlers(ipcMain, db) {
   // ── db:* handlers ──────────────────────────────────────────────────
 
   ipcMain.handle('db:getWorld', async (_event, id) => {
-    if (id !== undefined && id !== null) {
-      assertPositiveInt(id, 'id');
-    }
+    // id can be an integer (legacy) or a hex string (actual DB schema)
     return dbCall(
       (database) => {
-        const row = database.prepare('SELECT * FROM worlds WHERE id = ?').get(id || 1);
-        return row || null;
+        if (id !== undefined && id !== null) {
+          // Try exact match first (works for both text hex IDs and integers)
+          const row = database.prepare('SELECT * FROM worlds WHERE id = ?').get(id);
+          if (row) return row;
+        }
+        // Fallback: return the first world in the database
+        const fallback = database.prepare('SELECT * FROM worlds ORDER BY created_at ASC LIMIT 1').get();
+        return fallback || null;
       },
       MOCK_WORLD
     );
@@ -98,14 +116,17 @@ function registerHandlers(ipcMain, db) {
         const result = database.prepare(
           'INSERT INTO worlds (name, template) VALUES (?, ?)'
         ).run(name, tpl);
-        return database.prepare('SELECT * FROM worlds WHERE id = ?').get(result.lastInsertRowid);
+        // The id column uses DEFAULT (lower(hex(randomblob(8)))), so we must
+        // look up by rowid to get the generated text ID
+        const row = database.prepare('SELECT * FROM worlds WHERE rowid = ?').get(result.lastInsertRowid);
+        return row || null;
       },
       { ...MOCK_WORLD, name, template: tpl }
     );
   });
 
   ipcMain.handle('db:getZones', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare('SELECT * FROM zones WHERE world_id = ?').all(worldId),
       MOCK_ZONES.filter((z) => z.world_id === worldId)
@@ -113,7 +134,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:getAgents', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare('SELECT * FROM agents WHERE world_id = ?').all(worldId),
       MOCK_AGENTS.filter((a) => a.world_id === worldId)
@@ -121,7 +142,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:getQuests', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare('SELECT * FROM quests WHERE world_id = ?').all(worldId),
       MOCK_QUESTS.filter((q) => q.world_id === worldId)
@@ -129,7 +150,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:addXP', async (_event, worldId, amount) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(amount, 'number', 'amount');
     if (amount < 0) throw new Error('XP amount must be non-negative');
     return dbCall(
@@ -152,7 +173,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:updateAgentState', async (_event, id, state, tileX, tileY) => {
-    assertPositiveInt(id, 'id');
+    assertId(id, 'id');
     assertType(state, 'string', 'state');
     assertType(tileX, 'number', 'tileX');
     assertType(tileY, 'number', 'tileY');
@@ -172,7 +193,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:getRecentTasks', async (_event, worldId, limit) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     const lim = (limit !== undefined && limit !== null) ? limit : 20;
     assertPositiveInt(lim, 'limit');
     return dbCall(
@@ -185,7 +206,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:searchTasks', async (_event, worldId, query) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(query, 'string', 'query');
     return dbCall(
       (database) =>
@@ -197,7 +218,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:getTaskStats', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => {
         const total = database.prepare('SELECT COUNT(*) as count FROM tasks WHERE world_id = ?').get(worldId);
@@ -216,7 +237,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:completeQuest', async (_event, questId) => {
-    assertPositiveInt(questId, 'questId');
+    assertId(questId, 'questId');
     return dbCall(
       (database) => {
         const quest = database.prepare('SELECT * FROM quests WHERE id = ?').get(questId);
@@ -234,7 +255,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:updateZoneProgress', async (_event, worldId, zoneType, progress) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(zoneType, 'string', 'zoneType');
     assertType(progress, 'number', 'progress');
     if (progress < 0 || progress > 1) throw new Error('progress must be 0.0-1.0');
@@ -252,7 +273,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:getZoneProgress', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT zone_type, build_progress, unlocked FROM zones WHERE world_id = ?'
@@ -262,7 +283,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:unlockZone', async (_event, worldId, zoneType) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(zoneType, 'string', 'zoneType');
     return dbCall(
       (database) => {
@@ -482,7 +503,7 @@ function registerHandlers(ipcMain, db) {
   // ── Chat (projects + messages) ────────────────────────────────────
 
   ipcMain.handle('db:getProjects', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM projects WHERE world_id = ? ORDER BY pinned DESC, updated_at DESC'
@@ -492,7 +513,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createProject', async (_event, worldId, name, icon) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(name, 'string', 'name');
     return dbCall(
       (database) => {
@@ -518,7 +539,7 @@ function registerHandlers(ipcMain, db) {
 
   ipcMain.handle('db:saveMessage', async (_event, projectId, worldId, role, content, meta) => {
     assertType(projectId, 'string', 'projectId');
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(role, 'string', 'role');
     assertType(content, 'string', 'content');
     const m = meta || {};
@@ -540,7 +561,7 @@ function registerHandlers(ipcMain, db) {
   // ── Incidents ─────────────────────────────────────────────────────
 
   ipcMain.handle('db:getIncidents', async (_event, worldId, limit) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         "SELECT i.*, a.name AS reporter_name FROM incidents i LEFT JOIN agents a ON i.reporter_agent_id = a.id WHERE i.world_id = ? AND i.status != 'resolved' ORDER BY i.created_at DESC LIMIT ?"
@@ -550,7 +571,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createIncident', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.title, 'string', 'title');
     assertType(data.description, 'string', 'description');
     return dbCall(
@@ -582,7 +603,7 @@ function registerHandlers(ipcMain, db) {
   // ── Minions ───────────────────────────────────────────────────────
 
   ipcMain.handle('db:getMinions', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM minions WHERE world_id = ? ORDER BY created_at ASC'
@@ -592,7 +613,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createMinion', async (_event, worldId, config) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(config.name, 'string', 'name');
     assertType(config.prompt, 'string', 'prompt');
     return dbCall(
@@ -623,7 +644,7 @@ function registerHandlers(ipcMain, db) {
 
   ipcMain.handle('db:recordMinionRun', async (_event, minionId, worldId, runData) => {
     assertType(minionId, 'string', 'minionId');
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => {
         const result = database.prepare(
@@ -641,7 +662,7 @@ function registerHandlers(ipcMain, db) {
   // ── Airport ───────────────────────────────────────────────────────
 
   ipcMain.handle('db:getAirportLog', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM airport_log WHERE world_id = ? ORDER BY created_at DESC LIMIT 50'
@@ -651,7 +672,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createAirportLog', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => {
         const result = database.prepare(
@@ -664,7 +685,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:getDeployToken', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare('SELECT * FROM deploy_tokens WHERE world_id = ?').get(worldId) || null,
       null
@@ -672,7 +693,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:upsertDeployToken', async (_event, worldId, token) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(token, 'string', 'token');
     return dbCall(
       (database) => {
@@ -688,7 +709,7 @@ function registerHandlers(ipcMain, db) {
   // ── Globe Room — Research ─────────────────────────────────────────
 
   ipcMain.handle('db:getResearchQueries', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM research_queries WHERE world_id = ? ORDER BY created_at DESC LIMIT 50'
@@ -698,7 +719,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createResearchQuery', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.query, 'string', 'query');
     return dbCall(
       (database) => {
@@ -729,7 +750,7 @@ function registerHandlers(ipcMain, db) {
   // ── Broadcast Tower ───────────────────────────────────────────────
 
   ipcMain.handle('db:getBroadcastChannels', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM broadcast_channels WHERE world_id = ? ORDER BY name ASC'
@@ -739,7 +760,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createBroadcastChannel', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.name, 'string', 'name');
     return dbCall(
       (database) => {
@@ -779,7 +800,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:getBroadcastLog', async (_event, worldId, limit) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT l.*, c.name AS channel_name FROM broadcast_log l LEFT JOIN broadcast_channels c ON l.channel_id = c.id WHERE l.world_id = ? ORDER BY l.created_at DESC LIMIT ?'
@@ -789,7 +810,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createBroadcastLog', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.eventType, 'string', 'eventType');
     return dbCall(
       (database) => {
@@ -816,7 +837,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:restoreSnapshot', async (_event, worldId, snapshotId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(snapshotId, 'string', 'snapshotId');
     // Restoration in MVP: return the snapshot for the renderer to apply
     return dbCall(
@@ -828,7 +849,7 @@ function registerHandlers(ipcMain, db) {
   // ── Sales District — Leads ────────────────────────────────────────
 
   ipcMain.handle('db:getLeads', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM leads WHERE world_id = ? ORDER BY updated_at DESC'
@@ -838,7 +859,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createLead', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.name, 'string', 'name');
     return dbCall(
       (database) => {
@@ -880,7 +901,7 @@ function registerHandlers(ipcMain, db) {
   // ── Marketing Plaza — Content Pieces ──────────────────────────────
 
   ipcMain.handle('db:getContentPieces', async (_event, worldId, limit) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM content_pieces WHERE world_id = ? ORDER BY created_at DESC LIMIT ?'
@@ -890,7 +911,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createContentPiece', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.title, 'string', 'title');
     assertType(data.content, 'string', 'content');
     const wordCount = data.content.trim().split(/\s+/).filter(Boolean).length;
@@ -908,7 +929,7 @@ function registerHandlers(ipcMain, db) {
   // ── The Exchange — Integrations & Webhooks ────────────────────────
 
   ipcMain.handle('db:getIntegrations', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM integrations WHERE world_id = ? ORDER BY name ASC'
@@ -918,7 +939,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createIntegration', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.name, 'string', 'name');
     return dbCall(
       (database) => {
@@ -947,7 +968,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:getWebhookEvents', async (_event, worldId, limit) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM webhook_events WHERE world_id = ? ORDER BY created_at DESC LIMIT ?'
@@ -957,7 +978,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createWebhookEvent', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.eventType, 'string', 'eventType');
     return dbCall(
       (database) => {
@@ -973,7 +994,7 @@ function registerHandlers(ipcMain, db) {
   // ── The Market — Installs ─────────────────────────────────────────
 
   ipcMain.handle('db:getMarketInstalls', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM market_installs WHERE world_id = ? ORDER BY installed_at DESC'
@@ -983,7 +1004,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:installMarketItem', async (_event, worldId, catalogItemId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(catalogItemId, 'string', 'catalogItemId');
     return dbCall(
       (database) => {
@@ -1005,7 +1026,7 @@ function registerHandlers(ipcMain, db) {
   // ── Identity & Reputation ─────────────────────────────────────────
 
   ipcMain.handle('db:getIdentity', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => {
         let row = database.prepare('SELECT * FROM identity WHERE world_id = ? LIMIT 1').get(worldId);
@@ -1022,7 +1043,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:updateIdentity', async (_event, worldId, updates) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     const allowed = ['display_name', 'avatar_emoji', 'avatar_color', 'title', 'bio'];
     const fields = Object.keys(updates).filter(k => allowed.includes(k));
     if (fields.length === 0) return null;
@@ -1037,7 +1058,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:awardReputation', async (_event, worldId, eventType, points, description) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(eventType, 'string', 'eventType');
     assertType(points, 'number', 'points');
     assertType(description, 'string', 'description');
@@ -1056,7 +1077,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:getReputationHistory', async (_event, worldId, limit) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM reputation_events WHERE world_id = ? ORDER BY created_at DESC LIMIT ?'
@@ -1068,7 +1089,7 @@ function registerHandlers(ipcMain, db) {
   // ── Legal Tower ───────────────────────────────────────────────────
 
   ipcMain.handle('db:getLegalDocs', async (_event, worldId, limit) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM legal_docs WHERE world_id = ? ORDER BY updated_at DESC LIMIT ?'
@@ -1078,7 +1099,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createLegalDoc', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.title, 'string', 'title');
     return dbCall(
       (database) => {
@@ -1109,7 +1130,7 @@ function registerHandlers(ipcMain, db) {
   // ── Council ───────────────────────────────────────────────────────
 
   ipcMain.handle('db:getCouncilSessions', async (_event, worldId, limit) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM council_sessions WHERE world_id = ? ORDER BY created_at DESC LIMIT ?'
@@ -1119,7 +1140,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createCouncilSession', async (_event, worldId, prompt, models) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(prompt, 'string', 'prompt');
     return dbCall(
       (database) => {
@@ -1158,7 +1179,7 @@ function registerHandlers(ipcMain, db) {
   // ── Archive & Snapshots ───────────────────────────────────────────
 
   ipcMain.handle('db:getSnapshots', async (_event, worldId, limit) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM world_snapshots WHERE world_id = ? ORDER BY created_at DESC LIMIT ?'
@@ -1168,7 +1189,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:saveWorldSnapshot', async (_event, worldId, label) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(label, 'string', 'label');
     return dbCall(
       (database) => {
@@ -1187,7 +1208,7 @@ function registerHandlers(ipcMain, db) {
   // ── R&D Lab — Experiments ─────────────────────────────────────────
 
   ipcMain.handle('db:getExperiments', async (_event, worldId, limit) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM experiments WHERE world_id = ? ORDER BY created_at DESC LIMIT ?'
@@ -1197,7 +1218,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createExperiment', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.name, 'string', 'name');
     assertType(data.prompt, 'string', 'prompt');
     return dbCall(
@@ -1229,7 +1250,7 @@ function registerHandlers(ipcMain, db) {
   // ── Settings ──────────────────────────────────────────────────────
 
   ipcMain.handle('db:getSettings', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT key, value FROM settings WHERE world_id = ?'
@@ -1239,7 +1260,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:updateSettings', async (_event, worldId, key, value) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(key, 'string', 'key');
     assertType(value, 'string', 'value');
     return dbCall(
@@ -1256,7 +1277,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:exportWorld', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => {
         const world = database.prepare('SELECT * FROM worlds WHERE id = ?').get(worldId);
@@ -1383,7 +1404,7 @@ function registerHandlers(ipcMain, db) {
   }
 
   ipcMain.handle('db:getKanbanCards', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM kanban_cards WHERE world_id = ? ORDER BY sort_order ASC, created_at DESC'
@@ -1393,7 +1414,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createKanbanCard', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.title, 'string', 'title');
     return dbCall(
       (database) => {
@@ -1490,7 +1511,7 @@ function registerHandlers(ipcMain, db) {
       case 'insertSession': {
         const { id, worldId, prompt, modelsJson } = params;
         assertType(id, 'string', 'id');
-        assertPositiveInt(worldId, 'worldId');
+        assertId(worldId, 'worldId');
         assertType(prompt, 'string', 'prompt');
         assertType(modelsJson, 'string', 'modelsJson');
         return dbCall(
@@ -1544,7 +1565,7 @@ function registerHandlers(ipcMain, db) {
     switch (action) {
       case 'getSessionsWithCounts': {
         const { worldId } = params;
-        assertPositiveInt(worldId, 'worldId');
+        assertId(worldId, 'worldId');
         return dbCall(
           (database) => database.prepare(
             `SELECT cs.id, cs.prompt, cs.models_json, cs.created_at,
@@ -1577,7 +1598,7 @@ function registerHandlers(ipcMain, db) {
   // ── Analytics ──────────────────────────────────────────────────────
 
   ipcMain.handle('db:getAnalytics', async (_event, worldId, range) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     const rangeKey = typeof range === 'string' ? range : '30d';
     const daysMap = { '7d': 7, '30d': 30, '90d': 90, 'all': 0 };
     const days = daysMap[rangeKey] ?? 30;
@@ -1760,7 +1781,7 @@ function registerHandlers(ipcMain, db) {
   // ── db:globalSearch — cross-zone search ──────────────────────────
 
   ipcMain.handle('db:globalSearch', async (_event, worldId, query, limit) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(query, 'string', 'query');
     const maxResults = (limit && Number.isInteger(limit) && limit > 0) ? limit : 50;
     const likePattern = `%${query}%`;
@@ -1926,7 +1947,7 @@ function registerHandlers(ipcMain, db) {
   // ── Achievements ──────────────────────────────────────────────────
 
   ipcMain.handle('db:getAchievements', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM achievements WHERE world_id = ? ORDER BY unlocked_at DESC'
@@ -1936,7 +1957,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:unlockAchievement', async (_event, worldId, achievementId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(achievementId, 'string', 'achievementId');
     return dbCall(
       (database) => database.prepare(
@@ -1950,7 +1971,7 @@ function registerHandlers(ipcMain, db) {
 
   // ── Timeline ──────────────────────────────────────────────────────────
   ipcMain.handle('db:getTimelineEvents', async (_event, worldId, limit) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     const max = (typeof limit === 'number' && limit > 0) ? limit : 2000;
 
     return dbCall(
@@ -2134,7 +2155,7 @@ function registerHandlers(ipcMain, db) {
   // ── Automation Builder — Workflows ─────────────────────────────────
 
   ipcMain.handle('db:getWorkflows', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM workflows WHERE world_id = ? ORDER BY updated_at DESC'
@@ -2144,7 +2165,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:saveWorkflow', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.name, 'string', 'name');
     return dbCall(
       (database) => {
@@ -2179,7 +2200,7 @@ function registerHandlers(ipcMain, db) {
   // ── Agent Skill Trees ──────────────────────────────────────────────
 
   ipcMain.handle('db:getAgentSkills', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM agent_skills WHERE world_id = ? ORDER BY unlocked_at ASC'
@@ -2189,7 +2210,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:unlockAgentSkill', async (_event, worldId, agentId, skillId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(agentId, 'string', 'agentId');
     assertType(skillId, 'string', 'skillId');
     return dbCall(
@@ -2231,7 +2252,7 @@ function registerHandlers(ipcMain, db) {
   }
 
   ipcMain.handle('db:getCalendarEvents', async (_event, worldId) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => database.prepare(
         'SELECT * FROM calendar_events WHERE world_id = ? ORDER BY event_date ASC, start_time ASC'
@@ -2241,7 +2262,7 @@ function registerHandlers(ipcMain, db) {
   });
 
   ipcMain.handle('db:createCalendarEvent', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     assertType(data.title, 'string', 'title');
     return dbCall(
       (database) => {
@@ -2297,7 +2318,7 @@ function registerHandlers(ipcMain, db) {
 
   // ── Task creation (for Dispatch zone) ──────────────────────────
   ipcMain.handle('db:createTask', async (_event, worldId, data) => {
-    assertPositiveInt(worldId, 'worldId');
+    assertId(worldId, 'worldId');
     return dbCall(
       (database) => {
         const result = database.prepare(

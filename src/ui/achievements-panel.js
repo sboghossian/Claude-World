@@ -77,7 +77,7 @@ export class AchievementsPanel {
 
   async _loadUnlockDates() {
     try {
-      const rows = await window.api.db.getAchievements(this._worldId);
+      const rows = await window.api.db.getAchievements(this._worldId) || [];
       this._unlockDates.clear();
       for (const row of rows) {
         this._unlockDates.set(row.achievement_id, row.unlocked_at);

@@ -568,7 +568,9 @@ export class PersonalityEngine {
   _bindEvents() {
     if (typeof window === 'undefined') return;
 
-    window.addEventListener('dispatch:task-complete', (e) => {
+    this._boundHandlers = [];
+
+    const onTaskComplete = (e) => {
       const { agentId } = e.detail || {};
       if (!agentId) return;
 
@@ -586,9 +588,9 @@ export class PersonalityEngine {
       } else {
         this.setMood(agentId, 'happy');
       }
-    });
+    };
 
-    window.addEventListener('dispatch:task-failed', (e) => {
+    const onTaskFailed = (e) => {
       const { agentId } = e.detail || {};
       if (!agentId) return;
 
@@ -597,9 +599,9 @@ export class PersonalityEngine {
 
       state._idleTimer = 0;
       this.setMood(agentId, 'worried');
-    });
+    };
 
-    window.addEventListener('dispatch:task-assigned', (e) => {
+    const onTaskAssigned = (e) => {
       const { agentId } = e.detail || {};
       if (!agentId) return;
 
@@ -608,9 +610,9 @@ export class PersonalityEngine {
 
       // Reset idle timer on any task assignment
       state._idleTimer = 0;
-    });
+    };
 
-    window.addEventListener('dispatch:quest-complete', (e) => {
+    const onQuestComplete = (e) => {
       // Quest completion makes all participating agents excited for 5 min
       const { agentIds } = e.detail || {};
       const targets = Array.isArray(agentIds) ? agentIds : [...this._agents.keys()];
@@ -622,7 +624,31 @@ export class PersonalityEngine {
           this._moods.get(agentId)._moodTimer = 300;
         }
       }
-    });
+    };
+
+    window.addEventListener('dispatch:task-complete', onTaskComplete);
+    window.addEventListener('dispatch:task-failed', onTaskFailed);
+    window.addEventListener('dispatch:task-assigned', onTaskAssigned);
+    window.addEventListener('dispatch:quest-complete', onQuestComplete);
+
+    this._boundHandlers.push(
+      ['dispatch:task-complete', onTaskComplete],
+      ['dispatch:task-failed', onTaskFailed],
+      ['dispatch:task-assigned', onTaskAssigned],
+      ['dispatch:quest-complete', onQuestComplete],
+    );
+  }
+
+  /**
+   * Remove all event listeners to prevent leaks.
+   */
+  destroy() {
+    if (this._boundHandlers) {
+      for (const [event, handler] of this._boundHandlers) {
+        window.removeEventListener(event, handler);
+      }
+      this._boundHandlers = [];
+    }
   }
 
   // ── Convenience: get all registered agent ids ─────────────────────────────
