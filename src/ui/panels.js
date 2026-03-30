@@ -29,6 +29,11 @@ import { Settings, buildSettingsContent } from '../zones/settings.js';
 import { Reports } from '../zones/reports.js';
 import { AchievementsPanel } from './achievements-panel.js';
 import { Timeline } from '../zones/timeline.js';
+import { HomeDashboard } from '../zones/home-dashboard.js';
+import { Kanban } from '../zones/kanban.js';
+import { KnowledgeGraph } from '../zones/knowledge-graph.js';
+import { AutomationBuilder } from '../zones/automation-builder.js';
+import { SkillTree } from '../zones/skill-tree.js';
 
 // ── Panel content builders ──────────────────────────────────────
 
@@ -59,6 +64,11 @@ const ZONE_INFO = {
   reports: { icon: '\u{1F4CB}', desc: 'Generate and export weekly, cost, and performance reports.' },
   achievements: { icon: '\u{1F3C6}', desc: 'Badges, milestones, and progression tracking.' },
   timeline: { icon: '\u{1F4C5}', desc: 'Chronological history of everything that happened in your world.' },
+  home: { icon: '\u{1F3E0}', desc: 'Your personalized dashboard with stats, agents, and quick actions.' },
+  kanban: { icon: '\u{1F4CB}', desc: 'Kanban task board with drag-and-drop columns.' },
+  'knowledge-graph': { icon: '\u{1F578}', desc: 'Force-directed graph of zones, agents, tasks, and skills.' },
+  automations: { icon: '\u{2699}', desc: 'Visual workflow builder for automating tasks.' },
+  'skill-tree': { icon: '\u{1F333}', desc: 'Agent skill trees with XP-based unlock progression.' },
 };
 
 const AGENT_INFO = {
@@ -223,6 +233,41 @@ function buildZoneContent(zoneId) {
     const timeline = new Timeline();
     const el = timeline.render();
     timeline.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'home') {
+    const home = new HomeDashboard();
+    const el = home.render();
+    home.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'kanban') {
+    const kanban = new Kanban();
+    const el = kanban.render();
+    kanban.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'knowledge-graph') {
+    const kg = new KnowledgeGraph();
+    const el = kg.render();
+    kg.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'automations') {
+    const ab = new AutomationBuilder();
+    const el = ab.render();
+    ab.init(window.__claudeWorldId || 1);
+    return el;
+  }
+
+  if (zoneId === 'skill-tree') {
+    const st = new SkillTree();
+    const el = st.render();
+    st.init(window.__claudeWorldId || 1);
     return el;
   }
 

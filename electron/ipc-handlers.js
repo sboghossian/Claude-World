@@ -1356,6 +1356,93 @@ function registerHandlers(ipcMain, db) {
     );
   });
 
+  // ── Kanban Board — Cards ──────────────────────────────────────────
+
+  // Ensure the kanban_cards table exists (safe to call multiple times)
+  if (db) {
+    try {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS kanban_cards (
+          id TEXT PRIMARY KEY,
+          world_id INTEGER NOT NULL,
+          title TEXT NOT NULL,
+          description TEXT DEFAULT '',
+          priority TEXT NOT NULL DEFAULT 'medium',
+          column_key TEXT NOT NULL DEFAULT 'backlog',
+          zone_tag TEXT DEFAULT '',
+          agent_id TEXT,
+          sort_order INTEGER DEFAULT 0,
+          created_at TEXT NOT NULL DEFAULT (datetime('now')),
+          updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )
+      `);
+      db.exec('CREATE INDEX IF NOT EXISTS idx_kanban_world ON kanban_cards(world_id, column_key)');
+    } catch (err) {
+      console.warn('[ipc] Could not create kanban_cards table:', err.message);
+    }
+  }
+
+  ipcMain.handle('db:getKanbanCards', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM kanban_cards WHERE world_id = ? ORDER BY sort_order ASC, created_at DESC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:createKanbanCard', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.title, 'string', 'title');
+    return dbCall(
+      (database) => {
+        const id = require('crypto').randomBytes(8).toString('hex');
+        database.prepare(
+          `INSERT INTO kanban_cards (id, world_id, title, description, priority, column_key, zone_tag, agent_id, sort_order)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        ).run(
+          id, worldId,
+          data.title.trim(),
+          data.description || '',
+          data.priority || 'medium',
+          data.column_key || 'backlog',
+          data.zone_tag || '',
+          data.agent_id || null,
+          data.sort_order || 0
+        );
+        return database.prepare('SELECT * FROM kanban_cards WHERE id = ?').get(id);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:updateKanbanCard', async (_event, cardId, updates) => {
+    assertType(cardId, 'string', 'cardId');
+    const allowed = ['title', 'description', 'priority', 'column_key', 'zone_tag', 'agent_id', 'sort_order'];
+    const fields = Object.keys(updates).filter(k => allowed.includes(k));
+    if (fields.length === 0) return null;
+    return dbCall(
+      (database) => {
+        const sets = fields.map(f => `${f} = @${f}`).join(', ');
+        database.prepare(`UPDATE kanban_cards SET ${sets}, updated_at = datetime('now') WHERE id = @id`).run({ ...updates, id: cardId });
+        return database.prepare('SELECT * FROM kanban_cards WHERE id = ?').get(cardId);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:deleteKanbanCard', async (_event, cardId) => {
+    assertType(cardId, 'string', 'cardId');
+    return dbCall(
+      (database) => {
+        database.prepare('DELETE FROM kanban_cards WHERE id = ?').run(cardId);
+        return { deleted: true };
+      },
+      { deleted: false }
+    );
+  });
+
   ipcMain.handle('db:getAgentRelationships', async (_event, worldId) => {
     return dbCall(
       (database) => database.prepare('SELECT * FROM agent_relationships WHERE world_id = ?').all(worldId),
@@ -1963,6 +2050,75 @@ function registerHandlers(ipcMain, db) {
         return events.slice(0, max);
       },
       []
+    );
+  });
+
+  // ── Automation Builder — Workflows ─────────────────────────────────
+
+  ipcMain.handle('db:getWorkflows', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM workflows WHERE world_id = ? ORDER BY updated_at DESC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:saveWorkflow', async (_event, worldId, data) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(data.name, 'string', 'name');
+    return dbCall(
+      (database) => {
+        if (data.id) {
+          // Update existing
+          database.prepare(
+            `UPDATE workflows SET name = ?, config = ?, updated_at = datetime('now') WHERE id = ? AND world_id = ?`
+          ).run(data.name, data.config || '{}', data.id, worldId);
+          return database.prepare('SELECT * FROM workflows WHERE id = ?').get(data.id);
+        }
+        // Insert new
+        const result = database.prepare(
+          `INSERT INTO workflows (world_id, name, config, status) VALUES (?, ?, ?, 'draft')`
+        ).run(worldId, data.name, data.config || '{}');
+        return database.prepare('SELECT * FROM workflows WHERE rowid = ?').get(result.lastInsertRowid);
+      },
+      null
+    );
+  });
+
+  ipcMain.handle('db:deleteWorkflow', async (_event, workflowId) => {
+    assertType(workflowId, 'string', 'workflowId');
+    return dbCall(
+      (database) => {
+        database.prepare('DELETE FROM workflows WHERE id = ?').run(workflowId);
+        return { success: true };
+      },
+      { success: true }
+    );
+  });
+
+  // ── Agent Skill Trees ──────────────────────────────────────────────
+
+  ipcMain.handle('db:getAgentSkills', async (_event, worldId) => {
+    assertPositiveInt(worldId, 'worldId');
+    return dbCall(
+      (database) => database.prepare(
+        'SELECT * FROM agent_skills WHERE world_id = ? ORDER BY unlocked_at ASC'
+      ).all(worldId),
+      []
+    );
+  });
+
+  ipcMain.handle('db:unlockAgentSkill', async (_event, worldId, agentId, skillId) => {
+    assertPositiveInt(worldId, 'worldId');
+    assertType(agentId, 'string', 'agentId');
+    assertType(skillId, 'string', 'skillId');
+    return dbCall(
+      (database) => database.prepare(
+        `INSERT OR IGNORE INTO agent_skills (world_id, agent_id, skill_id) VALUES (?, ?, ?)`
+      ).run(worldId, agentId, skillId),
+      { changes: 0 }
     );
   });
 

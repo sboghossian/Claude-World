@@ -101,6 +101,15 @@ contextBridge.exposeInMainWorld('api', {
     importSkills: (worldId, skills) => ipcRenderer.invoke('db:importSkills', worldId, skills),
     // Tasks
     getTasks: (worldId, opts) => ipcRenderer.invoke('db:getTasks', worldId, opts),
+    // Kanban Board
+    getKanbanCards: (worldId) => ipcRenderer.invoke('db:getKanbanCards', worldId),
+    createKanbanCard: (worldId, data) => ipcRenderer.invoke('db:createKanbanCard', worldId, data),
+    updateKanbanCard: (cardId, updates) => ipcRenderer.invoke('db:updateKanbanCard', cardId, updates),
+    deleteKanbanCard: (cardId) => ipcRenderer.invoke('db:deleteKanbanCard', cardId),
+    // Workflows (Automation Builder)
+    getWorkflows: (worldId) => ipcRenderer.invoke('db:getWorkflows', worldId),
+    saveWorkflow: (worldId, data) => ipcRenderer.invoke('db:saveWorkflow', worldId, data),
+    deleteWorkflow: (workflowId) => ipcRenderer.invoke('db:deleteWorkflow', workflowId),
     // Agent relationships
     getAgentRelationships: (worldId) => ipcRenderer.invoke('db:getAgentRelationships', worldId),
     // Minion runs
@@ -121,6 +130,9 @@ contextBridge.exposeInMainWorld('api', {
     // Achievements
     getAchievements: (worldId) => ipcRenderer.invoke('db:getAchievements', worldId),
     unlockAchievement: (worldId, achievementId) => ipcRenderer.invoke('db:unlockAchievement', worldId, achievementId),
+    // Agent Skill Trees
+    getAgentSkills: (worldId) => ipcRenderer.invoke('db:getAgentSkills', worldId),
+    unlockAgentSkill: (worldId, agentId, skillId) => ipcRenderer.invoke('db:unlockAgentSkill', worldId, agentId, skillId),
     // Global search
     globalSearch: (worldId, query, limit) => ipcRenderer.invoke('db:globalSearch', worldId, query, limit),
     // Raw query helpers (used by council.js)

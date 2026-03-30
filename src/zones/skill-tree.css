@@ -1,0 +1,452 @@
+/**
+ * skill-tree.css — Agent Skill Tree zone styles
+ *
+ * Dark theme matching variables.css tokens.
+ * Canvas-based skill tree with agent tabs, detail panel,
+ * XP bar, and unlock animations.
+ */
+
+/* ── Container ──────────────────────────────────────────────────── */
+.skill-tree {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+.st-header {
+  flex-shrink: 0;
+  padding: 20px 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.st-header__title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.st-header__subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+
+/* ── Agent Tab Bar ──────────────────────────────────────────────── */
+.st-tabs {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.st-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.st-tab {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  border-bottom: 3px solid transparent;
+  position: relative;
+}
+
+.st-tab:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+}
+
+.st-tab--active {
+  color: var(--text-primary);
+}
+
+.st-tab__emoji {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.st-tab__name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+/* Agent-specific colored underlines */
+.st-tab--commander.st-tab--active { border-bottom-color: #7c3aed; color: #c4a6ff; }
+.st-tab--librarian.st-tab--active { border-bottom-color: #2563eb; color: #93b8ff; }
+.st-tab--archivist.st-tab--active { border-bottom-color: #0891b2; color: #7dddf0; }
+.st-tab--instructor.st-tab--active { border-bottom-color: #16a34a; color: #7ddf9d; }
+.st-tab--dockmaster.st-tab--active { border-bottom-color: #d97706; color: #f5c97a; }
+
+/* ── XP Bar Section ─────────────────────────────────────────────── */
+.st-xp-section {
+  flex-shrink: 0;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.st-xp-label {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+.st-xp-label strong {
+  color: var(--text-primary);
+}
+
+.st-xp-bar-outer {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 100px;
+  overflow: hidden;
+  position: relative;
+}
+
+.st-xp-bar-inner {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.st-xp-bar-inner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: st-xp-shimmer 2s infinite;
+}
+
+@keyframes st-xp-shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.st-xp-count {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  white-space: nowrap;
+  min-width: 60px;
+  text-align: right;
+}
+
+/* ── Canvas Container ───────────────────────────────────────────── */
+.st-canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(30, 35, 55, 0.8) 0%, rgba(10, 10, 20, 0.95) 70%);
+}
+
+.st-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.st-canvas:active {
+  cursor: grabbing;
+}
+
+.st-canvas-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: var(--text-dim);
+  pointer-events: none;
+  opacity: 0.6;
+  font-family: var(--font-mono);
+}
+
+/* ── Skill Detail Card (slide-in from right) ────────────────────── */
+.st-detail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 280px;
+  height: 100%;
+  background: var(--bg-primary);
+  border-left: 1px solid var(--border-light);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: var(--blur);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform var(--transition-normal);
+  z-index: 10;
+}
+
+.st-detail--open {
+  transform: translateX(0);
+}
+
+.st-detail__header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.st-detail__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.st-detail__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.st-detail__name {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.st-detail__tier {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.st-detail__close {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: background var(--transition-fast);
+}
+
+.st-detail__close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.st-detail__body {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.st-detail__desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+.st-detail__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.st-detail__meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.st-detail__meta-label {
+  color: var(--text-dim);
+}
+
+.st-detail__meta-value {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.st-detail__effect {
+  font-size: 12px;
+  color: var(--accent-green);
+  background: rgba(74, 255, 138, 0.08);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.st-detail__prereq {
+  font-size: 12px;
+  color: var(--accent-amber);
+  margin-bottom: 16px;
+}
+
+.st-detail__status {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.st-detail__status--unlocked {
+  color: var(--accent-green);
+  background: rgba(74, 255, 138, 0.08);
+}
+
+.st-detail__status--locked {
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Unlock Button ──────────────────────────────────────────────── */
+.st-detail__footer {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.st-unlock-btn {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.st-unlock-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.st-unlock-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.st-unlock-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Agent-specific gradients */
+.st-unlock-btn--commander { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+.st-unlock-btn--librarian { background: linear-gradient(135deg, #2563eb, #60a5fa); }
+.st-unlock-btn--archivist { background: linear-gradient(135deg, #0891b2, #22d3ee); }
+.st-unlock-btn--instructor { background: linear-gradient(135deg, #16a34a, #4ade80); }
+.st-unlock-btn--dockmaster { background: linear-gradient(135deg, #d97706, #fbbf24); }
+
+/* ── Tooltip (canvas hover) ─────────────────────────────────────── */
+.st-tooltip {
+  position: absolute;
+  padding: 6px 10px;
+  background: var(--bg-toast);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-primary);
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: var(--shadow);
+  z-index: 20;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.st-tooltip--visible {
+  opacity: 1;
+}
+
+/* ── Unlock celebration ─────────────────────────────────────────── */
+@keyframes st-celebrate-pop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  50%  { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes st-particle-fly {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
+
+.st-celebration {
+  position: absolute;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.st-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: st-particle-fly 0.8s ease-out forwards;
+}
+
+/* ── Loading state ──────────────────────────────────────────────── */
+.st-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-dim);
+  font-size: 14px;
+}

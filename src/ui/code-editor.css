@@ -1,0 +1,360 @@
+/**
+ * code-editor.css — In-app code editor styling
+ * Dark theme with syntax highlighting, line numbers, minimap, and find bar.
+ */
+
+/* ── Container ───────────────────────────────────────────────────────── */
+
+.code-editor {
+  display: flex;
+  flex-direction: column;
+  background: #1a1a2e;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+  min-height: 200px;
+  font-family: var(--font-mono);
+}
+
+/* ── Main area (line numbers + editor + minimap) ─────────────────────── */
+
+.ce-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Line numbers gutter ─────────────────────────────────────────────── */
+
+.ce-gutter {
+  flex-shrink: 0;
+  width: 48px;
+  background: rgba(15, 15, 28, 0.9);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  user-select: none;
+  padding: 10px 0;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+.ce-gutter__inner {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-dim);
+  padding-right: 10px;
+  white-space: pre;
+}
+
+.ce-gutter__line--active {
+  color: var(--text-secondary);
+}
+
+/* ── Editor area (textarea + highlight overlay) ──────────────────────── */
+
+.ce-editor-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.ce-scroll-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+}
+
+/* Scrollbar styling */
+.ce-scroll-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.ce-scroll-container::-webkit-scrollbar-track {
+  background: rgba(15, 15, 28, 0.5);
+}
+
+.ce-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.ce-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.ce-scroll-container::-webkit-scrollbar-corner {
+  background: rgba(15, 15, 28, 0.5);
+}
+
+/* Shared base for textarea and highlight layer */
+.ce-highlight,
+.ce-textarea {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 20px;
+  padding: 10px 12px;
+  margin: 0;
+  border: none;
+  white-space: pre;
+  word-wrap: normal;
+  tab-size: 2;
+  -moz-tab-size: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+/* Syntax highlight overlay (pre > code) */
+.ce-highlight {
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+  color: var(--text-primary);
+}
+
+.ce-highlight code {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  display: block;
+}
+
+/* Textarea (input layer — transparent text) */
+.ce-textarea {
+  z-index: 2;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--text-primary);
+  resize: none;
+  outline: none;
+  overflow: visible;
+  -webkit-text-fill-color: transparent;
+}
+
+.ce-textarea::selection {
+  background: rgba(168, 85, 247, 0.3);
+  -webkit-text-fill-color: transparent;
+}
+
+.ce-textarea::placeholder {
+  -webkit-text-fill-color: var(--text-dim);
+  color: var(--text-dim);
+}
+
+/* ── Current line highlight ──────────────────────────────────────────── */
+
+.ce-current-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  z-index: 0;
+  pointer-events: none;
+  transition: top 50ms ease;
+}
+
+/* subtle pulse animation on cursor line */
+@keyframes ce-line-pulse {
+  0%, 100% { background: rgba(255, 255, 255, 0.04); }
+  50% { background: rgba(255, 255, 255, 0.06); }
+}
+
+.ce-current-line--animated {
+  animation: ce-line-pulse 2s ease-in-out infinite;
+}
+
+/* ── Syntax token colors ─────────────────────────────────────────────── */
+
+.ce-tok-keyword  { color: var(--accent-blue); }
+.ce-tok-string   { color: var(--accent-green); }
+.ce-tok-comment  { color: var(--text-dim); font-style: italic; }
+.ce-tok-number   { color: var(--accent-amber); }
+.ce-tok-function { color: var(--accent-purple); }
+.ce-tok-operator { color: var(--accent-red); }
+.ce-tok-bracket  { color: var(--text-primary); }
+.ce-tok-regex    { color: var(--accent-amber); }
+
+/* ── Find bar ────────────────────────────────────────────────────────── */
+
+.ce-find-bar {
+  display: none;
+  position: absolute;
+  top: 8px;
+  right: 60px;
+  z-index: 10;
+  background: rgba(20, 20, 40, 0.85);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  gap: 6px;
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+
+.ce-find-bar--visible {
+  display: flex;
+}
+
+.ce-find-bar__input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 4px 8px;
+  width: 180px;
+  outline: none;
+}
+
+.ce-find-bar__input:focus {
+  border-color: var(--accent-blue);
+}
+
+.ce-find-bar__count {
+  font-size: 11px;
+  color: var(--text-secondary);
+  min-width: 40px;
+  text-align: center;
+  user-select: none;
+}
+
+.ce-find-bar__btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.ce-find-bar__btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
+.ce-find-bar__close {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+}
+
+.ce-find-bar__close:hover {
+  color: var(--text-primary);
+}
+
+/* Find match highlights in the highlight layer */
+.ce-match {
+  background: rgba(255, 184, 74, 0.25);
+  border-radius: 2px;
+}
+
+.ce-match--active {
+  background: rgba(255, 184, 74, 0.50);
+  outline: 1px solid var(--accent-amber);
+}
+
+/* ── Minimap ─────────────────────────────────────────────────────────── */
+
+.ce-minimap {
+  flex-shrink: 0;
+  width: 10%;
+  min-width: 50px;
+  max-width: 80px;
+  background: rgba(15, 15, 28, 0.7);
+  border-left: 1px solid rgba(255, 255, 255, 0.04);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ce-minimap canvas {
+  display: block;
+  width: 100%;
+  opacity: 0.55;
+}
+
+.ce-minimap__viewport {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  pointer-events: none;
+  transition: top 50ms ease, height 50ms ease;
+}
+
+/* ── Status bar ──────────────────────────────────────────────────────── */
+
+.ce-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 26px;
+  padding: 0 10px;
+  background: rgba(12, 12, 24, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.ce-status-bar__left,
+.ce-status-bar__right {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.ce-status-bar__item--lang {
+  color: var(--accent-blue);
+}
+
+/* ── Resize handle ───────────────────────────────────────────────────── */
+
+.ce-resize-handle {
+  height: 5px;
+  cursor: ns-resize;
+  background: transparent;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ce-resize-handle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background var(--transition-fast);
+}
+
+.ce-resize-handle:hover::after {
+  background: rgba(255, 255, 255, 0.25);
+}
