@@ -79,6 +79,14 @@ export class IdentityPanel {
    * @param {object} [options.db] — database instance (passed to ReputationSystem)
    */
   constructor(container, options = {}) {
+    if (!document.getElementById("identity-panel-styles")) {
+      const link = document.createElement("link");
+      link.id = "identity-panel-styles";
+      link.rel = "stylesheet";
+      link.href = new URL("./identity-panel.css", import.meta.url).href;
+      document.head.appendChild(link);
+    }
+
     /** @type {HTMLElement} */
     this._container = container;
     this._container.classList.add("ip-root");
@@ -122,8 +130,14 @@ export class IdentityPanel {
     this._worldId = worldId;
 
     if (this._rep) {
-      this._identity = await this._rep.getIdentity(worldId);
-      this._history = await this._rep.getHistory(worldId, 20);
+      try {
+        this._identity = await this._rep.getIdentity(worldId);
+        this._history = await this._rep.getHistory(worldId, 20);
+      } catch (err) {
+        console.warn("[identity-panel] Failed to load identity:", err.message);
+        this._identity = null;
+        this._history = [];
+      }
     } else {
       // Demo data when no DB is wired
       this._identity = {
@@ -219,7 +233,7 @@ export class IdentityPanel {
         ? `${this._identity.display_name}'s World`
         : "My World",
     );
-    title.innerHTML = `${this._identity.avatar_emoji}  ${safeWorld}`;
+    title.innerHTML = `${escapeHtml(this._identity.avatar_emoji || "🧠")}  ${safeWorld}`;
     header.appendChild(title);
 
     return header;
@@ -278,12 +292,12 @@ export class IdentityPanel {
 
     const titleBadge = document.createElement("span");
     titleBadge.className = "ip-title-badge";
-    titleBadge.textContent = this._identity.title;
+    titleBadge.textContent = this._identity.title || "Explorer";
     titleRow.appendChild(titleBadge);
 
     const repScore = document.createElement("span");
     repScore.className = "ip-rep-score";
-    repScore.innerHTML = `⭐ ${this._identity.reputation.toLocaleString()} rep`;
+    repScore.innerHTML = `⭐ ${(this._identity.reputation || 0).toLocaleString()} rep`;
     titleRow.appendChild(repScore);
 
     section.appendChild(titleRow);
@@ -562,7 +576,7 @@ export class IdentityPanel {
       const pill = document.createElement("div");
       pill.className = "ip-badge-pill";
       pill.title = badge.label;
-      pill.innerHTML = `<span class="ip-badge-icon">${badge.icon}</span><span class="ip-badge-label">${escapeHtml(badge.label)}</span>`;
+      pill.innerHTML = `<span class="ip-badge-icon">${escapeHtml(badge.icon || "")}</span><span class="ip-badge-label">${escapeHtml(badge.label)}</span>`;
       grid.appendChild(pill);
     }
 
@@ -710,10 +724,18 @@ export class IdentityPanel {
       if (!this._worldId || e.detail.worldId !== this._worldId) return;
       this._identity = e.detail.identity;
       this._rep &&
-        this._rep.getHistory(this._worldId, 20).then((h) => {
-          this._history = h;
-          this._render();
-        });
+        this._rep
+          .getHistory(this._worldId, 20)
+          .then((h) => {
+            this._history = h;
+            this._render();
+          })
+          .catch((err) => {
+            console.warn(
+              "[identity-panel] Failed to refresh history:",
+              err.message,
+            );
+          });
     };
     document.addEventListener("reputation:awarded", this._repListener);
 

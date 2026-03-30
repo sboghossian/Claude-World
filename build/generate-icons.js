@@ -49,17 +49,23 @@ async function generateIcons() {
     ICONSET_ENTRIES.map(async ({ name, size }) => {
       const outPath = path.join(ICONSET_DIR, name);
       await sharp(svgBuffer)
-        .resize(size, size, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+        .resize(size, size, {
+          fit: "contain",
+          background: { r: 0, g: 0, b: 0, alpha: 0 },
+        })
         .png()
         .toFile(outPath);
       console.log(`  ${name} (${size}x${size})`);
-    })
+    }),
   );
 
   // Generate build/icon.png (512x512) for electron-builder
   const iconPngPath = path.join(BUILD_DIR, "icon.png");
   await sharp(svgBuffer)
-    .resize(512, 512, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .resize(512, 512, {
+      fit: "contain",
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
     .png()
     .toFile(iconPngPath);
   console.log("[icons] Generated icon.png (512x512)");

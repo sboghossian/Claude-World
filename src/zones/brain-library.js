@@ -30,6 +30,14 @@ export class BrainLibrary {
    * @returns {HTMLElement}
    */
   render() {
+    if (!document.getElementById("brain-library-styles")) {
+      const link = document.createElement("link");
+      link.id = "brain-library-styles";
+      link.rel = "stylesheet";
+      link.href = new URL("./brain-library.css", import.meta.url).href;
+      document.head.appendChild(link);
+    }
+
     const el = document.createElement("div");
     el.className = "brain-library";
     el.setAttribute("role", "region");

@@ -402,8 +402,13 @@ export class OnboardingCinema {
 
   _ensureCSS() {
     if (this._cssLoaded) return;
-    // CSS is expected to be loaded as a <link> by the app's bundler.
-    // This is a no-op guard — the stylesheet ships alongside this module.
+    if (!document.getElementById("onboarding-cinema-styles")) {
+      const link = document.createElement("link");
+      link.id = "onboarding-cinema-styles";
+      link.rel = "stylesheet";
+      link.href = new URL("./onboarding-cinema.css", import.meta.url).href;
+      document.head.appendChild(link);
+    }
     this._cssLoaded = true;
   }
 }

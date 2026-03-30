@@ -14,7 +14,7 @@ Claude World is a **Mac desktop app** where your AI agents live inside an isomet
 
 It's not a chat interface. It's not a dashboard. It's a **place** your AI agents actually inhabit.
 
-### The City Zones (35+)
+### The City Zones (45+)
 
 | Zone                     | Color    | Purpose                                               |
 | ------------------------ | -------- | ----------------------------------------------------- |
@@ -52,6 +52,15 @@ It's not a chat interface. It's not a dashboard. It's a **place** your AI agents
 | **Calendar**             | Blue     | Schedule tasks, deadlines, and agent activities       |
 | **Sharing / Export**     | Teal     | Share snapshots, export data, publish reports         |
 | **Achievements Gallery** | Gold     | Track milestones, badges, and world accomplishments   |
+| **Plugin Store**         | Violet   | Browse, install, and manage community plugins         |
+| **Leaderboard**          | Amber    | Rankings, streaks, and competitive agent stats        |
+| **Prompt Library**       | Cyan     | Curated and custom prompt templates                   |
+| **Conversation History** | Blue     | Searchable log of all AI conversations                |
+| **Agent Profiles**       | Lavender | Detailed agent bios, skills, and configuration        |
+| **World Map**            | Green    | Bird's-eye view of all zones and connections          |
+| **MCP Hub**              | Teal     | Model Context Protocol server management              |
+| **Daily Digest**         | Orange   | Morning briefing with overnight activity summary      |
+| **Backups**              | Slate    | Auto-backup management and restore points             |
 
 ### Visual Systems
 
@@ -68,6 +77,12 @@ It's not a chat interface. It's not a dashboard. It's a **place** your AI agents
 - **Thought bubbles** — agents surface context-aware thoughts
 - **Celebration system** — confetti, level-ups, quest completions
 - **Focus / Zen mode** — dim the city, hide UI, spotlight the active zone
+- **Workspace** — multi-panel tabs with split view layout
+- **Sound effects** — 12 audio cues for actions, notifications, and achievements
+- **Command history** — full undo/redo stack for world actions
+- **Backup system** — automatic world backups with one-click restore
+- **Quality manager** — adaptive performance settings based on hardware
+- **Plugin API** — third-party zone and extension support
 
 ---
 
@@ -106,7 +121,7 @@ claude-world/                    # 99K+ lines · 191 files
 │   │   ├── constants.js         # Shared constants
 │   │   └── drag-drop.js         # Drag-and-drop support
 │   │
-│   ├── zones/                   # 33 zones — each a JS + CSS pair
+│   ├── zones/                   # 45+ zones — each a JS + CSS pair
 │   │   ├── dispatch.js/css      # Dispatch HQ
 │   │   ├── kanban.js/css        # Kanban Board
 │   │   ├── calendar.js/css      # Calendar
@@ -186,6 +201,11 @@ claude-world/                    # 99K+ lines · 191 files
 | `Cmd+K`       | Command Palette — search zones, run tasks, jump anywhere  |
 | `Cmd+Shift+F` | Focus Mode — dim the city, hide UI, spotlight active zone |
 | `Cmd+Shift+P` | Performance Monitor — FPS, memory, render stats           |
+| `Cmd+\`       | Split View — open a second panel side-by-side             |
+| `Cmd+W`       | Close Tab — close the active workspace tab                |
+| `Cmd+Z`       | Undo — revert the last world action                       |
+| `Cmd+Shift+Z` | Redo — re-apply the last undone action                    |
+| `Cmd+Shift+H` | Command History — browse and replay past commands         |
 | `?`           | Shortcuts Overlay — show all available shortcuts          |
 | `V`           | Toggle Data Flows — show/hide animated data connections   |
 | `1`–`9`       | Zone Quick Jump — jump directly to your pinned zones      |
@@ -235,9 +255,9 @@ Keys are stored encrypted via Electron's `safeStorage`. Enter them in **Connecto
 
 Supported providers:
 
-- Anthropic (Claude 3.5 Sonnet, Haiku)
+- Anthropic (Claude Sonnet 4, Claude Haiku 4)
 - OpenAI (GPT-4o, GPT-4o mini)
-- Google (Gemini 1.5 Pro) — via OpenAI-compatible endpoint
+- Google (Gemini 2.0 Flash) — via OpenAI-compatible endpoint
 
 ---
 
@@ -246,11 +266,8 @@ Supported providers:
 ### macOS DMG
 
 ```bash
-# First, generate the .icns icon
-cd build && ./generate-icons.sh  # or see build/README.md for manual steps
-
-# Build the DMG (universal: x64 + arm64)
-npm run build:dmg
+npm run build:icons  # Generate .icns from SVG
+npm run build:dmg    # Build the DMG installer (universal: x64 + arm64)
 ```
 
 Output: `dist/Claude World-0.1.0-universal.dmg`
@@ -294,7 +311,7 @@ Then wire it into `src/ui/panels.js` (routing), `electron/ipc-handlers.js` (IPC)
 - **No frontend frameworks** — vanilla ES modules only. Keep the zero-dependency renderer philosophy.
 - **Zone pattern** — each zone is self-contained (JS + CSS). It fetches its own data, manages its own state.
 - **IPC pattern** — renderer never touches Node.js directly. All main-process work goes through `window.api.db.*` via contextBridge.
-- **Database** — add migrations in `electron/migrations/` as `NNN_name.sql`. Never modify existing migrations.
+- **Database** — add migrations in `src/db/migrations/` as `NNN_name.sql`. Never modify existing migrations.
 - **Styling** — use `--cw-*` CSS variables for colors. See `src/ui/variables.css` for the full token set.
 
 ### Pull Request Process
@@ -323,7 +340,7 @@ Please include:
 
 ### Built
 
-- [x] 35+ fully functional zones (Kanban, Calendar, Knowledge Graph, Automation Builder, Skill Trees, Analytics, and more)
+- [x] 45+ fully functional zones (Kanban, Calendar, Knowledge Graph, Automation Builder, Skill Trees, Analytics, Plugin Store, MCP Hub, and more)
 - [x] Weather effects system (rain, snow, fog, aurora, lightning)
 - [x] Particle system with 10 presets
 - [x] Data flow visualization between zones
@@ -335,6 +352,12 @@ Please include:
 - [x] Sharing and export system
 - [x] Performance monitor and keyboard shortcuts overlay
 - [x] Global search across all zones
+- [x] Workspace system with multi-panel tabs and split view
+- [x] Sound effects (12 audio cues)
+- [x] Command history with undo/redo
+- [x] Backup system with auto-backup and restore
+- [x] Quality manager for adaptive performance
+- [x] Plugin API for third-party extensions
 
 ### Up Next
 
@@ -342,7 +365,6 @@ Please include:
 - [ ] Zone marketplace (community zones as npm packages)
 - [ ] Multiplayer worlds (shared city, multiple users)
 - [ ] Mobile companion app
-- [ ] Plugin API for third-party zones
 - [ ] Voice commands ("Hey Claude, dispatch a task")
 
 ---

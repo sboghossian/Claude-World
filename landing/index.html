@@ -14,23 +14,26 @@
     <!-- Open Graph -->
     <meta
       property="og:title"
-      content="Claude World — AI orchestration as a city"
+      content="Claude World — AI-native OS as an Isometric City"
     />
     <meta
       property="og:description"
-      content="Your company runs on agents. Now you can see them. Every AI component is a physical building you enter, staff, and operate."
+      content="A Mac desktop app that turns AI orchestration into a navigable isometric city. 45+ zones, 22 database migrations, 100+ IPC endpoints. SimCity meets your AI IDE. Built with Electron, PixiJS, SQLite, and Claude."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://claudeworld.app" />
+    <meta
+      property="og:url"
+      content="https://github.com/sboghossian/Claude-World"
+    />
     <meta property="og:image" content="https://claudeworld.app/og-image.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="Claude World — AI orchestration as a city"
+      content="Claude World — AI-native OS as an Isometric City"
     />
     <meta
       name="twitter:description"
-      content="Your company runs on agents. Now you can see them."
+      content="45+ zones. 22 migrations. 100+ IPC endpoints. Every AI tool is a building you enter, staff, and operate."
     />
 
     <!-- Favicon: purple hexagon via data URI -->
@@ -67,7 +70,7 @@
         </h1>
         <p class="hero-sub">
           Claude World is a Mac desktop app that turns AI orchestration into a
-          navigable isometric city. 35+ zones, 100+ IPC endpoints, 10 visual
+          navigable isometric city. 45+ zones, 100+ IPC endpoints, 10 visual
           effects. Every tool is a building. Every agent is staff. SimCity meets
           your AI IDE.
         </p>
@@ -75,7 +78,10 @@
           <a href="#download" class="btn btn-primary btn-shimmer">
             <span>⬇ Download for Mac</span>
           </a>
-          <a href="https://github.com" class="btn btn-outline">
+          <a
+            href="https://github.com/sboghossian/Claude-World"
+            class="btn btn-outline"
+          >
             <span>★ View on GitHub</span>
           </a>
         </div>
@@ -111,7 +117,7 @@
     <section id="features" class="section">
       <div class="container">
         <div class="section-header">
-          <h2>35+ zones. Each one a fully functional AI tool.</h2>
+          <h2>45+ zones. Each one a fully functional AI tool.</h2>
           <p>
             Not a dashboard. Not a wrapper. Each building is a real workspace —
             enter it, use it, leave.
@@ -226,7 +232,7 @@
     <section class="section section-alt">
       <div class="container">
         <div class="section-header">
-          <h2>Up and running in minutes</h2>
+          <h2>How it works</h2>
           <p>
             No server setup. No Docker. Just your API key and a city to build.
           </p>
@@ -235,28 +241,83 @@
         <div class="steps-grid">
           <div class="step">
             <div class="step-num">01</div>
-            <h3>Enter your API key</h3>
+            <h3>Launch</h3>
             <p>
-              Connect Anthropic or OpenAI. Your keys stay local — we never touch
-              your data.
+              Download the Mac app and launch it. Runs locally via Electron —
+              nothing to install, no containers.
             </p>
           </div>
           <div class="step-arrow" aria-hidden="true">→</div>
           <div class="step">
             <div class="step-num">02</div>
-            <h3>Build your city</h3>
+            <h3>Connect API</h3>
             <p>
-              Unlock zones as you complete tasks. Your city grows with your
-              usage.
+              Enter your Anthropic or OpenAI key. Keys stay in your system
+              keychain — we never see them.
             </p>
           </div>
           <div class="step-arrow" aria-hidden="true">→</div>
           <div class="step">
             <div class="step-num">03</div>
-            <h3>Let your agents run</h3>
+            <h3>Build your city</h3>
             <p>
-              Automate, delegate, repeat. The city works even when you don't.
+              Unlock zones, assign agents, automate workflows. Your city grows
+              with your usage.
             </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ TECH STATS ═════════════════════ -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Built different. Built to last.</h2>
+          <p>Real engineering, not a weekend wrapper.</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number">128K+</div>
+            <div class="stat-label">Lines of code</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">45+</div>
+            <div class="stat-label">Functional zones</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">22</div>
+            <div class="stat-label">Database migrations</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">100+</div>
+            <div class="stat-label">IPC endpoints</div>
+          </div>
+        </div>
+
+        <div class="built-with">
+          <span class="built-with-label">Built with</span>
+          <div class="built-with-logos">
+            <span class="tech-badge">Electron</span>
+            <span class="tech-badge">PixiJS</span>
+            <span class="tech-badge">SQLite</span>
+            <span class="tech-badge">Claude</span>
+          </div>
+        </div>
+
+        <div class="shortcuts-showcase">
+          <div class="shortcut-item">
+            <kbd>Cmd</kbd> + <kbd>K</kbd>
+            <span>Command palette</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>?</kbd>
+            <span>Keyboard shortcuts</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd>
+            <span>Full-text search</span>
           </div>
         </div>
       </div>
@@ -331,7 +392,7 @@
     <section id="zones" class="section">
       <div class="container">
         <div class="section-header">
-          <h2>35+ zones. All functional.</h2>
+          <h2>45+ zones. All functional.</h2>
           <p>
             Every zone on the map is a fully built tool. Not a placeholder — a
             place.
@@ -618,7 +679,7 @@
               🐦 First 100 users get <strong>lifetime access at $49</strong>
             </p>
             <ul class="pricing-features">
-              <li>✓ All 35+ zones unlocked</li>
+              <li>✓ All 45+ zones unlocked</li>
               <li>✓ Anthropic + OpenAI support</li>
               <li>✓ SQLite Memory Vault (persistent context)</li>
               <li>✓ Cmd+K command palette</li>
@@ -693,10 +754,10 @@
             <div class="faq-answer">
               <p>
                 Claude World supports the latest Claude models including Claude
-                Sonnet 4 and Claude Opus 4 (via Anthropic), and GPT-4o, GPT-4.1,
-                and other OpenAI models. More models are added regularly. The
-                Council zone lets you query multiple models simultaneously to
-                compare responses.
+                Sonnet 4, Claude Opus 4, and Claude Haiku 4 (via Anthropic), as
+                well as GPT-4o, GPT-4.1, and other OpenAI models. More models
+                are added regularly. The Council zone lets you query multiple
+                models simultaneously to compare responses.
               </p>
             </div>
           </details>
@@ -730,7 +791,10 @@
             <a href="#" class="btn btn-primary btn-lg btn-shimmer">
               <span>⬇ Download for Mac</span>
             </a>
-            <a href="https://github.com" class="btn btn-outline btn-lg">
+            <a
+              href="https://github.com/sboghossian/Claude-World"
+              class="btn btn-outline btn-lg"
+            >
               <span>★ Star on GitHub</span>
             </a>
           </div>
@@ -751,7 +815,7 @@
           <a href="#zones">Zones</a>
           <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
-          <a href="https://github.com">GitHub</a>
+          <a href="https://github.com/sboghossian/Claude-World">GitHub</a>
         </div>
         <p class="footer-copy">© 2026 Claude World · Made with ❤️ and Claude</p>
       </div>

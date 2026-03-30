@@ -233,18 +233,26 @@ function registerHandlers(ipcMain, db) {
         const world = database
           .prepare("SELECT * FROM worlds WHERE id = ?")
           .get(worldId);
-        // Level up logic
-        if (world && world.xp >= world.xp_to_next) {
-          const newLevel = world.level + 1;
-          const newXpToNext = Math.floor(world.xp_to_next * 1.5);
-          database
-            .prepare(
-              "UPDATE worlds SET level = ?, xp = xp - ?, xp_to_next = ? WHERE id = ?",
-            )
-            .run(newLevel, world.xp_to_next, newXpToNext, worldId);
-          return database
-            .prepare("SELECT * FROM worlds WHERE id = ?")
-            .get(worldId);
+        // Level up logic: level N requires cumulative 500 * N*(N-1)/2 XP
+        if (world) {
+          const totalXP = world.xp || 0;
+          const newLevel =
+            totalXP <= 0
+              ? 1
+              : Math.max(
+                  1,
+                  Math.floor((1 + Math.sqrt(1 + (4 * totalXP) / 250)) / 2),
+                );
+          if (newLevel !== world.level) {
+            database
+              .prepare(
+                "UPDATE worlds SET level = ?, updated_at = datetime('now') WHERE id = ?",
+              )
+              .run(newLevel, worldId);
+            return database
+              .prepare("SELECT * FROM worlds WHERE id = ?")
+              .get(worldId);
+          }
         }
         return world;
       },
@@ -307,7 +315,7 @@ function registerHandlers(ipcMain, db) {
       (database) =>
         database
           .prepare(
-            "SELECT * FROM tasks WHERE world_id = ? AND (title LIKE ? OR description LIKE ?) ORDER BY created_at DESC LIMIT 50",
+            "SELECT * FROM tasks WHERE world_id = ? AND (prompt LIKE ? OR response LIKE ?) ORDER BY created_at DESC LIMIT 50",
           )
           .all(worldId, `%${query}%`, `%${query}%`),
       [],
@@ -363,10 +371,10 @@ function registerHandlers(ipcMain, db) {
           )
           .run(questId);
         // Award XP
-        if (quest.xp_reward) {
+        if (quest.reward_xp) {
           database
             .prepare("UPDATE worlds SET xp = xp + ? WHERE id = ?")
-            .run(quest.xp_reward, quest.world_id);
+            .run(quest.reward_xp, quest.world_id);
         }
         return database
           .prepare("SELECT * FROM quests WHERE id = ?")
@@ -482,7 +490,7 @@ function registerHandlers(ipcMain, db) {
         const rawDb = db.db || db;
         rawDb
           .prepare(
-            `INSERT INTO tasks (world_id, title, description, status, provider, model,
+            `INSERT INTO tasks (world_id, prompt, response, status, provider, model,
               input_tokens, output_tokens, cost_usd, latency_ms, created_at, completed_at)
             VALUES (?, ?, ?, 'completed', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
           )
@@ -567,7 +575,7 @@ function registerHandlers(ipcMain, db) {
         const rawDb = db.db || db;
         rawDb
           .prepare(
-            `INSERT INTO tasks (world_id, title, description, status, provider, model,
+            `INSERT INTO tasks (world_id, prompt, response, status, provider, model,
               input_tokens, output_tokens, cost_usd, latency_ms, created_at, completed_at)
             VALUES (?, ?, ?, 'completed', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
           )
@@ -1853,18 +1861,17 @@ function registerHandlers(ipcMain, db) {
     return dbCall((database) => {
       const result = database
         .prepare(
-          "INSERT INTO skills (world_id, name, description, category, code, status) VALUES (?, ?, ?, ?, ?, ?)",
+          "INSERT INTO skills (world_id, name, description, prompt_template, zone_type) VALUES (?, ?, ?, ?, ?)",
         )
         .run(
           worldId,
           data.name || "",
           data.description || "",
-          data.category || "general",
-          data.code || "",
-          data.status || "active",
+          data.prompt_template || data.code || "",
+          data.zone_type || data.category || null,
         );
       return database
-        .prepare("SELECT * FROM skills WHERE id = ?")
+        .prepare("SELECT * FROM skills WHERE rowid = ?")
         .get(result.lastInsertRowid);
     }, null);
   });
@@ -1872,7 +1879,7 @@ function registerHandlers(ipcMain, db) {
   ipcMain.handle("db:importSkills", async (_event, worldId, skills) => {
     return dbCall((database) => {
       const insert = database.prepare(
-        "INSERT OR IGNORE INTO skills (world_id, name, description, category, code, status) VALUES (?, ?, ?, ?, ?, ?)",
+        "INSERT OR IGNORE INTO skills (world_id, name, description, prompt_template, zone_type) VALUES (?, ?, ?, ?, ?)",
       );
       const tx = database.transaction(() => {
         for (const s of skills) {
@@ -1880,9 +1887,8 @@ function registerHandlers(ipcMain, db) {
             worldId,
             s.name || "",
             s.description || "",
-            s.category || "general",
-            s.code || "",
-            s.status || "active",
+            s.prompt_template || s.code || "",
+            s.zone_type || s.category || null,
           );
         }
       });
@@ -2036,18 +2042,17 @@ function registerHandlers(ipcMain, db) {
     return dbCall((database) => {
       const result = database
         .prepare(
-          "INSERT INTO experiments (world_id, name, hypothesis, status, config, results) VALUES (?, ?, ?, ?, ?, ?)",
+          "INSERT INTO experiments (world_id, name, description, prompt, status) VALUES (?, ?, ?, ?, ?)",
         )
         .run(
           worldId,
           data.name || "",
-          data.hypothesis || "",
+          data.description || data.hypothesis || "",
+          data.prompt || JSON.stringify(data.config || {}),
           data.status || "draft",
-          JSON.stringify(data.config || {}),
-          JSON.stringify(data.results || {}),
         );
       return database
-        .prepare("SELECT * FROM experiments WHERE id = ?")
+        .prepare("SELECT * FROM experiments WHERE rowid = ?")
         .get(result.lastInsertRowid);
     }, null);
   });
@@ -2056,7 +2061,7 @@ function registerHandlers(ipcMain, db) {
     return dbCall((database) => {
       const result = database
         .prepare(
-          "INSERT INTO world_snapshots (world_id, label, snapshot_data) VALUES (?, ?, ?)",
+          "INSERT INTO world_snapshots (world_id, label, state_json) VALUES (?, ?, ?)",
         )
         .run(worldId, data.label || "Imported snapshot", JSON.stringify(data));
       return { id: result.lastInsertRowid };
@@ -2674,7 +2679,7 @@ function registerHandlers(ipcMain, db) {
         const zones = rawDb
           .prepare(
             `
-            SELECT slug, name, color, unlocked, unlocked_at, progress, created_at
+            SELECT zone_type, name, unlocked, unlocked_at, build_progress, created_at
             FROM zones
             WHERE world_id = ?
           `,
@@ -2685,24 +2690,24 @@ function registerHandlers(ipcMain, db) {
           if (z.unlocked) {
             events.push({
               category: "zones",
-              title: `Zone Unlocked: ${z.name || z.slug}`,
-              description: `The ${z.name || z.slug} zone is now accessible.`,
+              title: `Zone Unlocked: ${z.name || z.zone_type}`,
+              description: `The ${z.name || z.zone_type} zone is now accessible.`,
               created_at: z.unlocked_at || z.created_at,
-              zone_link: z.slug,
-              meta: { color: z.color },
+              zone_link: z.zone_type,
+              meta: {},
             });
           }
           // Progress milestones
-          const progress = z.progress || 0;
+          const progress = Math.round((z.build_progress || 0) * 100);
           const milestones = [25, 50, 75, 100];
           for (const m of milestones) {
             if (progress >= m) {
               events.push({
                 category: "zones",
-                title: `${z.name || z.slug}: ${m}% Complete`,
+                title: `${z.name || z.zone_type}: ${m}% Complete`,
                 description: `Zone progress reached ${m}%.`,
                 created_at: z.created_at, // approximate
-                zone_link: z.slug,
+                zone_link: z.zone_type,
                 meta: { progress: m },
               });
             }
@@ -2743,7 +2748,7 @@ function registerHandlers(ipcMain, db) {
         const achievements = rawDb
           .prepare(
             `
-            SELECT achievement_id, description, unlocked_at, created_at
+            SELECT achievement_id, unlocked_at
             FROM achievements
             WHERE world_id = ?
           `,
@@ -2754,8 +2759,8 @@ function registerHandlers(ipcMain, db) {
           events.push({
             category: "achievements",
             title: `Achievement Unlocked: ${a.achievement_id || "Badge"}`,
-            description: a.description || "A new achievement was unlocked.",
-            created_at: a.unlocked_at || a.created_at,
+            description: "A new achievement was unlocked.",
+            created_at: a.unlocked_at,
             zone_link: null,
             meta: {},
           });
@@ -2769,7 +2774,7 @@ function registerHandlers(ipcMain, db) {
         const quests = rawDb
           .prepare(
             `
-            SELECT title, description, xp_reward, status, created_at, completed_at
+            SELECT title, description, reward_xp, status, created_at, completed_at
             FROM quests
             WHERE world_id = ?
           `,
@@ -2789,7 +2794,7 @@ function registerHandlers(ipcMain, db) {
                 ? q.completed_at || q.created_at
                 : q.created_at,
             zone_link: null,
-            meta: { xp_reward: q.xp_reward, status: q.status },
+            meta: { xp_reward: q.reward_xp, status: q.status },
           });
         }
       } catch (_) {
@@ -3069,7 +3074,7 @@ function registerHandlers(ipcMain, db) {
     return dbCall((database) => {
       const result = database
         .prepare(
-          `INSERT INTO tasks (world_id, prompt, model, provider, status, response, tokens_in, tokens_out, cost, created_at, completed_at)
+          `INSERT INTO tasks (world_id, prompt, model, provider, status, response, input_tokens, output_tokens, cost_usd, created_at, completed_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?)`,
         )
         .run(
@@ -3079,13 +3084,13 @@ function registerHandlers(ipcMain, db) {
           data.provider || "",
           data.status || "completed",
           data.response || "",
-          data.tokens_in || 0,
-          data.tokens_out || 0,
-          data.cost || 0,
+          data.input_tokens || data.tokens_in || 0,
+          data.output_tokens || data.tokens_out || 0,
+          data.cost_usd || data.cost || 0,
           data.completed_at || null,
         );
       return database
-        .prepare("SELECT * FROM tasks WHERE id = ?")
+        .prepare("SELECT * FROM tasks WHERE rowid = ?")
         .get(result.lastInsertRowid);
     }, null);
   });

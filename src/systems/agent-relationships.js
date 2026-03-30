@@ -33,15 +33,21 @@ export class AgentRelationshipSystem {
     this._worldId = worldId;
 
     // Load agents first so relationship lookups can resolve names/roles.
-    const agents = await window.api.db.getAgents(worldId);
-    this._agents.clear();
-    for (const agent of agents) {
-      this._agents.set(agent.id, agent);
-    }
+    try {
+      const agents = await window.api.db.getAgents(worldId);
+      this._agents.clear();
+      for (const agent of agents || []) {
+        this._agents.set(agent.id, agent);
+      }
 
-    // Load all agent_relationships for this world.
-    this._relationships =
-      (await window.api.db.getAgentRelationships(worldId)) || [];
+      // Load all agent_relationships for this world.
+      this._relationships =
+        (await window.api.db.getAgentRelationships(worldId)) || [];
+    } catch (err) {
+      console.warn("[agent-relationships] Failed to init:", err.message);
+      this._agents.clear();
+      this._relationships = [];
+    }
 
     console.log(
       `[agent-relationships] Loaded ${this._relationships.length} relationships` +

@@ -1024,4 +1024,13 @@ export class Dispatch {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
   }
+
+  /** Tear down — clear all active task timers. */
+  destroy() {
+    for (const [, timerId] of this._timerIntervals) {
+      clearInterval(timerId);
+    }
+    this._timerIntervals.clear();
+    if (this.container) this.container.innerHTML = "";
+  }
 }

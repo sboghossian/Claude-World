@@ -984,6 +984,11 @@ export class ZoneAmbience {
     this._activeGain = null;
     this._currentZone = null;
 
+    if (this._onZoneClick) {
+      document.removeEventListener("zone-click", this._onZoneClick);
+      this._onZoneClick = null;
+    }
+
     try {
       this._master.disconnect();
     } catch (_) {}

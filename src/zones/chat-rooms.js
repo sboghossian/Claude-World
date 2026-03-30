@@ -46,6 +46,14 @@ export class ChatRooms {
    * @returns {HTMLElement}
    */
   render() {
+    if (!document.getElementById("chat-rooms-styles")) {
+      const link = document.createElement("link");
+      link.id = "chat-rooms-styles";
+      link.rel = "stylesheet";
+      link.href = new URL("./chat-rooms.css", import.meta.url).href;
+      document.head.appendChild(link);
+    }
+
     const el = document.createElement("div");
     el.className = "chat-rooms";
     el.setAttribute("role", "region");

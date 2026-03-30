@@ -548,7 +548,7 @@ export class AchievementEngine {
     this._worldId = worldId;
     try {
       const rows = await window.api.db.getAchievements(worldId);
-      this._unlocked = new Set(rows.map((r) => r.achievement_id));
+      this._unlocked = new Set((rows || []).map((r) => r.achievement_id));
     } catch (err) {
       console.warn(
         "[achievements] Failed to load unlocked achievements:",
@@ -638,12 +638,19 @@ export class AchievementEngine {
     const ids = EVENT_MAP[eventType];
     if (!ids || ids.length === 0) return;
 
-    const ctx = this._buildContext();
-    for (const id of ids) {
-      if (this._unlocked.has(id)) continue;
-      const def = ACHIEVEMENTS.find((a) => a.id === id);
-      if (!def) continue;
-      await this._evaluateOne(def, ctx);
+    try {
+      const ctx = this._buildContext();
+      for (const id of ids) {
+        if (this._unlocked.has(id)) continue;
+        const def = ACHIEVEMENTS.find((a) => a.id === id);
+        if (!def) continue;
+        await this._evaluateOne(def, ctx);
+      }
+    } catch (err) {
+      console.warn(
+        `[achievements] Error evaluating for ${eventType}:`,
+        err.message,
+      );
     }
   }
 

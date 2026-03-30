@@ -365,6 +365,14 @@ export class SkillTree {
    * @returns {HTMLElement}
    */
   render() {
+    if (!document.getElementById("skill-tree-styles")) {
+      const link = document.createElement("link");
+      link.id = "skill-tree-styles";
+      link.rel = "stylesheet";
+      link.href = new URL("./skill-tree.css", import.meta.url).href;
+      document.head.appendChild(link);
+    }
+
     this._el = document.createElement("div");
     this._el.className = "skill-tree";
     this._el.innerHTML =

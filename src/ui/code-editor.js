@@ -262,6 +262,14 @@ export class CodeEditor {
    * @param {number} [opts.minHeight=200]  Minimum editor height in px.
    */
   constructor(container, opts = {}) {
+    if (!document.getElementById("code-editor-styles")) {
+      const link = document.createElement("link");
+      link.id = "code-editor-styles";
+      link.rel = "stylesheet";
+      link.href = new URL("./code-editor.css", import.meta.url).href;
+      document.head.appendChild(link);
+    }
+
     this._container = container;
     this._language = opts.language || "javascript";
     this._placeholder = opts.placeholder || "";

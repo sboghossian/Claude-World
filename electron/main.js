@@ -1,4 +1,12 @@
-const { app, BrowserWindow, session, ipcMain, dialog } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  Menu,
+  shell,
+  session,
+  ipcMain,
+  dialog,
+} = require("electron");
 const path = require("path");
 const { initAutoUpdater } = require("./auto-updater");
 const backup = require("./backup");
@@ -21,6 +29,118 @@ function initDatabase() {
     );
     return null;
   }
+}
+
+// ── App menu ──────────────────────────────────────────────────────────
+function buildAppMenu() {
+  const isMac = process.platform === "darwin";
+  const template = [
+    // Claude World (app) menu — macOS only
+    ...(isMac
+      ? [
+          {
+            label: app.name,
+            submenu: [
+              { role: "about" },
+              { type: "separator" },
+              {
+                label: "Preferences…",
+                accelerator: "CmdOrCtrl+,",
+                click: () => {
+                  if (mainWindow) {
+                    mainWindow.webContents.send("open-preferences");
+                  }
+                },
+              },
+              { type: "separator" },
+              { role: "services" },
+              { type: "separator" },
+              { role: "hide" },
+              { role: "hideOthers" },
+              { role: "unhide" },
+              { type: "separator" },
+              { role: "quit" },
+            ],
+          },
+        ]
+      : []),
+    // File
+    {
+      label: "File",
+      submenu: [
+        {
+          label: "New Task",
+          accelerator: "CmdOrCtrl+N",
+          click: () => {
+            if (mainWindow) {
+              mainWindow.webContents.send("new-task");
+            }
+          },
+        },
+        { type: "separator" },
+        isMac ? { role: "close" } : { role: "quit" },
+      ],
+    },
+    // Edit
+    {
+      label: "Edit",
+      submenu: [
+        { role: "undo" },
+        { role: "redo" },
+        { type: "separator" },
+        { role: "cut" },
+        { role: "copy" },
+        { role: "paste" },
+        { role: "selectAll" },
+      ],
+    },
+    // View
+    {
+      label: "View",
+      submenu: [
+        { role: "reload" },
+        { role: "forceReload" },
+        { role: "toggleDevTools" },
+        { type: "separator" },
+        { role: "resetZoom" },
+        { role: "zoomIn" },
+        { role: "zoomOut" },
+        { type: "separator" },
+        { role: "togglefullscreen" },
+      ],
+    },
+    // Window
+    {
+      label: "Window",
+      submenu: [
+        { role: "minimize" },
+        { role: "zoom" },
+        ...(isMac
+          ? [
+              { type: "separator" },
+              { role: "front" },
+              { type: "separator" },
+              { role: "window" },
+            ]
+          : [{ role: "close" }]),
+      ],
+    },
+    // Help
+    {
+      label: "Help",
+      submenu: [
+        {
+          label: "Claude World on GitHub",
+          click: () => {
+            shell.openExternal("https://github.com/sboghossian/Claude-World");
+          },
+        },
+      ],
+    },
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
 }
 
 // ── Window creation ────────────────────────────────────────────────────
@@ -98,6 +218,19 @@ function createWindow() {
 
 // ── App lifecycle ──────────────────────────────────────────────────────
 app.whenReady().then(() => {
+  // Set up app menu
+  buildAppMenu();
+
+  // Set dock icon on macOS
+  if (process.platform === "darwin") {
+    const iconPath = path.join(__dirname, "..", "build", "icon.png");
+    try {
+      app.dock.setIcon(iconPath);
+    } catch (err) {
+      console.warn("[main] Could not set dock icon:", err.message);
+    }
+  }
+
   // Initialize database before creating window
   db = initDatabase();
 

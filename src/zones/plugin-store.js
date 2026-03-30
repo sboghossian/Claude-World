@@ -208,9 +208,22 @@ export class PluginStore {
     this.worldId = worldId;
 
     // Listen for plugin events to refresh the view
-    document.addEventListener("plugin:loaded", () => this._rebuild());
-    document.addEventListener("plugin:unloaded", () => this._rebuild());
-    document.addEventListener("plugin:toggled", () => this._rebuild());
+    this._onPluginLoaded = () => this._rebuild();
+    this._onPluginUnloaded = () => this._rebuild();
+    this._onPluginToggled = () => this._rebuild();
+    document.addEventListener("plugin:loaded", this._onPluginLoaded);
+    document.addEventListener("plugin:unloaded", this._onPluginUnloaded);
+    document.addEventListener("plugin:toggled", this._onPluginToggled);
+  }
+
+  /** Tear down event listeners. */
+  destroy() {
+    if (this._onPluginLoaded) {
+      document.removeEventListener("plugin:loaded", this._onPluginLoaded);
+      document.removeEventListener("plugin:unloaded", this._onPluginUnloaded);
+      document.removeEventListener("plugin:toggled", this._onPluginToggled);
+    }
+    if (this.el) this.el.innerHTML = "";
   }
 
   // ── Rebuild the entire UI ────────────────────────────────────

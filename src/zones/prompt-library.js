@@ -249,7 +249,7 @@ export class PromptLibrary {
 
   async _loadPrompts() {
     try {
-      this.prompts = await window.api.db.getPrompts(this.worldId);
+      this.prompts = (await window.api.db.getPrompts(this.worldId)) || [];
     } catch (err) {
       console.error("[PromptLibrary] Failed to load prompts:", err);
       this.prompts = [];

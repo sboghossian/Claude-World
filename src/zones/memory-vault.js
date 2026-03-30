@@ -88,6 +88,14 @@ export class MemoryVault {
    * @param {Array} [options.memories] — initial memories array
    */
   constructor(container, options = {}) {
+    if (!document.getElementById("memory-vault-styles")) {
+      const link = document.createElement("link");
+      link.id = "memory-vault-styles";
+      link.rel = "stylesheet";
+      link.href = new URL("./memory-vault.css", import.meta.url).href;
+      document.head.appendChild(link);
+    }
+
     /** @type {HTMLElement} */
     this._container = container;
 

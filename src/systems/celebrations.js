@@ -531,7 +531,11 @@ export class CelebrationSystem {
     document.body.appendChild(this._canvas);
     this._ctx = this._canvas.getContext("2d");
     this._resize();
-    window.addEventListener("resize", () => this._resize());
+    this._onResize = () => this._resize();
+    window.addEventListener("resize", this._onResize);
+
+    // Track bound event listeners for cleanup
+    this._boundListeners = [];
 
     // Particle & effect pools
     this._particles = []; // ConfettiParticle, SparkleParticle, StarOrbiter, XPFloater
@@ -625,17 +629,22 @@ export class CelebrationSystem {
   // ── Event bindings ───────────────────────────────────────
 
   _bindEvents() {
-    window.addEventListener("quest:complete", (e) => {
+    const listen = (event, handler) => {
+      window.addEventListener(event, handler);
+      this._boundListeners.push([event, handler]);
+    };
+
+    listen("quest:complete", (e) => {
       const title = e.detail?.title ?? "Quest Complete";
       this.triggerQuestComplete(title);
     });
 
-    window.addEventListener("world:level-up", (e) => {
+    listen("world:level-up", (e) => {
       const level = e.detail?.level ?? "?";
       this.triggerLevelUp(level);
     });
 
-    window.addEventListener("dispatch:task-complete", (e) => {
+    listen("dispatch:task-complete", (e) => {
       // XP float at HUD XP bar position (default bottom-center if not provided)
       const x = e.detail?.screenX ?? this._w / 2;
       const y = e.detail?.screenY ?? this._h - 80;
@@ -644,12 +653,12 @@ export class CelebrationSystem {
       this._trackStreak();
     });
 
-    window.addEventListener("zone:building-complete", (e) => {
+    listen("zone:building-complete", (e) => {
       const name = e.detail?.buildingName ?? e.detail?.name ?? "Building";
       this.triggerBuildingComplete(name);
     });
 
-    window.addEventListener("onboarding:complete", () => {
+    listen("onboarding:complete", () => {
       this.triggerConfetti(3);
       setTimeout(() => this.triggerLevelUp(1), 600);
     });
@@ -785,6 +794,14 @@ export class CelebrationSystem {
   destroy() {
     cancelAnimationFrame(this._raf);
     this._running = false;
+
+    // Remove all bound event listeners
+    window.removeEventListener("resize", this._onResize);
+    for (const [event, handler] of this._boundListeners) {
+      window.removeEventListener(event, handler);
+    }
+    this._boundListeners = [];
+
     this._canvas.remove();
   }
 }

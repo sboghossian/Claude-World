@@ -220,6 +220,7 @@ export class KnowledgeGraph {
       this._canvas.removeEventListener("mousedown", this._onMouseDown);
       this._canvas.removeEventListener("mousemove", this._onMouseMove);
       this._canvas.removeEventListener("mouseup", this._onMouseUp);
+      this._canvas.removeEventListener("mouseleave", this._onMouseUp);
       this._canvas.removeEventListener("wheel", this._onWheel);
       this._canvas.removeEventListener("dblclick", this._onDblClick);
     }

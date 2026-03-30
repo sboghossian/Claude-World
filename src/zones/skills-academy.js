@@ -84,6 +84,14 @@ export class SkillsAcademy {
    * @param {string} [options.worldId]  Current world ID.
    */
   constructor(container, options = {}) {
+    if (!document.getElementById("skills-academy-styles")) {
+      const link = document.createElement("link");
+      link.id = "skills-academy-styles";
+      link.rel = "stylesheet";
+      link.href = new URL("./skills-academy.css", import.meta.url).href;
+      document.head.appendChild(link);
+    }
+
     /** @type {HTMLElement} */
     this._container = container;
     /** @type {object|null} */

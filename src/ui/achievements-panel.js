@@ -102,7 +102,9 @@ export class AchievementsPanel {
       return;
     }
     this._open = true;
-    this._loadUnlockDates().then(() => this._createDOM());
+    this._loadUnlockDates()
+      .then(() => this._createDOM())
+      .catch(() => this._createDOM());
     document.addEventListener("keydown", this._onKeyDown);
   }
 
@@ -395,9 +397,11 @@ export class AchievementsPanel {
   }
 
   _onUpdated() {
-    this._loadUnlockDates().then(() => {
-      if (this._open) this._refresh();
-    });
+    this._loadUnlockDates()
+      .then(() => {
+        if (this._open) this._refresh();
+      })
+      .catch(() => {});
   }
 
   // ── Keyboard ──────────────────────────────────────────────

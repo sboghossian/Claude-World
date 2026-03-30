@@ -381,6 +381,11 @@ export class MissionControl {
     }
     this._listeners.clear();
 
+    if (this._onEscapeKey) {
+      document.removeEventListener("keydown", this._onEscapeKey);
+      this._onEscapeKey = null;
+    }
+
     if (this._fullscreen) this._exitFullscreen();
   }
 
@@ -604,9 +609,10 @@ export class MissionControl {
     });
 
     // Escape key exits fullscreen
-    document.addEventListener("keydown", (e) => {
+    this._onEscapeKey = (e) => {
       if (e.key === "Escape" && this._fullscreen) this._exitFullscreen();
-    });
+    };
+    document.addEventListener("keydown", this._onEscapeKey);
   }
 
   // ═══════════════════════════════════════════════════════════════════════

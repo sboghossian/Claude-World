@@ -20,8 +20,13 @@
     "isometric",
     "orchestration"
   ],
-  "author": "",
+  "author": "Stephane Boghossian",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sboghossian/Claude-World.git"
+  },
+  "homepage": "https://github.com/sboghossian/Claude-World",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
     "@electron/rebuild": "^4.0.3",
