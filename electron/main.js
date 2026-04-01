@@ -301,6 +301,17 @@ if (!gotLock) {
 
 // Handle uncaught errors gracefully
 process.on("uncaughtException", (error) => {
+  // Suppress known non-critical errors
+  const benign = ["EPIPE", "ECONNRESET", "ECONNREFUSED", "ETIMEDOUT"];
+  if (
+    benign.some((code) => error.code === code || error.message?.includes(code))
+  ) {
+    console.warn(
+      "[main] Suppressed benign error:",
+      error.code || error.message,
+    );
+    return;
+  }
   console.error("[main] Uncaught exception:", error);
   dialog.showErrorBox(
     "Claude World — Unexpected Error",

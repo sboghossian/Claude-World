@@ -64,10 +64,11 @@ let _lastSnapshot = [];
  */
 function getPsRows() {
   try {
-    const raw = execSync("ps aux", {
+    const raw = execSync("ps aux 2>/dev/null", {
       encoding: "utf8",
       timeout: 5000,
-      maxBuffer: 1024 * 1024,
+      maxBuffer: 2 * 1024 * 1024,
+      stdio: ["pipe", "pipe", "ignore"],
     });
     const lines = raw.split("\n").slice(1); // skip header
     const rows = [];
@@ -78,6 +79,9 @@ function getPsRows() {
       if (parts.length < 11) continue;
       const pid = parseInt(parts[1], 10);
       if (isNaN(pid) || pid === SELF_PID) continue;
+      // Also skip our own Electron child processes
+      const ppid = process.ppid || 0;
+      if (pid === ppid) continue;
       const cpu = parseFloat(parts[2]) || 0;
       const mem = parseFloat(parts[3]) || 0;
       const started = parts[8] || "";

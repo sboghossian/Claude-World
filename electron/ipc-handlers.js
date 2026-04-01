@@ -3488,7 +3488,6 @@ function registerHandlers(ipcMain, db) {
         .get(goalId);
     }, null);
   });
-}
 
   // ── Live Claude Sessions ─────────────────────────────────────────────
   const claudeSessions = require("./claude-sessions");
