@@ -1,10 +1,9 @@
 /**
- * session-agents.js — Live Claude Code session sprites on the isometric map
+ * session-agents.js — Rich per-agent sprites for live Claude Code sessions
  *
- * For each detected Claude Code CLI session, spawns a special agent sprite
- * that is larger, cyan-colored, with a pulsing glow. Sessions walk between
- * the Dispatch Tower and zones. When sessions end, agents fade out.
- * When new sessions start, agents materialize with a particle burst.
+ * For each detected Claude Code CLI session, reads the agents array and
+ * spawns individual sprites with role-specific visuals and activity
+ * animations. Agents walk to zones relevant to their current activity.
  *
  * Uses PixiJS v8 Container, Graphics, Text.
  */
@@ -15,80 +14,135 @@ import { tileToScreen } from "./tiles.js";
 
 // ── Constants ────────────────────────────────────────────────────────────
 
-const BODY_W = 16;
-const BODY_H = 24;
-const HEAD_RADIUS = 8;
-const SHADOW_RX = 13;
-const SHADOW_RY = 5;
-const STATUS_R = 4;
-
-const AGENT_COLOR = 0x00d4ff;
-const AGENT_COLOR_LIGHT = 0x66e8ff;
-const GLOW_COLOR = 0x00d4ff;
-const STREAMING_COLOR = 0x00ff88;
-
-const LERP_SPEED = 0.02;
-const BOB_AMPLITUDE = 2.5;
-const BOB_FREQUENCY = 3.0;
-
-const FADE_DURATION = 2.0; // seconds
-const SPAWN_BURST_PARTICLES = 12;
+const FADE_DURATION = 2.0;
+const SPAWN_BURST_PARTICLES = 10;
+const DONE_PARTICLE_COUNT = 6;
 
 const rand = (lo, hi) => lo + Math.random() * (hi - lo);
 const lerp = (a, b, t) => a + (b - a) * t;
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
-// ── Find dispatch tower center ───────────────────────────────────────────
+// ── Role config ─────────────────────────────────────────────────────────
 
-function getDispatchCenter() {
-  const dispatch = ZONE_DEFS.find((z) => z.id === "dispatch") || ZONE_DEFS[0];
-  return tileToScreen(
-    dispatch.tileX + dispatch.w / 2,
-    dispatch.tileY + dispatch.h / 2,
-  );
-}
+const ROLE_CONFIG = {
+  main: {
+    color: 0x00d4ff,
+    bodyW: 14,
+    bodyH: 22,
+    headR: 7,
+    label: "Main",
+  },
+  coder: {
+    color: 0x22c55e,
+    bodyW: 12,
+    bodyH: 20,
+    headR: 6,
+    label: "Coder",
+  },
+  researcher: {
+    color: 0x8b5cf6,
+    bodyW: 12,
+    bodyH: 20,
+    headR: 6,
+    label: "Researcher",
+  },
+  explorer: {
+    color: 0xf59e0b,
+    bodyW: 12,
+    bodyH: 20,
+    headR: 6,
+    label: "Explorer",
+  },
+  reviewer: {
+    color: 0xef4444,
+    bodyW: 12,
+    bodyH: 20,
+    headR: 6,
+    label: "Reviewer",
+  },
+  builder: {
+    color: 0x3b82f6,
+    bodyW: 12,
+    bodyH: 20,
+    headR: 6,
+    label: "Builder",
+  },
+};
+
+// ── Activity → zone mapping ─────────────────────────────────────────────
+
+const ACTIVITY_ZONES = {
+  reading: ["dispatch", "brain"],
+  writing: ["dispatch", "brain"],
+  searching: ["globe", "archive"],
+  thinking: ["dispatch", "brain"],
+  building: ["minions", "skills"],
+  testing: ["rnd"],
+  idle: ["chat", "memory"],
+  chatting: ["chat", "conversations"],
+};
+
+// ── Zone helpers ────────────────────────────────────────────────────────
 
 function getZoneCenter(zoneId) {
   const zone = ZONE_DEFS.find((z) => z.id === zoneId);
-  if (!zone) return getDispatchCenter();
+  if (!zone) {
+    const fallback = ZONE_DEFS[0];
+    return tileToScreen(
+      fallback.tileX + fallback.w / 2,
+      fallback.tileY + fallback.h / 2,
+    );
+  }
   return tileToScreen(zone.tileX + zone.w / 2, zone.tileY + zone.h / 2);
 }
 
-/** Pick a zone for a session based on its working directory. */
-function pickZoneForSession(session) {
-  const cwd = (session.cwd || "").toLowerCase();
-  if (cwd.includes("test")) return "rnd";
-  if (cwd.includes("doc")) return "brain";
-  if (cwd.includes("deploy") || cwd.includes("ci")) return "airport";
-  if (cwd.includes("api") || cwd.includes("server")) return "docks";
-  if (cwd.includes("ui") || cwd.includes("frontend") || cwd.includes("web"))
-    return "marketing";
-  // Default: wander near dispatch
-  const zones = ["dispatch", "brain", "memory", "skills", "chat"];
+function pickZoneForActivity(activity) {
+  const zones = ACTIVITY_ZONES[activity] || ACTIVITY_ZONES.idle;
   return zones[Math.floor(Math.random() * zones.length)];
 }
 
-// ── SessionAgentSprite ───────────────────────────────────────────────────
+// ── Color helpers ───────────────────────────────────────────────────────
 
-class SessionAgentSprite {
+function lighten(color, amount) {
+  const r = clamp(Math.round(((color >> 16) & 0xff) + 255 * amount), 0, 255);
+  const g = clamp(Math.round(((color >> 8) & 0xff) + 255 * amount), 0, 255);
+  const b = clamp(Math.round((color & 0xff) + 255 * amount), 0, 255);
+  return (r << 16) | (g << 8) | b;
+}
+
+// ── SessionSubAgentSprite ───────────────────────────────────────────────
+
+class SessionSubAgentSprite {
   /**
-   * @param {object} session — SessionInfo from claude-sessions
-   * @param {Container} worldContainer
+   * @param {object} agentInfo — AgentInfo from claude-sessions
+   * @param {object} session   — parent SessionInfo
+   * @param {Container} layer
+   * @param {number} indexInSession — for offset positioning
    */
-  constructor(session, worldContainer) {
-    this.pid = session.pid;
+  constructor(agentInfo, session, layer, indexInSession) {
+    this.id = agentInfo.id;
+    this.sessionPid = agentInfo.sessionPid;
+    this.role = agentInfo.role || "main";
+    this.activity = agentInfo.activity || "idle";
+    this.target = agentInfo.target || null;
+    this.tool = agentInfo.tool || null;
     this.session = session;
-    this.status = session.status || "idle";
+    this.indexInSession = indexInSession;
+
     this.alive = true;
     this.fadingOut = false;
     this.fadeTimer = 0;
-    this.spawnTimer = 0.5; // spawn burst period
+    this.spawnTimer = 0.6;
     this.age = 0;
 
-    // Position near dispatch
-    const home = getDispatchCenter();
-    this.x = home.x + rand(-20, 20);
-    this.y = home.y + rand(-10, 10);
+    const cfg = ROLE_CONFIG[this.role] || ROLE_CONFIG.main;
+    this._cfg = cfg;
+
+    // Position near a zone matching activity
+    const zone = pickZoneForActivity(this.activity);
+    const center = getZoneCenter(zone);
+    this.x = center.x + rand(-20, 20) + indexInSession * 18;
+    this.y = center.y + rand(-10, 10);
 
     // Movement
     this.moving = false;
@@ -98,121 +152,250 @@ class SessionAgentSprite {
     this.toY = this.y;
     this.walkProgress = 0;
     this.walkDuration = 3.0;
-    this.wanderTimer = rand(3, 8);
-    this.homeZone = pickZoneForSession(session);
-    this.atDispatch = true;
+    this.wanderTimer = rand(4, 10);
+    this.currentZone = zone;
 
     // PixiJS container
     this.container = new Container();
     this.container.sortableChildren = true;
     this.container.x = this.x;
     this.container.y = this.y;
-    this.container.zIndex = 10; // above default agents
+    this.container.zIndex = 10;
+    this.container.eventMode = "static";
+    this.container.cursor = "pointer";
 
-    this._buildGraphics(session);
-    worldContainer.addChild(this.container);
+    this._buildGraphics();
+    layer.addChild(this.container);
 
-    // Particle burst
+    // Particles
     this._particles = [];
     this._spawnBurst();
+
+    // Activity-specific state
+    this._activityGfx = new Graphics();
+    this._activityGfx.zIndex = 6;
+    this.container.addChild(this._activityGfx);
+
+    // Desk for writing activity
+    this._deskGfx = null;
   }
 
-  _buildGraphics(session) {
+  // ── Build ───────────────────────────────────────────────────────────
+
+  _buildGraphics() {
+    const cfg = this._cfg;
+
     // Glow ring
     this._glow = new Graphics();
-    this._glow.circle(0, -BODY_H / 2, BODY_W + 8);
-    this._glow.fill({ color: GLOW_COLOR, alpha: 0.08 });
+    this._glow.circle(0, -cfg.bodyH / 2, cfg.bodyW + 6);
+    this._glow.fill({ color: cfg.color, alpha: 0.07 });
     this._glow.zIndex = -1;
     this.container.addChild(this._glow);
 
     // Shadow
     this._shadow = new Graphics();
-    this._shadow.ellipse(0, 0, SHADOW_RX, SHADOW_RY);
-    this._shadow.fill({ color: 0x000000, alpha: 0.3 });
+    this._shadow.ellipse(0, 0, 10, 4);
+    this._shadow.fill({ color: 0x000000, alpha: 0.25 });
     this._shadow.zIndex = 0;
     this.container.addChild(this._shadow);
 
-    // Body — larger rounded rect
+    // Body capsule
     this._body = new Graphics();
-    this._body.roundRect(-BODY_W / 2, -BODY_H, BODY_W, BODY_H, 5);
-    this._body.fill({ color: AGENT_COLOR });
-    this._body.roundRect(-BODY_W / 2, -BODY_H, BODY_W, BODY_H, 5);
+    this._body.roundRect(
+      -cfg.bodyW / 2,
+      -cfg.bodyH,
+      cfg.bodyW,
+      cfg.bodyH,
+      5,
+    );
+    this._body.fill({ color: cfg.color });
+    this._body.roundRect(
+      -cfg.bodyW / 2,
+      -cfg.bodyH,
+      cfg.bodyW,
+      cfg.bodyH,
+      5,
+    );
     this._body.stroke({ color: 0x000000, alpha: 0.3, width: 1 });
     this._body.zIndex = 1;
     this.container.addChild(this._body);
 
     // Head
     this._head = new Graphics();
-    this._head.circle(0, -BODY_H - HEAD_RADIUS + 3, HEAD_RADIUS);
-    this._head.fill({ color: AGENT_COLOR_LIGHT });
+    this._head.circle(0, -cfg.bodyH - cfg.headR + 3, cfg.headR);
+    this._head.fill({ color: lighten(cfg.color, 0.25) });
     this._head.zIndex = 2;
     this.container.addChild(this._head);
 
-    // Status dot
-    this._statusDot = new Graphics();
-    this._drawStatusDot();
-    this._statusDot.zIndex = 3;
-    this.container.addChild(this._statusDot);
+    // Role accessory
+    this._accessory = new Graphics();
+    this._accessory.zIndex = 3;
+    this._drawAccessory();
+    this.container.addChild(this._accessory);
 
-    // Label: "Claude" + truncated cwd
-    const cwdShort = this._shortDir(session.cwd);
+    // Name label
     this._label = new Text({
-      text: `Claude ${cwdShort}`,
+      text: this._getLabelText(),
       style: {
         fontFamily: "monospace",
-        fontSize: 8,
-        fill: 0x00d4ff,
+        fontSize: 7,
+        fill: cfg.color,
         align: "center",
         letterSpacing: 0.2,
       },
     });
     this._label.anchor.set(0.5, 0);
-    this._label.y = 6;
+    this._label.y = 5;
     this._label.alpha = 0.85;
     this._label.zIndex = 4;
     this.container.addChild(this._label);
 
-    // Streaming indicator dots
-    this._streamDots = new Graphics();
-    this._streamDots.zIndex = 5;
-    this._streamDots.visible = this.status === "streaming";
-    this.container.addChild(this._streamDots);
+    // Activity label
+    this._activityLabel = new Text({
+      text: this._getActivityText(),
+      style: {
+        fontFamily: "monospace",
+        fontSize: 6,
+        fill: 0x999999,
+        align: "center",
+        letterSpacing: 0.1,
+      },
+    });
+    this._activityLabel.anchor.set(0.5, 0);
+    this._activityLabel.y = 14;
+    this._activityLabel.alpha = 0.7;
+    this._activityLabel.zIndex = 4;
+    this.container.addChild(this._activityLabel);
   }
 
-  _shortDir(cwd) {
-    if (!cwd) return "";
-    const parts = cwd.split("/").filter(Boolean);
-    const last = parts[parts.length - 1] || "";
-    return last.length > 12 ? last.slice(0, 12) + ".." : last;
+  _getLabelText() {
+    const cfg = ROLE_CONFIG[this.role] || ROLE_CONFIG.main;
+    return cfg.label;
   }
 
-  _drawStatusDot() {
-    this._statusDot.clear();
-    const colors = {
-      active: 0x22c55e,
-      streaming: 0x00ff88,
-      idle: 0x9ca3af,
-    };
-    const color = colors[this.status] || colors.idle;
-    const dotX = HEAD_RADIUS;
-    const dotY = -BODY_H - HEAD_RADIUS * 2 + 5;
-    this._statusDot.circle(dotX, dotY, STATUS_R);
-    this._statusDot.fill({ color });
-    this._statusDot.circle(dotX, dotY, STATUS_R);
-    this._statusDot.stroke({ color: 0x000000, alpha: 0.4, width: 0.5 });
+  _getActivityText() {
+    if (!this.target) return this.activity;
+    const short =
+      this.target.length > 20 ? this.target.slice(0, 20) + ".." : this.target;
+    // Extract just the filename from a path
+    const parts = short.split("/");
+    return `${this.activity} ${parts[parts.length - 1]}`;
   }
+
+  _drawAccessory() {
+    this._accessory.clear();
+    const cfg = this._cfg;
+    const topY = -cfg.bodyH - cfg.headR * 2 + 2;
+
+    switch (this.role) {
+      case "main": {
+        // Crown/star on head
+        const cx = 0;
+        const cy = topY - 2;
+        // Simple 3-point crown
+        this._accessory.moveTo(cx - 4, cy + 3);
+        this._accessory.lineTo(cx - 3, cy);
+        this._accessory.lineTo(cx, cy + 2);
+        this._accessory.lineTo(cx + 3, cy);
+        this._accessory.lineTo(cx + 4, cy + 3);
+        this._accessory.stroke({ color: 0xffd700, alpha: 0.9, width: 1.2 });
+        break;
+      }
+      case "coder": {
+        // Tiny laptop in front
+        const lx = cfg.bodyW / 2 + 2;
+        const ly = -cfg.bodyH / 2;
+        this._accessory.rect(lx, ly, 6, 4);
+        this._accessory.fill({ color: 0x333333, alpha: 0.8 });
+        this._accessory.rect(lx + 0.5, ly + 0.5, 5, 2.5);
+        this._accessory.fill({ color: 0x66ff66, alpha: 0.5 });
+        break;
+      }
+      case "researcher": {
+        // Magnifying glass
+        const mx = cfg.bodyW / 2 + 1;
+        const my = -cfg.bodyH + 4;
+        this._accessory.circle(mx + 3, my, 3);
+        this._accessory.stroke({ color: 0xdddddd, alpha: 0.8, width: 1 });
+        this._accessory.moveTo(mx + 1, my + 2);
+        this._accessory.lineTo(mx - 1, my + 5);
+        this._accessory.stroke({ color: 0xbbbbbb, alpha: 0.7, width: 1.2 });
+        break;
+      }
+      case "explorer": {
+        // Binoculars (two small circles)
+        const ex = 0;
+        const ey = topY;
+        this._accessory.circle(ex - 2, ey + 4, 2);
+        this._accessory.fill({ color: 0x444444, alpha: 0.8 });
+        this._accessory.circle(ex + 2, ey + 4, 2);
+        this._accessory.fill({ color: 0x444444, alpha: 0.8 });
+        this._accessory.circle(ex - 2, ey + 4, 1.2);
+        this._accessory.fill({ color: 0x88ccff, alpha: 0.5 });
+        this._accessory.circle(ex + 2, ey + 4, 1.2);
+        this._accessory.fill({ color: 0x88ccff, alpha: 0.5 });
+        break;
+      }
+      case "reviewer": {
+        // Clipboard
+        const rx = -cfg.bodyW / 2 - 6;
+        const ry = -cfg.bodyH + 2;
+        this._accessory.rect(rx, ry, 5, 7);
+        this._accessory.fill({ color: 0xddddbb, alpha: 0.8 });
+        this._accessory.rect(rx + 1, ry + 1, 3, 0.8);
+        this._accessory.fill({ color: 0x666666, alpha: 0.5 });
+        this._accessory.rect(rx + 1, ry + 2.5, 3, 0.8);
+        this._accessory.fill({ color: 0x666666, alpha: 0.5 });
+        this._accessory.rect(rx + 1, ry + 4, 2, 0.8);
+        this._accessory.fill({ color: 0x666666, alpha: 0.5 });
+        break;
+      }
+      case "builder": {
+        // Hammer (T shape)
+        const bx = cfg.bodyW / 2 + 2;
+        const by = -cfg.bodyH + 6;
+        // Handle
+        this._accessory.moveTo(bx + 2, by);
+        this._accessory.lineTo(bx + 2, by + 6);
+        this._accessory.stroke({ color: 0x8b6b3e, alpha: 0.8, width: 1.5 });
+        // Head
+        this._accessory.rect(bx, by - 1, 4, 2.5);
+        this._accessory.fill({ color: 0x888888, alpha: 0.8 });
+        break;
+      }
+    }
+  }
+
+  // ── Spawn burst ─────────────────────────────────────────────────────
 
   _spawnBurst() {
+    const cfg = this._cfg;
     for (let i = 0; i < SPAWN_BURST_PARTICLES; i++) {
       const angle = (Math.PI * 2 * i) / SPAWN_BURST_PARTICLES;
-      const speed = rand(30, 80);
+      const speed = rand(25, 60);
       this._particles.push({
         x: 0,
-        y: -BODY_H / 2,
+        y: -cfg.bodyH / 2,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         life: 1.0,
-        gfx: null, // created on first draw
+        color: cfg.color,
+        gfx: null,
+      });
+    }
+  }
+
+  _spawnDoneParticles() {
+    const cfg = this._cfg;
+    for (let i = 0; i < DONE_PARTICLE_COUNT; i++) {
+      this._particles.push({
+        x: rand(-5, 5),
+        y: -cfg.bodyH - cfg.headR,
+        vx: rand(-10, 10),
+        vy: rand(-30, -10),
+        life: 1.0,
+        color: 0x22c55e,
+        gfx: null,
       });
     }
   }
@@ -227,33 +410,44 @@ class SessionAgentSprite {
       this.fadeTimer += dt;
       const alpha = clamp(1 - this.fadeTimer / FADE_DURATION, 0, 1);
       this.container.alpha = alpha;
-      if (alpha <= 0) {
-        this.alive = false;
-      }
+      if (alpha <= 0) this.alive = false;
+      this._updateParticles(dt);
       return;
     }
 
-    // Spawn burst particles
+    // Spawn particles
     if (this.spawnTimer > 0) {
       this.spawnTimer -= dt;
       this._updateParticles(dt);
     }
 
-    // Wander logic
+    // Wander / activity zone walk
     this.wanderTimer -= dt;
     if (this.wanderTimer <= 0 && !this.moving) {
-      // Alternate between dispatch and home zone
-      const targetZone = this.atDispatch ? this.homeZone : "dispatch";
-      const dest = getZoneCenter(targetZone);
+      const zone = pickZoneForActivity(this.activity);
+      const dest = getZoneCenter(zone);
       this.fromX = this.x;
       this.fromY = this.y;
-      this.toX = dest.x + rand(-16, 16);
+      this.toX = dest.x + rand(-18, 18);
       this.toY = dest.y + rand(-8, 8);
       this.walkProgress = 0;
-      this.walkDuration = rand(2.5, 4.0);
+      this.walkDuration = rand(2.5, 4.5);
       this.moving = true;
-      this.atDispatch = !this.atDispatch;
-      this.wanderTimer = rand(5, 12);
+      this.currentZone = zone;
+
+      // Activity-specific wander patterns
+      if (this.activity === "searching") {
+        this.wanderTimer = rand(3, 6); // brisk
+      } else if (this.activity === "testing") {
+        this.wanderTimer = rand(2, 4); // pacing
+        // Pace in small area
+        this.toX = this.x + rand(-30, 30);
+        this.toY = this.y + rand(-15, 15);
+      } else if (this.activity === "idle") {
+        this.wanderTimer = rand(10, 18); // slow
+      } else {
+        this.wanderTimer = rand(5, 12);
+      }
     }
 
     // Walk interpolation
@@ -264,32 +458,185 @@ class SessionAgentSprite {
         this.moving = false;
       }
       const t = this.walkProgress;
-      // Smooth ease in-out
       const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
       this.x = lerp(this.fromX, this.toX, ease);
       this.y = lerp(this.fromY, this.toY, ease);
     }
 
     // Walking bob
-    const bob = this.moving
-      ? Math.sin(this.age * BOB_FREQUENCY * Math.PI * 2) * BOB_AMPLITUDE
-      : 0;
+    const bobAmp = this.moving
+      ? this.activity === "searching"
+        ? 3
+        : 2
+      : this.activity === "idle"
+        ? 0.8
+        : 0;
+    const bobFreq = this.moving ? 3.5 : 1.5;
+    const bob = Math.sin(this.age * bobFreq * Math.PI * 2) * bobAmp;
 
     this.container.x = this.x;
     this.container.y = this.y + bob;
 
     // Pulsing glow
-    const glowPulse = 0.06 + Math.sin(this.age * 2) * 0.03;
-    this._glow.alpha = this.status === "streaming" ? glowPulse * 2 : glowPulse;
+    const glowBase = 0.06;
+    const glowPulse = glowBase + Math.sin(this.age * 2.5) * 0.04;
+    this._glow.alpha =
+      this.activity === "idle" ? glowPulse * 0.5 : glowPulse * 1.5;
 
-    // Streaming dots animation
-    this._streamDots.visible = this.status === "streaming";
-    if (this.status === "streaming") {
-      this._drawStreamDots();
-    }
+    // Activity animation
+    this._drawActivityAnimation();
 
-    // Sort by y for depth
+    // Depth sort
     this.container.zIndex = 10 + Math.floor(this.y);
+  }
+
+  _drawActivityAnimation() {
+    this._activityGfx.clear();
+    const cfg = this._cfg;
+    const topY = -cfg.bodyH - cfg.headR * 2;
+
+    switch (this.activity) {
+      case "reading": {
+        // Page particles floating up
+        const phase = this.age * 2;
+        for (let i = 0; i < 3; i++) {
+          const t = ((phase + i * 0.7) % 2) / 2;
+          const py = -cfg.bodyH * 0.3 - t * 15;
+          const px = Math.sin(t * Math.PI) * 4 - 2;
+          const alpha = (1 - t) * 0.5;
+          this._activityGfx.rect(px - 1.5, py - 1, 3, 2);
+          this._activityGfx.fill({ color: 0xffffff, alpha });
+        }
+        break;
+      }
+      case "writing": {
+        // Small dots moving near a desk
+        const wx = cfg.bodyW / 2 + 3;
+        const wy = -3;
+        // Desk
+        this._activityGfx.rect(wx - 1, wy, 8, 2);
+        this._activityGfx.fill({ color: 0x5a4030, alpha: 0.6 });
+        // Typing dots
+        for (let i = 0; i < 3; i++) {
+          const phase = this.age * 6 + i * 1.2;
+          const dy = Math.sin(phase) * 1.5;
+          this._activityGfx.circle(wx + 1 + i * 2, wy - 1 + dy, 0.7);
+          this._activityGfx.fill({ color: cfg.color, alpha: 0.6 });
+        }
+        break;
+      }
+      case "searching": {
+        // Magnifying glass bobs if researcher
+        if (this.role === "researcher" || this.role === "explorer") {
+          const bobY = Math.sin(this.age * 3) * 2;
+          this._accessory.y = bobY;
+        }
+        break;
+      }
+      case "thinking": {
+        // Thought bubble with cycling dots
+        const bx = cfg.bodyW / 2 + 4;
+        const by = topY - 2;
+        // Bubble
+        this._activityGfx.circle(bx + 5, by, 6);
+        this._activityGfx.fill({ color: 0xffffff, alpha: 0.15 });
+        this._activityGfx.circle(bx + 5, by, 6);
+        this._activityGfx.stroke({ color: 0xffffff, alpha: 0.2, width: 0.5 });
+        // Three dots cycling
+        for (let i = 0; i < 3; i++) {
+          const phase = this.age * 3 + i * 0.6;
+          const dotAlpha = 0.3 + Math.sin(phase) * 0.4;
+          this._activityGfx.circle(bx + 2 + i * 2.5, by, 1);
+          this._activityGfx.fill({
+            color: 0xffffff,
+            alpha: clamp(dotAlpha, 0.1, 0.8),
+          });
+        }
+        // Small connector bubbles
+        this._activityGfx.circle(bx, by + 4, 1.5);
+        this._activityGfx.fill({ color: 0xffffff, alpha: 0.12 });
+        this._activityGfx.circle(bx - 1, by + 6, 1);
+        this._activityGfx.fill({ color: 0xffffff, alpha: 0.08 });
+        break;
+      }
+      case "building": {
+        // Sparks flying
+        for (let i = 0; i < 4; i++) {
+          const phase = this.age * 5 + i * 1.3;
+          const t = (phase % 1.5) / 1.5;
+          const angle = (i / 4) * Math.PI - Math.PI / 2;
+          const dist = t * 10;
+          const sx = Math.cos(angle) * dist;
+          const sy = -cfg.bodyH * 0.5 + Math.sin(angle) * dist - t * 5;
+          const alpha = (1 - t) * 0.7;
+          this._activityGfx.circle(sx, sy, 1);
+          this._activityGfx.fill({ color: 0xffdd44, alpha });
+        }
+        break;
+      }
+      case "testing": {
+        // Checkmark/X flashing
+        const phase = Math.floor(this.age * 2) % 4;
+        const tx = 0;
+        const ty = topY - 4;
+        if (phase < 3) {
+          // Checkmark
+          this._activityGfx.moveTo(tx - 3, ty);
+          this._activityGfx.lineTo(tx - 1, ty + 2);
+          this._activityGfx.lineTo(tx + 3, ty - 2);
+          this._activityGfx.stroke({
+            color: 0x22c55e,
+            alpha: 0.7,
+            width: 1.2,
+          });
+        } else {
+          // X mark
+          this._activityGfx.moveTo(tx - 2, ty - 2);
+          this._activityGfx.lineTo(tx + 2, ty + 2);
+          this._activityGfx.moveTo(tx + 2, ty - 2);
+          this._activityGfx.lineTo(tx - 2, ty + 2);
+          this._activityGfx.stroke({
+            color: 0xef4444,
+            alpha: 0.7,
+            width: 1.2,
+          });
+        }
+        break;
+      }
+      case "idle": {
+        // Gentle breathing bob is already in the main update
+        // Draw a small bench
+        const bx2 = 6;
+        const by2 = -2;
+        this._activityGfx.rect(bx2, by2, 10, 2);
+        this._activityGfx.fill({ color: 0x5a4030, alpha: 0.4 });
+        this._activityGfx.rect(bx2, by2 + 2, 1, 3);
+        this._activityGfx.fill({ color: 0x5a4030, alpha: 0.3 });
+        this._activityGfx.rect(bx2 + 9, by2 + 2, 1, 3);
+        this._activityGfx.fill({ color: 0x5a4030, alpha: 0.3 });
+        break;
+      }
+      case "chatting": {
+        // Speech arcs emanating
+        for (let i = 0; i < 3; i++) {
+          const phase = this.age * 2 + i * 0.8;
+          const t = (phase % 2) / 2;
+          const radius = 4 + t * 8;
+          const alpha = (1 - t) * 0.3;
+          const startAngle = -Math.PI / 3;
+          const endAngle = Math.PI / 6;
+          this._activityGfx.arc(
+            cfg.bodyW / 2 + 2,
+            -cfg.bodyH,
+            radius,
+            startAngle,
+            endAngle,
+          );
+          this._activityGfx.stroke({ color: 0xffffff, alpha, width: 0.8 });
+        }
+        break;
+      }
+    }
   }
 
   _updateParticles(dt) {
@@ -297,13 +644,13 @@ class SessionAgentSprite {
       p.life -= dt * 2;
       p.x += p.vx * dt;
       p.y += p.vy * dt;
-      p.vy += 40 * dt; // gravity
+      p.vy += 40 * dt;
 
       if (!p.gfx) {
         p.gfx = new Graphics();
-        p.gfx.circle(0, 0, 2);
-        p.gfx.fill({ color: AGENT_COLOR, alpha: 0.8 });
-        p.gfx.zIndex = 6;
+        p.gfx.circle(0, 0, 1.5);
+        p.gfx.fill({ color: p.color, alpha: 0.7 });
+        p.gfx.zIndex = 7;
         this.container.addChild(p.gfx);
       }
 
@@ -317,43 +664,39 @@ class SessionAgentSprite {
         p.gfx = null;
       }
     }
-
     this._particles = this._particles.filter((p) => p.life > 0);
-  }
-
-  _drawStreamDots() {
-    this._streamDots.clear();
-    const baseY = -BODY_H - HEAD_RADIUS * 2 - 4;
-    for (let i = 0; i < 3; i++) {
-      const phase = this.age * 4 + i * 0.5;
-      const alpha = 0.3 + Math.sin(phase) * 0.5;
-      const dotY = baseY - Math.abs(Math.sin(phase)) * 4;
-      this._streamDots.circle(-4 + i * 4, dotY, 1.5);
-      this._streamDots.fill({
-        color: STREAMING_COLOR,
-        alpha: clamp(alpha, 0.1, 1),
-      });
-    }
   }
 
   // ── External API ──────────────────────────────────────────────────
 
-  updateSession(session) {
+  updateFromInfo(agentInfo, session) {
     this.session = session;
-    const newStatus = session.status || "idle";
-    if (newStatus !== this.status) {
-      this.status = newStatus;
-      this._drawStatusDot();
+    const newActivity = agentInfo.activity || "idle";
+    const newRole = agentInfo.role || this.role;
+    this.target = agentInfo.target || this.target;
+    this.tool = agentInfo.tool || this.tool;
+
+    if (newActivity !== this.activity) {
+      this.activity = newActivity;
+      this._activityLabel.text = this._getActivityText();
+      // Walk to new zone for the activity
+      this.wanderTimer = rand(0.5, 2);
+    }
+
+    if (newRole !== this.role) {
+      this.role = newRole;
+      this._cfg = ROLE_CONFIG[this.role] || ROLE_CONFIG.main;
+      this._label.text = this._getLabelText();
     }
   }
 
   startFadeOut() {
     this.fadingOut = true;
     this.fadeTimer = 0;
+    this._spawnDoneParticles();
   }
 
   destroy() {
-    // Clean up particles
     for (const p of this._particles) {
       if (p.gfx?.parent) {
         this.container.removeChild(p.gfx);
@@ -361,11 +704,16 @@ class SessionAgentSprite {
       }
     }
     this._particles = [];
-
     if (this.container.parent) {
       this.container.parent.removeChild(this.container);
     }
     this.container.destroy({ children: true });
+  }
+
+  /** Hit test for tooltip. */
+  containsPoint(globalX, globalY) {
+    const bounds = this.container.getBounds();
+    return bounds.contains(globalX, globalY);
   }
 }
 
@@ -379,68 +727,248 @@ export class SessionAgents {
   constructor(app, worldContainer) {
     this._app = app;
     this._worldContainer = worldContainer;
-    /** @type {Map<number, SessionAgentSprite>} */
+
+    /** @type {Map<string, SessionSubAgentSprite>} agentId → sprite */
     this._agents = new Map();
+
+    this._layer = new Container();
+    this._layer.sortableChildren = true;
+    this._layer.zIndex = 2;
+    this._worldContainer.addChild(this._layer);
+
+    // Session connector lines
+    this._lineGfx = new Graphics();
+    this._lineGfx.zIndex = -1;
+    this._layer.addChild(this._lineGfx);
+
     this._tick = this._tick.bind(this);
     this._started = false;
+
+    // Tooltip state
+    this._tooltip = null;
+    this._hoveredAgent = null;
+    this._setupTooltip();
   }
 
-  /**
-   * Start the ticker.
-   */
   start() {
     if (this._started) return;
     this._app.ticker.add(this._tick);
     this._started = true;
-    console.log("[SessionAgents] Started");
+    console.log("[SessionAgents] Started (multi-agent mode)");
   }
 
   /**
    * Update from a new list of sessions (from IPC).
-   * Spawns new agents, removes ended ones.
+   * Each session now contains an agents[] array.
    * @param {Array} sessions
    */
   updateSessions(sessions) {
-    const activePids = new Set(sessions.map((s) => s.pid));
+    const activeIds = new Set();
 
-    // Fade out agents for ended sessions
-    for (const [pid, agent] of this._agents) {
-      if (!activePids.has(pid) && !agent.fadingOut) {
+    for (const session of sessions) {
+      const agents = session.agents || [];
+
+      // If no agents array (legacy), create one from session
+      if (agents.length === 0) {
+        agents.push({
+          id: `session-${session.pid}-agent-0`,
+          sessionPid: session.pid,
+          role: "main",
+          activity:
+            session.status === "streaming"
+              ? "thinking"
+              : session.status === "active"
+                ? "chatting"
+                : "idle",
+          target: session.task || null,
+          tool: null,
+        });
+      }
+
+      for (let i = 0; i < agents.length; i++) {
+        const agentInfo = agents[i];
+        const id = agentInfo.id;
+        activeIds.add(id);
+
+        if (this._agents.has(id)) {
+          this._agents.get(id).updateFromInfo(agentInfo, session);
+        } else {
+          const sprite = new SessionSubAgentSprite(
+            agentInfo,
+            session,
+            this._layer,
+            i,
+          );
+          this._agents.set(id, sprite);
+        }
+      }
+    }
+
+    // Fade out removed agents
+    for (const [id, agent] of this._agents) {
+      if (!activeIds.has(id) && !agent.fadingOut) {
         agent.startFadeOut();
       }
     }
-
-    // Spawn new agents for new sessions
-    for (const session of sessions) {
-      if (this._agents.has(session.pid)) {
-        // Update existing
-        this._agents.get(session.pid).updateSession(session);
-      } else {
-        // New session — spawn
-        const sprite = new SessionAgentSprite(session, this._worldContainer);
-        this._agents.set(session.pid, sprite);
-      }
-    }
   }
 
-  /**
-   * Per-frame update (called by PixiJS ticker).
-   * @param {number} dt — delta time in seconds
-   */
   update(dt) {
-    for (const [pid, agent] of this._agents) {
+    // Update all agents
+    for (const [id, agent] of this._agents) {
       agent.update(dt);
-      // Remove dead agents
       if (!agent.alive) {
         agent.destroy();
-        this._agents.delete(pid);
+        this._agents.delete(id);
+      }
+    }
+
+    // Draw session connector lines
+    this._drawSessionLines();
+
+    // Update tooltip position
+    this._updateTooltipPosition();
+  }
+
+  _drawSessionLines() {
+    this._lineGfx.clear();
+
+    // Group agents by session PID
+    const bySession = new Map();
+    for (const agent of this._agents.values()) {
+      if (agent.fadingOut) continue;
+      const pid = agent.sessionPid;
+      if (!bySession.has(pid)) bySession.set(pid, []);
+      bySession.get(pid).push(agent);
+    }
+
+    // Draw faint lines between agents of the same session
+    for (const agents of bySession.values()) {
+      if (agents.length < 2) continue;
+      const color = (ROLE_CONFIG[agents[0].role] || ROLE_CONFIG.main).color;
+      for (let i = 1; i < agents.length; i++) {
+        const a = agents[0];
+        const b = agents[i];
+        this._lineGfx.moveTo(a.x, a.y - 5);
+        this._lineGfx.lineTo(b.x, b.y - 5);
+        this._lineGfx.stroke({ color, alpha: 0.08, width: 0.8 });
       }
     }
   }
 
-  /**
-   * Tear down everything.
-   */
+  // ── Tooltip ───────────────────────────────────────────────────────
+
+  _setupTooltip() {
+    // Create DOM tooltip element
+    const tip = document.createElement("div");
+    tip.id = "session-agent-tooltip";
+    tip.style.cssText = `
+      position: fixed;
+      display: none;
+      pointer-events: none;
+      z-index: 9999;
+      background: rgba(15, 15, 25, 0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #e0e0e0;
+      max-width: 280px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      line-height: 1.5;
+    `;
+    document.body.appendChild(tip);
+    this._tooltip = tip;
+
+    // Track mouse for hover detection
+    this._mouseX = 0;
+    this._mouseY = 0;
+    const canvas = this._app.canvas;
+    if (canvas) {
+      canvas.addEventListener("mousemove", (e) => {
+        this._mouseX = e.clientX;
+        this._mouseY = e.clientY;
+        this._checkHover(e);
+      });
+      canvas.addEventListener("mouseleave", () => {
+        this._hideTooltip();
+      });
+    }
+  }
+
+  _checkHover(e) {
+    // Convert client coords to global pixi coords
+    const rect = this._app.canvas.getBoundingClientRect();
+    const globalX = e.clientX - rect.left;
+    const globalY = e.clientY - rect.top;
+
+    let found = null;
+    for (const agent of this._agents.values()) {
+      if (agent.fadingOut) continue;
+      if (agent.containsPoint(globalX, globalY)) {
+        found = agent;
+        break;
+      }
+    }
+
+    if (found && found !== this._hoveredAgent) {
+      this._hoveredAgent = found;
+      this._showTooltip(found);
+    } else if (!found && this._hoveredAgent) {
+      this._hoveredAgent = null;
+      this._hideTooltip();
+    }
+  }
+
+  _showTooltip(agent) {
+    if (!this._tooltip) return;
+    const cfg = ROLE_CONFIG[agent.role] || ROLE_CONFIG.main;
+    const colorHex = "#" + cfg.color.toString(16).padStart(6, "0");
+    const session = agent.session || {};
+    const cwd = session.cwd || "unknown";
+    const cwdShort =
+      cwd.length > 40 ? "..." + cwd.slice(-37) : cwd;
+    const target = agent.target || "none";
+    const targetShort =
+      target.length > 40 ? "..." + target.slice(-37) : target;
+
+    this._tooltip.innerHTML = `
+      <div style="color:${colorHex};font-weight:bold;margin-bottom:4px;">
+        ${cfg.label} Agent
+        <span style="color:#666;font-weight:normal;font-size:10px;">
+          PID ${agent.sessionPid}
+        </span>
+      </div>
+      <div style="color:#aaa;font-size:10px;margin-bottom:3px;">
+        ${cwdShort}
+      </div>
+      <div>
+        <span style="color:${colorHex};">${agent.role}</span>
+        &middot;
+        <span style="color:#ddd;">${agent.activity}</span>
+      </div>
+      <div style="color:#888;font-size:10px;">
+        Tool: ${agent.tool || "none"} &middot; Target: ${targetShort}
+      </div>
+      <div style="color:#555;font-size:10px;margin-top:3px;">
+        CPU ${session.cpu?.toFixed(1) || "?"}%
+        &middot; MEM ${session.mem?.toFixed(1) || "?"}%
+      </div>
+    `;
+    this._tooltip.style.display = "block";
+  }
+
+  _updateTooltipPosition() {
+    if (!this._tooltip || this._tooltip.style.display === "none") return;
+    this._tooltip.style.left = this._mouseX + 14 + "px";
+    this._tooltip.style.top = this._mouseY - 10 + "px";
+  }
+
+  _hideTooltip() {
+    if (this._tooltip) this._tooltip.style.display = "none";
+  }
+
   destroy() {
     if (this._started) {
       this._app.ticker.remove(this._tick);
@@ -450,14 +978,17 @@ export class SessionAgents {
       agent.destroy();
     }
     this._agents.clear();
+    if (this._layer.parent) {
+      this._layer.parent.removeChild(this._layer);
+    }
+    this._layer.destroy({ children: true });
+    if (this._tooltip?.parentNode) {
+      this._tooltip.parentNode.removeChild(this._tooltip);
+    }
     console.log("[SessionAgents] Destroyed");
   }
 
-  // ── Private ────────────────────────────────────────────────────────
-
-  /**
-   * @param {import('pixi.js').Ticker} ticker
-   */
+  /** @param {import('pixi.js').Ticker} ticker */
   _tick(ticker) {
     const dt = ticker.deltaMS / 1000;
     this.update(dt);
