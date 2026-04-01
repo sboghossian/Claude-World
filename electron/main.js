@@ -10,6 +10,7 @@ const {
 const path = require("path");
 const { initAutoUpdater } = require("./auto-updater");
 const backup = require("./backup");
+const claudeSessions = require("./claude-sessions");
 
 let mainWindow = null;
 let db = null;
@@ -244,6 +245,16 @@ app.whenReady().then(() => {
   const { registerHandlers } = require("./ipc-handlers");
   registerHandlers(ipcMain, db);
 
+  // Start live Claude Code session monitor
+  claudeSessions.startSessionMonitor((sessions) => {
+    // Push updates to all renderer windows
+    for (const win of BrowserWindow.getAllWindows()) {
+      if (!win.isDestroyed()) {
+        win.webContents.send("sessions:update", sessions);
+      }
+    }
+  });
+
   app.on("activate", () => {
     // macOS: re-create window when dock icon is clicked
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -258,6 +269,9 @@ app.on("window-all-closed", () => {
 });
 
 app.on("before-quit", () => {
+  // Stop session monitor
+  claudeSessions.stopSessionMonitor();
+
   // Graceful backup on quit (before DB close)
   backup.cleanup();
 

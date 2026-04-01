@@ -294,6 +294,17 @@ contextBridge.exposeInMainWorld("api", {
     },
   },
 
+  // ── Live Claude Sessions ───────────────────────────────────────────
+  sessions: {
+    getActive: () => ipcRenderer.invoke("sessions:getActive"),
+    getHistory: () => ipcRenderer.invoke("sessions:getHistory"),
+    onUpdate: (callback) => {
+      const handler = (_event, sessions) => callback(sessions);
+      ipcRenderer.on("sessions:update", handler);
+      return () => ipcRenderer.removeListener("sessions:update", handler);
+    },
+  },
+
   // ── App info ───────────────────────────────────────────────────────
   app: {
     getVersion: () => ipcRenderer.invoke("app:getVersion"),

@@ -32,6 +32,7 @@ let initPersonalityEngine, ThoughtBubbles, getQualityManager;
 let initVFX, initParticles, initCityLife, initDataFlows;
 let OnboardingCinema, NotificationCenter, Minimap, ActivityFeed;
 let initAgentSprites, DragDropSystem, ContextMenu;
+let SessionAgents;
 let getAchievementEngine, TutorialEngine, FocusMode;
 let TaskStream, AgentChat, StatusBar, PerfMonitor;
 
@@ -82,6 +83,7 @@ try {
   ({ Minimap } = await import("../ui/minimap.js"));
   ({ ActivityFeed } = await import("../ui/activity-feed.js"));
   ({ initAgentSprites } = await import("./agent-sprites.js"));
+  ({ SessionAgents } = await import("./session-agents.js"));
   ({ DragDropSystem } = await import("./drag-drop.js"));
   ({ ContextMenu } = await import("../ui/context-menu.js"));
 
@@ -439,6 +441,34 @@ async function boot() {
       }
     } catch (e) {
       console.warn("[boot] Sprites:", e.message);
+    }
+
+    try {
+      const pa = getApp();
+      if (pa && SessionAgents) {
+        const sessionAgents = new SessionAgents(pa, pa.stage);
+        sessionAgents.start();
+        window.__sessionAgents = sessionAgents;
+
+        // Load initial sessions
+        if (window.api?.sessions?.getActive) {
+          window.api.sessions
+            .getActive()
+            .then((sessions) => {
+              if (sessions?.length) sessionAgents.updateSessions(sessions);
+            })
+            .catch(() => {});
+        }
+
+        // Subscribe to live updates
+        if (window.api?.sessions?.onUpdate) {
+          window.api.sessions.onUpdate((sessions) => {
+            sessionAgents.updateSessions(sessions || []);
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("[boot] SessionAgents:", e.message);
     }
 
     try {

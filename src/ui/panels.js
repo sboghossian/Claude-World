@@ -234,6 +234,14 @@ const ZONE_INFO = {
     icon: "\u{1F4F0}",
     desc: "AI-powered daily summaries with stats, insights, goals, and weekly trends.",
   },
+  "live-sessions": {
+    icon: "\u{1F4BB}",
+    desc: "Live Claude Code CLI sessions running on your machine. Real-time process monitoring.",
+  },
+  live_sessions: {
+    icon: "\u{1F4BB}",
+    desc: "Live Claude Code CLI sessions running on your machine. Real-time process monitoring.",
+  },
 };
 
 const AGENT_INFO = {
@@ -544,6 +552,11 @@ async function buildZoneContent(zoneId) {
   if (zoneId === "daily-digest" || zoneId === "daily_digest") {
     const { DailyDigest } = await _loadZoneModule("../zones/daily-digest.js");
     return initZone(DailyDigest, wid);
+  }
+
+  if (zoneId === "live-sessions" || zoneId === "live_sessions") {
+    const { LiveSessions } = await _loadZoneModule("../zones/live-sessions.js");
+    return initZone(LiveSessions, wid);
   }
 
   // Check if this is a plugin-provided zone

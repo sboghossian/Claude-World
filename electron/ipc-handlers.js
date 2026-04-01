@@ -3490,4 +3490,16 @@ function registerHandlers(ipcMain, db) {
   });
 }
 
+  // ── Live Claude Sessions ─────────────────────────────────────────────
+  const claudeSessions = require("./claude-sessions");
+
+  ipcMain.handle("sessions:getActive", () => {
+    return claudeSessions.getActiveSessions();
+  });
+
+  ipcMain.handle("sessions:getHistory", () => {
+    return claudeSessions.getSessionHistory();
+  });
+}
+
 module.exports = { registerHandlers };
