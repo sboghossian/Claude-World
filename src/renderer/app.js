@@ -134,10 +134,25 @@ export async function initWorld() {
   decorations = new Decorations(app, worldContainer);
   decorations.init();
 
-  // ── Click handler ─────────────────────────────────────────────
+  // ── Click handler (with session house zoom support) ────────────
+  let _lastClickTime = 0;
   canvas.addEventListener("click", (e) => {
     if (!camera || !buildingManager) return;
     const worldPos = camera.screenToWorld(e.clientX, e.clientY);
+    const now = Date.now();
+    const isDoubleClick = now - _lastClickTime < 350;
+    _lastClickTime = now;
+
+    // Let session houses handle the click first (zoom interaction)
+    if (window.__sessionHouses) {
+      const consumed = window.__sessionHouses.handleClick(
+        worldPos.x,
+        worldPos.y,
+        isDoubleClick,
+      );
+      if (consumed) return;
+    }
+
     const hitZone = buildingManager.hitTest(worldPos.x, worldPos.y);
     if (hitZone) {
       console.log(

@@ -33,6 +33,7 @@ let initVFX, initParticles, initCityLife, initDataFlows;
 let OnboardingCinema, NotificationCenter, Minimap, ActivityFeed;
 let initAgentSprites, DragDropSystem, ContextMenu;
 let SessionAgents;
+let SessionHouses;
 let getAchievementEngine, TutorialEngine, FocusMode;
 let TaskStream, AgentChat, StatusBar, PerfMonitor;
 
@@ -84,6 +85,7 @@ try {
   ({ ActivityFeed } = await import("../ui/activity-feed.js"));
   ({ initAgentSprites } = await import("./agent-sprites.js"));
   ({ SessionAgents } = await import("./session-agents.js"));
+  ({ SessionHouses } = await import("./session-houses.js"));
   ({ DragDropSystem } = await import("./drag-drop.js"));
   ({ ContextMenu } = await import("../ui/context-menu.js"));
 
@@ -445,12 +447,34 @@ async function boot() {
 
     try {
       const pa = getApp();
-      if (pa && SessionAgents) {
+      const cam = getCamera();
+      const bm = getBuildingManager();
+      if (pa && cam && bm && SessionHouses) {
+        const sessionHouses = new SessionHouses(pa, pa.stage, cam, bm);
+        sessionHouses.start();
+        window.__sessionHouses = sessionHouses;
+
+        // Load initial sessions
+        if (window.api?.sessions?.getActive) {
+          window.api.sessions
+            .getActive()
+            .then((sessions) => {
+              if (sessions?.length) sessionHouses.updateSessions(sessions);
+            })
+            .catch(() => {});
+        }
+
+        // Subscribe to live updates
+        if (window.api?.sessions?.onUpdate) {
+          window.api.sessions.onUpdate((sessions) => {
+            sessionHouses.updateSessions(sessions || []);
+          });
+        }
+      } else if (pa && SessionAgents) {
+        // Fallback to free-roaming agents if SessionHouses unavailable
         const sessionAgents = new SessionAgents(pa, pa.stage);
         sessionAgents.start();
         window.__sessionAgents = sessionAgents;
-
-        // Load initial sessions
         if (window.api?.sessions?.getActive) {
           window.api.sessions
             .getActive()
@@ -459,8 +483,6 @@ async function boot() {
             })
             .catch(() => {});
         }
-
-        // Subscribe to live updates
         if (window.api?.sessions?.onUpdate) {
           window.api.sessions.onUpdate((sessions) => {
             sessionAgents.updateSessions(sessions || []);
@@ -468,7 +490,7 @@ async function boot() {
         }
       }
     } catch (e) {
-      console.warn("[boot] SessionAgents:", e.message);
+      console.warn("[boot] SessionHouses/Agents:", e.message);
     }
 
     try {
